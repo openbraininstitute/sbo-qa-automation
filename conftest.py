@@ -7,10 +7,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 
-@pytest.fixture(scope="module")
-def setup():
+@pytest.fixture(scope="class")
+def setup(request):
     browser = webdriver.Chrome()
     wait = WebDriverWait(browser, 10)
+    request.cls.browser = browser
     yield browser, wait
 
     browser.quit()

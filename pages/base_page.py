@@ -4,15 +4,16 @@ from locators.base_page_locators import BasePageLocators
 # from util.util_base import logger
 import pytest
 
-@pytest.mark.usefixtures("logger")
+@pytest.mark.usefixtures("setup", "logger")
 class BasePage:
 
-    def __init__(self, browser):
+    def __init__(self, browser, wait):
         self.browser = browser
-        self.wait = WebDriverWait(self.browser, 10)
+        self.wait = wait
+        self.url = "https://bbp.epfl.ch/mmb-beta"
         # self.logger = logger
 
 
     def wait_for_loading(self, logger):
         logger.info("Waiting for element to load")
-        self.wait.until_not(EC.presence_of_element_located(BasePageLocators.PAGE_LOAD))
+        element = WebDriverWait(self.browser, 10).until(EC.presence_of_element_located(BasePageLocators.PAGE_LOAD))

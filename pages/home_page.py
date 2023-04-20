@@ -1,3 +1,5 @@
+from selenium.webdriver.common.by import By
+
 from locators.home_page_locators import HomePageLocators
 from selenium.common.exceptions import TimeoutException
 import logging
@@ -8,14 +10,11 @@ from pages.base_page import BasePage
 
 class HomePage(BasePage):
 
-    def __init__(self, browser):
-        # super().__init__(browser)
-        self.browser = browser
-        self.url = "https://bbp.epfl.ch/mmb-beta"
-
-    # def load(self):
+    def __init__(self, browser, wait):
+        super().__init__(browser, wait)
     def go_to_home_page(self):
         self.browser.get(self.url)
-
+    def find_explore_title(self):
+        return self.wait.until(EC.presence_of_element_located(HomePageLocators.EXPLORE_TITLE))
     def find_login_button(self):
-        return self.wait.until(EC.element_to_be_clickable(*HomePageLocators.LOGIN_BUTTON))
+        return self.wait.until(EC.element_to_be_clickable(HomePageLocators.LOGIN_BUTTON))
