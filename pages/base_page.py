@@ -2,8 +2,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from locators.base_page_locators import BasePageLocators
 # from util.util_base import logger
+import pytest
 
-
+@pytest.mark.usefixtures("logger")
 class BasePage:
 
     def __init__(self, browser):
@@ -12,6 +13,6 @@ class BasePage:
         # self.logger = logger
 
 
-    def wait_for_loading(self):
-        self.logger.info("Waiting for element to load")
+    def wait_for_loading(self, logger):
+        logger.info("Waiting for element to load")
         self.wait.until_not(EC.presence_of_element_located(BasePageLocators.PAGE_LOAD))

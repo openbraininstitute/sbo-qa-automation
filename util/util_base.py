@@ -25,7 +25,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 # @pytest.fixture(scope="module")
 # def logger():
-#     logger = logging.getLogger(__name__)
+#     logging.basicConfig(level=logging.INFO)
+#     logger = logging.getLogger()
 #     logger.setLevel(logging.DEBUG)
 #
 #     console_handler = logging.StreamHandler()
