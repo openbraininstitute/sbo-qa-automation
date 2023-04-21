@@ -1,3 +1,6 @@
 .DS_Store
 .idea/
 data/.DS_Store
+config.yaml
+geckodriver.log
+test.log
