@@ -9,7 +9,11 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 @pytest.fixture(scope="class")
 def setup(request):
+
+    # Initialize webdriver object
     browser = webdriver.Chrome()
+
+    # Setting explicit wait
     wait = WebDriverWait(browser, 10)
     request.cls.browser = browser
     yield browser, wait
@@ -19,6 +23,8 @@ def setup(request):
 
 @pytest.fixture(scope="module")
 def logger():
+
+    # Initializing the logger object
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)

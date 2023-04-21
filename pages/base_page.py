@@ -11,8 +11,6 @@ class BasePage:
         self.browser = browser
         self.wait = wait
         self.url = "https://bbp.epfl.ch/mmb-beta"
-        # self.logger = logger
-
 
     def wait_for_loading(self, logger):
         logger.info("Waiting for element to load")

@@ -16,5 +16,12 @@ class HomePage(BasePage):
         self.browser.get(self.url)
     def find_explore_title(self):
         return self.wait.until(EC.presence_of_element_located(HomePageLocators.EXPLORE_TITLE))
+
+    def find_build_title(self):
+        return self.wait.until(EC.presence_of_element_located(HomePageLocators.BUILD_TITLE))
+
+    def find_simulate_title(self):
+        return self.wait.until(EC.presence_of_element_located(HomePageLocators.SIMULATE_TITLE))
+
     def find_login_button(self):
         return self.wait.until(EC.element_to_be_clickable(HomePageLocators.LOGIN_BUTTON))
