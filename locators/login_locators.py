@@ -6,3 +6,4 @@ class LoginPageLocators:
     USERNAME = (By.XPATH, '//input[@id="username"]')
     PASSWORD = (By.XPATH, '//input[@id="password"]')
     SIGN_IN = (By.ID, 'kc-login')
+    LOGOUT = (By.XPATH,'//button[text()="Logout"]')

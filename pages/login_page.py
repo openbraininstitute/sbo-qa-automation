@@ -22,3 +22,6 @@ class LoginPage(HomePage):
 
     def find_signin_button(self):
         return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.SIGN_IN))
+
+    def find_logout_button(self):
+        return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.LOGOUT))
