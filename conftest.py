@@ -16,6 +16,7 @@ def setup(request):
     # Setting explicit wait
     wait = WebDriverWait(browser, 10)
     request.cls.browser = browser
+    request.cls.wait = wait
     yield browser, wait
 
     browser.quit()
