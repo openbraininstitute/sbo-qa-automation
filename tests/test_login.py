@@ -1,10 +1,9 @@
 import time
 import pytest
-from pages.login_page import LoginPage
-from pages.home_page import HomePage
 from util.util_base import load_config
 
-@pytest.mark.usefixtures("setup","logger", "navigate_to_login")
+
+@pytest.mark.usefixtures("setup", "logger", "navigate_to_login")
 class TestLogin:
 
     def test_login(self, setup, logger, login):
@@ -34,6 +33,3 @@ class TestLogin:
         logout_button = login.find_logout_button()
         assert logout_button.is_displayed()
         logger.info('The user is logged in and logout button is displayed')
-
-
-

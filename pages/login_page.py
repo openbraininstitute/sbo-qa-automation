@@ -1,6 +1,4 @@
-from locators.home_page_locators import HomePageLocators
 from locators.login_locators import LoginPageLocators
-from pages.base_page import BasePage
 from selenium.webdriver.support import expected_conditions as EC
 
 from pages.home_page import HomePage

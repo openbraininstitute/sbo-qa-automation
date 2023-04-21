@@ -1,12 +1,7 @@
 import time
-
 import pytest
-
-from locators.home_page_locators import HomePageLocators
 from pages.home_page import HomePage
-from selenium.webdriver.support import expected_conditions as EC
 
-from pages.login_page import LoginPage
 
 
 @pytest.mark.usefixtures("setup", "logger")
