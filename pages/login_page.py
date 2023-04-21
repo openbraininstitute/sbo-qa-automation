@@ -14,12 +14,11 @@ class LoginPage(HomePage):
         self.browser.get(url)
         self.wait.until(EC.url_contains(url))
 
-    # def find_login_button(self):
-    #     return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.LOGIN_BUTTON))
-
-    # def login(self, username):
-    #    # return self.driver.find_element(LoginPageLocators.USERNAME)
-    #     pass
-
-    def find_username(self):
+    def find_username_field(self):
         return self.wait.until(EC.presence_of_element_located(LoginPageLocators.USERNAME))
+
+    def find_password_field(self):
+        return self.wait.until(EC.presence_of_element_located(LoginPageLocators.PASSWORD))
+
+    def find_signin_button(self):
+        return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.SIGN_IN))
