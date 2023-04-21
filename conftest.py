@@ -5,6 +5,8 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+from pages.home_page import HomePage
+from pages.login_page import LoginPage
 
 
 @pytest.fixture(scope="class")
@@ -43,3 +45,24 @@ def logger():
     logger.addHandler(file_handler)
 
     return logger
+
+
+@pytest.fixture(scope="function")
+def navigate_to_login(setup):
+    browser, wait = setup
+    home_page = HomePage(browser, wait)
+    home_page.go_to_home_page()
+    login_button = home_page.find_login_button()
+    assert login_button.is_displayed()
+    login_button.click()
+    wait.until(EC.url_contains("auth"))
+    login_url = browser.current_url
+    yield login_url
+
+
+@pytest.fixture(scope="function")
+def login(setup, navigate_to_login):
+    login_page = LoginPage(*setup)
+    login_page.go_to_login_page(navigate_to_login)
+    yield login_page
+

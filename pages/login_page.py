@@ -9,7 +9,6 @@ from pages.home_page import HomePage
 class LoginPage(HomePage):
     def __init__(self, browser, wait):
         super().__init__(browser, wait)
-        self.url = "https://bbp.epfl.ch/mmb-beta/login"
 
     def go_to_login_page(self, url):
         self.browser.get(url)
