@@ -1,12 +1,11 @@
-import os
 import logging
 import pytest
-
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
+from util.util_base import load_config
 
 
 @pytest.fixture(scope="class")
@@ -47,11 +46,19 @@ def logger():
     return logger
 
 
+# This is the initial fixture that works
 @pytest.fixture(scope="function")
+def login(setup, navigate_to_login):
+    login_page = LoginPage(*setup)
+    login_page.go_to_login_page(navigate_to_login)
+    yield login_page
+
+# Login fixture that is used throughout the project
+@pytest.fixture(scope="class")
 def navigate_to_login(setup):
     browser, wait = setup
-    home_page = HomePage(browser, wait)
-    home_page.go_to_home_page()
+    browser.get("https://bbp.epfl.ch/mmb-beta")
+    home_page = HomePage(*setup)
     login_button = home_page.find_login_button()
     assert login_button.is_displayed()
     login_button.click()
@@ -59,10 +66,20 @@ def navigate_to_login(setup):
     login_url = browser.current_url
     yield login_url
 
+# @pytest.fixture(scope="function")
+# def login(setup, navigate_to_login):
+#     login_page = LoginPage(*setup)
+#     login_page.go_to_login_page(navigate_to_login)
+#     config = load_config()
+#     user_name_field = login.find_username_field()
+#     assert user_name_field.is_displayed()
+#     user_name_field.send_keys(config['username'])
+#     yield login_page
 
-@pytest.fixture(scope="function")
-def login(setup, navigate_to_login):
-    login_page = LoginPage(*setup)
-    login_page.go_to_login_page(navigate_to_login)
-    yield login_page
+
+
+
+
+
+
 

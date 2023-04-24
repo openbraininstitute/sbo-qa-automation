@@ -1,6 +1,7 @@
+import time
+
 from locators.login_locators import LoginPageLocators
 from selenium.webdriver.support import expected_conditions as EC
-
 from pages.home_page import HomePage
 
 

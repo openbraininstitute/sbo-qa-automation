@@ -6,3 +6,4 @@ class HomePageLocators:
     EXPLORE_TITLE = (By.XPATH, "//div[text()='Explore']")
     BUILD_TITLE = (By.XPATH, "//div[text()='Build']")
     SIMULATE_TITLE = (By.XPATH, "//div[text()='Simulate']")
+    BUILD_URL = (By.XPATH, '//a[@href="/mmb-beta/build/load-brain-config"]')
