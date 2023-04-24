@@ -8,14 +8,20 @@ from pages.login_page import LoginPage
 class BuildPage(HomePage):
     def __init__(self, browser, wait):
         super().__init__(browser, wait)
-        self.login_page = LoginPage(browser, wait)
+        self.login_page = HomePage(browser, wait)
 
     def go_to_build_page(self):
-        self.wait.until(EC.element_to_be_clickable(HomePageLocators.BUILD_URL)).click()
-
-
-    # def click_on_build_page_url(self):
-    #     self.browser.get(HomePage.BUILD_URL)
+        self.browser.get(self.url + "/build/load-brain-config")
+        return self.browser.current_url
 
     def find_recent_configurations(self):
-        self.wait.until(EC.presence_of_element_located(BuildPageLocators.RECENT_CONFIGURATIONS))
+        return self.wait.until(EC.presence_of_element_located(BuildPageLocators.RECENT_CONFIGURATIONS))
+
+    # def find_recent_configurations(self):
+    #     try:
+    #         return self.wait.until(EC.presence_of_element_located(BuildPageLocators.RECENT_CONFIGURATIONS))
+    #     except:
+    #         return None
+
+    def verify_release_version(self):
+        return self.wait.until(EC.presence_of_element_located(BuildPageLocators.RELEASE_VERSION))

@@ -8,8 +8,8 @@ from util.util_base import load_config
 
 class TestBuild:
     def test_build_page(self, setup, logger, login, navigate_to_login):
-        # navigate to the home page
-        # login to the site
+        # Navigate to the home page
+        # Login to the site
         login_page = login
         username_field = login_page.find_username_field()
         username_field.send_keys(load_config()['username'])
@@ -18,11 +18,19 @@ class TestBuild:
         sign_in_button = login_page.find_signin_button()
         sign_in_button.click()
 
+        # Navigate to the Build page
         build_page = BuildPage(*setup)
         build_url = build_page.go_to_build_page()
-        time.sleep(3)
-        login.browser.get(build_url)
-        time.sleep(3)
+        assert build_url == 'https://bbp.epfl.ch/mmb-beta/build/load-brain-config'
+
+        # Find "Text on Build Page"
+        recent_config = build_page.find_recent_configurations()
+        assert recent_config.text == "Recently used configurations"
+
+        # Check the Release version
+        verify_release_version = build_page.verify_release_version()
+        assert verify_release_version.text == "Release 23.01"
+
 
 
 
