@@ -31,6 +31,10 @@ class TestBuild:
         verify_release_version = build_page.verify_release_version()
         assert verify_release_version.text == "Release 23.01"
 
+        plus_icon_open_default_config = build_page.select_default_config().click()
 
-
+        # Find the public configuration referring to Release 23.01
+        # select_public_config = build_page.public_config_release().click()
+        # txt = select_public_config.text
+        # print("FINDING PUBLIC CONFIG WITH THE LATEST RELEASE VERSION", txt)
 
