@@ -10,6 +10,8 @@ from util.util_base import load_config
 class TestLogin:
 
     def test_login(self, setup, logger, login):
+        # Access the login fixture
+        # Find the username/password fields and enter credentials
         login_page = LoginPage(*setup)
         username_field = login_page.find_username_field()
         assert username_field.is_displayed()
@@ -21,11 +23,13 @@ class TestLogin:
         logger.info('The password field is displayed')
         password_field.send_keys(load_config()['password'])
 
+        # Find and click on sign in button
         sign_in_button = login_page.find_signin_button()
         assert sign_in_button.is_displayed()
         sign_in_button.click()
         logger.info('The user is logged in the SBO')
 
+        # If he user is logged in, log out button should be present
         logout_button = login_page.find_logout_button()
         assert logout_button.is_displayed()
         logger.info('The user is logged in and logout button is displayed')

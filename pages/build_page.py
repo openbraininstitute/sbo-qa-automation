@@ -1,8 +1,6 @@
 from locators.build_page_locators import BuildPageLocators
-from locators.home_page_locators import HomePageLocators
 from selenium.webdriver.support import expected_conditions as EC
 from pages.home_page import HomePage
-from pages.login_page import LoginPage
 
 
 class BuildPage(HomePage):
@@ -23,9 +21,3 @@ class BuildPage(HomePage):
     def select_default_config(self):
         return self.wait.until(EC.presence_of_element_located(BuildPageLocators.BUILD_PAGE_CLICK_PLUS_ICON))
 
-    # def public_config_release(self):
-    #     pub = self.wait.until(EC.presence_of_element_located(BuildPageLocators.PUBLIC_CONFIG_RELEASE))
-    #     if pub:
-    #         return pub
-    #     else:
-    #         self.wait.until(EC.presence_of_element_located(BuildPageLocators.BUILD_CONFIGURATION_NEXT_PAGE)).click()

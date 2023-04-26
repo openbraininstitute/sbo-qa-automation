@@ -1,4 +1,6 @@
 import logging
+import time
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
@@ -8,6 +10,7 @@ from pages.login_page import LoginPage
 from util.util_base import load_config
 
 
+# The setup fixture used throughout the project
 @pytest.fixture(scope="class")
 def setup(request):
 
@@ -23,6 +26,7 @@ def setup(request):
     browser.quit()
 
 
+# Logger object fixture
 @pytest.fixture(scope="module")
 def logger():
 
@@ -46,14 +50,14 @@ def logger():
     return logger
 
 
-# This is the initial fixture that works
+# Fixture that navigates to the login page
 @pytest.fixture(scope="function")
 def login(setup, navigate_to_login):
     login_page = LoginPage(*setup)
     login_page.go_to_login_page(navigate_to_login)
     yield login_page
 
-# Login fixture that is used throughout the project
+# Login & credentials fixture that is used throughout the project
 @pytest.fixture(scope="class")
 def navigate_to_login(setup):
     browser, wait = setup
@@ -66,18 +70,19 @@ def navigate_to_login(setup):
     login_url = browser.current_url
     yield login_url
 
-# @pytest.fixture(scope="function")
-# def login(setup, navigate_to_login):
-#     login_page = LoginPage(*setup)
-#     login_page.go_to_login_page(navigate_to_login)
-#     config = load_config()
-#     user_name_field = login.find_username_field()
-#     assert user_name_field.is_displayed()
-#     user_name_field.send_keys(config['username'])
-#     yield login_page
 
-
-
+# Create the login_explore fixture with username/password so that it can be re-used.
+@pytest.fixture(scope="function")
+def login_explore(setup, navigate_to_login):
+    browser, wait = setup
+    login_page = LoginPage(*setup)
+    login_page.go_to_login_page(navigate_to_login)
+    login_page.find_username_field().send_keys(load_config()['username'])
+    login_page.find_password_field().send_keys(load_config()['password'])
+    login_page.find_signin_button().click()
+    # time.sleep(5)
+    wait.until(EC.url_contains("mmb-beta"))
+    yield browser, wait
 
 
 

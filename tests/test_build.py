@@ -22,19 +22,20 @@ class TestBuild:
         build_page = BuildPage(*setup)
         build_url = build_page.go_to_build_page()
         assert build_url == 'https://bbp.epfl.ch/mmb-beta/build/load-brain-config'
+        logger.info("Build page is displayed")
 
-        # Find "Text on Build Page"
+        # Find "titles on the Build Page"
         recent_config = build_page.find_recent_configurations()
         assert recent_config.text == "Recently used configurations"
+        logger.info("Build page main titles are displayed, such as Recent recently used configurations")
 
         # Check the Release version
         verify_release_version = build_page.verify_release_version()
         assert verify_release_version.text == "Release 23.01"
+        logger.info("Build page release version is displayed")
 
+        # Find the default public config and click on it
         plus_icon_open_default_config = build_page.select_default_config().click()
+        logger.info("Accessing public config link via plus icon")
 
-        # Find the public configuration referring to Release 23.01
-        # select_public_config = build_page.public_config_release().click()
-        # txt = select_public_config.text
-        # print("FINDING PUBLIC CONFIG WITH THE LATEST RELEASE VERSION", txt)
 
