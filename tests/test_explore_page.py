@@ -23,17 +23,21 @@ class TestExplorePage:
         brain_txt = brain_and_cells.text
         print(brain_txt)
         assert brain_txt == "Brain & cells annotations"
+        logger.info("Checking that the Brain & cells annotations is present")
 
         experimental_data = explore_page.experimental_data_title()
         exp_data = experimental_data.text
-        assert exp_data == "Experimental Data"
+        assert exp_data == "Experimental data"
+        logger.info("Experimental data title is present on the page")
 
         digital_reconstruction = explore_page.digital_reconstruction_title()
         digital = digital_reconstruction.text
         print(digital, "CHECKING DIGITAL")
-        assert digital == "Digital reconstructions"
+        assert digital == "Brain models"
+        logger.info("Brain models title is present and unchanged")
 
         simulations = explore_page.simulations_title()
         simul = simulations.text
         print(simul, "CHECKING SIMULATIONS")
         assert simul == "Simulations"
+        logger.info("Verifying Simulations title is found on the page")
