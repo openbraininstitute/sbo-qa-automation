@@ -1,6 +1,6 @@
+import html
 import logging
-import time
-
+import os
 import pytest
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
@@ -8,12 +8,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from util.util_base import load_config
+import allure
 
 
 # The setup fixture used throughout the project
 @pytest.fixture(scope="class")
 def setup(request):
-
     # Initialize webdriver object
     browser = webdriver.Chrome()
 
@@ -29,7 +29,6 @@ def setup(request):
 # Logger object fixture
 @pytest.fixture(scope="module")
 def logger():
-
     # Initializing the logger object
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger()
@@ -56,6 +55,7 @@ def login(setup, navigate_to_login):
     login_page = LoginPage(*setup)
     login_page.go_to_login_page(navigate_to_login)
     yield login_page
+
 
 # Login & credentials fixture that is used throughout the project
 @pytest.fixture(scope="class")
@@ -85,6 +85,35 @@ def login_explore(setup, navigate_to_login):
     yield browser, wait
 
 
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+    if rep.when == "call" and rep.failed:
+        try:
+            os.makedirs("screenshots")
+        except FileExistsError:
+            pass  # Directory already exists
+        screenshot_path = os.path.join("screenshots", f"{item.name}.png")
+        browser = item.parent.obj.browser
+        browser.save_screenshot(screenshot_path)
+        allure.attach.file(screenshot_path, attachment_type=allure.attachment_type.PNG)
 
 
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "skip_on_failure: mark test to be skipped if it fails"
+    )
 
+
+def pytest_html_report_title(report):
+    report.title = "SBO Test Automation Report"
+
+
+def pytest_html_results_table_row(report, cells):
+    if report.failed:
+        cells.insert(1, ("✘", "success"))
+    elif report.failed:
+        cells.insert(1, ("✔", "error"))
+    else:
+        cells.insert(1, ("?", "skipped"))

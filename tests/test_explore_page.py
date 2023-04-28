@@ -10,7 +10,6 @@ class TestExplorePage:
         browser, wait = login_explore
         explore_page = ExplorePage(browser, wait)
         exp_url = explore_page.go_to_explore_page()
-        # assert EC.url_contains("explore") in browser.current_url
         assert exp_url == "https://bbp.epfl.ch/mmb-beta/explore"
         logger.info("Explore page is loaded")
 
