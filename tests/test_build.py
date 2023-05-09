@@ -22,6 +22,12 @@ class TestBuild:
         logger.info("Build page release version is displayed")
 
         # Find the default public config and click on it
-        plus_icon_open_default_config = build_page.select_default_config().click()
-        logger.info("Accessing public config link via plus icon")
+        # plus_icon_open_default_config = build_page.select_default_config().click()
+        # logger.info("Accessing default public config link via plus icon")
+
+        # Find the search field and enter 'Custom model configuration' as a search param
+        find_search_textfield = build_page.find_config_search_field()
+        find_search_textfield.send_keys("Custom model configuration")
+
+        time.sleep(4)
 

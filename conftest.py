@@ -1,4 +1,3 @@
-import html
 import logging
 import os
 import pytest
@@ -9,6 +8,7 @@ from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from util.util_base import load_config
 import allure
+import argparse
 
 
 # The setup fixture used throughout the project
@@ -80,9 +80,24 @@ def login_explore(setup, navigate_to_login):
     login_page.find_username_field().send_keys(load_config()['username'])
     login_page.find_password_field().send_keys(load_config()['password'])
     login_page.find_signin_button().click()
-    # time.sleep(5)
     wait.until(EC.url_contains("mmb-beta"))
     yield browser, wait
+
+
+def pytest_addoption(parser):
+    parser.addoption("--no-report", action="store_true", help="Disable report generation")
+
+
+def pytest_configure(config):
+    generate_report = not config.getoption("--no-report")
+    if generate_report:
+        # Generate report code
+        config.addinivalue_line(
+            "markers", "skip_on_failure: mark test to be skipped if it fails"
+        )
+
+    else:
+        print("Report generation disabled")
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -98,12 +113,6 @@ def pytest_runtest_makereport(item, call):
         browser = item.parent.obj.browser
         browser.save_screenshot(screenshot_path)
         allure.attach.file(screenshot_path, attachment_type=allure.attachment_type.PNG)
-
-
-def pytest_configure(config):
-    config.addinivalue_line(
-        "markers", "skip_on_failure: mark test to be skipped if it fails"
-    )
 
 
 def pytest_html_report_title(report):

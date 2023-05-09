@@ -9,7 +9,6 @@ class HomePage(BasePage):
     def __init__(self, browser, wait):
         super().__init__(browser, wait)
         self.url = "https://bbp.epfl.ch/mmb-beta"
-        # self.url = "https://example.com"
     def go_to_home_page(self):
         self.browser.get(self.url)
     def find_explore_title(self):

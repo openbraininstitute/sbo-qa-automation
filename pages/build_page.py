@@ -21,3 +21,5 @@ class BuildPage(HomePage):
     def select_default_config(self):
         return self.wait.until(EC.presence_of_element_located(BuildPageLocators.BUILD_PAGE_CLICK_PLUS_ICON))
 
+    def find_config_search_field(self):
+        return self.wait.until(EC.presence_of_element_located(BuildPageLocators.CONFIG_SEARCH_FIELD))
