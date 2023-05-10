@@ -3,7 +3,6 @@ from locators.home_page_locators import HomePageLocators
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
 
-
 class HomePage(BasePage):
 
     def __init__(self, browser, wait):

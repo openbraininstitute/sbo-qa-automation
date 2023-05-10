@@ -1,7 +1,10 @@
 import time
 import pytest
+from selenium.webdriver import ActionChains, Keys
+
 from pages.build_page import BuildPage
 from util.util_base import load_config
+
 
 class TestBuild:
     @pytest.mark.build_page
@@ -29,5 +32,24 @@ class TestBuild:
         find_search_textfield = build_page.find_config_search_field()
         find_search_textfield.send_keys("Custom model configuration")
 
-        time.sleep(4)
+        # Use public config
+        use_public_config = build_page.use_custom_config()
 
+        # wait_for_presence_in_DOM_config = build_page.wait_for_presence_of_custom_config()
+        # wait_for_visibility_config = build_page.wait_for_custom_config_to_be_visible()
+
+        # if wait_for_visibility_config:
+        # Clone the public config
+        clone_public_config = build_page.clone_custom_config().click()
+        logger.info("'Clone' button is clicked")
+
+        # Edit configuration modal is found
+        edit_modal = build_page.find_edit_config_modal()
+        logger.info("Edit configuration modal is displayed")
+        clear_default_config_name = build_page.clear_default_config_name()
+
+        # The BACKSPACE repeatedly delete previous value (name of previous config)
+        while clear_default_config_name.get_property('value'):
+            clear_default_config_name.send_keys(Keys.BACKSPACE)
+        set_config_name = build_page.set_your_config_name().send_keys("Cloned public config")
+        time.sleep(3)

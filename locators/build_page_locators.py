@@ -12,6 +12,6 @@ class BuildPageLocators:
     BTN_CLONE_CONFIG = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[@class ='ant-table-row ant-table-row-level-0'][1]/td[4]/button[2]")
     EDIT_MODAL = (By.CSS_SELECTOR, 'div[role="dialog"][aria-modal="true"]')
     EDIT_CONFIG_DIALOG = (By.XPATH, "//div[@role='dialog' and @aria-modal='true']//div[@class='ant-modal-confirm-body']//span[text()='Edit configuration']")
-    CONFIG_TEXT_FIELD_NAME = (By.CSS_SELECTOR, '#name[value="Test main configuration_"]')
-    CHANGE_CONFIG_NAME = (By.CSS_SELECTOR, "#name")
+    CONFIG_TEXT_FIELD_NAME = (By.CSS_SELECTOR, '#name')
+    CHANGE_CONFIG_NAME_TEXT_FIELD = (By.CSS_SELECTOR, "#name")
     BTN_START_EDITING = (By.XPATH, "//span[contains(text(), 'Start editing')]")

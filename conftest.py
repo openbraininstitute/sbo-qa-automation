@@ -19,6 +19,8 @@ def setup(request):
 
     # Setting explicit wait
     wait = WebDriverWait(browser, 10)
+    browser.set_window_position(-1000,0)
+    browser.maximize_window()
     request.cls.browser = browser
     request.cls.wait = wait
     yield browser, wait
@@ -89,13 +91,20 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    generate_report = not config.getoption("--no-report")
+    if config.getoption("--no-report"):
+        generate_report = False
+        print("Report generation disabled")
+    else:
+        generate_report = True
+        print("Report generation enabled")
+
+    # generate_report = not config.getoption("--no-report")
+    # print(f"Generate report: {generate_report}")
     if generate_report:
         # Generate report code
         config.addinivalue_line(
             "markers", "skip_on_failure: mark test to be skipped if it fails"
         )
-
     else:
         print("Report generation disabled")
 
@@ -126,3 +135,6 @@ def pytest_html_results_table_row(report, cells):
         cells.insert(1, ("✔", "error"))
     else:
         cells.insert(1, ("?", "skipped"))
+
+
+# os.environ["DISPLAY"] = ":0"
