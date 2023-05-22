@@ -13,3 +13,9 @@ def load_config():
         print(f"Error loading config: {e}")
         return \
             None
+
+
+def load_links():
+    with open('links.json', 'r') as file:
+        links = json.load(file)
+    return links

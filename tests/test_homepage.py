@@ -1,11 +1,13 @@
+import json
 import time
 import pytest
 from pages.home_page import HomePage
+from util.links_checker import LinkChecker
 
 
 
 @pytest.mark.usefixtures("setup", "logger")
-class TestFindLogin:
+class TestFindLogin():
 
     def test_find_homepage_titles(self, setup, logger, login):
         home_page = HomePage(*setup)
@@ -24,3 +26,15 @@ class TestFindLogin:
         assert login_button.is_displayed()
         logger.info('the button is found')
 
+    def test_links(self):
+        link_checker = LinkChecker()
+
+        with open('links.json') as f:
+            links = json.load(f)['main_page_links']  # Assuming 'home_page' is the key for the links on the home page
+
+        for link in links:
+            is_valid = link_checker.check_link(link)
+            if is_valid:
+                print(f"Link is valid: {link}")
+            else:
+                print(f"Broken link found: {link}")
