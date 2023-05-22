@@ -14,5 +14,6 @@ class BuildPageLocators:
     EDIT_CONFIG_DIALOG = (By.XPATH, "//div[@role='dialog' and @aria-modal='true']//div[@class='ant-modal-confirm-body']//span[text()='Edit configuration']")
     CONFIG_TEXT_FIELD_NAME = (By.CSS_SELECTOR, '#name')
     CHANGE_CONFIG_NAME_TEXT_FIELD = (By.CSS_SELECTOR, "#name")
+    DESCRIPTION = (By.ID, 'description')
     BTN_START_EDITING = (By.XPATH, "//span[text()='Start editing']")
     BASIC_CELL_GROUPS_AND_REGIONS = (By.XPATH, "//span[contains(text(),'Basic cell groups and regions')]")

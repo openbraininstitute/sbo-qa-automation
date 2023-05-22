@@ -37,12 +37,22 @@ class BuildPage(HomePage):
     def find_edit_config_modal(self):
         return self.wait.until(EC.visibility_of_element_located(BuildPageLocators.EDIT_MODAL))
 
-    def clear_default_config_name(self):
+    def find_default_config_name(self):
         return self.wait.until(EC.visibility_of_element_located(BuildPageLocators.CONFIG_TEXT_FIELD_NAME))
 
     def set_your_config_name(self):
         return self.wait.until(
             lambda d: EC.visibility_of_element_located(BuildPageLocators.CHANGE_CONFIG_NAME_TEXT_FIELD)(d)
+        )
+
+    def clear_default_description_name(self):
+        return self.wait.until(
+            lambda d: EC.visibility_of_element_located(BuildPageLocators.DESCRIPTION)(d)
+        )
+
+    def set_config_description(self):
+        return self.wait.until(
+            lambda d: EC.visibility_of_element_located(BuildPageLocators.DESCRIPTION)(d)
         )
 
     def push_start_editing(self):
