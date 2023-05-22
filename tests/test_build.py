@@ -1,4 +1,6 @@
 import time
+import uuid
+
 import pytest
 from selenium.webdriver import ActionChains, Keys
 
@@ -35,10 +37,6 @@ class TestBuild:
         # Use public config
         use_public_config = build_page.use_custom_config()
 
-        # wait_for_presence_in_DOM_config = build_page.wait_for_presence_of_custom_config()
-        # wait_for_visibility_config = build_page.wait_for_custom_config_to_be_visible()
-
-        # if wait_for_visibility_config:
         # Clone the public config
         clone_public_config = build_page.clone_custom_config().click()
         logger.info("'Clone' button is clicked")
@@ -48,8 +46,20 @@ class TestBuild:
         logger.info("Edit configuration modal is displayed")
         clear_default_config_name = build_page.clear_default_config_name()
 
-        # The BACKSPACE repeatedly delete previous value (name of previous config)
+        # The BACKSPACE repeatedly deletes the previous value (name of previous config)
         while clear_default_config_name.get_property('value'):
             clear_default_config_name.send_keys(Keys.BACKSPACE)
-        set_config_name = build_page.set_your_config_name().send_keys("Cloned public config")
-        time.sleep(3)
+        generate_config_name = "Config_" + str(uuid.uuid4())
+        set_config_name = build_page.set_your_config_name().send_keys(generate_config_name)
+
+
+        # Click Start editing button
+        start_editing = build_page.push_start_editing()
+        time.sleep(15)
+        start_editing.click()
+
+
+        # Get the current URL and assert that it matches the expected URL
+        current_url = browser.current_url
+        assert "https://bbp.epfl.ch/mmb-beta/build/cell-composition" in current_url
+
