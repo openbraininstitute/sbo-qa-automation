@@ -55,6 +55,9 @@ class BuildPage(HomePage):
             lambda d: EC.visibility_of_element_located(BuildPageLocators.DESCRIPTION)(d)
         )
 
+    def click_on_description(self):
+        return self.wait.until(EC.visibility_of_element_located(BuildPageLocators.DESCRIPTION))
+
     def push_start_editing(self):
         return self.wait.until(
             lambda d: EC.element_to_be_clickable(BuildPageLocators.BTN_START_EDITING)(d)

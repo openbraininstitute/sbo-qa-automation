@@ -9,3 +9,4 @@ class ExplorePageLocators:
     EXPERIMENTAL_DATA = (By.XPATH, "//h1[contains(text(), 'Experimental data')]")
     DIGITAL_RECONSTRUCTION = (By.XPATH, "//h1[text()='Brain models']")
     SIMULATIONS = (By.XPATH, "//h1[text()='Simulations']")
+    NEURON_EPHYS = (By.XPATH, "//")

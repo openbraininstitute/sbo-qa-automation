@@ -41,7 +41,62 @@ class TestBuild:
         clone_public_config = build_page.clone_custom_config().click()
         logger.info("'Clone' button is clicked")
 
-        # Edit configuration modal is found
+        # ****************** Try out
+        # Find the name input field in the modal
+        find_default_config_name = build_page.find_default_config_name()
+
+        # Clear any existing value in the name input field
+        while find_default_config_name.get_property('value'):
+            find_default_config_name.send_keys(Keys.BACKSPACE)
+
+        # Generate a unique configuration name
+        generate_config_name = "Config_" + str(uuid.uuid4())
+
+        # Enter the generated configuration name in the input field
+        find_default_config_name.send_keys(generate_config_name)
+        find_default_config_name.send_keys(Keys.SPACE)
+
+        # Find the description input field in the modal
+        find_default_description = build_page.clear_default_description_name()
+        #
+        # # Clear any existing value in the description input field
+        # while find_default_description.get_property('value'):
+        #     find_default_description.send_keys(Keys.BACKSPACE)
+        #
+        # # Generate a unique configuration description
+        # generate_config_description = "Description_" + str(uuid.uuid4())
+        #
+        # # Enter the generated configuration description in the input field
+        # find_default_description.send_keys(generate_config_description)
+        # find_default_description.send_keys(Keys.SPACE)
+        # time.sleep(15)
+
+        # Find the "Start editing" button in the modal
+        start_editing = build_page.push_start_editing()
+
+        # Execute JavaScript code to enable the "Start editing" button
+        # browser.execute_script("arguments[0].removeAttribute('disabled');", start_editing)
+
+        # Check if the "Start editing" button is enabled
+        # assert start_editing.is_enabled()
+
+        # Click the "Start editing" button
+        if start_editing.is_enabled():
+            start_editing.click()
+
+        else:
+            print("The button to edit the config is disabled")
+        # start_editing.click()
+        time.sleep(15)
+        # Get the current URL and assert that it matches the expected URL
+        current_url = browser.current_url
+        assert "https://bbp.epfl.ch/mmb-beta/build/cell-composition" in current_url
+
+
+
+
+
+'''        # Edit configuration modal is found
         edit_modal = build_page.find_edit_config_modal()
         logger.info("Edit configuration modal is displayed")
         find_default_config_name = build_page.find_default_config_name()
@@ -67,16 +122,13 @@ class TestBuild:
             clear_default_description.send_keys(Keys.BACKSPACE)
         generate_config_description = "Description_" + str(uuid.uuid4())
         set_description_name = build_page.set_config_description().send_keys(generate_config_description)
-
+        click_on_description = build_page.click_on_description().click()
+        time.sleep(5)
 
         # Click Start editing button
         start_editing = build_page.push_start_editing()
         start_editing.click()
-        time.sleep(5)
-        #
-        #
-        #
-        # # Get the current URL and assert that it matches the expected URL
-        # current_url = browser.current_url
-        # assert "https://bbp.epfl.ch/mmb-beta/build/cell-composition" in current_url
-        #
+        time.sleep(5)'''
+
+
+
