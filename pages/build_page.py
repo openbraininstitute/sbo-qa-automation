@@ -8,9 +8,12 @@ class BuildPage(HomePage):
         super().__init__(browser, wait)
         self.login_page = HomePage(browser, wait)
 
+    # def go_to_build_page(self):
+    #     self.browser.get(self.url + "/build/load-brain-config")
+    #     return self.browser.current_url
+
     def go_to_build_page(self):
-        self.browser.get(self.url + "/build/load-brain-config")
-        return self.browser.current_url
+        self.browser.get("http://localhost:3000/build/load-brain-config")
 
     def find_recent_configurations(self):
         return self.wait.until(EC.presence_of_element_located(BuildPageLocators.RECENT_CONFIGURATIONS))

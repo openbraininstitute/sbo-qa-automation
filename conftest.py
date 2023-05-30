@@ -25,7 +25,7 @@ def setup(request):
     request.cls.wait = wait
     yield browser, wait
 
-    browser.quit()
+    # browser.quit()
 
 
 # Logger object fixture
