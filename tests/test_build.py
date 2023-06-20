@@ -115,6 +115,7 @@ class TestBuild:
 
         # Get the current URL and assert that it matches the expected URL
 
+
         # start_editing = build_page.push_start_editing()
         # max_wait_time = 10
         # # Perform custom wait loop until element is visible and clickable or timeout occurs
@@ -135,5 +136,4 @@ class TestBuild:
 
         # current_url = browser.current_url
         # assert "https://bbp.epfl.ch/mmb-beta/build/cell-composition" in current_url
-        #
 

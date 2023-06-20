@@ -14,6 +14,9 @@ class LoginPage(HomePage):
         self.browser.get(url)
         self.wait.until(EC.url_contains(url))
 
+    def already_logged(self):
+        return self.wait.until(EC.presence_of_element_located(LoginPageLocators.ALREADY_LOGGED))
+
     def find_username_field(self):
         return self.wait.until(EC.presence_of_element_located(LoginPageLocators.USERNAME))
 

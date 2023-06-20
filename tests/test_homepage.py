@@ -1,4 +1,5 @@
 import json
+import os.path
 import time
 import pytest
 from pages.home_page import HomePage
@@ -22,15 +23,18 @@ class TestFindLogin():
     def test_find_login_button(self, setup, logger, login):
         home_page = HomePage(*setup)
         home_page.go_to_home_page()
+
         login_button = home_page.find_login_button()
         assert login_button.is_displayed()
         logger.info('the button is found')
 
     def test_links(self):
-        link_checker = LinkChecker()
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        links_file_path = os.path.join(current_directory, '..', 'links.json')
 
-        with open('links.json') as f:
-            links = json.load(f)['main_page_links']  # Assuming 'home_page' is the key for the links on the home page
+        link_checker = LinkChecker()
+        with open(links_file_path) as f:
+            links = json.load(f)['main_page_links']
 
         for link in links:
             is_valid = link_checker.check_link(link)

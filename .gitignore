@@ -4,6 +4,7 @@ data/.DS_Store
 config.json
 geckodriver.log
 test.log
+latest_logs
 allure_reports/
 assets/
 screenshots/
