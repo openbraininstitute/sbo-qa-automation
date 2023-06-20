@@ -11,8 +11,8 @@ from util.util_base import load_config
 class TestLogin:
 
     def test_login(self, setup, logger, login):
-        # Access the login fixture
-        # Find the username/password fields and enter credentials
+        """Access the login fixture
+        Find the username/password fields and enter credentials"""
         login_page = LoginPage(*setup)
         username_field = login_page.find_username_field()
         assert username_field.is_displayed()

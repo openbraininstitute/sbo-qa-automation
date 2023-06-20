@@ -53,26 +53,6 @@ def setup(request, pytestconfig):
     else:
         raise ValueError(f"Invalid browser name: {browser_name}")
 
-
-# @pytest.fixture(scope="class")
-# def setup(request):
-#     # Check if geckodriver or chromedriver is available
-#     if "geckodriver" in os.environ.get("PATH", ""):
-#         # Use Firefox driver
-#         options = FirefoxOptions()
-#         browser = webdriver.Firefox(options=options)
-#     elif "chromedriver" in os.environ.get("PATH", ""):
-#         # Use Chrome driver
-#         options = ChromeOptions()
-#         browser = webdriver.Chrome(options=options)
-#     else:
-#         # No driver available, run in headless mode without a browser
-#         options = FirefoxOptions()
-#         options.add_argument("--headless=new")
-#         options.add_argument("--disable-gpu")
-#         options.add_argument("--sandbox-no")
-#         browser = webdriver.Firefox(options=options)
-    # Setting explicit wait
     wait = WebDriverWait(browser, 10)
     browser.set_window_position(-1000, 0)
     browser.maximize_window()

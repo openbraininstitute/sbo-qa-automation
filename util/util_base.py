@@ -5,7 +5,7 @@ import json
 def load_config():
     try:
         if os.getenv('CI'):
-            # Running in GitLab CI/CD pipeline
+            """ Running in GitLab CI/CD pipeline"""
             username = os.environ['USERNAME']
             password = os.environ['PASSWORD']
             config = {
@@ -13,7 +13,7 @@ def load_config():
                 'password': password
             }
         else:
-            # Running locally
+            """Running locally"""
             base_dir = os.path.abspath(os.path.dirname(__file__))
             config_path = os.path.join(base_dir, '..', 'util', 'config.json')
             with open(config_path, 'r') as f:
