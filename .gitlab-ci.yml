@@ -15,15 +15,13 @@ variables:
   USERNAME: $USERNAME
   PASSWORD: $PASSWORD
 
-
 pytest_firefox:
   image: python:3.9
   stage: test
   before_script:
-    - apt-get update && apt-get install -y unzip curl software-properties-common vim git python3-pip python3 xvfb jq firefox-esr
+    - apt-get update && apt-get install -y firefox-esr xvfb
     - python -m venv $VENV_DIR
     - source $VENV_DIR/bin/activate
-    - mkdir -p /usr/share/desktop-directories
     - wget "https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz"
     - tar -xvzf geckodriver-v0.33.0-linux64.tar.gz
     - chmod +x geckodriver
@@ -36,10 +34,11 @@ pytest_firefox:
     - Xvfb :99 &
     - export DISPLAY=:99
     - geckodriver --version || (echo "GeckoDriver not found, running tests in headless mode" && export HEADLESS="true")
-    - if [ "$HEADLESS" = "true" ]; then pytest tests/test_login.py --headless -s -v; else pytest tests/test_login.py -s -v; fi
+    - if [ "$HEADLESS" = "true" ]; then pytest tests/test_login.py -s -v; else pytest tests/test_login.py -s -v; fi
     - message="Failed job at ${CI_JOB_URL} , issues ${message}"
     - echo "${CI_PIPELINE_SOURCE}"
     - exit $exit_code
+
   artifacts:
     paths:
       - allure_reports/

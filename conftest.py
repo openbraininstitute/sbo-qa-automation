@@ -5,10 +5,13 @@ import pytest
 from selenium import webdriver
 from seleniumbase import BaseCase
 from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from util.util_base import load_config
@@ -22,45 +25,43 @@ import glob
 def setup(request, pytestconfig):
     browser_name = os.environ.get("BROWSER_NAME")
     headless_mode = pytestconfig.getoption("--headless")
+    browser = None
+    options = ChromeOptions()  # Default to Chrome options
 
     if browser_name == "chrome":
-        if "chromedriver" in os.environ.get("PATH", ""):
-            options = ChromeOptions()
-            if headless_mode:
-                options.add_argument("--headless")
-                options.add_argument("--no-sandbox")
-                options.add_argument("--disable-gpu")
-            browser = webdriver.Chrome(options=options)
-        else:
-            options = ChromeOptions()
-            if headless_mode:
-                options.add_argument("--headless")
-                options.add_argument("--no-sandbox")
-                options.add_argument("--disable-gpu")
-            browser = webdriver.Chrome(options=options)
+        if headless_mode:
+            options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-gpu")
+        service = ChromeService(ChromeDriverManager().install())
+        browser = webdriver.Chrome(service=service, options=options)
     elif browser_name == "firefox":
-        if "geckodriver" in os.environ.get("PATH", ""):
-            options = FirefoxOptions()
-            if headless_mode:
-                options.add_argument("--headless=new")
-            executable_path = GeckoDriverManager().install()
-            browser = webdriver.Firefox(options=options, executable_path=executable_path)
-        else:
-            options = FirefoxOptions()
-            if headless_mode:
-                options.add_argument("--headless=new")
-            browser = webdriver.Firefox(options=options)
+        options = FirefoxOptions()
+        if headless_mode:
+            options.add_argument("--headless")
+        service = FirefoxService(executable_path=GeckoDriverManager().install())
+        browser = webdriver.Firefox(service=service, options=options)
+    elif browser_name == "headless":
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-gpu")
+        service = ChromeService(ChromeDriverManager().install())
+        browser = webdriver.Chrome(service=service, options=options)
     else:
-        raise ValueError(f"Invalid browser name: {browser_name}")
+        raise ValueError("Invalid BROWSER_NAME: {}".format(browser_name))
 
-    wait = WebDriverWait(browser, 10)
-    browser.set_window_position(-1000, 0)
-    browser.maximize_window()
+    wait = webdriver.support.ui.WebDriverWait(browser, 10)
+
+    if browser is not None:
+        browser.set_window_position(-1000, 0)
+        browser.maximize_window()
     request.cls.browser = browser
     request.cls.wait = wait
     yield browser, wait
 
-    browser.quit()
+    if browser is not None:
+        browser.quit()
+
 
 def pytest_addoption(parser):
     parser.addoption("--no-report", action="store_true", help="Disable report generation")
