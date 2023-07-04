@@ -1,6 +1,8 @@
 from locators.build_page_locators import BuildPageLocators
 from selenium.webdriver.support import expected_conditions as EC
 from pages.home_page import HomePage
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from urllib.parse import urlparse, parse_qs
 
 
 class BuildPage(HomePage):
@@ -8,12 +10,12 @@ class BuildPage(HomePage):
         super().__init__(browser, wait)
         self.login_page = HomePage(browser, wait)
 
-    # def go_to_build_page(self):
-    #     self.browser.get(self.url + "/build/load-brain-config")
-    #     return self.browser.current_url
-
     def go_to_build_page(self):
-        self.browser.get("http://localhost:3000/build/load-brain-config")
+        self.browser.get(self.url + "/build/load-brain-config")
+        return self.browser.current_url
+
+    # def go_to_build_page(self):
+    #     self.browser.get("http://localhost:3000/build/load-brain-config")
 
     def find_recent_configurations(self):
         return self.wait.until(EC.presence_of_element_located(BuildPageLocators.RECENT_CONFIGURATIONS))
@@ -62,6 +64,29 @@ class BuildPage(HomePage):
         return self.wait.until(EC.visibility_of_element_located(BuildPageLocators.DESCRIPTION))
 
     def push_start_editing(self):
-        return self.wait.until(
-            lambda d: EC.element_to_be_clickable(BuildPageLocators.BTN_START_EDITING)(d)
-        )
+        try:
+            return self.wait.until(
+                lambda d: EC.element_to_be_clickable(BuildPageLocators.BTN_START_EDITING)(d)
+            )
+        except StaleElementReferenceException:
+            # Retry the operation
+            return self.push_start_editing()
+        except TimeoutException:
+            return None
+
+    def is_config_page_loaded(self):
+        current_url = self.browser.current_url
+        expected_url = self.generate_expected_url(current_url)
+        print("This is 'is_config_page_loaded URL", expected_url)
+        try:
+            self.wait.until(lambda d: self.browser.current_url == expected_url)
+            return True
+        except TimeoutException:
+            return False
+
+    def generate_expected_url(self, current_url):
+        url_parts = urlparse(current_url)
+        query_params = parse_qs(url_parts.query)
+        config_id = query_params.get(b'brainModelConfig', [b''])[0].decode('utf-8')
+        expected_url = f"https://bbp.epfl.ch/mmb-beta/build/cell-composition/interactive?brainModelConfigId={config_id}"
+        return expected_url

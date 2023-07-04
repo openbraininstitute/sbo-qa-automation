@@ -12,6 +12,7 @@ class LoginPage(HomePage):
 
     def go_to_login_page(self, url):
         self.browser.get(url)
+
         self.wait.until(EC.url_contains(url))
 
     def already_logged(self):

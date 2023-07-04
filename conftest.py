@@ -3,7 +3,7 @@ import logging
 import os
 import pytest
 from selenium import webdriver
-from seleniumbase import BaseCase
+from selenium.common import NoSuchElementException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -20,17 +20,18 @@ import argparse
 import glob
 
 
-
-@pytest.fixture(scope="class")
+# Fixture to set up the browser
+@pytest.fixture(scope="class", autouse=True)
 def setup(request, pytestconfig):
     browser_name = os.environ.get("BROWSER_NAME")
+    print("BROWSER_NAME******", browser_name)
     headless_mode = pytestconfig.getoption("--headless")
     browser = None
     options = ChromeOptions()  # Default to Chrome options
 
     if browser_name == "chrome":
         if headless_mode:
-            options.add_argument("--headless")
+            options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-gpu")
         service = ChromeService(ChromeDriverManager().install())
@@ -47,14 +48,17 @@ def setup(request, pytestconfig):
         options.add_argument("--disable-gpu")
         service = ChromeService(ChromeDriverManager().install())
         browser = webdriver.Chrome(service=service, options=options)
+
     else:
         raise ValueError("Invalid BROWSER_NAME: {}".format(browser_name))
 
-    wait = webdriver.support.ui.WebDriverWait(browser, 10)
+    wait = WebDriverWait(browser, 10)
 
     if browser is not None:
         browser.set_window_position(-1000, 0)
         browser.maximize_window()
+    browser.delete_all_cookies()
+
     request.cls.browser = browser
     request.cls.wait = wait
     yield browser, wait
@@ -63,16 +67,12 @@ def setup(request, pytestconfig):
         browser.quit()
 
 
-def pytest_addoption(parser):
-    parser.addoption("--no-report", action="store_true", help="Disable report generation")
-
-
-# Logger object fixture
-@pytest.fixture(scope="module")
+# Fixture to initialize the logger object
+@pytest.fixture(scope="function")
 def logger(request):
     # Initialize the logger object
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger()
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.DEBUG)
     logger.setLevel(logging.DEBUG)
 
     # Check if the logger already has a file handler
@@ -98,7 +98,6 @@ def logger(request):
     return logger
 
 
-
 # Fixture that navigates to the login page
 @pytest.fixture(scope="function")
 def login(setup, navigate_to_login):
@@ -108,16 +107,28 @@ def login(setup, navigate_to_login):
 
 
 @pytest.fixture(scope="function")
-def navigate_to_login(setup):
+def navigate_to_login(setup, logger):
     browser, wait = setup
-    print(f"What is {setup}")
     browser.get("https://bbp.epfl.ch/mmb-beta")
     home_page = HomePage(*setup)
+    browser.delete_all_cookies()
+    try:
+        logger.info('Looking for login button')
+        login_button = home_page.find_login_button()
+        login_btn = login_button.text
+        assert login_btn == 'Login'
+
+    except NoSuchElementException:
+        logger.info('Login button not found - assuming already logged in')
+        return
+    logger.debug('Login button found: {}'.format(login_button))
     login_button = home_page.find_login_button()
-    assert login_button.is_displayed()
+    login_btn = login_button.text
+    assert login_btn == 'Login'
     login_button.click()
-    wait.until(EC.url_contains("auth"))
+    tst_url = wait.until(EC.url_contains("auth"))
     login_url = browser.current_url
+    print("Navigate_to_login-------------------------", login_url)
     yield login_url
 
 
@@ -139,21 +150,35 @@ def login_explore(navigate_to_login, setup):
 
 
 @pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_makereport(item, call):
+def pytest_runtest_makereport(item):
+    """
+    Extends the PyTest Plugin to take and embed screenshot in html report, whenever test fails.
+    :param item:
+    """
+    pytest_html = item.config.pluginmanager.getplugin('html')
     outcome = yield
-    rep = outcome.get_result()
-    if rep.when == "call" and rep.failed:
-        screenshot_dir = os.path.join("allure_reports", "screenshots")
-        os.makedirs(screenshot_dir, exist_ok=True)
-        screenshot_path = os.path.join(screenshot_dir, f"{item.name}.png")
-        browser = item.parent.obj.browser
-        browser.save_screenshot(screenshot_path)
-        allure.attach.file(screenshot_path, attachment_type=allure.attachment_type.PNG)
-        # Custom logging to report.log
-        logger = logging.getLogger(__name__)
-        logger.info("Test failed: %s", item.name)
-        logger.info("Failure description: %s", rep.longreprtext)
+    report = outcome.get_result()
+    extra = getattr(report, 'extra', [])
 
+    if report.when == 'call' or report.when == "setup":
+        xfail = hasattr(report, 'wasxfail')
+        if (report.skipped and xfail) or (report.failed and not xfail):
+            file_name = report.nodeid.replace("::", "_") + ".png"
+            browser = getattr(item, "_browser", None)
+            if browser:
+                _capture_screenshot(file_name, browser)
+                if file_name:
+                    html = '<div><img src="%s" alt="screenshot" style="width:304px;height:228px;" ' \
+                           'onclick="window.open(this.src)" align="right"/></div>' % file_name
+                    extra.append(pytest_html.extras.html(html))
+        report.extra = extra
+
+
+def _capture_screenshot(name, browser):
+    browser.get_screenshot_as_file(name)
+
+
+# Hook to customize the HTML report table row cells
 def pytest_html_results_table_row(report, cells):
     if report.failed:
         cells.insert(1, ("✘", "success"))
@@ -163,24 +188,66 @@ def pytest_html_results_table_row(report, cells):
         cells.insert(1, ("?", "skipped"))
 
 
+# Hook to delete previous allure reports before running the tests
+def pytest_sessionstart(session):
+    folder_path = session.config.getoption("--alluredir")
+    if os.path.exists(folder_path):
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                os.remove(os.path.join(root, file))
+            for dir in dirs:
+                os.rmdir(os.path.join(root, dir))
 
-def delete_previous_reports(folder_path):
-    try:
-        os.makedirs(folder_path, exist_ok=True)  # Create the directory if it doesn't exist
-        os.chdir(folder_path)
 
-        file_list = glob.glob("*")
-        file_list.sort(key=os.path.getmtime)
+# Command-line options
+def pytest_addoption(parser):
+    parser.addoption(
+        "--browser-name",
+        action="store",
+        default="firefox",
+        choices=["firefox"],
+        help="Specify the browser to run the tests in",
+    )
 
-        files_to_delete = file_list[:-3]
-        for file_name in files_to_delete:
-            os.remove(file_name)
-    except OSError as e:
-        print(f"Error deleting previous reports: {e}")
+    parser.addoption("--log-file-path", action="store", default=None, help="Specify the log file path")
 
-# Specify the folder path where the allure reports are stored
-folder_path = "allure_reports/allure_reports"
 
-# Call the function to delete previous reports
-delete_previous_reports(folder_path)
+# Remove the pytest_html plugin hook
+# def pytest_configure(config):
+#     config.addinivalue_line(
+#         "markers", "explore_page: mark a test as an explore_page test"
+#     )
+#     config.addinivalue_line(
+#         "markers", "build_page: mark a test as a build_page test"
+#     )
+#     os.environ["BROWSER_NAME"] = config.getoption("--browser")
+
+
+# Add custom markers
+def pytest_collection_modifyitems(config, items):
+    config.addinivalue_line(
+        "markers", "explore_page: mark a test as an explore_page test"
+    )
+    config.addinivalue_line(
+        "markers", "build_page: mark a test as a build_page test"
+    )
+
+
+# Custom report generation
+# def pytest_terminal_summary(terminalreporter, config):
+#     if not terminalreporter.config.option.no_report:
+#         terminalreporter.config.pluginmanager.get_plugin("seleniumbase_reporter")
+
+
+# Delete previous allure reports before generating new reports
+def pytest_sessionfinish(session, exitstatus):
+    if exitstatus == pytest.ExitCode.OK:
+        reports_folder = session.config.getoption("--alluredir")
+        if os.path.exists(reports_folder):
+            for root, dirs, files in os.walk(reports_folder):
+                for file in files:
+                    os.remove(os.path.join(root, file))
+                for dir in dirs:
+                    os.rmdir(os.path.join(root, dir))
+
 

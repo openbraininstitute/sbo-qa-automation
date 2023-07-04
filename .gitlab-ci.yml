@@ -16,7 +16,7 @@ variables:
   PASSWORD: $PASSWORD
 
 pytest_firefox:
-  image: python:3.9
+  image: python:3.10
   stage: test
   before_script:
     - apt-get update && apt-get install -y firefox-esr xvfb
@@ -30,11 +30,12 @@ pytest_firefox:
     - pip install -r requirements.txt
 
   script:
+    - firefox --version
     - exit_code=0
     - Xvfb :99 &
     - export DISPLAY=:99
     - geckodriver --version || (echo "GeckoDriver not found, running tests in headless mode" && export HEADLESS="true")
-    - if [ "$HEADLESS" = "true" ]; then pytest tests/test_login.py -s -v; else pytest tests/test_login.py -s -v; fi
+    - if [ "$HEADLESS" = "true" ]; then pytest tests/test_login.py -s -v ; else pytest tests/test_login.py -s -v --cache-clear; fi
     - message="Failed job at ${CI_JOB_URL} , issues ${message}"
     - echo "${CI_PIPELINE_SOURCE}"
     - exit $exit_code
