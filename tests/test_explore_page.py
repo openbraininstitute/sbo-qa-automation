@@ -1,7 +1,17 @@
 import time
+import os.path
 import pytest
+import requests
+
 from pages.explore_page import ExplorePage
-from selenium.webdriver.support import expected_conditions as EC
+from util.util_links_checker import LinkChecker
+from util.util_links_writer import write_links_to_file
+from util.util_load_links import LinkUtil
+from util.util_scraper import UrlScraper
+
+current_directory = os.getcwd()
+relative_file_path = 'scraped_links.txt'
+file_path = os.path.join(current_directory, relative_file_path)
 
 
 class TestExplorePage:
@@ -40,3 +50,22 @@ class TestExplorePage:
         print(simul, "CHECKING SIMULATIONS")
         assert simul == "Simulations"
         logger.info("Verifying Simulations title is found on the page")
+
+    def test_links(self):
+        test_directory = os.path.dirname(os.path.abspath(__file__))
+        links_file_path = os.path.join(test_directory, '..', 'links.json')
+
+        link_checker = LinkChecker()
+        links = link_checker.load_links(links_file_path)['explore_page_links']
+        link_checker.check_links(links)
+        # url = "https://bbp.epfl.ch/mmb-beta/explore"
+        # response = requests.get(url)
+        # page_source = response.text
+        # print(page_source, "THIS IS FROM THE EXPLORE_TEST, PAGE_LINKS")
+        # url_scraper = UrlScraper()
+        # scraped_links = url_scraper.scrape_links(page_source)
+        #
+        # write_links_to_file(file_path, scraped_links)
+        # # print("Scraped links from Explore page saved to file successfully")
+        # print("File path EXPLORE test", file_path)
+        # print("Scraped links EXPLORE page", scraped_links)

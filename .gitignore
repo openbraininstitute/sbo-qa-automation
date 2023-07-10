@@ -10,3 +10,10 @@ latest_logs
 allure_reports/
 assets/
 screenshots/
+myenv/
+report.html
+reports/
+testresults.xml
+container_venv/
+tests/container_venv
+podman

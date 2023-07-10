@@ -5,12 +5,10 @@
     "https://bbp.epfl.ch/mmb-beta/build/load-brain-config",
     "https://bbp.epfl.ch/mmb-beta/simulate"
   ],
-  "explore_age_links":[
+  "explore_page_links":[
     "https://bbp.epfl.ch/mmb-beta/explore",
+    "https://bbp.epfl.ch/mmb-beta/explore/simulation-campaigns",
     "https://bbp.epfl.ch/mmb-beta/explore/electrophysiology",
-    [
-
-    ],
     "https://bbp.epfl.ch/mmb-beta/explore/morphology",
     "https://bbp.epfl.ch/mmb-beta/explore/bouton-density",
     "https://bbp.epfl.ch/mmb-beta/explore/neuron-density",
@@ -20,8 +18,8 @@
   ],
   "build_page_links":[
       "https://bbp.epfl.ch/mmb-beta/build/load-brain-config",
-      "",
-      ""
+      "https://bbp.epfl.ch/mmb-beta"
+
   ],
   "simulate_page_links": [
     "https://bbp.epfl.ch/mmb-beta/simulate/sim-campaign-selector"

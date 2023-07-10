@@ -1,10 +1,10 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from locators.base_page_locators import BasePageLocators
+from locators.base_page_locators import CustomBasePageLocators
 import pytest
 
 @pytest.mark.usefixtures("setup", "logger")
-class BasePage:
+class CustomBasePage:
 
     def __init__(self, browser, wait):
         self.browser = browser

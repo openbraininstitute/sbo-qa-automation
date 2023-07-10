@@ -1,9 +1,12 @@
 import json
 import logging
 import os
+from io import BytesIO
+
 import pytest
+from PIL import Image
 from selenium import webdriver
-from selenium.common import NoSuchElementException
+from selenium.common import exceptions, NoSuchElementException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -24,7 +27,6 @@ import glob
 @pytest.fixture(scope="class", autouse=True)
 def setup(request, pytestconfig):
     browser_name = os.environ.get("BROWSER_NAME")
-    print("BROWSER_NAME******", browser_name)
     headless_mode = pytestconfig.getoption("--headless")
     browser = None
     options = ChromeOptions()  # Default to Chrome options
@@ -107,28 +109,19 @@ def login(setup, navigate_to_login):
 
 
 @pytest.fixture(scope="function")
-def navigate_to_login(setup, logger):
+def navigate_to_login(setup):
     browser, wait = setup
     browser.get("https://bbp.epfl.ch/mmb-beta")
     home_page = HomePage(*setup)
     browser.delete_all_cookies()
-    try:
-        logger.info('Looking for login button')
-        login_button = home_page.find_login_button()
-        login_btn = login_button.text
-        assert login_btn == 'Login'
 
-    except NoSuchElementException:
-        logger.info('Login button not found - assuming already logged in')
-        return
-    logger.debug('Login button found: {}'.format(login_button))
     login_button = home_page.find_login_button()
+    assert login_button.is_displayed()
     login_btn = login_button.text
     assert login_btn == 'Login'
     login_button.click()
-    tst_url = wait.until(EC.url_contains("auth"))
+    wait.until(EC.url_contains("auth"))
     login_url = browser.current_url
-    print("Navigate_to_login-------------------------", login_url)
     yield login_url
 
 
@@ -163,9 +156,14 @@ def pytest_runtest_makereport(item):
     if report.when == 'call' or report.when == "setup":
         xfail = hasattr(report, 'wasxfail')
         if (report.skipped and xfail) or (report.failed and not xfail):
-            file_name = report.nodeid.replace("::", "_") + ".png"
-            browser = getattr(item, "_browser", None)
+            print("Test failed - handling it")
+            file_name = "latest_logs/" + report.nodeid.replace("::", "_") + ".png"
+            if hasattr(item, "cls"):
+                browser = getattr(item.cls, "browser", None)
+            if not browser:
+                browser = getattr(item, "_browser", None)
             if browser:
+                print("Browser object found - making screenshot")
                 _capture_screenshot(file_name, browser)
                 if file_name:
                     html = '<div><img src="%s" alt="screenshot" style="width:304px;height:228px;" ' \
@@ -175,15 +173,16 @@ def pytest_runtest_makereport(item):
 
 
 def _capture_screenshot(name, browser):
-    browser.get_screenshot_as_file(name)
+    os.makedirs(os.path.dirname(name), exist_ok=True)
+    browser.get_full_page_screenshot_as_file(name)
 
 
 # Hook to customize the HTML report table row cells
 def pytest_html_results_table_row(report, cells):
     if report.failed:
-        cells.insert(1, ("✘", "success"))
-    elif report.failed:
-        cells.insert(1, ("✔", "error"))
+        cells.insert(1, ("✘", "fail"))
+    # elif report.failed:
+        # cells.insert(1, ("✔", "error"))
     else:
         cells.insert(1, ("?", "skipped"))
 
@@ -212,17 +211,6 @@ def pytest_addoption(parser):
     parser.addoption("--log-file-path", action="store", default=None, help="Specify the log file path")
 
 
-# Remove the pytest_html plugin hook
-# def pytest_configure(config):
-#     config.addinivalue_line(
-#         "markers", "explore_page: mark a test as an explore_page test"
-#     )
-#     config.addinivalue_line(
-#         "markers", "build_page: mark a test as a build_page test"
-#     )
-#     os.environ["BROWSER_NAME"] = config.getoption("--browser")
-
-
 # Add custom markers
 def pytest_collection_modifyitems(config, items):
     config.addinivalue_line(
@@ -233,21 +221,60 @@ def pytest_collection_modifyitems(config, items):
     )
 
 
-# Custom report generation
-# def pytest_terminal_summary(terminalreporter, config):
-#     if not terminalreporter.config.option.no_report:
-#         terminalreporter.config.pluginmanager.get_plugin("seleniumbase_reporter")
+def make_full_screenshot(browser, savename):
+    """Performs a full screenshot of the entire page.
+    Taken from https://gist.github.com/fabtho/13e4a2e7cfbfde671b8fa81bbe9359fb
+    """
+    logger.debug('Making full-page screenshot')
+    # initiate value
+    img_list = []  # to store image fragment
+    offset = 0  # where to start
 
+    # js to get height of the window
+    try:
+        height = browser.execute_script(
+            "return Math.max("
+            "document.documentElement.clientHeight, window.innerHeight);"
+        )
+    except exceptions.WebDriverException:
+        return
 
-# Delete previous allure reports before generating new reports
-def pytest_sessionfinish(session, exitstatus):
-    if exitstatus == pytest.ExitCode.OK:
-        reports_folder = session.config.getoption("--alluredir")
-        if os.path.exists(reports_folder):
-            for root, dirs, files in os.walk(reports_folder):
-                for file in files:
-                    os.remove(os.path.join(root, file))
-                for dir in dirs:
-                    os.rmdir(os.path.join(root, dir))
+    max_window_height = browser.execute_script(
+        "return Math.max("
+        "document.body.scrollHeight, "
+        "document.body.offsetHeight, "
+        "document.documentElement.clientHeight, "
+        "document.documentElement.scrollHeight, "
+        "document.documentElement.offsetHeight);"
+    )
 
+    header_height = 0
+    while offset < max_window_height:
+        browser.execute_script(f"window.scrollTo(0, {offset});")
 
+        # get the screenshot of the current window
+        img = Image.open(BytesIO((browser.driver.get_screenshot_as_png())))
+        img_list.append(img)
+        offset += height - header_height
+
+    # Stitch image into one, set up the full screen frame
+    img_frame_height = sum([img_frag.size[1] for img_frag in img_list])
+    img_frame = Image.new("RGB", (img_list[0].size[0], img_frame_height))
+
+    offset = 0  # offset used to create the snapshots
+    img_loc = 0  # offset used to create the final image
+    for img_frag in img_list:
+        # image fragment must be cropped in case the page is a jupyter notebook;
+        # also make sure the last image fragment gets added correctly to avoid overlap.
+        offset1 = offset + height
+        if offset1 > max_window_height:
+            top_offset = offset + height - max_window_height
+            box = (0, top_offset, img_frag.size[0], img_frag.size[1])
+        else:
+            box = (0, header_height, img_frag.size[0], img_frag.size[1])
+        img_frame.paste(img_frag.crop(box), (0, img_loc))
+        img_loc += img_frag.size[1] - header_height
+        offset += height - header_height
+
+    # Save the final image
+    img_frame.save(savename)

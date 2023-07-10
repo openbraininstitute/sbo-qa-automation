@@ -1,5 +1,5 @@
 from selenium.webdriver.common.by import By
 
 
-class BasePageLocators:
+class CustomBasePageLocators:
     PAGE_LOAD = (By.XPATH, "//a[@href='https://bbp.epfl.ch/mmb-beta']")

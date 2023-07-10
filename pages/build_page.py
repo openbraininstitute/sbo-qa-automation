@@ -1,11 +1,13 @@
 from locators.build_page_locators import BuildPageLocators
 from selenium.webdriver.support import expected_conditions as EC
+from pages.base_page import CustomBasePage
+from seleniumbase import BaseCase
 from pages.home_page import HomePage
 from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from urllib.parse import urlparse, parse_qs
 
 
-class BuildPage(HomePage):
+class BuildPage(HomePage, CustomBasePage):
     def __init__(self, browser, wait):
         super().__init__(browser, wait)
         self.login_page = HomePage(browser, wait)
@@ -32,8 +34,6 @@ class BuildPage(HomePage):
     def use_custom_config(self):
         return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CUSTOM_MODEL_CONFIG))
 
-    # def clone_custom_config(self):
-    #     return self.wait.until(EC.presence_of_element_located(BuildPageLocators.BTN_CLONE_CONFIG))
     def clone_custom_config(self):
         return self.wait.until(
             lambda d: EC.presence_of_element_located(BuildPageLocators.BTN_CLONE_CONFIG)(d)
@@ -63,16 +63,18 @@ class BuildPage(HomePage):
     def click_on_description(self):
         return self.wait.until(EC.visibility_of_element_located(BuildPageLocators.DESCRIPTION))
 
-    def push_start_editing(self):
+    def find_start_editing_btn(self):
+        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.BTN_START_EDITING))
+
+    def is_start_ed_btn_clickable(self):
         try:
-            return self.wait.until(
-                lambda d: EC.element_to_be_clickable(BuildPageLocators.BTN_START_EDITING)(d)
-            )
-        except StaleElementReferenceException:
-            # Retry the operation
-            return self.push_start_editing()
+            self.wait.until(EC.element_to_be_clickable(BuildPageLocators.BTN_START_EDITING))
+            return True  # Button is clickable, so it is not disabled
         except TimeoutException:
-            return None
+            return False  # Button is not clickable, so it is disabled
+
+    def push_start_editing(self):
+        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.BTN_START_EDITING))
 
     def is_config_page_loaded(self):
         current_url = self.browser.current_url
@@ -90,3 +92,23 @@ class BuildPage(HomePage):
         config_id = query_params.get(b'brainModelConfig', [b''])[0].decode('utf-8')
         expected_url = f"https://bbp.epfl.ch/mmb-beta/build/cell-composition/interactive?brainModelConfigId={config_id}"
         return expected_url
+
+    def find_basic_cell_groups(self):
+        return self.wait.until(EC.presence_of_element_located(BuildPageLocators.BASIC_CELL_GROUPS_AND_REGIONS))
+
+    def find_cell_composition(self):
+        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CELL_COMPOSITION))
+
+    def find_cell_model_assignment(self):
+        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CELL_MODEL_ASSIGNMENT))
+
+    def find_connectome_definition(self):
+        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CONNECTOME_DEFINITION))
+
+    def find_connection_model_assignment(self):
+        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CONNECTION_MODEL_ASSIGNMENT))
+
+    def find_build_and_simulate_button(self):
+        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.BUILD_AND_SIMULATE_BUTTON))
+
+

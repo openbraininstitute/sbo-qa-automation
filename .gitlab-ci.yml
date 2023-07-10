@@ -35,13 +35,25 @@ pytest_firefox:
     - Xvfb :99 &
     - export DISPLAY=:99
     - geckodriver --version || (echo "GeckoDriver not found, running tests in headless mode" && export HEADLESS="true")
-    - if [ "$HEADLESS" = "true" ]; then pytest tests/test_login.py -s -v ; else pytest tests/test_login.py -s -v --cache-clear; fi
+    - |  # it's important to use this syntax here, because individual lines don't persist $? from one line to the next
+      set +e
+      if [ "$HEADLESS" = "true" ]; then
+        pytest --headless tests/test_brain_region.py -s -v --junitxml=testresults.xml --report-log test_run.log
+        exit_code=$?
+      else
+        pytest tests/test_explore_page.py -s -v --cache-clear;
+        exit_code=$?
+      fi
+      set -e
     - message="Failed job at ${CI_JOB_URL} , issues ${message}"
     - echo "${CI_PIPELINE_SOURCE}"
+    - find latest_logs
     - exit $exit_code
 
   artifacts:
+    when: on_failure
     paths:
-      - allure_reports/
+      - latest_logs
+      - test_run.log
     reports:
       junit: testresults.xml

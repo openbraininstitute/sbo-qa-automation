@@ -1,9 +1,5 @@
 import time
-
 import pytest
-from selenium.common import NoSuchElementException
-
-from pages.login_page import LoginPage
 from util.util_base import load_config
 
 
@@ -13,7 +9,7 @@ class TestLogin:
     def test_login(self, setup, logger, login):
         """Access the login fixture
         Find the username/password fields and enter credentials"""
-        login_page = LoginPage(*setup)
+        login_page = login
         username_field = login_page.find_username_field()
         assert username_field.is_displayed()
         logger.info('The username field is displayed')
@@ -30,10 +26,11 @@ class TestLogin:
         sign_in_button.click()
         logger.info('The user is logged in the SBO')
 
+
         # If he user is logged in, log out button should be present
-        # logout_button = login_page.find_logout_button()
-        # lgt_btn = logout_button.text
-        # print("THIS IS LOGOUT BUTTON: ", lgt_btn)
-        # assert lgt_btn == 'Logout'
-        # assert logout_button.is_displayed()
-        # logger.info('The user is logged in and logout button is displayed')
+        logout_button = login_page.find_logout_button()
+        lgt_btn = logout_button.text
+        print("THIS IS LOGOUT BUTTON: ", lgt_btn)
+        assert lgt_btn == 'Logout'
+        assert logout_button.is_displayed()
+        logger.info('The user is logged in and logout button is displayed')
