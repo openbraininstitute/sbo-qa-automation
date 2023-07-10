@@ -5,9 +5,6 @@ import requests
 
 from pages.explore_page import ExplorePage
 from util.util_links_checker import LinkChecker
-from util.util_links_writer import write_links_to_file
-from util.util_load_links import LinkUtil
-from util.util_scraper import UrlScraper
 
 current_directory = os.getcwd()
 relative_file_path = 'scraped_links.txt'

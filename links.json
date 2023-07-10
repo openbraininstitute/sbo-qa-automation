@@ -23,5 +23,9 @@
   ],
   "simulate_page_links": [
     "https://bbp.epfl.ch/mmb-beta/simulate/sim-campaign-selector"
+  ],
+
+  "brain_build_page_links": [
+    "https://bbp.epfl.ch/mmb-beta/build/cell-composition/interactive?brainModelConfigId="
   ]
 }

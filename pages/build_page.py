@@ -5,12 +5,15 @@ from seleniumbase import BaseCase
 from pages.home_page import HomePage
 from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from urllib.parse import urlparse, parse_qs
+from util.util_scraper import UrlScraper
 
 
 class BuildPage(HomePage, CustomBasePage):
     def __init__(self, browser, wait):
         super().__init__(browser, wait)
         self.login_page = HomePage(browser, wait)
+        self.url_scraper = UrlScraper()
+
 
     def go_to_build_page(self):
         self.browser.get(self.url + "/build/load-brain-config")
@@ -18,6 +21,10 @@ class BuildPage(HomePage, CustomBasePage):
 
     # def go_to_build_page(self):
     #     self.browser.get("http://localhost:3000/build/load-brain-config")
+
+    def scrape_links(self):
+        page_source = self.browser.page_source
+        links = self.url_scraper.scrape_links(page_source)
 
     def find_recent_configurations(self):
         return self.wait.until(EC.presence_of_element_located(BuildPageLocators.RECENT_CONFIGURATIONS))

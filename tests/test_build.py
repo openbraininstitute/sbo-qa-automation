@@ -8,7 +8,15 @@ from selenium.webdriver import ActionChains, Keys
 from selenium import webdriver
 from pages.build_page import BuildPage
 from util.util_base import load_config
+from util.util_links_checker import LinkChecker
 from util.util_load_links import LinkUtil
+
+current_directory = os.getcwd()
+relative_file_path = 'scraped_links.txt'
+file_path = os.path.join(current_directory, relative_file_path)
+
+
+
 
 
 class TestBuild:
@@ -84,9 +92,9 @@ class TestBuild:
         logger.info("Build & Simulate button is found")
 
     def test_links(self):
-        current_directory = os.path.dirname(os.path.abspath(__file__))
-        links_file_path = os.path.join(current_directory, '..', 'links.json')
+        test_directory = os.path.dirname(os.path.abspath(__file__))
+        links_file_path = os.path.join(test_directory, '..', 'links.json')
 
-        link_util = LinkUtil()
-        links = link_util.load_links(links_file_path)['build_page_links']
-        link_util.check_links(links)
+        link_checker = LinkChecker()
+        links = link_checker.load_links(links_file_path)['build_page_links']
+        link_checker.check_links(links)

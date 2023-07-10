@@ -34,8 +34,20 @@ class BuildPageLocators:
 
     BASIC_CELL_GROUPS_ARROW_BTN = (
     By.XPATH, "//div[@class='py-3 flex items-center justify-between']//button[3]//*[name()='svg']")
-    BLOCK_CEREBRUM = (By.XPATH, "//div[3][@data-state='closed']")
-    CEREBRUM_ARROW_BUTTON = (By.XPATH, "//div[3][@data-state='closed']//descendant::button[4]//*[name()='svg']")
 
+    BRAIN_STEM_BTN = (By.XPATH, "//div[@data-tree-id='343' and .//span[contains(text(),'Brain stem')]]//button[3]")
+    CEREBRUM_ARROW_BTN = (By.XPATH, "//div[@data-tree-id='567' and .//span[contains(text(),'Cerebrum')]]//button[3]")
+    CEREBRAL_CORTEX_BTN = (By.XPATH, "//div[@data-tree-id='688' and .//span[contains(text(),'Cerebral cortex')]]//button[3]")
+    CORTICAL_PLATE_BTN = (By.XPATH, "//div[@data-tree-id='695' and .//span[contains(text(),'Cortical plate')]]//button[3]")
+    ISOCORTEX_BTN = (By.XPATH, "//div[@data-tree-id='315' and .//span[contains(text(),'Isocortex')]]//button[3]")
+    AGRANULAR_INS_AREA_BTN = (By.XPATH, "//div[@data-tree-id='95' and .//span[contains(text(),'Agranular insular area')]]//button[3]")
+    AGRANULAR_INS_AREA_DORSAL_P_BTN = (By.XPATH, "//div[@data-tree-id='104' and .//span[contains(text(),'Agranular insular area, dorsal part')]]//button[3]")
+    AGRANULAR_INS_AREA_DORSAL_P_TITLE = (By.XPATH, "//div[@data-tree-id='104' and .//span[contains(text(),'Agranular insular area, dorsal part')]]//button[1]")
+    # CONFIGURATION_BTN = (By.XPATH, "//a[starts-with(@href, '/mmb-beta/build/cell-composition/interactive?brainModelConfigId=') and text()='Configuration']")
+    CONFIGURATION_BTN = (By.XPATH, "//a[text()='Configuration']")
+
+    L5_BP_ARROW_BTN = (By.XPATH, "//div[@data-tree-id='http://uri.interlex.org/base/ilx_0383221?rev=34' and .//span[contains(text(), 'L5_BP')]]/descendant::button[2]")
+    L5_BP_SLIDER_HANDLE = (By.XPATH, "//div[@data-tree-id='http://uri.interlex.org/base/ilx_0383221?rev=34' and .//span[contains(text(), 'L5_BP')]]//div[@class='ant-slider-rail']")
     CELL_COMP_INTERACTIVE = (By.XPATH, "//a[starts-with(@href, '/mmb-beta/build/cell-composition/interactive?brainModelConfigId=') and text()='Interactive']" )
+
 
