@@ -18,9 +18,7 @@ class HomePage(CustomBasePage, LinkChecker):
 
     def scrape_links(self):
         page_source = self.browser.page_source
-        print("Home page page source", page_source)
         links = self.url_scraper.scrape_links(page_source)
-        print("Home page links", links)
 
     def find_explore_title(self):
         return self.wait.until(EC.presence_of_element_located(HomePageLocators.EXPLORE_TITLE))

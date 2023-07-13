@@ -92,6 +92,10 @@ class TestBuild:
         logger.info("Build & Simulate button is found")
 
     def test_links(self):
+        """
+            test_links methods checks the request status
+            Also, writes non-dynamic URLs that are present on the page to a text file.
+        """
         test_directory = os.path.dirname(os.path.abspath(__file__))
         links_file_path = os.path.join(test_directory, '..', 'links.json')
 

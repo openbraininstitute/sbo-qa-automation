@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 from io import BytesIO
 
 import pytest
@@ -23,9 +24,10 @@ import argparse
 import glob
 
 
-# Fixture to set up the browser
+
 @pytest.fixture(scope="class", autouse=True)
 def setup(request, pytestconfig):
+    """Fixture to set up the browser/webdriver"""
     browser_name = os.environ.get("BROWSER_NAME")
     headless_mode = pytestconfig.getoption("--headless")
     browser = None
@@ -69,17 +71,19 @@ def setup(request, pytestconfig):
         browser.quit()
 
 
-# Fixture to initialize the logger object
+
 @pytest.fixture(scope="function")
 def logger(request):
-    # Initialize the logger object
+    """Fixture to initialize the logger object"""
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.DEBUG)
     logger.setLevel(logging.DEBUG)
 
     # Check if the logger already has a file handler
     has_file_handler = any(isinstance(handler, logging.FileHandler) for handler in logger.handlers)
+    # Check if the logger already has a stream handler
 
+    has_stream_handler = any(isinstance(handler, logging.StreamHandler) for handler in logger.handlers)
     # Determine the outer allure_reports directory
     allure_reports_dir = request.config.getoption("--alluredir")
 
@@ -97,12 +101,20 @@ def logger(request):
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
 
+    if not has_stream_handler:
+        # Create the stream handler for console output
+        stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler.setLevel(logging.DEBUG)
+        stream_formatter = logging.Formatter("%(levelname)s : %(asctime)s : %(message)s")
+        stream_handler.setFormatter(stream_formatter)
+        logger.addHandler(stream_handler)
+
     return logger
 
 
-# Fixture that navigates to the login page
 @pytest.fixture(scope="function")
 def login(setup, navigate_to_login):
+    """Fixture that navigates to the login page"""
     login_page = LoginPage(*setup)
     login_page.go_to_login_page(navigate_to_login)
     yield login_page
@@ -110,6 +122,7 @@ def login(setup, navigate_to_login):
 
 @pytest.fixture(scope="function")
 def navigate_to_login(setup):
+    """Fixture that navigates to the login page and finds login button"""
     browser, wait = setup
     browser.get("https://bbp.epfl.ch/mmb-beta")
     home_page = HomePage(*setup)
@@ -127,6 +140,7 @@ def navigate_to_login(setup):
 
 @pytest.fixture(scope="function")
 def login_explore(navigate_to_login, setup):
+    """User authentication that is used in all other pages/"""
     browser, wait = setup
     login_page = LoginPage(*setup)
     login_page.go_to_login_page(navigate_to_login)
@@ -179,16 +193,17 @@ def _capture_screenshot(name, browser):
 
 # Hook to customize the HTML report table row cells
 def pytest_html_results_table_row(report, cells):
+    """Styling for html.report"""
     if report.failed:
         cells.insert(1, ("✘", "fail"))
     # elif report.failed:
-        # cells.insert(1, ("✔", "error"))
+    # cells.insert(1, ("✔", "error"))
     else:
         cells.insert(1, ("?", "skipped"))
 
 
-# Hook to delete previous allure reports before running the tests
 def pytest_sessionstart(session):
+    """ Hook to delete previous allure reports before running the tests"""
     folder_path = session.config.getoption("--alluredir")
     if os.path.exists(folder_path):
         for root, dirs, files in os.walk(folder_path):
@@ -211,14 +226,14 @@ def pytest_addoption(parser):
     parser.addoption("--log-file-path", action="store", default=None, help="Specify the log file path")
 
 
-# Add custom markers
-def pytest_collection_modifyitems(config, items):
-    config.addinivalue_line(
-        "markers", "explore_page: mark a test as an explore_page test"
-    )
-    config.addinivalue_line(
-        "markers", "build_page: mark a test as a build_page test"
-    )
+""" Temporarily disabling custom markers"""
+# def pytest_collection_modifyitems(config, items):
+#     config.addinivalue_line(
+#         "markers", "explore_page: mark a test as an explore_page test"
+#     )
+#     config.addinivalue_line(
+#         "markers", "build_page: mark a test as a build_page test"
+#     )
 
 
 def make_full_screenshot(browser, savename):

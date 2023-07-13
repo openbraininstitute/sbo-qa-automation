@@ -1,3 +1,38 @@
+# UI Testing with Selenium Python Pytest - Page Object Model (POM)
+
+## Features
+- The tests use setup/teardown methods for the session. 
+- Test with Chrome and Firefox (also in headless).
+- Possibility to visually see the execution.
+- Possibility to see the screenshots of the errors.
+- A html report generated at each test run.
+
+## Prerequisites
+* Make sure pip is installed in your system (please see the instructions below).
+* Install virtual environment.
+* A json file with login credentials would need to be created. 
+
+### To activate the virtual environment:
+```bash
+source venv/bin/activate
+```
+## Run the tests
+### To execute a test run this in your cmd: 
+1. cd /tests
+2. python -m venv myenv
+3. source myenv/bin/activate
+4. python -m pip install --upgrade pip
+5. pip install -r requirements.txt
+6. pytest tests -s -v or pytest --headless tests -s -v --cache-clear
+
+
+### Accessing the reports and screenshots
+* The screenshot of an error is in the 'screenshot' directory.
+* The html reports are in the tests/.
+* The report.log is in allure_reports/.
+
+
+
 # Simulating GitLab locally
 
 ## Building a container
