@@ -103,19 +103,3 @@ class BuildPage(HomePage, CustomBasePage):
     def find_basic_cell_groups(self):
         return self.wait.until(EC.presence_of_element_located(BuildPageLocators.BASIC_CELL_GROUPS_AND_REGIONS))
 
-    def find_cell_composition(self):
-        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CELL_COMPOSITION))
-
-    def find_cell_model_assignment(self):
-        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CELL_MODEL_ASSIGNMENT))
-
-    def find_connectome_definition(self):
-        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CONNECTOME_DEFINITION))
-
-    def find_connection_model_assignment(self):
-        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CONNECTION_MODEL_ASSIGNMENT))
-
-    def find_build_and_simulate_button(self):
-        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.BUILD_AND_SIMULATE_BUTTON))
-
-

@@ -13,8 +13,9 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestExplorePage:
     @pytest.mark.explore_page
+    @pytest.mark.run(order=2)
     def test_explore_page(self, setup, login_explore, logger):
-        browser, wait = login_explore
+        browser, wait = setup
         explore_page = ExplorePage(browser, wait)
         exp_url = explore_page.go_to_explore_page()
         assert exp_url == "https://bbp.epfl.ch/mmb-beta/explore"
@@ -59,7 +60,7 @@ class TestExplorePage:
         link_checker = LinkChecker()
         links = link_checker.load_links(links_file_path)['explore_page_links']
         link_checker.check_links(links)
-        # url = "https://bbp.epfl.ch/mmb-beta/explore"
+        # url = "https://bbp.epfl.ch/mmb-beta/explore/electrophysiology"
         # response = requests.get(url)
         # page_source = response.text
         # print(page_source, "THIS IS FROM THE EXPLORE_TEST, PAGE_LINKS")

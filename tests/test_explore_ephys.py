@@ -18,6 +18,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestExploreEphys:
     @pytest.mark.build_page
+    @pytest.mark.run(order=3)
     def test_explore_ephys_page(self, setup, login_explore, logger):
         browser, wait = setup
         explore_ephys_page = ExploreElectrphysiologyPage(browser, wait)
@@ -27,7 +28,6 @@ class TestExploreEphys:
 
         find_ephys_page_title = explore_ephys_page.find_ephys_page_title()
         logger.info("Neuron electrophysiology title is present")
-
         find_ephys_brain_region_c_header = explore_ephys_page.find_brain_region_header()
         logger.info("Electrophysiology brain region column header")
         find_ephys_e_type_c_header = explore_ephys_page.find_e_type_header()
@@ -44,3 +44,36 @@ class TestExploreEphys:
         find_search_field = explore_ephys_page.find_search_label()
         assert find_search_field is not None
         logger.info("Search field is found")
+        find_search_field.click()
+
+        find_search_input = explore_ephys_page.find_search_input_search_item()
+        find_search_input.send_keys("Mus muculus")
+        logger.info("Search input for a Specie")
+
+        find_filter_btn = explore_ephys_page.find_filter_btn().click()
+        logger.info("Looking for filter button")
+        find_filter_close_btn = explore_ephys_page.find_filter_close_btn().click()
+        logger.info("Looking for filter close button")
+
+        find_side_bar_plus_icon = explore_ephys_page.find_side_bar_plus_btn().click()
+        logger.info("Looking for side bar plus icon")
+
+        find_side_bar_menu = explore_ephys_page.find_side_bar_menu()
+        logger.info("Side bar menu is open")
+
+        find_side_bar_menu_close_btn = explore_ephys_page.find_side_bar_menu_close_btn()
+        logger.info("Side bar menu close")
+
+
+
+    def test_links(self):
+        """
+        test_links methods checks the request status
+        Also, writes non-dynamic URLs that are present on the page to a text file.
+        """
+        test_directory = os.path.dirname(os.path.abspath(__file__))
+        links_file_path = os.path.join(test_directory, '..', 'links.json')
+
+        link_checker = LinkChecker()
+        links = link_checker.load_links(links_file_path)['explore_ephys_links']
+        link_checker.check_links(links)

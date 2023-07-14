@@ -5,7 +5,7 @@ from util.util_base import load_config
 
 @pytest.mark.usefixtures("setup", "logger", "login")
 class TestLogin:
-
+    @pytest.mark.run(order=1)
     def test_login(self, setup, logger, login):
         """Access the login fixture
         Find the username/password fields and enter credentials"""

@@ -16,6 +16,11 @@
     "https://bbp.epfl.ch/mmb-beta/explore/synapse-per-connection"
 
   ],
+  "explore_ephys_links":[
+      "https://bbp.epfl.ch/mmb-beta/explore/electrophysiology",
+      "https://bbp.epfl.ch/mmb-beta"
+
+  ],
   "build_page_links":[
       "https://bbp.epfl.ch/mmb-beta/build/load-brain-config",
       "https://bbp.epfl.ch/mmb-beta"

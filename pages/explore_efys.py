@@ -19,9 +19,7 @@ class ExploreElectrphysiologyPage(ExplorePage, LinkChecker):
 
     def scrape_links(self):
         page_source = self.browser.page_source
-        print("EPHYS page source", page_source)
         links = self.url_scraper.scrape_links(page_source)
-        print("EPHYS links", links)
 
     def find_ephys_page_title(self):
         return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.NEURON_EPHYS_PAGE_TITLE))
@@ -46,3 +44,27 @@ class ExploreElectrphysiologyPage(ExplorePage, LinkChecker):
 
     def find_search_label(self):
         return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SEARCH_LABEL))
+
+    def find_search_input_search_item(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SEARCH_INPUT_FIELD))
+
+    def find_filter_btn(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.FILTER_BTN))
+
+    def find_filter_close_btn(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.FILTER_CLOSE_BTN))
+
+    def find_plus_btn(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIDE_BAR_PLUS_BTN))
+
+    def find_side_bar_explore_btn(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIDE_BAR_EXPLORE_BTN))
+
+    def find_side_bar_plus_btn(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIDE_BAR_PLUS_BTN))
+
+    def find_side_bar_menu(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIDE_BAR_MENU))
+
+    def find_side_bar_menu_close_btn(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIDE_BAR_MENU_CLOSE_BTN))

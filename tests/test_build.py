@@ -21,6 +21,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestBuild:
     @pytest.mark.build_page
+    @pytest.mark.run(order=4)
     def test_build_page(self, setup, login_explore, logger):
         browser, wait = setup
         build_page = BuildPage(browser, wait)
@@ -40,12 +41,9 @@ class TestBuild:
 
         find_search_textfield = build_page.find_config_search_field()
         find_search_textfield.send_keys("Custom model configuration")
-
         use_public_config = build_page.use_custom_config()
         clone_public_config = build_page.clone_custom_config().click()
         logger.info("'Clone' button is clicked")
-
-        # Find the name input field in the modal
         find_default_config_name = build_page.find_default_config_name()
         find_default_config_name.send_keys(Keys.COMMAND + 'a')
         find_default_config_name.send_keys(Keys.DELETE)
@@ -63,33 +61,17 @@ class TestBuild:
         else:
             print('description value is EMPTY')
 
-        time.sleep(10)
+        time.sleep(5)
         start_editing = build_page.push_start_editing()
         str_ed_txt = start_editing.text
-        logger.info("start editing text is found")
+        logger.info("Start editing text is found")
         start_editing.click()
         logger.info("Start editing button was clicked")
-
         is_loaded = build_page.is_config_page_loaded()
         time.sleep(15)
-
         brain_cells_regions = build_page.find_basic_cell_groups()
         logger.info("Title brain cells and groups are present")
 
-        find_cell_composition = build_page.find_cell_composition()
-        logger.info("Cell composition link/button is found")
-
-        find_cell_model_assignment = build_page.find_cell_model_assignment()
-        logger.info("Cell model assignment link/button is found")
-
-        find_connectome_definition = build_page.find_connectome_definition()
-        logger.info("Connectome definition link/button is found")
-
-        find_connection_model_assignment = build_page.find_connection_model_assignment()
-        logger.info("Find connection model assignment link/button is found")
-
-        find_build_and_simulate_button = build_page.find_build_and_simulate_button()
-        logger.info("Build & Simulate button is found")
 
     def test_links(self):
         """

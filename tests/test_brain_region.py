@@ -20,11 +20,11 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestBrainBuild:
     @pytest.mark.build_page
-    def test_build_page(self, setup, login_explore, logger):
+    @pytest.mark.run(order=5)
+    def test_brain_build(self, setup, login_explore, logger):
         browser, wait = setup
         brain_region_page = BrainRegionPage(browser, wait)
         brain_region_url = brain_region_page.go_to_config_page()
-
         find_main_build_section = brain_region_page.find_build_main_section()
         open_build_div = brain_region_page.open_build_div()
         browser.execute_script("arguments[0].style.display = 'block'; arguments[0].style.visibility = 'visible';",
@@ -54,49 +54,43 @@ class TestBrainBuild:
         logger.info("Agranular Insular Area Dorsal Part is toggled")
         find_click_agranular_ins_area_dorsal_title = brain_region_page.find_agranular_ins_area_dorsal_p_title().click()
         logger.info("Agranular Insular Area Dorsal Part title is clicked")
-        time.sleep(10)
-        find_click_configuration_btn = brain_region_page.find_configuration_btn()
-        if find_click_configuration_btn:
-            find_click_configuration_btn.click()
-            print("CONFIG BUTTON FOUND")
-        else:
-            print("CONFIG BUTTON NOT FOUND")
+        find_second_submenu = brain_region_page.find_second_sub_menu().click()
+        logger.info("Second top submenu is opened")
+        configuration_btn = brain_region_page.configuration_button().click()
+        logger.info("Configuration button clicked")
 
         find_click_l5_bp_btn = brain_region_page.l5_bp_arrow_btn()
         find_click_l5_bp_btn.txt = find_click_l5_bp_btn.text
-        print(find_click_l5_bp_btn)
 
         find_l5_bp_slider = brain_region_page.l5_bp_slider_handle()
 
         if find_l5_bp_slider.is_enabled():
             move = ActionChains(browser)
             move.click_and_hold(find_l5_bp_slider).pause(0).move_by_offset(50, 0).release().perform()
+            logger.info("Slider shifted")
         else:
             print("L5_BP slider is not there")
-        time.sleep(15)
 
+        find_top_nav_menu = brain_region_page.find_top_nav_menu()
+        if find_top_nav_menu is not None:
+            find_top_nav_menu.click()
+            logger.info("Top navigation menu is clicked")
 
-"""
-    Below is a code snippet for scraping links
-
+        find_cell_composition = brain_region_page.find_cell_composition()
+        logger.info("Cell composition button is found")
+        find_cell_model_assignment = brain_region_page.find_cell_model_assignment()
+        logger.info("Cell model assignment button is found")
+        find_connectome_definition = brain_region_page.find_connectome_definition()
+        logger.info("Connectome definition button is found")
+        find_connection_model_assignment = brain_region_page.find_connection_model_assignment()
+        logger.info("Connection model assignment button is found")
+        find_build_and_simulate_button = brain_region_page.find_build_and_simulate_button()
+        logger.info("Build & Simulate button is found")
 
     def test_links(self):
         test_directory = os.path.dirname(os.path.abspath(__file__))
         links_file_path = os.path.join(test_directory, '..', 'links.json')
 
         link_checker = LinkChecker()
-        links = link_checker.load_links(links_file_path)['brain_build_page_links']
+        links = link_checker.load_links(links_file_path)['explore_ephys_links']
         link_checker.check_links(links)
-        
-        
-        # url = "https://bbp.epfl.ch/mmb-beta/build/cell-composition/interactive?brainModelConfigId=8a962b3a-2005-4bc1-9b35-c20c2ec4cc54"
-        # response = requests.get(url)
-        # page_source = response.text
-        # url_scraper = UrlScraper()
-        # scraped_links = url_scraper.scrape_links(page_source)
-        #
-        # write_links_to_file(file_path, scraped_links)
-        # print("Scraped links from BRAIN REGION saved to file successfully")
-        # print("File path BRAIN test", file_path)
-        # print("Scraped links BRAIN page", scraped_links) 
-"""
