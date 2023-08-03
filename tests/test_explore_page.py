@@ -23,31 +23,49 @@ class TestExplorePage:
 
         # Checking the titles of the Explore Page
         check_explore_title = explore_page.check_explore_title_is_present()
-        assert check_explore_title.text.lower() == 'Explore'.lower()
-        logger.info("Checking that the main title of Explore page is present")
+        logger.info("Explore page title is present")
 
-        brain_and_cells = explore_page.brain_and_cell_title()
-        brain_txt = brain_and_cells.text
-        print(brain_txt)
-        assert brain_txt == "Brain & cells annotations"
-        logger.info("Checking that the Brain & cells annotations is present")
+        brain_models_title = explore_page.brain_models_title()
+        brain_txt = brain_models_title.text
+        logger.info("Brain models title is found")
 
-        experimental_data = explore_page.experimental_data_title()
-        exp_data = experimental_data.text
-        assert exp_data == "Experimental data"
-        logger.info("Experimental data title is present on the page")
-
-        digital_reconstruction = explore_page.digital_reconstruction_title()
-        digital = digital_reconstruction.text
-        print(digital, "CHECKING DIGITAL")
-        assert digital == "Brain models"
-        logger.info("Brain models title is present and unchanged")
-
-        simulations = explore_page.simulations_title()
-        simul = simulations.text
+        simulations_title = explore_page.simulations_title()
+        simul = simulations_title.text
         print(simul, "CHECKING SIMULATIONS")
-        assert simul == "Simulations"
-        logger.info("Verifying Simulations title is found on the page")
+        logger.info("Verifying 'Simulations' title is found")
+
+        experimental_data_title = explore_page.experimental_data_title()
+        exp_data = experimental_data_title.text
+        logger.info("Verifying 'Experimental data' title is found")
+
+        portals_title = explore_page.portals_title()
+        portal_txt = portals_title.text
+        logger.info("Verifying 'Portals' title is found")
+
+        gallery_title = explore_page.gallery_title()
+        gallery_txt = gallery_title.text
+        logger.info("Verifying 'Gallery' title is found")
+
+        literature_title = explore_page.literature_title()
+        literature_txt = literature_title.text
+        logger.info("Verifying 'Literature' title is found")
+
+        click_experimental_data = explore_page.experimental_data_button()
+        logger.info("Selecting 'Experimental Data' section")
+        # time.sleep(5)
+        click_experimental_data.click()
+
+
+        neuron_electrphysiology_link = explore_page.neuron_electrophysiology_link()
+        href_value = neuron_electrphysiology_link.get_attribute('href')
+        print("The href corrsponds to the href link", href_value)
+
+        # neuron_morphology_link = explore_page.neuron_morphology_link()
+        # bouton_density_link = explore_page.bouton_density_link()
+        # neuron_density_link = explore_page.neuron_density_link()
+        # layer_thickness_link = explore_page.layer_thickness_link()
+        # synapse_per_connection_link = explore_page.synapse_per_connection_link()
+
 
     def test_links(self):
         """

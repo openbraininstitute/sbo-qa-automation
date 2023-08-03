@@ -25,14 +25,44 @@ class ExplorePage(HomePage, LinkChecker):
     def check_explore_title_is_present(self):
         return self.wait.until(EC.element_to_be_clickable(ExplorePageLocators.EXPLORE_TITLE))
 
-    def brain_and_cell_title(self):
-        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.BRAIN_CELL_ANNOTATIONS))
-
     def experimental_data_title(self):
         return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPERIMENTAL_DATA))
 
-    def digital_reconstruction_title(self):
-        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.DIGITAL_RECONSTRUCTION))
+    def brain_models_title(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.BRAIN_MODELS))
 
     def simulations_title(self):
         return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIMULATIONS))
+
+    def brain_and_cell_title(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.BRAIN_CELL_ANNOTATIONS))
+
+    def portals_title(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.PORTALS))
+
+    def gallery_title(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.GALLERY))
+
+    def literature_title(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.LITERATURE))
+
+    def experimental_data_button(self, timeout=10):
+        return self.wait.until(EC.visibility_of_element_located(ExplorePageLocators.EXPERIMENTAL_DATA_BUTTON))
+
+    def neuron_electrophysiology_link(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY))
+
+    def neuron_morphology_link(self):
+        return self.wait.until(EC.visibility_of_element_located(ExplorePageLocators.NEURON_MORPHOLOGY))
+
+    def bouton_density_link(self):
+        return self.wait.until(EC.visibility_of_element_located(ExplorePageLocators.BOUTON_DENSITY))
+
+    def neuron_density_link(self):
+        return self.wait.until(EC.visibility_of_element_located(ExplorePageLocators.NEURON_DENSITY))
+
+    def layer_thickness_link(self):
+        return self.wait.until(EC.visibility_of_element_located(ExplorePageLocators.LAYER_THICKNESS))
+
+    def synapse_per_connection_link(self):
+        return self.wait.until(EC.visibility_of_element_located(ExplorePageLocators.SYNAPSE_PER_CONNECTION))
