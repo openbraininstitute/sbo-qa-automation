@@ -31,6 +31,12 @@ class ExplorePage(HomePage, LinkChecker):
     def brain_models_title(self):
         return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.BRAIN_MODELS))
 
+    def brain_models_links(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.BRAIN_MODELS_LINK))
+
+    def simulations_link(self):
+        return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIMULATIONS_LINK))
+
     def simulations_title(self):
         return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIMULATIONS))
 
@@ -66,3 +72,4 @@ class ExplorePage(HomePage, LinkChecker):
 
     def synapse_per_connection_link(self):
         return self.wait.until(EC.visibility_of_element_located(ExplorePageLocators.SYNAPSE_PER_CONNECTION))
+

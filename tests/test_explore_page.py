@@ -55,17 +55,41 @@ class TestExplorePage:
         # time.sleep(5)
         click_experimental_data.click()
 
+        experimental_data_links = [
+            explore_page.neuron_electrophysiology_link(),
+            explore_page.neuron_morphology_link(),
+            explore_page.bouton_density_link(),
+            explore_page.neuron_density_link(),
+            explore_page.layer_thickness_link(),
+            explore_page.synapse_per_connection_link()
+        ]
 
-        neuron_electrphysiology_link = explore_page.neuron_electrophysiology_link()
-        href_value = neuron_electrphysiology_link.get_attribute('href')
-        print("The href corrsponds to the href link", href_value)
+        exp_data_titles = [
+            "Neuron electrophysiology link:",
+            "Neuron morphology href:",
+            "Bouton density href:",
+            "Neuron density href:",
+            "Layer thickness href:",
+            "Synapse per connection href:"
+        ]
 
-        # neuron_morphology_link = explore_page.neuron_morphology_link()
-        # bouton_density_link = explore_page.bouton_density_link()
-        # neuron_density_link = explore_page.neuron_density_link()
-        # layer_thickness_link = explore_page.layer_thickness_link()
-        # synapse_per_connection_link = explore_page.synapse_per_connection_link()
+        for link, title in zip(experimental_data_links, exp_data_titles):
+            href_value = link.get_attribute('href')
+            print(title, href_value)
 
+        explore_page_links = [
+            explore_page.brain_models_links(),
+            explore_page.simulations_link()
+        ]
+
+        titles = [
+            "Brain models link:",
+            "Simulations link:"
+        ]
+
+        for link, title in zip(explore_page_links, titles):
+            href_value = link.get_attribute('href')
+            print(title, href_value)
 
     def test_links(self):
         """
