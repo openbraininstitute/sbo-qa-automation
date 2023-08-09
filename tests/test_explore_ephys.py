@@ -5,6 +5,7 @@ from selenium.common import TimeoutException
 from selenium.webdriver import ActionChains, Keys
 from selenium import webdriver
 
+from locators.explore_ephys_locators import ExploreEphysPageLocators
 from pages.explore_efys import ExploreElectrphysiologyPage
 from pages.explore_page import ExplorePage
 from util.util_base import load_config
@@ -24,24 +25,44 @@ class TestExploreEphys:
         explore_ephys_page = ExploreElectrphysiologyPage(browser, wait)
         ephys_page = explore_ephys_page.go_to_explore_ephys_page()
         assert ephys_page == "https://bbp.epfl.ch/mmb-beta/explore/electrophysiology"
-        time.sleep(3)
 
         find_ephys_page_title = explore_ephys_page.find_ephys_page_title()
         logger.info("Neuron electrophysiology title is present")
         find_ephys_brain_region_c_header = explore_ephys_page.find_brain_region_header()
-        logger.info("Electrophysiology brain region column header")
+        logger.info("Electrophysiology 'Brain region' column header")
         find_ephys_e_type_c_header = explore_ephys_page.find_e_type_header()
-        logger.info("Electrophysiology E_Type column header")
+        logger.info("Electrophysiology 'E_Type' column header")
         find_ephys_name_c_header = explore_ephys_page.find_name_header()
-        logger.info("Electrophysiology Name column header")
+        logger.info("Electrophysiology 'Name' column header")
         find_ephys_species_c_header = explore_ephys_page.find_species_header()
-        logger.info("Electrophysiology Species column header")
+        logger.info("Electrophysiology 'Species' column header")
         find_ephys_contributors_c_header = explore_ephys_page.find_contributors_header()
-        logger.info("Electrophysiology Contributors column header")
+        logger.info("Electrophysiology 'Contributors' column header")
         find_ephys_date_c_header = explore_ephys_page.find_creation_date_header()
-        logger.info("Electrophysiology date creation column header")
+        logger.info("Electrophysiology 'Creation date' column header")
 
-        find_search_field = explore_ephys_page.find_search_label()
+
+        try:
+            # Find all checkboxes on the page
+            checkboxes = explore_ephys_page.find_checkbox()
+
+            # Click on the first 5 checkboxes
+            for checkbox in checkboxes[:5]:
+                checkbox.click()
+                logger.info("Clicked on checkbox")
+
+            # Uncheck the checkboxes after the first 5
+            for checkbox in checkboxes[:5]:
+                if checkbox.is_selected():
+                    checkbox.click()
+                    logger.info("Unchecked checkbox")
+
+        except Exception as e:
+            print("An error occurred:", e)
+
+        validate_table_fields = explore_ephys_page.perform_full_validation()
+        logger.info("Table validation for checking empty fields is performed")
+        find_search_field = explore_ephys_page.find_search_button()
         assert find_search_field is not None
         logger.info("Search field is found")
         find_search_field.click()
@@ -52,6 +73,11 @@ class TestExploreEphys:
 
         find_filter_btn = explore_ephys_page.find_filter_btn().click()
         logger.info("Looking for filter button")
+
+        filter_brain_region = explore_ephys_page.check_filter_brain_region_title()
+        filter_brain_region_txt = filter_brain_region.text
+        print("Filter titles", filter_brain_region_txt)
+
         find_filter_close_btn = explore_ephys_page.find_filter_close_btn().click()
         logger.info("Looking for filter close button")
 
@@ -63,8 +89,8 @@ class TestExploreEphys:
 
         find_side_bar_menu_close_btn = explore_ephys_page.find_side_bar_menu_close_btn()
         logger.info("Side bar menu close")
-
-
+        find_side_bar_menu_close_btn.click()
+        logger.info("Side bar menus is clicked to close")
 
     def test_links(self):
         """
