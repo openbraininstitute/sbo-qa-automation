@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import sys
+import time
 from io import BytesIO
 
 import pytest
@@ -19,10 +20,6 @@ from webdriver_manager.firefox import GeckoDriverManager
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from util.util_base import load_config
-import allure
-import argparse
-import glob
-
 
 
 @pytest.fixture(scope="class", autouse=True)
@@ -71,7 +68,6 @@ def setup(request, pytestconfig):
         browser.quit()
 
 
-
 @pytest.fixture(scope="function")
 def logger(request):
     """Fixture to initialize the logger object"""
@@ -113,20 +109,11 @@ def logger(request):
 
 
 @pytest.fixture(scope="function")
-def login(setup, navigate_to_login):
-    """Fixture that navigates to the login page"""
-    login_page = LoginPage(*setup)
-    login_page.go_to_login_page(navigate_to_login)
-    yield login_page
-
-
-@pytest.fixture(scope="function")
 def navigate_to_login(setup):
-    """Fixture that navigates to the login page and finds login button"""
+    # Fixture that navigates to the login page and finds login button
     browser, wait = setup
     browser.get("https://bbp.epfl.ch/mmb-beta")
-    home_page = HomePage(*setup)
-    browser.delete_all_cookies()
+    home_page = HomePage(browser, wait)
 
     login_button = home_page.find_login_button()
     assert login_button.is_displayed()
@@ -134,26 +121,27 @@ def navigate_to_login(setup):
     assert login_btn == 'Login'
     login_button.click()
     wait.until(EC.url_contains("auth"))
-    login_url = browser.current_url
-    yield login_url
+    login_page = LoginPage(browser, wait)
+    return login_page
 
 
 @pytest.fixture(scope="function")
-def login_explore(navigate_to_login, setup):
-    """User authentication that is used in all other pages/"""
+def login(setup, navigate_to_login):
+    """Fixture that navigates to the login page"""
     browser, wait = setup
-    login_page = LoginPage(*setup)
-    login_page.go_to_login_page(navigate_to_login)
-
+    login_page = navigate_to_login
     config = load_config()
     username = config['username']
     password = config['password']
 
-    login_page.find_username_field().send_keys(username)
-    login_page.find_password_field().send_keys(password)
-    login_page.find_signin_button().click()
-    wait.until(EC.url_contains("mmb-beta"))
+    if 'mmb-beta' not in browser.current_url:
+        login_page.find_username_field().send_keys(username)
+        login_page.find_password_field().send_keys(password)
+        login_page.find_signin_button().click()
+        wait.until(EC.url_contains("mmb-beta"))
+
     yield browser, wait
+    login_page.browser.delete_all_cookies()
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -227,6 +215,8 @@ def pytest_addoption(parser):
 
 
 """ Temporarily disabling custom markers"""
+
+
 # def pytest_collection_modifyitems(config, items):
 #     config.addinivalue_line(
 #         "markers", "explore_page: mark a test as an explore_page test"

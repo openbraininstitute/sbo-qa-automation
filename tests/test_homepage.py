@@ -26,9 +26,9 @@ class TestFindLogin:
         home_page = HomePage(*setup)
         home_page.go_to_home_page()
         home_page.find_explore_title()
-        logger.info("explore title on the homepage is found")
+        logger.info("'Explore' title on the homepage is found")
         build = home_page.find_build_title()
-        logger.info("build title on the homepage is found")
+        logger.info("'Build' title on the homepage is found")
         simulate = home_page.find_simulate_title()
         assert simulate.text == 'Simulate'
 
@@ -37,8 +37,9 @@ class TestFindLogin:
         home_page.go_to_home_page()
 
         login_button = home_page.find_login_button()
+        login_button_text = login_button.text
         assert login_button.is_displayed()
-        logger.info('the button is found')
+        logger.info("'Login' button is found")
 
     def test_links(self):
         test_directory = os.path.dirname(os.path.abspath(__file__))

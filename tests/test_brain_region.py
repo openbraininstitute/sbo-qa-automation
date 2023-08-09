@@ -21,10 +21,14 @@ file_path = os.path.join(current_directory, relative_file_path)
 class TestBrainBuild:
     @pytest.mark.build_page
     @pytest.mark.run(order=5)
-    def test_brain_build(self, setup, login_explore, logger):
+    def test_brain_build(self, setup, login, logger):
         browser, wait = setup
         brain_region_page = BrainRegionPage(browser, wait)
         brain_region_url = brain_region_page.go_to_config_page()
+        # current_url = brain_region_page.browser.current_url
+        # logger.info(f"!!!!!!!!!! Brain Build Current URL {current_url}")
+        # print(current_url)
+
         find_main_build_section = brain_region_page.find_build_main_section()
         open_build_div = brain_region_page.open_build_div()
         browser.execute_script("arguments[0].style.display = 'block'; arguments[0].style.visibility = 'visible';",
@@ -32,11 +36,9 @@ class TestBrainBuild:
 
         find_visible_basic_cells_txt = brain_region_page.find_visible_basic_cells()
         find_visible_basic_cells_txt.click()
-
         find_basic_cells_arrow_btn = brain_region_page.find_basic_cells_arrow_btn()
         find_basic_cells_arrow_btn.click()
         logger.info("Basic cell groups and regions first arrow is clicked ")
-
         find_brain_stem = brain_region_page.find_brain_stem_arrow_btn()
         find_brain_stem.click()
         logger.info("Brain stem arrow to toggle open is clicked")

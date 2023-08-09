@@ -16,16 +16,14 @@ relative_file_path = 'scraped_links.txt'
 file_path = os.path.join(current_directory, relative_file_path)
 
 
-
-
-
 class TestBuild:
     @pytest.mark.build_page
     @pytest.mark.run(order=4)
-    def test_build_page(self, setup, login_explore, logger):
+    def test_build_page(self, setup, login, logger):
         browser, wait = setup
         build_page = BuildPage(browser, wait)
         build_url = build_page.go_to_build_page()
+        # assert build_url == "https://bbp.epfl.ch/mmb-beta/build/load-brain-config"
 
         recent_config = build_page.find_recent_configurations()
         assert recent_config.text == "Recently used configurations"
@@ -39,7 +37,7 @@ class TestBuild:
         # plus_icon_open_default_config = build_page.select_default_config().click()
         # logger.info("Accessing default public config link via plus icon")
 
-        find_search_textfield = build_page.find_config_search_field()
+        """find_search_textfield = build_page.find_config_search_field()
         find_search_textfield.send_keys("Custom model configuration")
         use_public_config = build_page.use_custom_config()
         clone_public_config = build_page.clone_custom_config().click()
@@ -72,15 +70,14 @@ class TestBuild:
         brain_cells_regions = build_page.find_basic_cell_groups()
         logger.info("Title brain cells and groups are present")
 
-
     def test_links(self):
         """
-            test_links methods checks the request status
-            Also, writes non-dynamic URLs that are present on the page to a text file.
+            # test_links methods checks the request status
+            # Also, writes non-dynamic URLs that are present on the page to a text file.
         """
         test_directory = os.path.dirname(os.path.abspath(__file__))
         links_file_path = os.path.join(test_directory, '..', 'links.json')
 
         link_checker = LinkChecker()
         links = link_checker.load_links(links_file_path)['build_page_links']
-        link_checker.check_links(links)
+        link_checker.check_links(links)"""

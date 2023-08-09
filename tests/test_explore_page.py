@@ -14,7 +14,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 class TestExplorePage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=2)
-    def test_explore_page(self, setup, login_explore, logger):
+    def test_explore_page(self, setup, login, logger):
         browser, wait = setup
         explore_page = ExplorePage(browser, wait)
         exp_url = explore_page.go_to_explore_page()

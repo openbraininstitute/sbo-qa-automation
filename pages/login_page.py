@@ -1,19 +1,21 @@
 import time
-
 from locators.login_locators import LoginPageLocators
 from selenium.webdriver.support import expected_conditions as EC
+from pages.base_page import CustomBasePage
 from pages.home_page import HomePage
 
 
-class LoginPage(HomePage):
+class LoginPage(CustomBasePage):
     def __init__(self, browser, wait):
         super().__init__(browser, wait)
-        # self.login_page = HomePage(browser, wait)
 
-    def go_to_login_page(self, url):
-        self.browser.get(url)
+    def login(self):
+        self.wait.until(EC.presence_of_element_located(LoginPageLocators.USERNAME))
+        self.wait.until(EC.presence_of_element_located(LoginPageLocators.PASSWORD))
 
-        self.wait.until(EC.url_contains(url))
+    def wait_for_login_complete(self):
+        """Wait for login to complete by checking URL change"""
+        self.wait.until(EC.url_contains("mmb-beta"))
 
     def already_logged(self):
         return self.wait.until(EC.presence_of_element_located(LoginPageLocators.ALREADY_LOGGED))

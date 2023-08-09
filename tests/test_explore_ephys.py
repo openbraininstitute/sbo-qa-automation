@@ -20,7 +20,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 class TestExploreEphys:
     @pytest.mark.build_page
     @pytest.mark.run(order=3)
-    def test_explore_ephys_page(self, setup, login_explore, logger):
+    def test_explore_ephys_page(self, setup, login, logger):
         browser, wait = setup
         explore_ephys_page = ExploreElectrphysiologyPage(browser, wait)
         ephys_page = explore_ephys_page.go_to_explore_ephys_page()

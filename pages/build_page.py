@@ -8,12 +8,11 @@ from urllib.parse import urlparse, parse_qs
 from util.util_scraper import UrlScraper
 
 
-class BuildPage(HomePage, CustomBasePage):
+class BuildPage(HomePage):
     def __init__(self, browser, wait):
         super().__init__(browser, wait)
         self.login_page = HomePage(browser, wait)
         self.url_scraper = UrlScraper()
-
 
     def go_to_build_page(self):
         self.browser.get(self.url + "/build/load-brain-config")
@@ -102,4 +101,3 @@ class BuildPage(HomePage, CustomBasePage):
 
     def find_basic_cell_groups(self):
         return self.wait.until(EC.presence_of_element_located(BuildPageLocators.BASIC_CELL_GROUPS_AND_REGIONS))
-
