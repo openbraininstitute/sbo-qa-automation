@@ -1,9 +1,9 @@
 from locators.build_page_locators import BuildPageLocators
 from selenium.webdriver.support import expected_conditions as EC
-from pages.base_page import CustomBasePage
-from seleniumbase import BaseCase
 from pages.home_page import HomePage
 from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from util.util_methods import click_element, find_element, assert_element_text, \
+    find_visibility_of_all_elements, find_all_elements, find_element_visibility, wait_for_long_load
 from urllib.parse import urlparse, parse_qs
 from util.util_scraper import UrlScraper
 
@@ -26,51 +26,48 @@ class BuildPage(HomePage):
         links = self.url_scraper.scrape_links(page_source)
 
     def find_recent_configurations(self):
-        return self.wait.until(EC.presence_of_element_located(BuildPageLocators.RECENT_CONFIGURATIONS))
+        return find_element(self.wait, BuildPageLocators.RECENT_CONFIGURATIONS)
 
     def verify_release_version(self):
-        return self.wait.until(EC.presence_of_element_located(BuildPageLocators.RELEASE_VERSION))
+        return find_element(self.wait, BuildPageLocators.RELEASE_VERSION)
 
     def select_default_config(self):
-        return self.wait.until(EC.presence_of_element_located(BuildPageLocators.BUILD_PAGE_CLICK_PLUS_ICON))
+        return find_element(self.wait, BuildPageLocators.BUILD_PAGE_CLICK_PLUS_ICON)
 
     def find_config_search_field(self):
-        return self.wait.until(EC.visibility_of_element_located(BuildPageLocators.CONFIG_SEARCH_FIELD))
+        return find_element_visibility(self.wait, BuildPageLocators.CONFIG_SEARCH_FIELD)
 
     def use_custom_config(self):
-        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.CUSTOM_MODEL_CONFIG))
+        return click_element(self.wait, BuildPageLocators.CUSTOM_MODEL_CONFIG)
 
     def clone_custom_config(self):
-        return self.wait.until(
-            lambda d: EC.presence_of_element_located(BuildPageLocators.BTN_CLONE_CONFIG)(d)
-        )
+        return find_element(self.wait, BuildPageLocators.BTN_CLONE_CONFIG)
+
+    # def clone_custom_config(self):
+    #     return self.wait.until(
+    #         lambda d: EC.presence_of_element_located(BuildPageLocators.BTN_CLONE_CONFIG)(d)
+    #     )
 
     def find_edit_config_modal(self):
-        return self.wait.until(EC.visibility_of_element_located(BuildPageLocators.EDIT_MODAL))
+        return find_element_visibility(self.wait, BuildPageLocators.EDIT_MODAL)
 
     def find_default_config_name(self):
-        return self.wait.until(EC.visibility_of_element_located(BuildPageLocators.CONFIG_TEXT_FIELD_NAME))
+        return find_element_visibility(self.wait, BuildPageLocators.CONFIG_TEXT_FIELD_NAME)
 
     def set_your_config_name(self):
-        return self.wait.until(
-            lambda d: EC.visibility_of_element_located(BuildPageLocators.CHANGE_CONFIG_NAME_TEXT_FIELD)(d)
-        )
+        return find_element_visibility(self.wait, BuildPageLocators.CHANGE_CONFIG_NAME_TEXT_FIELD)
 
     def clear_default_description_name(self):
-        return self.wait.until(
-            lambda d: EC.visibility_of_element_located(BuildPageLocators.DESCRIPTION)(d)
-        )
+        return find_element_visibility(self.wait, BuildPageLocators.DESCRIPTION)
 
     def set_config_description(self):
-        return self.wait.until(
-            lambda d: EC.visibility_of_element_located(BuildPageLocators.DESCRIPTION)(d)
-        )
+        return find_element_visibility(self.wait, BuildPageLocators.DESCRIPTION)
 
     def click_on_description(self):
-        return self.wait.until(EC.visibility_of_element_located(BuildPageLocators.DESCRIPTION))
+        return find_element_visibility(self.wait, BuildPageLocators.DESCRIPTION)
 
     def find_start_editing_btn(self):
-        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.BTN_START_EDITING))
+        return find_element(self.wait, BuildPageLocators.BTN_START_EDITING)
 
     def is_start_ed_btn_clickable(self):
         try:
@@ -80,7 +77,8 @@ class BuildPage(HomePage):
             return False  # Button is not clickable, so it is disabled
 
     def push_start_editing(self):
-        return self.wait.until(EC.element_to_be_clickable(BuildPageLocators.BTN_START_EDITING))
+        click_element(self.wait, BuildPageLocators.BTN_START_EDITING)
+        wait_for_long_load(self.wait, BuildPageLocators.BTN_START_EDITING)
 
     def is_config_page_loaded(self):
         current_url = self.browser.current_url
@@ -100,4 +98,4 @@ class BuildPage(HomePage):
         return expected_url
 
     def find_basic_cell_groups(self):
-        return self.wait.until(EC.presence_of_element_located(BuildPageLocators.BASIC_CELL_GROUPS_AND_REGIONS))
+        return find_element(self.wait, BuildPageLocators.BASIC_CELL_GROUPS_AND_REGIONS)

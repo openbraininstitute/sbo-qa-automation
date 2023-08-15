@@ -21,23 +21,28 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 @pytest.mark.usefixtures("setup", "logger")
 class TestFindLogin:
-
-    def test_find_homepage_titles(self, setup, logger, login):
+    @pytest.mark.run(order=2)
+    def test_find_homepage_titles(self, setup, logger):
         home_page = HomePage(*setup)
         home_page.go_to_home_page()
-        home_page.find_explore_title()
-        logger.info("'Explore' title on the homepage is found")
-        build = home_page.find_build_title()
-        logger.info("'Build' title on the homepage is found")
-        simulate = home_page.find_simulate_title()
-        assert simulate.text == 'Simulate'
 
-    def test_find_login_button(self, setup, logger, login):
+        explore_title = home_page.find_explore_title()
+        assert explore_title.text == 'Explore'
+        logger.info("'Explore' title on the homepage is found")
+
+        build_title = home_page.find_build_title()
+        assert build_title.text == 'Build'
+        logger.info("'Build' title on the homepage is found")
+
+        simulate_title = home_page.find_simulate_title()
+        assert simulate_title.text == 'Simulate'
+        logger.info("'Simulate' title on the homepage is found")
+
+    def test_find_login_button(self, setup, logger):
         home_page = HomePage(*setup)
         home_page.go_to_home_page()
 
         login_button = home_page.find_login_button()
-        login_button_text = login_button.text
         assert login_button.is_displayed()
         logger.info("'Login' button is found")
 

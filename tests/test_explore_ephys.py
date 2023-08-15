@@ -1,16 +1,8 @@
 import os
 import time
 import pytest
-from selenium.common import TimeoutException
-from selenium.webdriver import ActionChains, Keys
-from selenium import webdriver
-
-from locators.explore_ephys_locators import ExploreEphysPageLocators
-from pages.explore_efys import ExploreElectrphysiologyPage
-from pages.explore_page import ExplorePage
-from util.util_base import load_config
+from pages.explore_efys import ExploreElectrophysiologyPage
 from util.util_links_checker import LinkChecker
-from util.util_load_links import LinkUtil
 
 current_directory = os.getcwd()
 relative_file_path = 'scraped_links.txt'
@@ -19,10 +11,10 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestExploreEphys:
     @pytest.mark.build_page
-    @pytest.mark.run(order=3)
+    @pytest.mark.run(order=4)
     def test_explore_ephys_page(self, setup, login, logger):
         browser, wait = setup
-        explore_ephys_page = ExploreElectrphysiologyPage(browser, wait)
+        explore_ephys_page = ExploreElectrophysiologyPage(browser, wait)
         ephys_page = explore_ephys_page.go_to_explore_ephys_page()
         assert ephys_page == "https://bbp.epfl.ch/mmb-beta/explore/electrophysiology"
 
@@ -40,7 +32,6 @@ class TestExploreEphys:
         logger.info("Electrophysiology 'Contributors' column header")
         find_ephys_date_c_header = explore_ephys_page.find_creation_date_header()
         logger.info("Electrophysiology 'Creation date' column header")
-
 
         try:
             # Find all checkboxes on the page
@@ -69,7 +60,7 @@ class TestExploreEphys:
 
         find_search_input = explore_ephys_page.find_search_input_search_item()
         find_search_input.send_keys("Mus muculus")
-        logger.info("Search input for a Specie")
+        logger.info("Search input for Species")
 
         find_filter_btn = explore_ephys_page.find_filter_btn().click()
         logger.info("Looking for filter button")

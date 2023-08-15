@@ -20,7 +20,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestBrainBuild:
     @pytest.mark.build_page
-    @pytest.mark.run(order=5)
+    @pytest.mark.run(order=0)
     def test_brain_build(self, setup, login, logger):
         browser, wait = setup
         brain_region_page = BrainRegionPage(browser, wait)

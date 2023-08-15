@@ -79,7 +79,8 @@ def logger(request):
     has_file_handler = any(isinstance(handler, logging.FileHandler) for handler in logger.handlers)
     # Check if the logger already has a stream handler
 
-    has_stream_handler = any(isinstance(handler, logging.StreamHandler) for handler in logger.handlers)
+    has_stream_handler = any(
+        isinstance(handler, logging.StreamHandler) for handler in logger.handlers)
     # Determine the outer allure_reports directory
     allure_reports_dir = request.config.getoption("--alluredir")
 
@@ -184,8 +185,6 @@ def pytest_html_results_table_row(report, cells):
     """Styling for html.report"""
     if report.failed:
         cells.insert(1, ("✘", "fail"))
-    # elif report.failed:
-    # cells.insert(1, ("✔", "error"))
     else:
         cells.insert(1, ("?", "skipped"))
 
@@ -211,19 +210,8 @@ def pytest_addoption(parser):
         help="Specify the browser to run the tests in",
     )
 
-    parser.addoption("--log-file-path", action="store", default=None, help="Specify the log file path")
-
-
-""" Temporarily disabling custom markers"""
-
-
-# def pytest_collection_modifyitems(config, items):
-#     config.addinivalue_line(
-#         "markers", "explore_page: mark a test as an explore_page test"
-#     )
-#     config.addinivalue_line(
-#         "markers", "build_page: mark a test as a build_page test"
-#     )
+    parser.addoption("--log-file-path", action="store", default=None,
+                     help="Specify the log file path")
 
 
 def make_full_screenshot(browser, savename):
