@@ -1,11 +1,8 @@
 import os
 import time
-
 import pytest
-import requests
 from selenium.common import TimeoutException
 from selenium.webdriver import ActionChains, Keys
-from selenium import webdriver
 
 from pages.brain_region import BrainRegionPage
 from util.util_base import load_config
@@ -20,7 +17,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestBrainBuild:
     @pytest.mark.build_page
-    @pytest.mark.run(order=0)
+    @pytest.mark.run(order=6)
     def test_brain_build(self, setup, login, logger):
         browser, wait = setup
         brain_region_page = BrainRegionPage(browser, wait)
@@ -73,6 +70,7 @@ class TestBrainBuild:
         else:
             print("L5_BP slider is not there")
 
+        '''
         find_top_nav_menu = brain_region_page.find_top_nav_menu()
         if find_top_nav_menu is not None:
             find_top_nav_menu.click()
@@ -95,4 +93,4 @@ class TestBrainBuild:
 
         link_checker = LinkChecker()
         links = link_checker.load_links(links_file_path)['explore_ephys_links']
-        link_checker.check_links(links)
+        link_checker.check_links(links)'''

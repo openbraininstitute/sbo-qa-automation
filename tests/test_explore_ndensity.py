@@ -7,7 +7,7 @@ from util.util_links_checker import LinkChecker
 
 class TestExploreNeuronDensity:
     @pytest.mark.build_page
-    @pytest.mark.run(order=6)
+    @pytest.mark.run(order=7)
     def test_explore_neuron_density_page(self, setup, login, logger):
         browser, wait = setup
         explore_ndensity_page = ExploreNeuronDensityPage(browser, wait)

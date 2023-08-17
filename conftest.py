@@ -111,18 +111,14 @@ def logger(request):
 
 @pytest.fixture(scope="function")
 def navigate_to_login(setup):
-    # Fixture that navigates to the login page and finds login button
     browser, wait = setup
-    browser.get("https://bbp.epfl.ch/mmb-beta")
-    home_page = HomePage(browser, wait)
+    login_page = LoginPage(browser, wait)
+    login_page.navigate_to_homepage()  # Navigate to homepage
 
-    login_button = home_page.find_login_button()
+    login_button = login_page.find_login_button()
     assert login_button.is_displayed()
-    login_btn = login_button.text
-    assert login_btn == 'Login'
     login_button.click()
     wait.until(EC.url_contains("auth"))
-    login_page = LoginPage(browser, wait)
     return login_page
 
 

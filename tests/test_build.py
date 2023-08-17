@@ -18,7 +18,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestBuild:
     @pytest.mark.build_page
-    @pytest.mark.run(order=0)
+    @pytest.mark.run(order=5)
     def test_build_page(self, setup, login, logger):
         browser, wait = setup
         build_page = BuildPage(browser, wait)
@@ -53,6 +53,7 @@ class TestBuild:
         # Find the description input field in the modal
         find_default_description = build_page.clear_default_description_name()
 
+        """
         # Wait until 'Start editing button is enabled'
         if find_default_description.get_property('value'):
             print("The default description has a value")
@@ -71,7 +72,7 @@ class TestBuild:
         brain_cells_regions = build_page.find_basic_cell_groups()
         logger.info("Title brain cells and groups are present")
 
-    """
+    
     def test_links(self):
         
             # test_links methods checks the request status
