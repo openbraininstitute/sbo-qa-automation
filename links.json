@@ -5,7 +5,15 @@
     "https://bbp.epfl.ch/mmb-beta/build/load-brain-config",
     "https://bbp.epfl.ch/mmb-beta/simulate"
   ],
-  "explore_page_links":[
+
+  "explore_links":[
+      "https://bbp.epfl.ch/mmb-beta/explore",
+      "https://bbp.epfl.ch/mmb-beta/explore/interactive",
+      "https://bbp.epfl.ch/mmb-beta/explore/literature",
+      "https://bbp.epfl.ch/mmb-beta/explore/portals",
+      "https://bbp.epfl.ch/mmb-beta/explore/gallery"
+  ],
+  "explore_interactive_links":[
     "https://bbp.epfl.ch/mmb-beta/explore",
     "https://bbp.epfl.ch/mmb-beta/explore/brain-models",
     "https://bbp.epfl.ch/mmb-beta/explore/simulation-campaigns",

@@ -17,9 +17,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from util.util_base import load_config
+from selenium.webdriver.common.keys import Keys
 
 
 @pytest.fixture(scope="class", autouse=True)
@@ -35,12 +35,14 @@ def setup(request, pytestconfig):
             options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-gpu")
+        # options.add_argument("--disable-javascript")
         service = ChromeService(ChromeDriverManager().install())
         browser = webdriver.Chrome(service=service, options=options)
     elif browser_name == "firefox":
         options = FirefoxOptions()
         if headless_mode:
             options.add_argument("--headless")
+            options.set_preference("extensions.enabled", False)
         service = FirefoxService(executable_path=GeckoDriverManager().install())
         browser = webdriver.Firefox(service=service, options=options)
     elif browser_name == "headless":
@@ -106,6 +108,15 @@ def logger(request):
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
+        # Log test start (moved to the beginning of the fixture)
+    logger.info('Test started')
+
+    # Log test finish (moved to the end of the fixture)
+    def log_test_finish():
+        logger.info('Test finished')
+
+    request.addfinalizer(log_test_finish)
+
     return logger
 
 
@@ -113,8 +124,10 @@ def logger(request):
 def navigate_to_login(setup):
     browser, wait = setup
     login_page = LoginPage(browser, wait)
-    login_page.navigate_to_homepage()  # Navigate to homepage
-
+    target_URL = login_page.navigate_to_homepage()  # Navigate to homepage
+    browser.execute_script("window.stop();")
+    # webdriver.ActionChains(browser).send_keys(Keys.ESCAPE).perform()
+    print(f"Navigated to: {target_URL}")
     login_button = login_page.find_login_button()
     assert login_button.is_displayed()
     login_button.click()
@@ -131,7 +144,9 @@ def login(setup, navigate_to_login):
     username = config['username']
     password = config['password']
 
-    if 'mmb-beta' not in browser.current_url:
+    if 'auth' in browser.current_url:
+        # github_button = login_page.find_github_login()
+        # github_button.click()
         login_page.find_username_field().send_keys(username)
         login_page.find_password_field().send_keys(password)
         login_page.find_signin_button().click()

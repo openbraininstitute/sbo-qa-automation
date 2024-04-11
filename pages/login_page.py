@@ -9,7 +9,14 @@ class LoginPage(CustomBasePage):
         super().__init__(browser, wait)
 
     def navigate_to_homepage(self):
-        self.browser.get("https://bbp.epfl.ch/mmb-beta")
+        self.browser.delete_all_cookies()
+        target_url = "https://openbrainplatform.org/mmb-beta"
+        self.browser.get(target_url)
+        print("Final URL:", self.browser.current_url)
+        return self.browser.current_url
+
+    def find_github_login(self):
+        return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.GITHUB_BTN))
 
     def find_login_button(self):
         return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.LOGIN_BUTTON))
@@ -20,7 +27,7 @@ class LoginPage(CustomBasePage):
 
     def wait_for_login_complete(self):
         """Wait for login to complete by checking URL change"""
-        self.wait.until(EC.url_contains("mmb-beta"))
+        self.wait.until(EC.url_contains("mmb-beta/main"))
 
     def find_username_field(self):
         return self.wait.until(EC.presence_of_element_located(LoginPageLocators.USERNAME))

@@ -9,7 +9,11 @@ class LinkChecker:
     def check_link_status(self, link):
         response = requests.head(link)
         status_code = response.status_code
-        return status_code in self.valid_status_codes
+        if status_code == 200:
+            return True
+        else:
+            print(f"Broken link found (Status Code {status_code}: {link} ")
+            return False
 
     @staticmethod
     def load_links(file_path):
