@@ -1,3 +1,7 @@
+# Copyright (c) 2024 Blue Brain Project/EPFL
+#
+# SPDX-License-Identifier: Apache-2.0
+
 from locators.explore_ephys_locators import ExploreEphysLocators
 from pages.explore_page import ExplorePage
 from util.util_links_checker import LinkChecker
