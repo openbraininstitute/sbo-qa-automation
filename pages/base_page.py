@@ -1,3 +1,7 @@
+# Copyright (c) 2024 Blue Brain Project/EPFL
+#
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 from selenium.common import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
