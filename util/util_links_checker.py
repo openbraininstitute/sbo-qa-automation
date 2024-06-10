@@ -5,6 +5,8 @@
 import json
 import requests
 
+from util.util_load_links import LinkLoader
+
 
 class LinkChecker:
     def __init__(self):
@@ -19,12 +21,6 @@ class LinkChecker:
             print(f"Broken link found (Status Code {status_code}: {link} ")
             return False
 
-    @staticmethod
-    def load_links(file_path):
-        with open(file_path, 'r') as file:
-            links = json.load(file)
-        return links
-
     def check_links(self, links_to_check):
         for link in links_to_check:
             is_valid = self.check_link_status(link)
@@ -32,3 +28,7 @@ class LinkChecker:
                 print(f"Link is valid: {link}")
             else:
                 print(f"Broken link found: {link}")
+
+    @staticmethod
+    def load_links(file_path):
+        return LinkLoader.load_links(file_path)

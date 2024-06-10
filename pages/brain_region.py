@@ -5,7 +5,7 @@
 # from locators.build_page_locators import BuildPageLocators
 # from selenium.webdriver.support import expected_conditions as EC
 # from pages.base_page import CustomBasePage
-# from pages.home_page import HomePage
+from pages.home_page import HomePage
 #
 #
 # from util.util_methods import find_element, element_to_be_clickable

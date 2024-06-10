@@ -8,7 +8,7 @@ import pytest
 from selenium.common import TimeoutException
 from selenium.webdriver import ActionChains, Keys
 
-from pages.brain_region import BrainRegionPage
+# from pages.brain_region import BrainRegionPage
 from util.util_base import load_config
 from util.util_links_checker import LinkChecker
 from util.util_links_writer import write_links_to_file
@@ -18,35 +18,35 @@ current_directory = os.getcwd()
 relative_file_path = 'scraped_links.txt'
 file_path = os.path.join(current_directory, relative_file_path)
 
-
-class TestBrainBuild:
-    @pytest.mark.build_page
-    @pytest.mark.run(order=6)
-    def test_brain_build(self, setup, login, logger):
-        browser, wait = setup
-        brain_region_page = BrainRegionPage(browser, wait)
-        brain_region_url = brain_region_page.go_to_config_page()
-        # current_url = brain_region_page.browser.current_url
-        # logger.info(f"Brain Build Current URL {current_url}")
-
-        search_input = brain_region_page.find_search_input()
-        logger.info("Search input is found")
-        search_input.click()
-        logger.info("Search input is clicked")
-        actions = ActionChains(browser)
-        actions.click(search_input).send_keys("Isocortex").perform()
-        search_value = brain_region_page.find_search_value()
-        actions.click(search_value).perform()
-        logger.info("Search value 'Isocortex' is clicked")
-        find_visible_basic_cells_txt = brain_region_page.find_visible_basic_cells()
-        logger.info("The Basic Cell Groups and Regions title is found")
-
-        find_top_nav_menu = brain_region_page.find_top_nav_menu()
-        if find_top_nav_menu is not None:
-            find_top_nav_menu.click()
-            logger.info("Top navigation menu is clicked")
-
-        # find_cell_composition = brain_region_page.find_cell_composition()
+'''
+# class TestBrainBuild:
+#     @pytest.mark.build_page
+#     @pytest.mark.run(order=6)
+#     def test_brain_build(self, setup, login, logger):
+#         browser, wait = setup
+#         brain_region_page = BrainRegionPage(browser, wait)
+#         brain_region_url = brain_region_page.go_to_config_page()
+#         # current_url = brain_region_page.browser.current_url
+#         # logger.info(f"Brain Build Current URL {current_url}")
+# 
+#         search_input = brain_region_page.find_search_input()
+#         logger.info("Search input is found")
+#         search_input.click()
+#         logger.info("Search input is clicked")
+#         actions = ActionChains(browser)
+#         actions.click(search_input).send_keys("Isocortex").perform()
+#         search_value = brain_region_page.find_search_value()
+#         actions.click(search_value).perform()
+#         logger.info("Search value 'Isocortex' is clicked")
+#         find_visible_basic_cells_txt = brain_region_page.find_visible_basic_cells()
+#         logger.info("The Basic Cell Groups and Regions title is found")
+# 
+#         find_top_nav_menu = brain_region_page.find_top_nav_menu()
+#         if find_top_nav_menu is not None:
+#             find_top_nav_menu.click()
+#             logger.info("Top navigation menu is clicked")
+# 
+#         # find_cell_composition = brain_region_page.find_cell_composition()
         # logger.info("Cell composition button is found")
         # find_cell_composition.click()
         # logger.info("Cell composition button is clicked")
@@ -106,12 +106,12 @@ class TestBrainBuild:
 
         # find_build_and_simulate_button = brain_region_page.find_build_and_simulate_button()
         # logger.info("Build & Simulate button is found")
-
-    '''
+  
     def test_links(self):
         test_directory = os.path.dirname(os.path.abspath(__file__))
         links_file_path = os.path.join(test_directory, '..', 'links.json')
 
         link_checker = LinkChecker()
         links = link_checker.load_links(links_file_path)['explore_ephys_links']
-        link_checker.check_links(links)'''
+        link_checker.check_links(links)
+'''

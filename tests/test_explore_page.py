@@ -5,8 +5,12 @@
 import time
 import os.path
 import pytest
+import requests
 
 from pages.explore_page import ExplorePage
+from util.util_links_checker import LinkChecker
+from util.util_links_writer import write_links_to_file
+from util.util_scraper import UrlScraper
 
 current_directory = os.getcwd()
 relative_file_path = 'scraped_links.txt'
@@ -29,7 +33,6 @@ class TestExplorePage:
         # interactive_exploraion = explore_page.interactive_exploration_title()
         # inter_exploration = interactive_exploraion.text
         # logger.info("Interactive exploration title is found")
-
 
         # experimental_data_title = explore_page.experimental_data_title()
         # exp_data = experimental_data_title.text
@@ -92,25 +95,20 @@ class TestExplorePage:
         #     href_value = link.get_attribute('href')
         #     print(title, href_value)
 
-    # def test_links(self):
-    #     """
-    #     test_links methods checks the request status
-    #     Also, writes non-dynamic URLs that are present on the page to a text file.
-    #     """
-    #     test_directory = os.path.dirname(os.path.abspath(__file__))
-    #     links_file_path = os.path.join(test_directory, '..', 'links.json')
-    #
-    #     link_checker = LinkChecker()
-    #     links = link_checker.load_links(links_file_path)['explore_links']
-    #     link_checker.check_links(links)
-        # url = "https://bbp.epfl.ch/mmb-beta/explore/electrophysiology"
-        # response = requests.get(url)
-        # page_source = response.text
-        # print(page_source, "THIS IS FROM THE EXPLORE_TEST, PAGE_LINKS")
-        # url_scraper = UrlScraper()
-        # scraped_links = url_scraper.scrape_links(page_source)
-        #
-        # write_links_to_file(file_path, scraped_links)
-        # # print("Scraped links from Explore page saved to file successfully")
-        # print("File path EXPLORE test", file_path)
-        # print("Scraped links EXPLORE page", scraped_links)
+    def test_links(self):
+        """
+        test_links methods checks the request status
+        Also, writes non-dynamic URLs that are present on the page to a text file.
+        """
+        test_directory = os.path.dirname(os.path.abspath(__file__))
+        links_file_path = os.path.join(test_directory, '..', 'links.json')
+
+        link_checker = LinkChecker()
+        links = link_checker.load_links(links_file_path)['explore_links']
+        link_checker.check_links(links)
+        url = "https://bbp.epfl.ch/mmb-beta/explore/electrophysiology"
+        response = requests.get(url)
+        page_source = response.text
+        url_scraper = UrlScraper()
+        scraped_links = url_scraper.scrape_links(page_source)
+        write_links_to_file(file_path, scraped_links)
