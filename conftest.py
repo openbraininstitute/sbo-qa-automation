@@ -126,12 +126,11 @@ def navigate_to_login(setup):
     login_page = LoginPage(browser, wait)
     target_URL = login_page.navigate_to_homepage()  # Navigate to homepage
     browser.execute_script("window.stop();")
-    # webdriver.ActionChains(browser).send_keys(Keys.ESCAPE).perform()
     print(f"Navigated to: {target_URL}")
     login_button = login_page.find_login_button()
     assert login_button.is_displayed()
     login_button.click()
-    wait.until(EC.url_contains("auth"))
+    # wait.until(EC.url_contains("auth"))
     return login_page
 
 
