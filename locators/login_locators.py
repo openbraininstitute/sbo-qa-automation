@@ -6,9 +6,9 @@ from selenium.webdriver.common.by import By
 
 
 class LoginPageLocators:
-    LOGIN_BUTTON = (By.XPATH, "//h3[text()='Log in']")
-    USERNAME = (By.XPATH, '//input[@id="username"]')
-    PASSWORD = (By.XPATH, "//input[@id='password']")
+    LOGIN_BUTTON = (By.XPATH, "//a[contains(.,'Log in')]")
+    USERNAME = (By.XPATH, "//input[@autocomplete='username']")
+    PASSWORD = (By.XPATH, "//input[@type='password']")
     LOGOUT = (By.XPATH, "//button[@type='button' and text()='Log out']")
-    GITHUB_BTN = (By.XPATH, "//button[@type='button']//span[@aria-label='github']")
-    SIGN_IN = (By.XPATH, "//input[@value='Sign In']")
+    GITHUB_BTN = (By.XPATH, "//a[@class='social-link']")
+    SIGN_IN = (By.XPATH, "//input[@type='submit']")

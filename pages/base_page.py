@@ -13,7 +13,7 @@ class CustomBasePage:
     def __init__(self, browser, wait):
         self.browser = browser
         self.wait = wait
-        self.base_url = "https://openbrainplatform.org/mmb-beta/"
+        self.base_url = "https://openbluebrain.com/mmb-beta"
 
     def go_to_page(self, page_url):
         url = self.base_url + page_url

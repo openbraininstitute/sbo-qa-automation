@@ -122,6 +122,7 @@ def logger(request):
 
 @pytest.fixture(scope="function")
 def navigate_to_login(setup):
+    """Fixture that navigates to the login page"""
     browser, wait = setup
     login_page = LoginPage(browser, wait)
     target_URL = login_page.navigate_to_homepage()  # Navigate to homepage
@@ -130,13 +131,15 @@ def navigate_to_login(setup):
     login_button = login_page.find_login_button()
     assert login_button.is_displayed()
     login_button.click()
-    # wait.until(EC.url_contains("auth"))
+    github_login = login_page.find_github_btn()
+    assert github_login.is_displayed()
+    browser.execute_script("arguments[0].click();", github_login)
     return login_page
 
 
 @pytest.fixture(scope="function")
 def login(setup, navigate_to_login):
-    """Fixture that navigates to the login page"""
+    """Fixture that logs in"""
     browser, wait = setup
     login_page = navigate_to_login
     config = load_config()
@@ -144,8 +147,6 @@ def login(setup, navigate_to_login):
     password = config['password']
 
     if 'auth' in browser.current_url:
-        # github_button = login_page.find_github_login()
-        # github_button.click()
         login_page.find_username_field().send_keys(username)
         login_page.find_password_field().send_keys(password)
         login_page.find_signin_button().click()

@@ -14,12 +14,12 @@ class LoginPage(CustomBasePage):
 
     def navigate_to_homepage(self):
         self.browser.delete_all_cookies()
-        target_url = "https://openbrainplatform.org/mmb-beta"
+        target_url = "https://openbluebrain.com/mmb-beta"
         self.browser.get(target_url)
         print("Final URL:", self.browser.current_url)
         return self.browser.current_url
 
-    def find_github_login(self):
+    def find_github_btn(self):
         return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.GITHUB_BTN))
 
     def find_login_button(self):
