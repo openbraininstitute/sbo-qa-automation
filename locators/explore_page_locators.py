@@ -8,18 +8,17 @@ from selenium.webdriver.common.by import By
 class ExplorePageLocators:
     EXPLORE_LINK1 = (By.XPATH, "//a[@href='/mmb-beta/explore/simulation-campaigns']//h1[text("
                                ")='Brain & cells annotations']")
-    EXPLORE_TITLE = (By.XPATH, "//button[@type='button']/h3[text()='Explore']")
+    EXPLORE_TITLE = (By.XPATH, "//a[text()='explore']")
     INTERACTIVE_EXPLORATION = (By.XPATH, "//h2[text()='Interactive exploration']")
 
-    EXPERIMENTAL_DATA = (By.XPATH, "//h2[contains(text(), 'Experimental Data')]")
-    EXPERIMENTAL_DATA_BUTTON = (By.XPATH, "//h2[contains(text(),'Experimental "
-                                          "Data')]//ancestor::div[2]")
-    BRAIN_MODELS = (By.XPATH, "//h2[text()='Brain Models']")
+    EXPERIMENTAL_DATA_BTN = (By.XPATH, "//button[text()='Experimental data']")
+
+    MODEL_DATA_BTN = (By.XPATH, "//button[text()='Model data']")
 
     SIMULATIONS = (By.XPATH, "//h2[text()='Simulations']")
     PORTALS = (By.XPATH, "//h2[text()='Portals']")
     GALLERY = (By.XPATH, "//h2[text()='Gallery']")
-    LITERATURE = (By.XPATH, "//h2[text()='Literature']")
+    LITERATURE = (By.XPATH, "//button[text()='Literature']")
     NEURON_ELECTROPHYSIOLOGY = (By.XPATH, "//h3[contains(text(),'Neuron "
                                           "electrophysiology')]//ancestor::a[1]["
                                           "@href='/mmb-beta/explore/electrophysiology']")
