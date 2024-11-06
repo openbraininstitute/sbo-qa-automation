@@ -40,32 +40,4 @@ class TestFindLogin:
         browser.execute_script("arguments[0].click();", github_btn)
         logger.info("Github button CLICKED")
 
-        # explore_title = home_page.find_explore_title()
-        # assert explore_title.text == 'Explore'
-        # logger.info("'Explore' title on the homepage is found")
-        #
-        # build_title = home_page.find_build_title()
-        # assert build_title.text == 'Build'
-        # logger.info("'Build' title on the homepage is found")
-        #
-        # simulate_title = home_page.find_simulate_title()
-        # assert simulate_title.text == 'Simulate'
-        # logger.info("'Simulate' title on the homepage is found")
 
-
-
-
-    # def test_links(self):
-    #     test_directory = os.path.dirname(os.path.abspath(__file__))
-    #     links_file_path = os.path.join(test_directory, '..', 'links.json')
-    #
-    #     link_checker = LinkChecker()
-    #     links = link_checker.load_links(links_file_path)['main_page_links']
-    #     link_checker.check_links(links)
-    #
-    #     url = "https://bbp.epfl.ch/mmb-beta"
-    #     response = requests.get(url)
-    #     page_source = response.text
-    #     url_scraper = UrlScraper()
-    #     scraped_links = url_scraper.scrape_links(page_source)
-    #     write_links_to_file(file_path, scraped_links)
