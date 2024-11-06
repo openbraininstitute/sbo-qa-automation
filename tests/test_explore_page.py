@@ -29,30 +29,18 @@ class TestExplorePage:
         """Checking the titles of the Explore Page"""
         check_explore_title = explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
-        #
-        # interactive_exploraion = explore_page.interactive_exploration_title()
-        # inter_exploration = interactive_exploraion.text
-        # logger.info("Interactive exploration title is found")
 
+        # interactive_exploraion = explore_page.interactive_exploration_title()
         # experimental_data_title = explore_page.experimental_data_title()
         # exp_data = experimental_data_title.text
         # logger.info("Verifying 'Experimental data' title is found")
 
-        # portals_title = explore_page.portals_title()
-        # portal_txt = portals_title.text
-        # logger.info("Verifying 'Portals' title is found")
-        #
-        # gallery_title = explore_page.gallery_title()
-        # gallery_txt = gallery_title.text
-        # logger.info("Verifying 'Gallery' title is found")
-        #
         # literature_title = explore_page.literature_title()
         # literature_txt = literature_title.text
         # logger.info("Verifying 'Literature' title is found")
 
         # click_experimental_data = explore_page.experimental_data_button()
         # logger.info("Selecting 'Experimental Data' section")
-        # # time.sleep(5)
         # click_experimental_data.click()
 
         # experimental_data_links = [
@@ -79,16 +67,12 @@ class TestExplorePage:
 
         # explore_page_links = [
         #     explore_page.interactive_exploration_link(),
-        #     explore_page.gallery_link(),
-        #     explore_page.portals_link(),
         #     explore_page.literature_link()
         # ]
         #
         # titles = [
         #     "Interactive exploration:",
-        #     "Literature:",
-        #     "Portals:",
-        #     "Gallery:"
+        #     "Literature:"
         # ]
         #
         # for link, title in zip(explore_page_links, titles):

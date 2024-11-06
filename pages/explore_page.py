@@ -16,7 +16,8 @@ class ExplorePage(HomePage, LinkChecker):
         # self.url_scraper = UrlScraper()
 
     def go_to_explore_page(self):
-        self.browser.get(self.base_url + "/main")
+        self.browser.get(self.base_url)
+        # self.browser.get(self.base_url + "/main")
         return self.browser.current_url
 
     # def scrape_links(self):
@@ -29,37 +30,6 @@ class ExplorePage(HomePage, LinkChecker):
     def check_explore_title_is_present(self):
         return self.element_to_be_clickable(ExplorePageLocators.EXPLORE_TITLE)
 
-    def brain_models_title(self):
-        return self.find_element(ExplorePageLocators.BRAIN_MODELS)
 
-    # def interactive_exploration_title(self):
-    #     return find_element(self.wait, ExplorePageLocators.INTERACTIVE_EXPLORATION)
-    #
-    # def interactive_exploration_link(self):
-    #     return find_element(self.wait, ExplorePageLocators.INTERACTIVE_EXPLORATION_LINK)
-
-    # def simulations_link(self):
-    #     return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIMULATIONS_LINK))
-    #
-    # def simulations_title(self):
-    #     return self.wait.until(EC.presence_of_element_located(ExplorePageLocators.SIMULATIONS))
-
-    # def portals_title(self):
-    #     return find_element(self.wait, ExplorePageLocators.PORTALS)
-    #
-    # def gallery_title(self):
-    #     return find_element(self.wait, ExplorePageLocators.GALLERY)
-    #
-    # def literature_title(self):
-    #     return find_element(self.wait, ExplorePageLocators.LITERATURE)
-    #
-    # def portals_link(self):
-    #     return find_element(self.wait, ExplorePageLocators.PORTALS_LINK)
-    #
-    # def literature_link(self):
-    #     return find_element(self.wait, ExplorePageLocators.LITERATURE_LINK)
-    #
-    # def gallery_link(self):
-    #     return find_element(self.wait, ExplorePageLocators.GALLERY_LINK)
 
 

@@ -8,7 +8,7 @@ from io import BytesIO
 import pytest
 from PIL import Image
 from selenium import webdriver
-from selenium.common import exceptions, NoSuchElementException
+from selenium.common import exceptions
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -19,7 +19,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from pages.login_page import LoginPage
 from util.util_base import load_config
-from selenium.webdriver.common.keys import Keys
 
 
 @pytest.fixture(scope="class", autouse=True)
