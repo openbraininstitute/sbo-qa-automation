@@ -77,7 +77,7 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
     def find_filtered_etype(self):
         return self.find_all_elements(ExploreEphysLocators.FILTERED_ETYPE)
 
-    def find_dv_title_hedader(self, title_locators):
+    def find_dv_title_header(self, title_locators):
         title_headers = []
         for title in title_locators:
             title_headers.extend(self.find_all_elements(title))

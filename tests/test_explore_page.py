@@ -21,6 +21,9 @@ class TestExplorePage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=3)
     def test_explore_page(self, setup, login, logger):
+        """
+        The commented out code below is pending changes in the platform.
+        """
         browser, wait = setup
         explore_page = ExplorePage(browser, wait)
         exp_url = explore_page.go_to_explore_page()

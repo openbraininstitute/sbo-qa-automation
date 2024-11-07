@@ -6,8 +6,7 @@ from selenium.webdriver.common.by import By
 
 
 class ExploreEphysLocators:
-    # FILTER_ETYPE_INPUT = (By.XPATH, "//input[@type='search']") SEARCHED_SPECIES = (By.XPATH,
-    # "//td[@title='Mus musculus' and contains(text(), 'Musmusculus')][1]")
+    FILTER_ETYPE_INPUT = (By.XPATH, "//input[@type='search']")
     ALL_CHECKBOXES = (By.XPATH, "//span[@class='ant-checkbox ant-wave-target']")
     CHECKBOXES = (By.XPATH, "//input[@class='ant-checkbox-input' and @type='checkbox']")
     DOWNLOAD_RESOURCES = (By.XPATH, "//button[@type='button' and "

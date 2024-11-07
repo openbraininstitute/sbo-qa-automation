@@ -6,8 +6,9 @@
 # from pages.explore_page import ExplorePage
 # from pages.home_page import HomePage
 # from util.util_methods import find_element
-#
-#
+
+"""The below is commented out, due to the upcoming changes in the platform"""
+
 # class ExploreInteractivePage(HomePage):
 #     def __init__(self, browser, wait):
 #         super().__init__(browser, wait)

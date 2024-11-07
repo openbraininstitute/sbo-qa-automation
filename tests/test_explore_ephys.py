@@ -5,10 +5,7 @@
 import os
 import time
 import pytest
-from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
-from selenium.webdriver.common.by import By
-
 from locators.explore_ephys_locators import ExploreEphysLocators
 from pages.explore_efys import ExploreElectrophysiologyPage
 from util.util_links_checker import LinkChecker
@@ -121,7 +118,7 @@ class TestExploreEphys:
             ExploreEphysLocators.DV_DESC_TITLE
         ]
 
-        title_headers = explore_ephys_page.find_dv_title_hedader(title_locators)
+        title_headers = explore_ephys_page.find_dv_title_header(title_locators)
         for title in title_headers:
             assert title.is_displayed(), f"DV title header {title} is not displayed"
         logger.info("Verify the presence of title headers.")
@@ -137,7 +134,7 @@ class TestExploreEphys:
         ]
 
         logger.info("Found metadata header locators.")
-        metadata_header = explore_ephys_page.find_dv_title_hedader(locators)
+        metadata_header = explore_ephys_page.find_dv_title_header(locators)
         for data in metadata_header:
             assert data.is_displayed(), f"DV title header {data} is not displayed"
         logger.info("Found detail view title headers.")
@@ -167,15 +164,10 @@ class TestExploreEphys:
         dv_id_sweep_title = explore_ephys_page.dv_id_sweep_title()
         logger.info("Found 'Interactive detail' Sweep.")
 
-        # time.sleep(6)
-
-        # time.sleep(5)
-
-
+    """The below is commented out, due to the upcoming changes in the platform"""
     # filter_brain_region = explore_ephys_page.check_filter_brain_region_title()
     # filter_brain_region_txt = filter_brain_region.text
     # print("Filter titles", filter_brain_region_txt)
-
 
     # find_side_bar_plus_icon = explore_ephys_page.find_side_bar_plus_btn().click()
     # logger.info("Looking for side bar plus icon")
