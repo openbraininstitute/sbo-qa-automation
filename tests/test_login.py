@@ -29,7 +29,6 @@ class TestLogin:
             browser.execute_script("arguments[0].click();", username_field)
             username_field.send_keys(load_config()['username'])
 
-
             password_field = login_page.find_password_field()
             assert password_field.is_displayed()
             logger.info("The 'password' field is displayed")
@@ -37,15 +36,13 @@ class TestLogin:
             typed_pass = password_field.send_keys(load_config()['password'])
             password_field.send_keys(Keys.ENTER)
 
-            time.sleep(3)
+            login_page.wait_for_login_complete()  # Wait for login to complete
             expected_url = 'https://openbluebrain.com/mmb-beta/virtual-lab/sandbox/home'
             assert browser.current_url == expected_url
             # sign_in_button = login_page.find_signin_button()
             # assert sign_in_button.is_displayed()
             # sign_in_button.click()
             # logger.info("The 'Sign in' button clicked")
-
-            # login_page.wait_for_login_complete()  # Wait for login to complete
 
             # logout_button = login_page.find_logout_button()
             # assert logout_button.text == 'Log out'

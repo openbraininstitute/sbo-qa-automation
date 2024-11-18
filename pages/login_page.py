@@ -20,10 +20,6 @@ class LoginPage(CustomBasePage):
         print("Final URL:", self.browser.current_url)
         return self.browser.current_url
 
-    # def find_github_btn(self):
-    # return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.GITHUB_BTN))
-    # return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.TEST_LOGIN))
-
     def find_login_button(self):
         return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.LOGIN_BUTTON))
 
@@ -35,7 +31,7 @@ class LoginPage(CustomBasePage):
 
     def wait_for_login_complete(self):
         """Wait for login to complete by checking URL change"""
-        self.wait.until(EC.url_contains("mmb-beta/virtual-lab"))
+        self.wait.until(EC.url_contains("mmb-beta/virtual-lab/sandbox/home"))
 
     def find_username_field(self):
         # return self.wait.until(EC.presence_of_element_located(LoginPageLocators.USERNAME))
