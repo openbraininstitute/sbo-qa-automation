@@ -23,23 +23,12 @@ class TestLogin:
             login_button = login_page.find_login_button()
             login_button.click()
             logger.info("login button found")
-            # logger.info("Current URL", browser.current_url)
-            # browser.execute_script("arguments[0].click();", github_btn)
-            # logger.info("Clicked Github login button")
-            # username_field = login_page.find_username_field()
-            # logger.info("The 'username' field is displayed")
-            # username_field.send_keys(load_config()['username'])
 
-            # browser.execute_script("arguments[0].click();", github_btn)
-            # logger.info("Clicked Github login button")
             username_field = login_page.find_username_field()
             logger.info("The 'username' field is displayed")
             browser.execute_script("arguments[0].click();", username_field)
             username_field.send_keys(load_config()['username'])
-            # password_field = login_page.find_password_field()
-            # assert password_field.is_displayed()
-            # logger.info("The 'password' field is displayed")
-            # password_field.send_keys(load_config()['password'])
+
 
             password_field = login_page.find_password_field()
             assert password_field.is_displayed()
@@ -47,14 +36,6 @@ class TestLogin:
             browser.execute_script("arguments[0].click();", password_field)
             typed_pass = password_field.send_keys(load_config()['password'])
             password_field.send_keys(Keys.ENTER)
-            time.sleep(2)
-
-            # password_field.send_keys("some text" + Keys.ENTER)
-            # submit_btn = login_page.find_submit()
-            # text = submit_btn.text()
-            # print(text)
-            # browser.execute_script("arguments[0].click();", submit_btn)
-            # logger.info("User clicked on 'ENTER' key.")
 
             time.sleep(3)
             expected_url = 'https://openbluebrain.com/mmb-beta/virtual-lab/sandbox/home'
