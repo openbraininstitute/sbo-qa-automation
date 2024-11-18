@@ -15,8 +15,11 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+# from webdriver.chrome import ChromeDriverManager
+# from webdriver.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
+
 from pages.login_page import LoginPage
 from util.util_base import load_config
 
@@ -124,16 +127,27 @@ def navigate_to_login(setup):
     """Fixture that navigates to the login page"""
     browser, wait = setup
     login_page = LoginPage(browser, wait)
-    target_URL = login_page.navigate_to_homepage()  # Navigate to homepage
+    target_URL = login_page.navigate_to_homepage()
     browser.execute_script("window.stop();")
     print(f"Navigated to: {target_URL}")
     login_button = login_page.find_login_button()
     assert login_button.is_displayed()
     login_button.click()
-    github_login = login_page.find_github_btn()
-    assert github_login.is_displayed()
-    browser.execute_script("arguments[0].click();", github_login)
+    print("Navigated to the log in page")
     return login_page
+
+    # browser, wait = setup
+    # login_page = LoginPage(browser, wait)
+    # target_URL = login_page.navigate_to_homepage()  # Navigate to homepage
+    # browser.execute_script("window.stop();")
+    # print(f"Navigated to: {target_URL}")
+    # login_button = login_page.find_login_button()
+    # assert login_button.is_displayed()
+    # login_button.click()
+    # # github_login = login_page.find_github_btn()
+    # # assert github_login.is_displayed()
+    # # browser.execute_script("arguments[0].click();", github_login)
+    # return login_page
 
 
 @pytest.fixture(scope="function")
@@ -144,7 +158,6 @@ def login(setup, navigate_to_login):
     config = load_config()
     username = config['username']
     password = config['password']
-
     if 'auth' in browser.current_url:
         login_page.find_username_field().send_keys(username)
         login_page.find_password_field().send_keys(password)
