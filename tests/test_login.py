@@ -9,23 +9,17 @@ import pytest
 import time
 
 
-@pytest.mark.usefixtures("setup", "logger")
+@pytest.mark.usefixtures("setup", "logger", "login")
 class TestLogin:
     @pytest.mark.run(order=1)
     def test_login_process(self, setup, logger):
         """Test the login process"""
         browser, wait = setup
-        login_page = LoginPage(browser, wait)
+        # Validate the user is logged in
+        print("Login process completed via fixture")
+        assert "virtual-lab" in browser.current_url, \
+            f"Unexpected URL after login: {browser.current_url}"
 
-        login_page.navigate_to_homepage()
-        login_page.find_login_button().click()
+        logger.info(f"Successfully logged in. Current page URL: {browser.current_url}")
 
-        # Perform login using keyboard Enter action
-        config = load_config()
-        username = config['username']
-        password = config['password']
-        login_page.perform_login(username, password)
-        # Verify the user is redirected to the Sandbox page
-        # assert "sandbox/home" in browser.current_url
-        logger.info(f"Successfully logged in page URL IS: " + browser.current_url)
 

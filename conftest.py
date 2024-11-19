@@ -127,43 +127,31 @@ def navigate_to_login(setup):
     """Fixture that navigates to the login page"""
     browser, wait = setup
     login_page = LoginPage(browser, wait)
+
     target_URL = login_page.navigate_to_homepage()
     browser.execute_script("window.stop();")
-    print(f"Navigated to: {target_URL}")
+    print(f"Contest fixture - Navigated to: {target_URL}")
+
     login_button = login_page.find_login_button()
     assert login_button.is_displayed()
     login_button.click()
-    print("Navigated to the log in page")
+    wait.until(EC.url_contains("auth"))
     return login_page
-
-    # browser, wait = setup
-    # login_page = LoginPage(browser, wait)
-    # target_URL = login_page.navigate_to_homepage()  # Navigate to homepage
-    # browser.execute_script("window.stop();")
-    # print(f"Navigated to: {target_URL}")
-    # login_button = login_page.find_login_button()
-    # assert login_button.is_displayed()
-    # login_button.click()
-    # # github_login = login_page.find_github_btn()
-    # # assert github_login.is_displayed()
-    # # browser.execute_script("arguments[0].click();", github_login)
-    # return login_page
 
 
 @pytest.fixture(scope="function")
 def login(setup, navigate_to_login):
-    """Fixture that logs in"""
+    """Fixture to log in and ensure user is authenticated."""
     browser, wait = setup
     login_page = navigate_to_login
     config = load_config()
     username = config['username']
     password = config['password']
-    if 'auth' in browser.current_url:
-        login_page.find_username_field().send_keys(username)
-        login_page.find_password_field().send_keys(password)
-        login_page.find_signin_button().click()
-        wait.until(EC.url_contains("mmb-beta"))
 
+    login_page.perform_login(username, password)
+    login_page.wait_for_login_complete()
+    assert "virtual-lab" in browser.current_url, f"Login failed, current URL: {browser.current_url}"
+    print("Login successful. Current URL:", browser.current_url)
     yield browser, wait
     login_page.browser.delete_all_cookies()
 

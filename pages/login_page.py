@@ -4,6 +4,7 @@
 
 import time
 
+from selenium.common import TimeoutException
 from selenium.webdriver import Keys
 
 from locators.login_locators import LoginPageLocators
@@ -20,22 +21,28 @@ class LoginPage(CustomBasePage):
         target_url = "https://openbluebrain.com/app/dev"
         # target_url = "https://staging.openbluebrain.com/"
         self.browser.get(target_url)
-        print("Starting URL:", self.browser.current_url)
+        print("Starting URL from PAGES/LOGIN_PAGE.PY:", self.browser.current_url)
         return self.browser.current_url
 
     def find_login_button(self):
         return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.LOGIN_BUTTON))
 
-    def wait_for_login_complete(self):
-        """Wait for login to complete by checking URL change"""
-        self.wait.until(EC.url_contains("dev/virtual-lab"))
+    def wait_for_login_complete(self, timeout=30):
+        """Wait for login completion by checking a URL or element."""
+        try:
+            self.wait.until(EC.url_contains('virtual-lab'), timeout)
+        except TimeoutException:
+            # print("Waiting for URL to contain AUTH")
+            # self.wait.until(EC.url_contains("dev/virtual-lab")) # To implement after Nick's change
+            print(
+                f"Timeout waiting for URL to contain 'virtual-lab'. Current URL: "
+                f"{self.browser.current_url}")
+            raise
 
     def find_username_field(self):
-        # return self.wait.until(EC.presence_of_element_located(LoginPageLocators.USERNAME))
         return self.wait.until(EC.presence_of_element_located(LoginPageLocators.USERNAME_FIELD))
 
     def find_password_field(self):
-        # return self.wait.until(EC.presence_of_element_located(LoginPageLocators.PASSWORD))
         return self.wait.until(EC.presence_of_element_located(LoginPageLocators.PASSWORD_FIELD))
 
     def find_signin_button(self):
@@ -54,6 +61,7 @@ class LoginPage(CustomBasePage):
         username_field.send_keys(username)
         password_field.send_keys(password)
         password_field.send_keys(Keys.ENTER)
+        print("Submitted login credentials")
 
-        # Wait for redirection to the target page
-        # self.wait.until(EC.url_contains("app/virtual-lab"))
+        self.wait_for_login_complete()
+        self.wait.until(EC.url_contains("app/virtual-lab"))

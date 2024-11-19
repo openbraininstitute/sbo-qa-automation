@@ -3,14 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from selenium.common import NoSuchElementException
-from selenium.webdriver import Keys
-
 from pages.sandbox_page import SandboxPage
-from util.util_base import load_config
 import pytest
 import time
 
 
+@pytest.mark.usefixtures("setup", "logger", "login")
 class TestSandbox:
     @pytest.mark.run(order=1)
     def test_sandbox(self, setup, logger):
@@ -18,15 +16,14 @@ class TestSandbox:
         browser, wait = setup
         try:
             sandbox_page = SandboxPage(browser, wait)
-            sandbox_page = sandbox_page.go_to_sandbox_page()
+            time.sleep(10)
+            assert "sandbox/home" in browser.current_url, (f"Expected 'sandbox/home' in URL, but "
+                                                           f"got: {browser.current_url}")
             logger.info("Navigated to the Sandbox Page")
 
-            time.sleep(5)
-
-            # sandbox_title = sandbox_page.find_sandbox_banner_title()
-
-            # assert sandbox_title == "Welcome to Blue Brain Open Platform"
-
+            sandbox_title = sandbox_page.find_sandbox_banner_title()
+            title = sandbox_title.text
+            assert title == "Welcome to Blue Brain Open Platform"
 
         except NoSuchElementException:
             print(f"An error occurred:")

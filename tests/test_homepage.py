@@ -37,9 +37,3 @@ class TestFindLogin:
 
 
 
-        # github_btn = home_page.find_github_btn()
-        # logger.info("Github button found")
-        # browser.execute_script("arguments[0].click();", github_btn)
-        # logger.info("Github button CLICKED")
-
-
