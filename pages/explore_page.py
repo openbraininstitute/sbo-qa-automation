@@ -18,6 +18,7 @@ class ExplorePage(HomePage, LinkChecker):
     def go_to_explore_page(self):
         self.browser.get(self.base_url)
         # self.browser.get(self.base_url + "/main")
+        print("PAGES/EXPLORE_PAGE.PY current url", self.browser.current_url)
         return self.browser.current_url
 
     # def scrape_links(self):

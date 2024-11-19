@@ -12,6 +12,6 @@ class LoginPageLocators:
     LOGOUT = (By.XPATH, "//button[@type='button' and text()='Log out']")
     # GITHUB_BTN = (By.XPATH, "//a[@class='social-link']")
     SIGN_IN = (By.XPATH, "//input[@type='submit']")
-    TEST_USERNAME = (By.XPATH, "//input[@id='username']")
-    TEST_PASSWORD = (By.XPATH, "//input[@id='password']")
+    USERNAME_FIELD = (By.XPATH, "//input[@id='username']")
+    PASSWORD_FIELD = (By.XPATH, "//input[@id='password']")
     SUBMIT = (By.XPATH, "//input[@type='submit']")
