@@ -16,7 +16,6 @@ class TestSandbox:
         browser, wait = setup
         try:
             sandbox_page = SandboxPage(browser, wait)
-            time.sleep(10)
             assert "sandbox/home" in browser.current_url, (f"Expected 'sandbox/home' in URL, but "
                                                            f"got: {browser.current_url}")
             logger.info("Navigated to the Sandbox Page")

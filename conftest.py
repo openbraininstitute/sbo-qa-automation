@@ -106,7 +106,7 @@ def logger(request):
         # Create the stream handler for console output
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setLevel(logging.DEBUG)
-        stream_formatter = logging.Formatter("%(levelname)s : %(asctime)s : %(message)s")
+        stream_formatter = logging.Formatter("\n%(levelname)s : %(asctime)s : %(message)s")
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
