@@ -52,8 +52,14 @@ class ExplorePage(HomePage, LinkChecker):
             exp_data_title.extend(self.find_all_elements(title))
         return exp_data_title
 
-
-
-
-
-
+    def get_experiment_record_count(self, record_count_locators):
+        record_counts = []
+        for locator in record_count_locators:
+            record = self.find_element(locator)
+            record_text = record.text.strip()
+            try:
+                record_number = int(''.join(filter(str.isdigit, record_text)))
+            except ValueError:
+                raise ValueError(f"Unable to parse record count from text: {record_text}")
+            record_counts.append(record_number)
+        return record_counts

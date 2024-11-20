@@ -34,14 +34,6 @@ class TestExplorePage:
         check_explore_title = explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
 
-        # model_data = explore_page.find_model_data_title()
-        # model_data_text = model_data.text
-        # logger.info("Verifying 'Model data' title is found")
-        #
-        # literature_title = explore_page.literature_title()
-        # literature_txt = literature_title.text
-        # logger.info("Verifying 'Literature' title is found")
-
         exp_data_titles = [
             ExplorePageLocators.NEURON_MORPHOLOGY,
             ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY,
@@ -67,9 +59,17 @@ class TestExplorePage:
             assert page_title.is_displayed(), f"Explore page titles {page_title} is not displayed"
         logger.info("Found Explore page titles")
 
-        # for link, title in zip(titles):
-        #     href_value = link.get_attribute('href')
-        #     print(title, href_value)
+        record_count_locators = [
+            ExplorePageLocators.MORPHOLOGY_NRECORDS,
+            ExplorePageLocators.NEURON_EPHYS_NRECORDS,
+            ExplorePageLocators.NEURON_DENSITY_NRECORDS,
+            ExplorePageLocators.BOUTON_DENSITY_NRECORDS,
+            ExplorePageLocators.SYNAPSE_PER_CONNECTION_NRECORDS
+        ]
+        record_counts = explore_page.get_experiment_record_count(record_count_locators)
+        for record_count in record_counts:
+            assert record_count >= 1, f"Record count is less than 100: {record_count}"
+        logger.info("Record counts validation passed")
 
     # def test_links(self):
     #     """
