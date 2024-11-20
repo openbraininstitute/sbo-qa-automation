@@ -5,13 +5,9 @@
 import time
 import os.path
 import pytest
-import requests
-
 from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
-from util.util_links_checker import LinkChecker
-from util.util_links_writer import write_links_to_file
-from util.util_scraper import UrlScraper
+
 
 current_directory = os.getcwd()
 relative_file_path = 'scraped_links.txt'
@@ -27,11 +23,11 @@ class TestExplorePage:
         """
         browser, wait = setup
         explore_page = ExplorePage(browser, wait)
-        exp_url = explore_page.go_to_explore_page()
+        explore_page.go_to_explore_page()
         logger.info("Explore page is loaded")
 
         """Checking the titles of the Explore Page"""
-        check_explore_title = explore_page.check_explore_title_is_present()
+        explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
 
         exp_data_titles = [
@@ -52,7 +48,7 @@ class TestExplorePage:
             ExplorePageLocators.MODEL_DATA_BTN,
             ExplorePageLocators.LITERATURE
         ]
-        logger.info("Found Explore Page titles")
+        logger.info("Searching for Explore Page titles")
         explore_page_titles = explore_page.find_explore_page_titles(page_titles)
 
         for page_title in explore_page_titles:
@@ -69,22 +65,30 @@ class TestExplorePage:
         record_counts = explore_page.get_experiment_record_count(record_count_locators)
         for record_count in record_counts:
             assert record_count >= 1, f"Record count is less than 100: {record_count}"
-        logger.info("Record counts validation passed")
+        logger.info("Number of records for data types are displayed")
 
-    # def test_links(self):
-    #     """
-    #     test_links methods checks the request status
-    #     Also, writes non-dynamic URLs that are present on the page to a text file.
-    #     """
-    #     test_directory = os.path.dirname(os.path.abspath(__file__))
-    #     links_file_path = os.path.join(test_directory, '..', 'links.json')
-    #
-    #     link_checker = LinkChecker()
-    #     links = link_checker.load_links(links_file_path)['explore_links']
-    #     link_checker.check_links(links)
-    #     url = "https://openbluebrain.com/app/explore/electrophysiology"
-    #     response = requests.get(url)
-    #     page_source = response.text
-    #     url_scraper = UrlScraper()
-    #     scraped_links = url_scraper.scrape_links(page_source)
-    #     write_links_to_file(file_path, scraped_links)
+        brain_region_panel = explore_page.find_brain_region_panel()
+        logger.info("Found Brain Region Panel")
+        cerebrum_in_brpanel = explore_page.find_cerebrum_brp()
+        logger.info("Found Cerebrum in the brain region panel")
+        cerebrum_arrow_btn = explore_page.find_cerebrum_arrow_btn()
+        logger.info("Cerebrum - parent arrow button is clicked")
+        browser.execute_script("arguments[0].click();",cerebrum_arrow_btn)
+        cerebral_cortex_title = explore_page.find_cerebral_cortex_brp()
+        logger.info("Found Cerebral cortex as a child of Cerebrum")
+        neurons_panel = explore_page.find_neurons_panel()
+        assert neurons_panel.is_displayed()
+        logger.info("Neurons panel is displayed")
+        density_count_switch = explore_page.find_count_switch()
+        assert density_count_switch.is_displayed()
+        logger.info("Density & count switch is displayed")
+        atlas = explore_page.find_3d_atlas()
+        assert atlas.is_displayed()
+        logger.info("3D Atlas is displayed")
+        atlas_fullscreen = explore_page.find_atlas_fullscreen_bt()
+        logger.info("Found atlas fullscreen button")
+        atlas_fullscreen.click()
+        fulscreen_exit = explore_page.find_fullscreen_exit()
+        logger.info("Fullscreen exit button is found")
+        fulscreen_exit.click()
+        logger.info("Fullscreen exit button is clicked, atlas is minimized")

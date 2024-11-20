@@ -63,3 +63,31 @@ class ExplorePage(HomePage, LinkChecker):
                 raise ValueError(f"Unable to parse record count from text: {record_text}")
             record_counts.append(record_number)
         return record_counts
+
+    def find_brain_region_panel(self):
+        return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL)
+
+    def find_cerebrum_brp(self):
+        return self.find_element(ExplorePageLocators.BRP_CEREBRUM)
+
+    def find_cerebral_cortex_brp(self):
+        return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE)
+
+    def find_cerebrum_arrow_btn(self):
+        return self.find_element(ExplorePageLocators.CEREBRUM_BTN)
+
+    def find_3d_atlas(self):
+        return self.find_element(ExplorePageLocators.ATLAS)
+
+    def find_atlas_fullscreen_bt(self):
+        return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN)
+
+    def find_fullscreen_exit(self):
+        return self.find_element(ExplorePageLocators.FULLSCREEN_EXIT)
+
+    def find_neurons_panel(self):
+        return self.find_element(ExplorePageLocators.NEURONS_PANEL)
+
+    def find_count_switch(self):
+        return self.find_element(ExplorePageLocators.COUNT_SWITCH)
+
