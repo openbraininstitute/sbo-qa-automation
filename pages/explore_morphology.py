@@ -16,6 +16,7 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
 
     def go_to_explore_morphology_page(self):
         self.go_to_page("/explore/interactive/experimental/morphology")
+        print("pages/morphology: ", self.browser.current_url)
 
     def find_morphology_tab(self):
         return self.find_element(ExploreMorphologyPageLocators.MORPHOLOGY_TAB)

@@ -18,7 +18,7 @@ class LoginPage(CustomBasePage):
 
     def navigate_to_homepage(self):
         self.browser.delete_all_cookies()
-        target_url = "https://openbluebrain.com/app/dev"
+        target_url = "https://openbluebrain.com/app"
         # target_url = "https://staging.openbluebrain.com/"
         self.browser.get(target_url)
         print("Starting URL from PAGES/LOGIN_PAGE.PY:", self.browser.current_url)
@@ -30,7 +30,7 @@ class LoginPage(CustomBasePage):
     def wait_for_login_complete(self, timeout=30):
         """Wait for login completion by checking a URL or element."""
         try:
-            self.wait.until(EC.url_contains('virtual-lab'), timeout)
+            self.wait.until(EC.url_contains('explore/interactive'), timeout)
         except TimeoutException:
             # print("Waiting for URL to contain AUTH")
             # self.wait.until(EC.url_contains("dev/virtual-lab")) # To implement after Nick's change
@@ -64,4 +64,5 @@ class LoginPage(CustomBasePage):
         print("Submitted login credentials")
 
         self.wait_for_login_complete()
-        self.wait.until(EC.url_contains("app/virtual-lab"))
+        self.wait.until(EC.url_contains("/app/explore"))
+        # self.wait.until(EC.url_contains("app/virtual-lab"))

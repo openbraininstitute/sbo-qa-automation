@@ -1,8 +1,6 @@
-import json
 import logging
 import os
 import sys
-import time
 from io import BytesIO
 
 import pytest
@@ -15,8 +13,6 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-# from webdriver.chrome import ChromeDriverManager
-# from webdriver.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
@@ -37,7 +33,6 @@ def setup(request, pytestconfig):
             options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-gpu")
-        # options.add_argument("--disable-javascript")
         service = ChromeService(ChromeDriverManager().install())
         browser = webdriver.Chrome(service=service, options=options)
     elif browser_name == "firefox":
@@ -82,7 +77,6 @@ def logger(request):
     # Check if the logger already has a file handler
     has_file_handler = any(isinstance(handler, logging.FileHandler) for handler in logger.handlers)
     # Check if the logger already has a stream handler
-
     has_stream_handler = any(
         isinstance(handler, logging.StreamHandler) for handler in logger.handlers)
     # Determine the outer allure_reports directory
@@ -110,7 +104,7 @@ def logger(request):
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
-        # Log test start (moved to the beginning of the fixture)
+    # Log test start (moved to the beginning of the fixture)
     logger.info('Test started')
 
     # Log test finish (moved to the end of the fixture)
@@ -150,7 +144,7 @@ def login(setup, navigate_to_login):
 
     login_page.perform_login(username, password)
     login_page.wait_for_login_complete()
-    assert "virtual-lab" in browser.current_url, f"Login failed, current URL: {browser.current_url}"
+    assert "/app/explore" in browser.current_url, f"Login failed, current URL: {browser.current_url}"
     print("Login successful. Current URL:", browser.current_url)
     yield browser, wait
     login_page.browser.delete_all_cookies()
