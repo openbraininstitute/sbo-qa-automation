@@ -7,6 +7,7 @@ import os.path
 import pytest
 import requests
 
+from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
 from util.util_links_checker import LinkChecker
 from util.util_links_writer import write_links_to_file
@@ -33,69 +34,57 @@ class TestExplorePage:
         check_explore_title = explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
 
-        # interactive_exploraion = explore_page.interactive_exploration_title()
-        # experimental_data_title = explore_page.experimental_data_title()
-        # exp_data = experimental_data_title.text
-        # logger.info("Verifying 'Experimental data' title is found")
-
+        # model_data = explore_page.find_model_data_title()
+        # model_data_text = model_data.text
+        # logger.info("Verifying 'Model data' title is found")
+        #
         # literature_title = explore_page.literature_title()
         # literature_txt = literature_title.text
         # logger.info("Verifying 'Literature' title is found")
 
-        # click_experimental_data = explore_page.experimental_data_button()
-        # logger.info("Selecting 'Experimental Data' section")
-        # click_experimental_data.click()
+        exp_data_titles = [
+            ExplorePageLocators.NEURON_MORPHOLOGY,
+            ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY,
+            ExplorePageLocators.NEURON_DENSITY,
+            ExplorePageLocators.BOUTON_DENSITY,
+            ExplorePageLocators.SYNAPSE_PER_CONNECTION
+        ]
+        logger.info("Searching for Experimental Data types")
+        exp_data_titles = explore_page.find_experimental_data_titles(exp_data_titles)
+        for title in exp_data_titles:
+            assert title.is_displayed(), f"Experimental data {title} is not displayed."
+        logger.info("Found Experimental data titles")
 
-        # experimental_data_links = [
-        #     explore_page.neuron_electrophysiology_link(),
-        #     explore_page.neuron_morphology_link(),
-        #     explore_page.bouton_density_link(),
-        #     explore_page.neuron_density_link(),
-        #     explore_page.layer_thickness_link(),
-        #     explore_page.synapse_per_connection_link()
-        # ]
+        page_titles = [
+            ExplorePageLocators.EXPERIMENTAL_DATA_BTN,
+            ExplorePageLocators.MODEL_DATA_BTN,
+            ExplorePageLocators.LITERATURE
+        ]
+        logger.info("Found Explore Page titles")
+        explore_page_titles = explore_page.find_explore_page_titles(page_titles)
 
-        # exp_data_titles = [
-        #     "Neuron electrophysiology link:",
-        #     "Neuron morphology href:",
-        #     "Bouton density href:",
-        #     "Neuron density href:",
-        #     "Layer thickness href:",
-        #     "Synapse per connection href:"
-        # ]
-        #
-        # for link, title in zip(experimental_data_links, exp_data_titles):
+        for page_title in explore_page_titles:
+            assert page_title.is_displayed(), f"Explore page titles {page_title} is not displayed"
+        logger.info("Found Explore page titles")
+
+        # for link, title in zip(titles):
         #     href_value = link.get_attribute('href')
         #     print(title, href_value)
 
-        # explore_page_links = [
-        #     explore_page.interactive_exploration_link(),
-        #     explore_page.literature_link()
-        # ]
-        #
-        # titles = [
-        #     "Interactive exploration:",
-        #     "Literature:"
-        # ]
-        #
-        # for link, title in zip(explore_page_links, titles):
-        #     href_value = link.get_attribute('href')
-        #     print(title, href_value)
-
-    def test_links(self):
-        """
-        test_links methods checks the request status
-        Also, writes non-dynamic URLs that are present on the page to a text file.
-        """
-        test_directory = os.path.dirname(os.path.abspath(__file__))
-        links_file_path = os.path.join(test_directory, '..', 'links.json')
-
-        link_checker = LinkChecker()
-        links = link_checker.load_links(links_file_path)['explore_links']
-        link_checker.check_links(links)
-        url = "https://bbp.epfl.ch/mmb-beta/explore/electrophysiology"
-        response = requests.get(url)
-        page_source = response.text
-        url_scraper = UrlScraper()
-        scraped_links = url_scraper.scrape_links(page_source)
-        write_links_to_file(file_path, scraped_links)
+    # def test_links(self):
+    #     """
+    #     test_links methods checks the request status
+    #     Also, writes non-dynamic URLs that are present on the page to a text file.
+    #     """
+    #     test_directory = os.path.dirname(os.path.abspath(__file__))
+    #     links_file_path = os.path.join(test_directory, '..', 'links.json')
+    #
+    #     link_checker = LinkChecker()
+    #     links = link_checker.load_links(links_file_path)['explore_links']
+    #     link_checker.check_links(links)
+    #     url = "https://openbluebrain.com/app/explore/electrophysiology"
+    #     response = requests.get(url)
+    #     page_source = response.text
+    #     url_scraper = UrlScraper()
+    #     scraped_links = url_scraper.scrape_links(page_source)
+    #     write_links_to_file(file_path, scraped_links)
