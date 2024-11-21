@@ -7,8 +7,8 @@ from selenium.webdriver.common.by import By
 
 class ExploreNDensityPageLocators:
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
+    BRP_CEREBRUM = (By.XPATH, "//span[@title='Cerebrum' and text()='Cerebrum']")
     TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
-    # TABLE_CELLS = (By.CSS_SELECTOR, "tbody.ant-table-tbody td.ant-table-cell")
     TABLE_CELLS = (
         By.CSS_SELECTOR,
         "tbody.ant-table-tbody td.ant-table-cell.text-primary-7.cursor-pointer.ant"
@@ -20,19 +20,22 @@ class ExploreNDensityPageLocators:
                                  "Region']")
     LV_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='M-Type']")
     LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-Type']")
-    LV_DENSITY = (By.XPATH, "//span[@class='ant-table-column-title']//div[contains(text(),"
-                            "'Density')]")
-    LV_NMEASUREMENTS = (By.XPATH, "//span[@class='ant-table-column-title']//div[contains(text(),"
-                                  "'N° of Measurements')]")
+    LV_DENSITY = (By.XPATH, "//th[@data-testid='column-header']//div[contains(text(),'Density')]")
+    LV_NMEASUREMENTS = (By.XPATH, "//th[@data-testid='column-header']//div[contains(text(),'N° of "
+                                  "Measurements')]")
     LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
     LV_AGE = (By.XPATH, "//span[@class='ant-table-column-title']//div[contains(text(),'Age')]")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
-    LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
-                                      ")='Registration date']")
+    LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Creation "
+                                      "Date']")
     LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-Type']")
-    LV_BR_ROW1 = (By.XPATH, "(//td[@class='ant-table-cell text-primary-7 cursor-pointer "
-                            "before:!content-none ant-table-cell-ellipsis'])[1]")
+    # LV_BR_ROW1 = (By.XPATH, "(//td[@class='ant-table-cell text-primary-7 cursor-pointer "
+    #                         "before:!content-none ant-table-cell-ellipsis'])[1]")
+    # LV_BR_ROW1 = (By.XPATH, "(//tr[starts-with(@class, 'ant-table-row')])[1]")
+    # LV_BR_ROW1 = (By.XPATH, "(//td[starts-with(@class, 'ant-table-cell') and contains(text(), "
+    #                         "'Field CA1, pyramidal layer')])[2]")
+    LV_BR_ROW1 = (By.XPATH, "(//td[starts-with(@class, 'ant-table-cell')])[13]")
     DV_DESC_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Description']")
     DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
                                        ")='Contributors']")
@@ -61,6 +64,7 @@ class ExploreNDensityPageLocators:
                             ")='Density']/following-sibling::div[@class='mt-2']")
     DV_NUM_MEAS = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='N° of "
                              "Measurements']/following-sibling::div[@class='mt-2']")
+    DV_NAME = (By.XPATH, "//div[@class='text font-thin' and contains(text(), 'Name')]")
     DV_REG_DATE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Registration "
                              "date']/following-sibling::div[@class='mt-2']")
     DV_CONTRIBUTORS = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("

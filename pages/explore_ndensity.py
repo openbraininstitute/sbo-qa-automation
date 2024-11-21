@@ -52,3 +52,10 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
 
     def lv_br_row1(self):
         return self.find_element(ExploreNDensityPageLocators.LV_BR_ROW1)
+
+    def find_dv_name(self):
+        return self.element_visibility(ExploreNDensityPageLocators.DV_NAME)
+
+    def find_cerebrum_brp(self):
+        return self.find_element(ExploreNDensityPageLocators.BRP_CEREBRUM)
+
