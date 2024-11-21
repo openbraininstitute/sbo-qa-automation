@@ -30,11 +30,6 @@ class ExploreNDensityPageLocators:
     LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Creation "
                                       "Date']")
     LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-Type']")
-    # LV_BR_ROW1 = (By.XPATH, "(//td[@class='ant-table-cell text-primary-7 cursor-pointer "
-    #                         "before:!content-none ant-table-cell-ellipsis'])[1]")
-    # LV_BR_ROW1 = (By.XPATH, "(//tr[starts-with(@class, 'ant-table-row')])[1]")
-    # LV_BR_ROW1 = (By.XPATH, "(//td[starts-with(@class, 'ant-table-cell') and contains(text(), "
-    #                         "'Field CA1, pyramidal layer')])[2]")
     LV_BR_ROW1 = (By.XPATH, "(//td[starts-with(@class, 'ant-table-cell')])[13]")
     DV_DESC_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Description']")
     DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("

@@ -6,8 +6,8 @@ from selenium.webdriver.common.by import By
 
 
 class ExploreEphysLocators:
-    FILTER_ETYPE_INPUT = (By.XPATH, "//input[@type='search']")
     ALL_CHECKBOXES = (By.XPATH, "//span[@class='ant-checkbox ant-wave-target']")
+    APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")
     CHECKBOXES = (By.XPATH, "//input[@class='ant-checkbox-input' and @type='checkbox']")
     DOWNLOAD_RESOURCES = (By.XPATH, "//button[@type='button' and "
                                     "@aria-label='download-resources-button']")
@@ -58,15 +58,20 @@ class ExploreEphysLocators:
     FILTERED_ETYPE = (By.XPATH, "//td[@class='ant-table-cell text-primary-7 cursor-pointer "
                                 "before:!content-none ant-table-cell-ellipsis' and @title='bNAC']")
     FILTER_ETYPE_BTN = (By.XPATH, "//div[@class='flex items-center gap-3 ']//span[text()='E-Type']")
-    FILTER_ETYPE_INPUT = (By.XPATH, "//input[@id='rc_select_2']")
+    FILTER_ETYPE_SEARCH_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input"
+                                           "'])[2]")
+    FILTER_ETYPE_INPUT_TYPE_AREA = (By.XPATH, "//div[@class='ant-select-selection-search']")
     FILTER_ETYPE_SEARCH = (By.XPATH, "//div[@class='ant-select-selection-overflow']")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
+    LV_GRID_VIEW = (By.XPATH, "//div[@data-testid='explore-section-listing-view']")
     LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
                                  "Region']")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
     LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-Type']")
     LV_FILTER_APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")
-    LV_FILTER_BTN = (By.XPATH, "//button[@aria-label='listing-view-filter-button']")
+    LV_FILTER_BTN = (By.XPATH, "//button[@type='button' and "
+                               "@aria-label='listing-view-filter-button']")
+    LV_FILTER_CLOSE_BTN = (By.XPATH, "//button[@type='button' and @aria-label='Close']")
     LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-Type']")
     LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
     LV_PREVIEW = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Preview']")
@@ -75,7 +80,7 @@ class ExploreEphysLocators:
     LV_ROW1 = (By.XPATH, "(//td[@class='ant-table-cell text-primary-7 cursor-pointer "
                          "before:!content-none ant-table-cell-ellipsis'])[1]")
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
-    LV_THUMBNAIL = (By.XPATH, "//img[starts-with(@alt,'Morphology preview')]")
+    LV_THUMBNAIL = (By.XPATH, "//img[@alt='img preview']")
     SEARCHED_SPECIES = (By.XPATH, "//td[@title='Rattus norvegicus' and contains(text(),'Rattus "
                                   "norvegicus')][1]")
     SEARCH_BUTTON = (By.XPATH, "//span[@aria-label='search']/parent::button[@type='button']")
