@@ -41,7 +41,7 @@ pytest_firefox:
         pytest --headless tests/test_morphology.py -s -v --junitxml=testresults.xml --report-log test_run.log
         exit_code=$?
       else
-        pytest  tests/test_morphology.py -s -v --cache-clear;
+        pytest  tests/test_explore_page.py -s -v --cache-clear;
         exit_code=$?
       fi
       set -e
