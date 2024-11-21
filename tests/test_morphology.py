@@ -14,9 +14,11 @@ from pages.explore_morphology import ExploreMorphologyPage
 
 class TestExploreMorphologyPage:
     @pytest.mark.explore_page
+    @pytest.mark.run(order=3)
     def test_explore_morphology(self, setup, login, logger):
         browser, wait = setup
         explore_morphology = ExploreMorphologyPage(browser, wait)
+        print(f'MORPH URL:', browser.current_url)
         explore_morphology.go_to_explore_morphology_page()
         logger.info("Explore morphology page is displayed")
         morphology_tab = explore_morphology.find_morphology_tab()

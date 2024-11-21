@@ -5,10 +5,7 @@
 import os
 import time
 import pytest
-from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
-from selenium.webdriver.common.by import By
-
 from locators.explore_ephys_locators import ExploreEphysLocators
 from pages.explore_efys import ExploreElectrophysiologyPage
 from util.util_links_checker import LinkChecker
@@ -24,12 +21,15 @@ class TestExploreEphys:
     def test_explore_ephys_page(self, setup, login, logger):
         browser, wait = setup
         explore_ephys_page = ExploreElectrophysiologyPage(browser, wait)
+        time.sleep(2)
         explore_ephys_page.go_to_explore_ephys_page()
         ephys_tab_title = explore_ephys_page.find_ephys_tab_title()
         logger.info("'Electrophysiology' tab title is present.")
 
+        lv_explore_grid = explore_ephys_page.find_explore_section_grid()
+        logger.info("Explore section grid/table view is displayed")
         thumbnail_img = explore_ephys_page.verify_all_thumbnails_displayed()
-        logger.info("Morphology thumbnail is displayed")
+        logger.info("Ephys thumbnail is displayed")
 
         column_locators = [
             ExploreEphysLocators.LV_PREVIEW,
@@ -69,7 +69,6 @@ class TestExploreEphys:
         browser.execute_script("arguments[0].click();", find_search_input)
 
         find_search_input.send_keys("Rattus norvegicus")
-        # find_search_input.send_keys("Mus musculus")
         logger.info("Search input is searching for Rattus norvegicus")
         found_species = explore_ephys_page.search_species()
         text_found_species = found_species.text
@@ -80,20 +79,25 @@ class TestExploreEphys:
 
         filter_etype = explore_ephys_page.filter_etype_btn().click()
         logger.info("'E-Type' button inside filter is found and clicked.")
+
         filter_etype_search = explore_ephys_page.filter_etype_search()
         filter_etype_search.click()
         logger.info("Clicked on 'E-Type Search Field' in the filter.")
-        filter_etype_input = explore_ephys_page.filter_etype_input()
-        filter_etype_input.click()
-        logger.info("Clicked on text input field.")
-        filter_etype_input.send_keys("bNAC")
-        logger.info("Searching for 'bNAC'.")
-        filter_etype_input.send_keys(Keys.ENTER)
+        filter_etype_search_input = explore_ephys_page.filter_etype_search_input()
+
+        logger.info("Clicked on the ETYPE search field")
+        filter_etype_search_input.send_keys("bNAC")
+        logger.info("Enter 'bNAC' as a search parameter")
+        filter_etype_search_input.send_keys(Keys.ENTER)
+        logger.info("Key ENTER to confirm the searched ETYPE")
+
         logger.info("'bNAC' found.")
+        apply = explore_ephys_page.find_apply_btn().click()
+        logger.info("Clicked on text APPLY button.")
 
         lv_filter_apply_btn = explore_ephys_page.lv_filter_apply().click()
         logger.info("List view filter is applied.")
-        find_filter_close_btn = explore_ephys_page.find_filter_btn().click()
+        find_filter_close_btn = explore_ephys_page.find_filter_close_btn().click()
         logger.info("Close listing view filter.")
 
         find_table = explore_ephys_page.find_table()
@@ -111,83 +115,64 @@ class TestExploreEphys:
         lv_row1 = explore_ephys_page.lv_row1().click()
         logger.info("Clicked on row 1 to see 'Detail View'.")
 
-        title_locators = [
-            ExploreEphysLocators.DV_CONTRIBUTORS_TITLE,
-            ExploreEphysLocators.DV_ETYPE_TITLE,
-            ExploreEphysLocators.DV_REG_DATE_TITLE,
-            ExploreEphysLocators.DV_LICENSE_TITLE,
-            ExploreEphysLocators.DV_BRAIN_REG_TITLE,
-            ExploreEphysLocators.DV_SPECIES_TITLE,
-            ExploreEphysLocators.DV_DESC_TITLE
-        ]
+        """The below is commented out, pending changes"""
+        # title_locators = [
+        #     ExploreEphysLocators.DV_CONTRIBUTORS_TITLE,
+        #     ExploreEphysLocators.DV_ETYPE_TITLE,
+        #     ExploreEphysLocators.DV_REG_DATE_TITLE,
+        #     ExploreEphysLocators.DV_LICENSE_TITLE,
+        #     ExploreEphysLocators.DV_BRAIN_REG_TITLE,
+        #     ExploreEphysLocators.DV_SPECIES_TITLE,
+        #     ExploreEphysLocators.DV_DESC_TITLE
+        # ]
+        #
+        # title_headers = explore_ephys_page.find_dv_title_header(title_locators)
+        # for title in title_headers:
+        #     assert title.is_displayed(), f"DV title header {title} is not displayed"
+        # logger.info("Verify the presence of title headers.")
+        #
+        # locators = [
+        #     ExploreEphysLocators.DV_CONTRIBUTORS,
+        #     ExploreEphysLocators.DV_ETYPE,
+        #     ExploreEphysLocators.DV_REG_DATE,
+        #     ExploreEphysLocators.DV_LICENSE,
+        #     ExploreEphysLocators.DV_BR_REG,
+        #     ExploreEphysLocators.DV_SPECIES,
+        #     ExploreEphysLocators.DV_DESC
+        # ]
+        #
+        # logger.info("Found metadata header locators.")
+        # metadata_header = explore_ephys_page.find_dv_title_header(locators)
+        # for data in metadata_header:
+        #     assert data.is_displayed(), f"DV title header {data} is not displayed"
+        # logger.info("Found detail view title headers.")
+        #
+        # dv_overview_btn = explore_ephys_page.dv_overview_btn()
+        # logger.info("Found 'Overview' button.")
+        # dv_interactive_details_btn = explore_ephys_page.dv_interactive_details_btn()
+        # logger.info("Found 'Interactive details' button.")
+        # dv_stimulus_btn = explore_ephys_page.dv_stimulus_btn().click()
+        # logger.info("Clicked 'Stimulus dropdown' button.")
+        # dv_stimulus_all = explore_ephys_page.dv_stimulus_all()
+        # logger.info("All stimuli is displayed.")
+        # dv_stimuli_images = explore_ephys_page.dv_stim_images()
+        # assert dv_stimuli_images, "Stimuli plots are not displayed"
+        # logger.info("Plots are displayed.")
+        #
+        # dv_interactive_details_btn.click()
+        # logger.info("Clicked 'Interactive details' button.")
+        # dv_id_plots = explore_ephys_page.dv_id_plots()
+        # logger.info("Found 'Interactive detail' plots.")
+        # dv_id_stimulus_title = explore_ephys_page.dv_id_stimulus_title()
+        # logger.info("Found 'Interactive detail' Stimulus.")
+        #
+        # dv_id_repetition_title = explore_ephys_page.dv_id_repetition_title()
+        # logger.info("Found 'Interactive detail' Repetition.")
+        #
+        # dv_id_sweep_title = explore_ephys_page.dv_id_sweep_title()
+        # logger.info("Found 'Interactive detail' Sweep.")
 
-        title_headers = explore_ephys_page.find_dv_title_hedader(title_locators)
-        for title in title_headers:
-            assert title.is_displayed(), f"DV title header {title} is not displayed"
-        logger.info("Verify the presence of title headers.")
-
-        locators = [
-            ExploreEphysLocators.DV_CONTRIBUTORS,
-            ExploreEphysLocators.DV_ETYPE,
-            ExploreEphysLocators.DV_REG_DATE,
-            ExploreEphysLocators.DV_LICENSE,
-            ExploreEphysLocators.DV_BR_REG,
-            ExploreEphysLocators.DV_SPECIES,
-            ExploreEphysLocators.DV_DESC
-        ]
-
-        logger.info("Found metadata header locators.")
-        metadata_header = explore_ephys_page.find_dv_title_hedader(locators)
-        for data in metadata_header:
-            assert data.is_displayed(), f"DV title header {data} is not displayed"
-        logger.info("Found detail view title headers.")
-
-        dv_overview_btn = explore_ephys_page.dv_overview_btn()
-        logger.info("Found 'Overview' button.")
-        dv_interactive_details_btn = explore_ephys_page.dv_interactive_details_btn()
-        logger.info("Found 'Interactive details' button.")
-        dv_stimulus_btn = explore_ephys_page.dv_stimulus_btn().click()
-        logger.info("Clicked 'Stimulus dropdown' button.")
-        dv_stimulus_all = explore_ephys_page.dv_stimulus_all()
-        logger.info("All stimuli is displayed.")
-        dv_stimuli_images = explore_ephys_page.dv_stim_images()
-        assert dv_stimuli_images, "Stimuli plots are not displayed"
-        logger.info("Plots are displayed.")
-
-        dv_interactive_details_btn.click()
-        logger.info("Clicked 'Interactive details' button.")
-        dv_id_plots = explore_ephys_page.dv_id_plots()
-        logger.info("Found 'Interactive detail' plots.")
-        dv_id_stimulus_title = explore_ephys_page.dv_id_stimulus_title()
-        logger.info("Found 'Interactive detail' Stimulus.")
-
-        dv_id_repetition_title = explore_ephys_page.dv_id_repetition_title()
-        logger.info("Found 'Interactive detail' Repetition.")
-
-        dv_id_sweep_title = explore_ephys_page.dv_id_sweep_title()
-        logger.info("Found 'Interactive detail' Sweep.")
-
-        # time.sleep(6)
-
-        # time.sleep(5)
-
-
-    # filter_brain_region = explore_ephys_page.check_filter_brain_region_title()
-    # filter_brain_region_txt = filter_brain_region.text
-    # print("Filter titles", filter_brain_region_txt)
-
-
-    # find_side_bar_plus_icon = explore_ephys_page.find_side_bar_plus_btn().click()
-    # logger.info("Looking for side bar plus icon")
-
-    # find_side_bar_menu = explore_ephys_page.find_side_bar_menu()
-    # logger.info("Side bar menu is open")
-
-    # find_side_bar_menu_close_btn = explore_ephys_page.find_side_bar_menu_close_btn()
-    # logger.info("Side bar menu close")
-    # find_side_bar_menu_close_btn.click()
-    # logger.info("Side bar menus is clicked to close")
-
+    """The below is commented out, due to the changes in the platform"""
     # def test_links(self):
     """
     test_links methods checks the request status

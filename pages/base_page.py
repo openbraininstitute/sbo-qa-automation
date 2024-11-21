@@ -13,7 +13,7 @@ class CustomBasePage:
     def __init__(self, browser, wait):
         self.browser = browser
         self.wait = wait
-        self.base_url = "https://openbrainplatform.org/mmb-beta/"
+        self.base_url = "https://openbluebrain.com/app"
 
     def go_to_page(self, page_url):
         url = self.base_url + page_url
@@ -33,7 +33,6 @@ class CustomBasePage:
 
     def element_to_be_clickable(self, by_locator, timeout=10):
         self.wait.until(EC.element_to_be_clickable(by_locator), timeout)
-        # wait.until(EC.element_to_be_clickable(by_locator), timeout).click()
 
     def assert_element_text(self, by_locator, expected_text):
         element = self.wait.until(EC.visibility_of_element_located(by_locator))
@@ -54,8 +53,19 @@ class CustomBasePage:
         try:
             element = self.wait.until(EC.presence_of_element_located(by_locator))
             self.wait.until(EC.visibility_of(element), timeout)
-            # Add more conditions as needed
 
         except TimeoutException:
             print("Loading took too long")
 
+    def wait_for_condition(self, condition, timeout=60, message=None):
+        """
+        General-purpose wait function to wait for a specific condition.
+        :param condition: The condition to wait for (e.g., element presence, URL contains).
+        :param timeout: How long to wait before timing out.
+        :param message: Custom error message if timeout occurs.
+        :return: The result of the condition (e.g., an element or True).
+        """
+        try:
+            return self.wait.until(condition, message)
+        except TimeoutException as e:
+            raise RuntimeError(message or f"Condition not met within {timeout} seconds") from e

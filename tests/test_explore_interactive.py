@@ -3,11 +3,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # import time
-#
 # import pytest
 # from pages.explore_interactive import ExploreInteractivePage
-#
-#
+"""The commented out code below is pending changes in the platform."""
+
 # class TestExploreInteractivePage:
 #     @pytest.mark.explore_page
 #     # @pytest.mark.run(order=0)
@@ -67,7 +66,4 @@
 #         logger.info("Isocortex selected as brain region")
 #         isocortex_option.click()
 #         logger.info("Isocortex and its sub-regions are displayed")
-#
 #         # morphology.click()
-#
-#

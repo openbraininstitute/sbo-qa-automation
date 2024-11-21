@@ -53,6 +53,9 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
     def dv_stim_images(self):
         return self.find_all_elements(ExploreEphysLocators.DV_STIM_IMAGES)
 
+    def find_apply_btn(self):
+        return self.find_element(ExploreEphysLocators.APPLY_BTN)
+
     def find_btn_all_checkboxes(self):
         return self.find_element(ExploreEphysLocators.ALL_CHECKBOXES)
 
@@ -71,13 +74,16 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
     def filter_etype_search(self):
         return self.find_element(ExploreEphysLocators.FILTER_ETYPE_SEARCH)
 
-    def filter_etype_input(self):
-        return self.find_element(ExploreEphysLocators.FILTER_ETYPE_INPUT)
+    def filter_etype_search_input(self):
+        return self.find_element(ExploreEphysLocators.FILTER_ETYPE_SEARCH_INPUT)
+
+    def filter_etype_input_type_area(self):
+        return self.find_element(ExploreEphysLocators.FILTER_ETYPE_INPUT_TYPE_AREA)
 
     def find_filtered_etype(self):
         return self.find_all_elements(ExploreEphysLocators.FILTERED_ETYPE)
 
-    def find_dv_title_hedader(self, title_locators):
+    def find_dv_title_header(self, title_locators):
         title_headers = []
         for title in title_locators:
             title_headers.extend(self.find_all_elements(title))
@@ -89,8 +95,14 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
             column_headers.extend(self.find_all_elements(locator))
         return column_headers
 
+    def find_explore_section_grid(self):
+        return self.element_visibility(ExploreEphysLocators.LV_GRID_VIEW)
+
     def find_filter_btn(self):
         return self.find_element(ExploreEphysLocators.LV_FILTER_BTN)
+
+    def find_filter_close_btn(self):
+        return self.element_visibility(ExploreEphysLocators.LV_FILTER_CLOSE_BTN)
 
     def find_load_more_btn(self):
         return self.find_element(self.wait, ExploreEphysLocators.LOAD_MORE_BUTTON)
@@ -126,7 +138,7 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
         return self.find_element(ExploreEphysLocators.TABLE)
 
     def find_thumbnails(self):
-        return self.find_all_elements(ExploreEphysLocators.LV_THUMBNAIL)
+        return self.visibility_of_all_elements(ExploreEphysLocators.LV_THUMBNAIL)
 
     def lv_filter_apply(self):
         return self.find_element(ExploreEphysLocators.LV_FILTER_APPLY_BTN)
@@ -152,3 +164,4 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
             })
 
         return thumbnail_status
+

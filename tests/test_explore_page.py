@@ -5,8 +5,9 @@
 import time
 import os.path
 import pytest
-
+from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
+
 
 current_directory = os.getcwd()
 relative_file_path = 'scraped_links.txt'
@@ -15,102 +16,87 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestExplorePage:
     @pytest.mark.explore_page
-    @pytest.mark.run(order=3)
+    @pytest.mark.run(order=2)
     def test_explore_page(self, setup, login, logger):
+        """
+        The commented out code below is pending changes in the platform.
+        """
         browser, wait = setup
         explore_page = ExplorePage(browser, wait)
-        exp_url = explore_page.go_to_explore_page()
+        explore_page.go_to_explore_page()
         logger.info("Explore page is loaded")
 
         """Checking the titles of the Explore Page"""
-        check_explore_title = explore_page.check_explore_title_is_present()
+        explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
-        #
-        # interactive_exploraion = explore_page.interactive_exploration_title()
-        # inter_exploration = interactive_exploraion.text
-        # logger.info("Interactive exploration title is found")
 
+        exp_data_titles = [
+            ExplorePageLocators.NEURON_MORPHOLOGY,
+            ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY,
+            ExplorePageLocators.NEURON_DENSITY,
+            ExplorePageLocators.BOUTON_DENSITY,
+            ExplorePageLocators.SYNAPSE_PER_CONNECTION
+        ]
+        logger.info("Searching for Experimental Data types")
+        exp_data_titles = explore_page.find_experimental_data_titles(exp_data_titles)
+        for title in exp_data_titles:
+            assert title.is_displayed(), f"Experimental data {title} is not displayed."
+        logger.info("Found Experimental data titles")
 
-        # experimental_data_title = explore_page.experimental_data_title()
-        # exp_data = experimental_data_title.text
-        # logger.info("Verifying 'Experimental data' title is found")
+        page_titles = [
+            ExplorePageLocators.EXPERIMENTAL_DATA_BTN,
+            ExplorePageLocators.MODEL_DATA_BTN,
+            ExplorePageLocators.LITERATURE
+        ]
+        logger.info("Searching for Explore Page titles")
+        explore_page_titles = explore_page.find_explore_page_titles(page_titles)
 
-        # portals_title = explore_page.portals_title()
-        # portal_txt = portals_title.text
-        # logger.info("Verifying 'Portals' title is found")
-        #
-        # gallery_title = explore_page.gallery_title()
-        # gallery_txt = gallery_title.text
-        # logger.info("Verifying 'Gallery' title is found")
-        #
-        # literature_title = explore_page.literature_title()
-        # literature_txt = literature_title.text
-        # logger.info("Verifying 'Literature' title is found")
+        for page_title in explore_page_titles:
+            assert page_title.is_displayed(), f"Explore page titles {page_title} is not displayed"
+        logger.info("Found Explore page titles")
 
-        # click_experimental_data = explore_page.experimental_data_button()
-        # logger.info("Selecting 'Experimental Data' section")
-        # # time.sleep(5)
-        # click_experimental_data.click()
+        record_count_locators = [
+            ExplorePageLocators.MORPHOLOGY_NRECORDS,
+            ExplorePageLocators.NEURON_EPHYS_NRECORDS,
+            ExplorePageLocators.NEURON_DENSITY_NRECORDS,
+            ExplorePageLocators.BOUTON_DENSITY_NRECORDS,
+            ExplorePageLocators.SYNAPSE_PER_CONNECTION_NRECORDS
+        ]
+        record_counts = explore_page.get_experiment_record_count(record_count_locators)
+        for record_count in record_counts:
+            assert record_count >= 1, f"Record count is less than 100: {record_count}"
+        logger.info("Number of records for data types are displayed")
 
-        # experimental_data_links = [
-        #     explore_page.neuron_electrophysiology_link(),
-        #     explore_page.neuron_morphology_link(),
-        #     explore_page.bouton_density_link(),
-        #     explore_page.neuron_density_link(),
-        #     explore_page.layer_thickness_link(),
-        #     explore_page.synapse_per_connection_link()
-        # ]
+        brain_region_panel = explore_page.find_brain_region_panel()
+        logger.info("Found Brain Region Panel")
 
-        # exp_data_titles = [
-        #     "Neuron electrophysiology link:",
-        #     "Neuron morphology href:",
-        #     "Bouton density href:",
-        #     "Neuron density href:",
-        #     "Layer thickness href:",
-        #     "Synapse per connection href:"
-        # ]
-        #
-        # for link, title in zip(experimental_data_links, exp_data_titles):
-        #     href_value = link.get_attribute('href')
-        #     print(title, href_value)
+        cerebrum_in_brpanel = explore_page.find_cerebrum_brp()
+        logger.info("Found Cerebrum in the brain region panel")
 
-        # explore_page_links = [
-        #     explore_page.interactive_exploration_link(),
-        #     explore_page.gallery_link(),
-        #     explore_page.portals_link(),
-        #     explore_page.literature_link()
-        # ]
-        #
-        # titles = [
-        #     "Interactive exploration:",
-        #     "Literature:",
-        #     "Portals:",
-        #     "Gallery:"
-        # ]
-        #
-        # for link, title in zip(explore_page_links, titles):
-        #     href_value = link.get_attribute('href')
-        #     print(title, href_value)
+        cerebrum_arrow_btn = explore_page.find_cerebrum_arrow_btn()
+        logger.info("Cerebrum - parent arrow button is clicked")
+        browser.execute_script("arguments[0].click();",cerebrum_arrow_btn)
 
-    # def test_links(self):
-    #     """
-    #     test_links methods checks the request status
-    #     Also, writes non-dynamic URLs that are present on the page to a text file.
-    #     """
-    #     test_directory = os.path.dirname(os.path.abspath(__file__))
-    #     links_file_path = os.path.join(test_directory, '..', 'links.json')
-    #
-    #     link_checker = LinkChecker()
-    #     links = link_checker.load_links(links_file_path)['explore_links']
-    #     link_checker.check_links(links)
-        # url = "https://bbp.epfl.ch/mmb-beta/explore/electrophysiology"
-        # response = requests.get(url)
-        # page_source = response.text
-        # print(page_source, "THIS IS FROM THE EXPLORE_TEST, PAGE_LINKS")
-        # url_scraper = UrlScraper()
-        # scraped_links = url_scraper.scrape_links(page_source)
-        #
-        # write_links_to_file(file_path, scraped_links)
-        # # print("Scraped links from Explore page saved to file successfully")
-        # print("File path EXPLORE test", file_path)
-        # print("Scraped links EXPLORE page", scraped_links)
+        cerebral_cortex_title = explore_page.find_cerebral_cortex_brp()
+        logger.info("Found Cerebral cortex as a child of Cerebrum")
+
+        neurons_panel = explore_page.find_neurons_panel()
+        assert neurons_panel.is_displayed()
+        logger.info("Neurons panel is displayed")
+
+        density_count_switch = explore_page.find_count_switch()
+        assert density_count_switch.is_displayed()
+        logger.info("Density & count switch is displayed")
+
+        atlas = explore_page.find_3d_atlas()
+        assert atlas.is_displayed()
+        logger.info("3D Atlas is displayed")
+
+        atlas_fullscreen = explore_page.find_atlas_fullscreen_bt()
+        logger.info("Found atlas fullscreen button")
+        atlas_fullscreen.click()
+
+        fulscreen_exit = explore_page.find_fullscreen_exit()
+        logger.info("Fullscreen exit button is found")
+        fulscreen_exit.click()
+        logger.info("Fullscreen exit button is clicked, atlas is minimized")

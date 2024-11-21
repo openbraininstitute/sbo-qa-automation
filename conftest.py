@@ -1,14 +1,17 @@
-import json
+# Copyright (c) 2024 Blue Brain Project/EPFL
+#
+# SPDX-License-Identifier: Apache-2.0
+
+
 import logging
 import os
 import sys
-import time
 from io import BytesIO
 
 import pytest
 from PIL import Image
 from selenium import webdriver
-from selenium.common import exceptions, NoSuchElementException
+from selenium.common import exceptions
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -17,9 +20,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
+
 from pages.login_page import LoginPage
 from util.util_base import load_config
-from selenium.webdriver.common.keys import Keys
 
 
 @pytest.fixture(scope="class", autouse=True)
@@ -35,7 +38,6 @@ def setup(request, pytestconfig):
             options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-gpu")
-        # options.add_argument("--disable-javascript")
         service = ChromeService(ChromeDriverManager().install())
         browser = webdriver.Chrome(service=service, options=options)
     elif browser_name == "firefox":
@@ -80,7 +82,6 @@ def logger(request):
     # Check if the logger already has a file handler
     has_file_handler = any(isinstance(handler, logging.FileHandler) for handler in logger.handlers)
     # Check if the logger already has a stream handler
-
     has_stream_handler = any(
         isinstance(handler, logging.StreamHandler) for handler in logger.handlers)
     # Determine the outer allure_reports directory
@@ -104,11 +105,11 @@ def logger(request):
         # Create the stream handler for console output
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setLevel(logging.DEBUG)
-        stream_formatter = logging.Formatter("%(levelname)s : %(asctime)s : %(message)s")
+        stream_formatter = logging.Formatter("\n%(levelname)s : %(asctime)s : %(message)s")
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
-        # Log test start (moved to the beginning of the fixture)
+    # Log test start (moved to the beginning of the fixture)
     logger.info('Test started')
 
     # Log test finish (moved to the end of the fixture)
@@ -122,12 +123,14 @@ def logger(request):
 
 @pytest.fixture(scope="function")
 def navigate_to_login(setup):
+    """Fixture that navigates to the login page"""
     browser, wait = setup
     login_page = LoginPage(browser, wait)
-    target_URL = login_page.navigate_to_homepage()  # Navigate to homepage
+
+    target_URL = login_page.navigate_to_homepage()
     browser.execute_script("window.stop();")
-    # webdriver.ActionChains(browser).send_keys(Keys.ESCAPE).perform()
-    print(f"Navigated to: {target_URL}")
+    print(f"Contest fixture - Navigated to: {target_URL}")
+
     login_button = login_page.find_login_button()
     assert login_button.is_displayed()
     login_button.click()
@@ -137,21 +140,17 @@ def navigate_to_login(setup):
 
 @pytest.fixture(scope="function")
 def login(setup, navigate_to_login):
-    """Fixture that navigates to the login page"""
+    """Fixture to log in and ensure user is authenticated."""
     browser, wait = setup
     login_page = navigate_to_login
     config = load_config()
     username = config['username']
     password = config['password']
 
-    if 'auth' in browser.current_url:
-        # github_button = login_page.find_github_login()
-        # github_button.click()
-        login_page.find_username_field().send_keys(username)
-        login_page.find_password_field().send_keys(password)
-        login_page.find_signin_button().click()
-        wait.until(EC.url_contains("mmb-beta"))
-
+    login_page.perform_login(username, password)
+    login_page.wait_for_login_complete()
+    assert "/app/explore" in browser.current_url, f"Login failed, current URL: {browser.current_url}"
+    print("Login successful. Current URL:", browser.current_url)
     yield browser, wait
     login_page.browser.delete_all_cookies()
 
