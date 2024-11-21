@@ -16,7 +16,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestExplorePage:
     @pytest.mark.explore_page
-    @pytest.mark.run(order=3)
+    @pytest.mark.run(order=2)
     def test_explore_page(self, setup, login, logger):
         """
         The commented out code below is pending changes in the platform.
@@ -69,25 +69,33 @@ class TestExplorePage:
 
         brain_region_panel = explore_page.find_brain_region_panel()
         logger.info("Found Brain Region Panel")
+
         cerebrum_in_brpanel = explore_page.find_cerebrum_brp()
         logger.info("Found Cerebrum in the brain region panel")
+
         cerebrum_arrow_btn = explore_page.find_cerebrum_arrow_btn()
         logger.info("Cerebrum - parent arrow button is clicked")
         browser.execute_script("arguments[0].click();",cerebrum_arrow_btn)
+
         cerebral_cortex_title = explore_page.find_cerebral_cortex_brp()
         logger.info("Found Cerebral cortex as a child of Cerebrum")
+
         neurons_panel = explore_page.find_neurons_panel()
         assert neurons_panel.is_displayed()
         logger.info("Neurons panel is displayed")
+
         density_count_switch = explore_page.find_count_switch()
         assert density_count_switch.is_displayed()
         logger.info("Density & count switch is displayed")
+
         atlas = explore_page.find_3d_atlas()
         assert atlas.is_displayed()
         logger.info("3D Atlas is displayed")
+
         atlas_fullscreen = explore_page.find_atlas_fullscreen_bt()
         logger.info("Found atlas fullscreen button")
         atlas_fullscreen.click()
+
         fulscreen_exit = explore_page.find_fullscreen_exit()
         logger.info("Fullscreen exit button is found")
         fulscreen_exit.click()

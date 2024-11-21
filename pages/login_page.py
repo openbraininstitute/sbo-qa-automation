@@ -32,8 +32,6 @@ class LoginPage(CustomBasePage):
         try:
             self.wait.until(EC.url_contains('explore/interactive'), timeout)
         except TimeoutException:
-            # print("Waiting for URL to contain AUTH")
-            # self.wait.until(EC.url_contains("dev/virtual-lab")) # To implement after Nick's change
             print(
                 f"Timeout waiting for URL to contain 'virtual-lab'. Current URL: "
                 f"{self.browser.current_url}")

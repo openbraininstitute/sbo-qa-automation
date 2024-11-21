@@ -14,6 +14,7 @@ from pages.explore_morphology import ExploreMorphologyPage
 
 class TestExploreMorphologyPage:
     @pytest.mark.explore_page
+    @pytest.mark.run(order=3)
     def test_explore_morphology(self, setup, login, logger):
         browser, wait = setup
         explore_morphology = ExploreMorphologyPage(browser, wait)
