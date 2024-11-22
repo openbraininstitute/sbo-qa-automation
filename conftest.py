@@ -129,7 +129,7 @@ def navigate_to_login(setup):
 
     target_URL = login_page.navigate_to_homepage()
     browser.execute_script("window.stop();")
-    print(f"Contest fixture - Navigated to: {target_URL}")
+    print(f"conftest.py fixture - Navigated to: {target_URL}")
 
     login_button = login_page.find_login_button()
     assert login_button.is_displayed()
