@@ -46,11 +46,11 @@ class ExplorePage(HomePage, LinkChecker):
             elements_list.extend(self.find_all_elements(locator))
         return elements_list
 
-    def find_experimental_data_titles(self, exp_data_title):
-        exp_data_title = []
-        for title in exp_data_title:
-            exp_data_title.extend(self.find_all_elements(title))
-        return exp_data_title
+    def find_experimental_data_titles(self, exp_data_locators):
+        result = []
+        for locator in exp_data_locators:
+            result.extend(self.find_all_elements(locator))
+        return result
 
     def get_experiment_record_count(self, record_count_locators):
         record_counts = []
@@ -67,8 +67,8 @@ class ExplorePage(HomePage, LinkChecker):
     def find_brain_region_panel(self):
         return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL)
 
-    def find_cerebrum_brp(self):
-        return self.find_element(ExplorePageLocators.BRP_CEREBRUM)
+    def find_cerebrum_brp(self, timeout=30):
+        return self.find_element(ExplorePageLocators.BRP_CEREBRUM, timeout=timeout)
 
     def find_cerebral_cortex_brp(self):
         return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE)
@@ -79,11 +79,11 @@ class ExplorePage(HomePage, LinkChecker):
     def find_3d_atlas(self):
         return self.find_element(ExplorePageLocators.ATLAS)
 
-    def find_atlas_fullscreen_bt(self):
-        return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN)
+    def find_atlas_fullscreen_bt(self, timeout=20):
+        return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN, timeout=timeout)
 
-    def find_fullscreen_exit(self):
-        return self.find_element(ExplorePageLocators.FULLSCREEN_EXIT)
+    def find_fullscreen_exit(self, timeout=20):
+        return self.find_element(ExplorePageLocators.FULLSCREEN_EXIT, timeout=timeout)
 
     def find_neurons_panel(self):
         return self.find_element(ExplorePageLocators.NEURONS_PANEL)
@@ -91,3 +91,8 @@ class ExplorePage(HomePage, LinkChecker):
     def find_count_switch(self):
         return self.find_element(ExplorePageLocators.COUNT_SWITCH)
 
+    def find_brain_region_search_field(self, timeout=20):
+        return self.find_element(ExplorePageLocators.SEARCH_REGION, timeout=timeout)
+
+    def find_selected_brain_region_title(self):
+        return self.find_element(ExplorePageLocators.SELECTED_BRAIN_REGION)

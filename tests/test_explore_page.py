@@ -5,6 +5,8 @@
 import time
 import os.path
 import pytest
+from selenium.webdriver import Keys
+
 from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
 
@@ -38,9 +40,12 @@ class TestExplorePage:
             ExplorePageLocators.SYNAPSE_PER_CONNECTION
         ]
         logger.info("Searching for Experimental Data types")
-        exp_data_titles = explore_page.find_experimental_data_titles(exp_data_titles)
-        for title in exp_data_titles:
-            assert title.is_displayed(), f"Experimental data {title} is not displayed."
+        exp_data_elements = explore_page.find_experimental_data_titles(exp_data_titles)
+
+        found_titles = [element.text for element in exp_data_elements]
+        logger.info(f"Found experimental data titles: {found_titles}")
+        for element in exp_data_elements:
+            assert element.is_displayed(), f"Experimental data {element} is not displayed."
         logger.info("Found Experimental data titles")
 
         page_titles = [
@@ -88,15 +93,29 @@ class TestExplorePage:
         assert density_count_switch.is_displayed()
         logger.info("Density & count switch is displayed")
 
+        brain_region_search_field = explore_page.find_brain_region_search_field(timeout=25)
+        assert brain_region_search_field.is_displayed()
+        logger.info("Bran region panel search field is found")
+        brain_region_search_field.send_keys(Keys.ENTER)
+        find_input_file_and_wait = ExplorePageLocators.SEARCH_REGION
+        explore_page.wait_for_long_load(find_input_file_and_wait)
+        logger.info("Waiting for page to load")
+
+        brain_region_search_field.send_keys("Isocortex")
+        logger.info("Searching for 'Isocortex'")
+        brain_region_search_field.send_keys(Keys.ENTER)
+        selected_brain_region_title = explore_page.find_selected_brain_region_title()
+        assert selected_brain_region_title.text == 'Isocortex'
+        logger.info("Found 'Isocortex' in the brain region panel and the title is displayed ")
         atlas = explore_page.find_3d_atlas()
         assert atlas.is_displayed()
         logger.info("3D Atlas is displayed")
 
-        atlas_fullscreen = explore_page.find_atlas_fullscreen_bt()
+        atlas_fullscreen = explore_page.find_atlas_fullscreen_bt(timeout=15)
         logger.info("Found atlas fullscreen button")
         atlas_fullscreen.click()
 
-        fulscreen_exit = explore_page.find_fullscreen_exit()
+        fulscreen_exit = explore_page.find_fullscreen_exit(timeout=15)
         logger.info("Fullscreen exit button is found")
         fulscreen_exit.click()
         logger.info("Fullscreen exit button is clicked, atlas is minimized")
