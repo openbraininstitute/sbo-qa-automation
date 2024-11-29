@@ -50,12 +50,22 @@ class CustomBasePage:
         return bool(element)
 
     def wait_for_long_load(self, by_locator, timeout=60):
-        try:
-            element = self.wait.until(EC.presence_of_element_located(by_locator))
-            self.wait.until(EC.visibility_of(element), timeout)
+        return self.wait.until(EC.visibility_of_element_located(by_locator))
 
-        except TimeoutException:
-            print("Loading took too long")
+    def wait_for_page_ready(self, timeout=10):
+        """
+        Waits until the page's readyState is 'complete', indicating that the page has finished loading.
+
+        Args:
+            timeout (int): Maximum time to wait for the page to be ready.
+
+        Returns:
+            bool: True if the page is ready within the timeout, False otherwise.
+        """
+        return self.wait.until(
+            lambda driver: self.browser.execute_script("return document.readyState") == "complete",
+            f"Page did not reach ready state within {timeout} seconds"
+        )
 
     def wait_for_condition(self, condition, timeout=60, message=None):
         """

@@ -1,6 +1,10 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 #
 # SPDX-License-Identifier: Apache-2.0
+import time
+
+from selenium.common import ElementNotVisibleException, TimeoutException, \
+    StaleElementReferenceException
 
 from pages.explore_page import ExplorePage
 from locators.explore_morphology_locators import ExploreMorphologyPageLocators
@@ -9,10 +13,11 @@ from util.util_scraper import UrlScraper
 
 
 class ExploreMorphologyPage(ExplorePage, LinkChecker):
-    def __init__(self, browser, wait):
+    def __init__(self, browser, wait, logger):
         super().__init__(browser, wait)
         self.home_page = ExplorePage(browser, wait)
         self.url_scraper = UrlScraper()
+        self.logger = logger
 
     def go_to_explore_morphology_page(self):
         self.go_to_page("/explore/interactive/experimental/morphology")
@@ -36,14 +41,47 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
     def find_thumbnails(self):
         return self.find_all_elements(ExploreMorphologyPageLocators.LV_THUMBNAIL)
 
-    def verify_all_thumbnails_displayed(self):
-        thumbnails = self.find_thumbnails()
+    def scroll_to_element(self, element):
+        """Scrolls the page to bring the element into the viewport."""
+        self.browser.execute_script("arguments[0].scrollIntoView();", element)
 
+    def scroll_to_bottom(self):
+        """Scrolls to the bottom of the page to trigger lazy-loading."""
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)  # Allow time for lazy-loaded content to load
+
+    def verify_all_thumbnails_displayed(self):
+        thumbnails = []
+        last_height = 0
+
+        while True:
+            # Find thumbnails currently loaded
+            new_thumbnails = self.find_thumbnails()
+            for thumbnail in new_thumbnails:
+                if thumbnail not in thumbnails:  # Avoid duplicate entries
+                    thumbnails.append(thumbnail)
+
+            # Scroll and update viewport height
+            self.scroll_to_bottom()
+            new_height = self.browser.execute_script("return document.body.scrollHeight;")
+
+            # If no new height, assume we reached the end of the page
+            if new_height == last_height:
+                break
+            last_height = new_height
+
+        # Check displayed status for all found thumbnails
         thumbnail_status = []
         for thumbnail in thumbnails:
+            try:
+                self.scroll_to_element(thumbnail)  # Ensure it's in view
+                is_displayed = thumbnail.is_displayed()
+            except ElementNotVisibleException:
+                self.logger.debug("Thumbnail is present but not visible in the viewport.")
+                is_displayed = False
             thumbnail_status.append({
                 'element': thumbnail,
-                'is_displayed': thumbnail.is_displayed()
+                'is_displayed': is_displayed
             })
 
         return thumbnail_status
@@ -60,6 +98,9 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
     def find_species_sorted(self):
         return self.element_visibility(ExploreMorphologyPageLocators.SPECIES_SORTED)
 
+    def find_brain_region_column_title(self):
+        return self.is_visible(ExploreMorphologyPageLocators.BRAIN_REGION_COLUMN_TITLE)
+
     def find_first_row(self):
         return self.element_visibility(ExploreMorphologyPageLocators.FIRST_ROW)
 
@@ -67,25 +108,38 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
         return self.find_element(ExploreMorphologyPageLocators.TABLE)
 
     def get_table_data(self):
-        table = self.find_element(ExploreMorphologyPageLocators.TABLE)
-        rows = self.find_all_elements(ExploreMorphologyPageLocators.ROW)
-
+        """Fetches all table data, row by row, with handling for dynamic changes to the DOM."""
+        max_retries = 3  # Number of retries to handle stale elements
         table_data = []
-        for row in rows:
-            cells = self.find_all_elements(ExploreMorphologyPageLocators.CELLS)
-            row_data = [cell.text for cell in cells]
-            table_data.append(row_data)
 
-    def is_sorted(self, data):
+        for attempt in range(max_retries):
+            try:
+                # Find the table element fresh each time to avoid stale references
+                table = self.find_element(ExploreMorphologyPageLocators.TABLE)
+                self.wait_for_page_ready(timeout=15)
+                rows = table.find_elements(*ExploreMorphologyPageLocators.ROW)
+                table_data = []
+                for row in rows:
+                    cells = row.find_elements(*ExploreMorphologyPageLocators.CELLS)
+                    row_data = [cell.text.strip() for cell in cells]
+                    table_data.append(row_data)
+
+                return table_data
+
+            except StaleElementReferenceException as e:
+                self.logger.warning(
+                    f"Stale element encountered on attempt {attempt + 1}. Retrying...")
+                if attempt == max_retries - 1:
+                    raise e  # Re-raise if we've reached the max retries
+
+        raise RuntimeError("Failed to fetch table data due to persistent stale elements.")
+
+    def is_sorted(self, data, col_index=0):
         # Check if data is not None and has at least one row
         if data and len(data) > 0 and data[0] is not None:
-            for col_index in range(len(data[0])):
-                col_values = [row[col_index] for row in data]
-                if col_values != sorted(col_values):
-                    return False
-            return True
-        else:
-            return False
+            col_values = [row[col_index] for row in data if len(row) > col_index]
+            return col_values == sorted(col_values)
+        return False
 
     def find_back_to_ie_btn(self):
         return self.find_element(ExploreMorphologyPageLocators.BACK_IE_BTN)
@@ -146,3 +200,12 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
 
     def clear_filters_btn(self):
         return self.find_element(ExploreMorphologyPageLocators.CLEAR_FILTERS_BTN)
+
+    def is_filter_panel_closed(self):
+        try:
+            # Use a locator for the filter panel (e.g., its container element)
+            filter_panel = self.element_visibility(ExploreMorphologyPageLocators.FILTER_PANEL,
+                                                   timeout=5)
+            return not filter_panel.is_displayed()
+        except TimeoutException:
+            return True
