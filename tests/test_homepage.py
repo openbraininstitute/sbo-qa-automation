@@ -39,9 +39,27 @@ class TestFindLogin:
 
         big_title1 = home_page.find_big_title1()
         assert big_title1.text.strip() != "", "The big title is found, but is empty"
-
+        logger.info("First big title is found")
         big_title2 = home_page.find_big_title2()
         assert big_title2.text.strip() != "", "The big title is found, but is empty"
+        logger.info("Second big title is found")
+
+        contributor = home_page.find_contributor()
+        logger.info("Found contributor")
+        contributors_table = home_page.find_contributor_table()
+        logger.info("Scrolled to the Github button, and it is displayed")
+        assert contributors_table.is_displayed(), "The table is displayed"
+
+        contributor_a = home_page.find_contributor()
+        assert contributor_a, "Contributor is found"
+
+        logo1 = home_page.find_bbop_logo1()
+        assert logo1.is_displayed(), "The logo is not displayed"
+        logger.info("Top logo is displayed")
+
+        logo2 = home_page.find_bbop_logo1()
+        assert logo1.is_displayed(), "The logo is not displayed"
+        logger.info("Bottom logo is displayed")
 
         login_button = home_page.find_login_button()
         assert login_button.is_displayed()
