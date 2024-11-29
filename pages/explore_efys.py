@@ -110,21 +110,6 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
     def find_table_rows(self):
         return self.find_all_elements(ExploreEphysLocators.TABLE_ROWS)
 
-    def validate_empty_cells(self):
-        rows = self.find_table_rows()
-        for row_index, row in enumerate(rows, start=2):
-            cells = self.find_all_elements(ExploreEphysLocators.TABLE_CELLS)
-            for cell_index, cell in enumerate(cells, start=2):
-                if not cell.text.strip():
-                    error_message = f'Error: Empty field in a row{row_index}, cell {cell_index}'
-                    print(error_message)
-
-    def perform_full_validation(self):
-        self.validate_empty_cells()
-        load_more_button = self.find_load_more_btn()
-        load_more_button.click()
-        self.validate_empty_cells()
-
     def find_search_button(self):
         return self.find_element(ExploreEphysLocators.SEARCH_BUTTON)
 
@@ -146,12 +131,27 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
     def lv_row1(self):
         return self.find_element(ExploreEphysLocators.LV_ROW1)
 
+    def perform_full_validation(self):
+        self.validate_empty_cells()
+        load_more_button = self.find_load_more_btn()
+        load_more_button.click()
+        self.validate_empty_cells()
+
     def scrape_links(self):
         page_source = self.browser.page_source
         links = self.url_scraper.scrape_links(page_source)
 
     def search_species(self):
         return self.element_visibility(ExploreEphysLocators.SEARCHED_SPECIES)
+
+    def validate_empty_cells(self):
+        rows = self.find_table_rows()
+        for row_index, row in enumerate(rows, start=2):
+            cells = self.find_all_elements(ExploreEphysLocators.TABLE_CELLS)
+            for cell_index, cell in enumerate(cells, start=2):
+                if not cell.text.strip():
+                    error_message = f'Error: Empty field in a row{row_index}, cell {cell_index}'
+                    print(error_message)
 
     def verify_all_thumbnails_displayed(self):
         thumbnails = self.find_thumbnails()

@@ -20,8 +20,53 @@ class HomePage(CustomBasePage, LinkChecker):
     def find_login_button(self):
         return self.find_element(HomePageLocators.LOGIN_BUTTON)
 
+    def find_about_btn(self):
+        return self.find_element(HomePageLocators.ABOUT)
+
+    def find_big_title1(self):
+        return self.find_element(HomePageLocators.BIG_TITLE1)
+
+    def find_big_title2(self):
+        return self.find_element(HomePageLocators.BIG_TITLE2)
+
+    def find_bbop_logo1(self):
+        return self.find_element(HomePageLocators.BBOP1)
+
+    def find_bbop_logo2(self):
+        return self.find_element(HomePageLocators.BBOP2)
+
+    def find_bbp1(self):
+        return self.find_element(HomePageLocators.BBP1)
+
+    def find_bbp2(self):
+        return self.find_element(HomePageLocators.BBP2)
+
+    def find_doc1(self):
+        return self.find_element(HomePageLocators.DOC1)
+
+    def find_doc2(self):
+        return self.find_element(HomePageLocators.DOC2)
+
+    def find_doc3(self):
+        return self.find_element(HomePageLocators.DOC3)
+
+    def find_doc4(self):
+        return self.find_element(HomePageLocators.DOC4)
+
+    def find_contributor_table(self):
+        return self.find_element(HomePageLocators.CONTRIBUTOR_TABLE)
+
+    def find_contributor(self):
+        return self.find_element(HomePageLocators.CONTRIBUTOR)
+
     def find_github_btn(self):
-        return self.find_element(HomePageLocators.GITHUB_BTN)
+        return self.find_element(HomePageLocators.BB_GITHUB_BTN)
+
+    def find_main_title(self):
+        return self.find_element(HomePageLocators.MAIN_TITLE)
+
+
+
 
     # def scrape_links(self):
     #     page_source = self.browser.page_source

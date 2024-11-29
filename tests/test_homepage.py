@@ -29,11 +29,21 @@ class TestFindLogin:
         browser, wait = setup
         home_page = HomePage(*setup)
         home_page.go_to_home_page()
+        bb_github = home_page.find_github_btn()
+        assert bb_github.is_displayed(), "The BlueBrain Github button is not found"
+        logger.info("BlueBrain Github button is displayed")
+
+        about_btn = home_page.find_about_btn()
+        assert about_btn.is_displayed(), "The About button is displayed"
+        logger.info("About button is found")
+
+        big_title1 = home_page.find_big_title1()
+        assert big_title1.text.strip() != "", "The big title is found, but is empty"
+
+        big_title2 = home_page.find_big_title2()
+        assert big_title2.text.strip() != "", "The big title is found, but is empty"
 
         login_button = home_page.find_login_button()
         assert login_button.is_displayed()
         logger.info("'Login' button is found")
         login_button.click()
-
-
-
