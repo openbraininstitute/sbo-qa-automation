@@ -17,7 +17,7 @@ class TestExploreMorphologyPage:
     @pytest.mark.run(order=3)
     def test_explore_morphology(self, setup, login, logger):
         browser, wait = setup
-        explore_morphology = ExploreMorphologyPage(browser, wait)
+        explore_morphology = ExploreMorphologyPage(browser, wait, logger)
         print(f'MORPH URL:', browser.current_url)
         explore_morphology.go_to_explore_morphology_page()
         logger.info("Explore morphology page is displayed")
@@ -35,66 +35,71 @@ class TestExploreMorphologyPage:
 
         for header in column_headers:
             assert header.is_displayed(), f"Column header {header} is not displayed."
-        logger.info("Morphology column headers are displayed")
+        logger.info("Morphology column headers are displayed.")
 
         thumbnail_img = explore_morphology.verify_all_thumbnails_displayed()
-        logger.info("Morphology thumbnail is displayed")
+        logger.info("Morphology thumbnail is displayed.")
+
+        for thumbnail in thumbnail_img:
+            assert thumbnail['is_displayed'], f"Thumbnail {thumbnail['element']} is not displayed!"
+            logger.info(f"Thumbnail {thumbnail['element']} is displayed.")
 
         results = explore_morphology.find_results()
-        logger.info("Total number of results for morphology tab is displayed")
+        logger.info("Total number of results for morphology tab is displayed.")
 
-        # try:
-        #     br_sort_arrow = explore_morphology.find_br_sort_arrow()
-        #     logger.info("Found the sorting arrow of Brain region column")
-        #     # The wait is required to wait for the thumbnails to load
-        #     time.sleep(5)
-        #     br_sort_arrow.click()
-        #     logger.info("The arrow to sort the brain region is clicked")
-        # except TimeoutException:
-        #     print("Timed out waiting for page to load")
-        #     logger.info("The column header arrow was not found")
+        original_data = explore_morphology.get_table_data()
+        logger.info("Fetch table data before sorting")
 
-        # find_table = explore_morphology.find_table()
-        # sorted_table_data = explore_morphology.get_table_data()
-        # assert explore_morphology.is_sorted(sorted_table_data), "Table is not sorted as expected"
+        br_sort_arrow = explore_morphology.find_br_sort_arrow()
+        br_sort_arrow.click()
+        logger.info("Click the column sort arrow.")
+
+        explore_morphology.wait_for_page_ready(timeout=15)
+        logger.info("Wait for the sorting action to complete.")
+        sorted_data = explore_morphology.get_table_data()
+        assert original_data != sorted_data, "Table data did not change after sorting."
+        logger.info("Asserting that the table data was sorted.")
 
         morphology_filter = explore_morphology.morphology_filter()
         morphology_filter.click()
         logger.info("Filter is toggled open")
 
         filter_mtype = explore_morphology.filter_mtype()
-        logger.info("In the filter Mtype button is displayed")
+        logger.info("In the filter Mtype button is displayed.")
         filter_mtype.click()
-        logger.info("In the filter Mtype button is clicked")
+        logger.info("In the filter Mtype button is clicked.")
         time.sleep(2)
 
         filter_mtype_search = explore_morphology.filter_mtype_search()
-        logger.info("In the filter Mtype Search Field is found")
+        logger.info("In the filter Mtype Search Field is found.")
         filter_mtype_search.click()
-        logger.info("In the filter Mtype Search Field is CLICKED")
+        logger.info("In the filter Mtype Search Field is CLICKED.")
 
         filter_mtype_text_input = explore_morphology.filter_mtype_text_input()
         if filter_mtype_text_input:
             assert True
-            logger.info("Text input field is found")
+            logger.info("Text input field is found.")
         else:
-            print("input_id is not valid or cannot be found")
+            print("input_id is not valid or cannot be found.")
         filter_mtype_text_input.click()
-        logger.info("Text input field is CLICKED")
+        logger.info("Text input field is CLICKED.")
         filter_mtype_text_input.send_keys("L5_TPC:A")
         logger.info("Looking for L5_TPC:A")
         filter_mtype_text_input.send_keys(Keys.ENTER)
-        logger.info("L5_TPC:A is typed in the search field")
+        logger.info("L5_TPC:A is typed in the search field.")
 
         lv_filter_apply_btn = explore_morphology.lv_filter_apply()
-        logger.info("Inside the filter 'Apply' button is FOUND")
+        logger.info("Inside the filter 'Apply' button is FOUND.")
         lv_filter_apply_btn.click()
-        logger.info("Inside the filter 'Apply' button is CLICKED")
+        logger.info("Inside the filter 'Apply' button is CLICKED.")
 
         close_filter = explore_morphology.morphology_filter_close_btn()
-        logger.info("Find button to close the filter")
+        logger.info("Find button to close the filter.")
         close_filter.click()
-        logger.info("Filter panel is CLOSED")
+        logger.info("Filter panel is CLOSED.")
+        # Assert that the filter panel is no longer visible
+        assert explore_morphology.is_filter_panel_closed(), ("Filter panel was not closed "
+                                                             "successfully.")
 
         find_table = explore_morphology.find_table()
         filtered_mtype = explore_morphology.find_filtered_mtype()
@@ -118,8 +123,11 @@ class TestExploreMorphologyPage:
         browser.execute_script("arguments[0].click();", find_search_input)
 
         find_search_input.send_keys("mtC070301B_idC")
+        time.sleep(5)
         logger.info("Search input is searching for 'mtC070301B_idC'")
         found_name = explore_morphology.search_name()
+        logger.info("Searching for name")
+        time.sleep(5)
         text_found_name = found_name.text
         logger.info(f"Found searched species:{text_found_name}")
         found_name.click()
@@ -141,10 +149,10 @@ class TestExploreMorphologyPage:
             assert header.is_displayed(), f"Detail view header {header} is not displayed."
         logger.info("Found detail view headers")
 
-        # confirm_selected_br = explore_morphology.confirm_selected_br()
-        # selected_br = confirm_selected_br.text
-        # assert selected_br == "Anterior cingulate area, dorsal part, layer 2/3"
-        # logger.info("Detail view selected brain region verified")
+        confirm_selected_br = explore_morphology.confirm_selected_br()
+        selected_br = confirm_selected_br.text
+        assert selected_br == "Anterior cingulate area, dorsal part, layer 2/3"
+        logger.info("Detail view selected brain region verified")
 
         morphometrics_title = explore_morphology.find_morphometrics_title()
         morpho_title = morphometrics_title.text

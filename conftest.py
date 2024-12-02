@@ -79,40 +79,29 @@ def logger(request):
     logging.basicConfig(level=logging.DEBUG)
     logger.setLevel(logging.DEBUG)
 
-    # Check if the logger already has a file handler
-    has_file_handler = any(isinstance(handler, logging.FileHandler) for handler in logger.handlers)
-    # Check if the logger already has a stream handler
-    has_stream_handler = any(
-        isinstance(handler, logging.StreamHandler) for handler in logger.handlers)
-    # Determine the outer allure_reports directory
-    allure_reports_dir = request.config.getoption("--alluredir")
+    project_root = os.path.abspath(os.path.dirname(__file__))
+    allure_reports_dir = os.path.join(project_root, "allure_reports")
+    log_file_path = os.path.join(allure_reports_dir, "report.log")
+    if not os.path.exists(allure_reports_dir):
+        os.makedirs(allure_reports_dir)
 
-    if not has_file_handler:
-        # Create the outer allure_reports directory if it doesn't exist
-        os.makedirs(allure_reports_dir, exist_ok=True)
-
-        # Create the log file path
-        log_file_path = os.path.join(allure_reports_dir, "report.log")
-
-        # Create the log file handler
+    # Check if logger already has handlers
+    if not any(isinstance(handler, logging.FileHandler) for handler in logger.handlers):
         file_handler = logging.FileHandler(filename=log_file_path)
         file_handler.setLevel(logging.DEBUG)
         file_formatter = logging.Formatter("%(levelname)s : %(asctime)s : %(message)s")
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
 
-    if not has_stream_handler:
-        # Create the stream handler for console output
+    if not any(isinstance(handler, logging.StreamHandler) for handler in logger.handlers):
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setLevel(logging.DEBUG)
         stream_formatter = logging.Formatter("\n%(levelname)s : %(asctime)s : %(message)s")
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
-    # Log test start (moved to the beginning of the fixture)
     logger.info('Test started')
 
-    # Log test finish (moved to the end of the fixture)
     def log_test_finish():
         logger.info('Test finished')
 
@@ -171,6 +160,7 @@ def pytest_runtest_makereport(item):
         if (report.skipped and xfail) or (report.failed and not xfail):
             print("Test failed - handling it")
             file_name = "latest_logs/" + report.nodeid.replace("::", "_") + ".png"
+            browser = None
             if hasattr(item, "cls"):
                 browser = getattr(item.cls, "browser", None)
             if not browser:
@@ -186,8 +176,11 @@ def pytest_runtest_makereport(item):
 
 
 def _capture_screenshot(name, browser):
-    os.makedirs(os.path.dirname(name), exist_ok=True)
-    browser.get_full_page_screenshot_as_file(name)
+    project_root = os.path.abspath(os.path.dirname(__file__))
+    logs_dir = os.path.join(project_root, "latest_logs")
+    os.makedirs(logs_dir, exist_ok=True)
+    file_path = os.path.join(logs_dir, name)
+    browser.get_full_page_screenshot_as_file(file_path)
 
 
 # Hook to customize the HTML report table row cells
@@ -201,9 +194,10 @@ def pytest_html_results_table_row(report, cells):
 
 def pytest_sessionstart(session):
     """ Hook to delete previous allure reports before running the tests"""
-    folder_path = session.config.getoption("--alluredir")
-    if os.path.exists(folder_path):
-        for root, dirs, files in os.walk(folder_path):
+    project_root = os.path.abspath(os.path.dirname(__file__))
+    folder_path = os.path.join(project_root, "allure_reports")
+    if os.path.exists(folder_path) and os.listdir(folder_path):
+        for root, dirs, files in os.walk(folder_path, topdown=False):
             for file in files:
                 os.remove(os.path.join(root, file))
             for dir in dirs:

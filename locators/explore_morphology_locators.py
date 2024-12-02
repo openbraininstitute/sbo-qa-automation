@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 class ExploreMorphologyPageLocators:
     BACK_IE_BTN = (By.XPATH, "//a[@href='/mmb-beta/explore/interactive']/div[text()='Back to "
                              "interactive exploration']")
+    BRAIN_REGION_COLUMN_TITLE = (By.XPATH, "//div[text()='Brain Region']")
     BR_SORTED = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]/descendant::td[contains(text("
                            "),'Primary somatosensory area')]")
     BR_SORT_ARROW = (By.XPATH, "//th[contains(.,'Brain Region')]//div["
@@ -41,6 +42,7 @@ class ExploreMorphologyPageLocators:
                                 "@title='L5_TPC:A']")
     FILTER_MTYPE_SEARCH = (By.XPATH, "//div[@class='ant-select-selection-overflow']")
     FILTER_MTYPE_TEXT_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input'])[2]")
+    FILTER_PANEL = (By.XPATH, "//div[@data-testid='listing-view-filter-panel']")
     FIRST_ROW = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]")
     LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
                                  "Region']")
@@ -51,10 +53,13 @@ class ExploreMorphologyPageLocators:
     LV_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='M-Type']")
     LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
     LV_PREVIEW = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Preview']")
-    LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
-                                      ")='Registration date']")
+    # LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
+    #                                   ")='Registration date']")
+    LV_REGISTRATION_DATE = (By.XPATH, "//span[@class='ant-table-column-title']//div[text("
+                                      ")='Creation Date']")
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
-    LV_THUMBNAIL = (By.XPATH, "//img[starts-with(@alt,'Morphology preview')]")
+    # LV_THUMBNAIL = (By.XPATH, "//img[starts-with(@alt,'Morphology preview')]")
+    LV_THUMBNAIL = (By.XPATH, "//img[@alt='img preview']")
     MORPHOLOGY_FILTER = (By.XPATH, "//button[@aria-label='listing-view-filter-button']")
     MORPHOLOGY_FILTER_CLOSE_BTN = (By.XPATH, "//div[@data-testid='listing-view-filter-panel"
                                              "']//button[@type='button' and @aria-label='Close']")
