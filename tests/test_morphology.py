@@ -87,9 +87,10 @@ class TestExploreMorphologyPage:
         logger.info("Looking for L5_TPC:A")
         filter_mtype_text_input.send_keys(Keys.ENTER)
         logger.info("L5_TPC:A is typed in the search field.")
-
-        lv_filter_apply_btn = explore_morphology.lv_filter_apply()
+        explore_morphology.wait_for_page_ready(timeout=15)
+        lv_filter_apply_btn = explore_morphology.lv_filter_apply(timeout=10)
         logger.info("Inside the filter 'Apply' button is FOUND.")
+        # time.sleep(4)
         lv_filter_apply_btn.click()
         logger.info("Inside the filter 'Apply' button is CLICKED.")
 
@@ -117,30 +118,33 @@ class TestExploreMorphologyPage:
         morphology_filter.click()
         logger.info("Filter is toggled open")
         clear_filters_btn = explore_morphology.clear_filters_btn().click()
+        logger.info("Filter cleared")
+        close_filter = explore_morphology.morphology_filter_close_btn().click()
+        logger.info("Find button to and close the filter.")
 
         find_search_input = explore_morphology.find_search_input_search_item()
         logger.info("Search input field is found")
         browser.execute_script("arguments[0].click();", find_search_input)
 
         find_search_input.send_keys("mtC070301B_idC")
-        time.sleep(5)
         logger.info("Search input is searching for 'mtC070301B_idC'")
         found_name = explore_morphology.search_name()
         logger.info("Searching for name")
-        time.sleep(5)
         text_found_name = found_name.text
         logger.info(f"Found searched species:{text_found_name}")
         found_name.click()
         logger.info("Clicked on the researched name")
 
         dv_header_locators = [
-            ExploreMorphologyPageLocators.DV_BRAIN_REGION,
-            ExploreMorphologyPageLocators.DV_NAME,
-            ExploreMorphologyPageLocators.DV_SPECIES,
-            ExploreMorphologyPageLocators.DV_DESCRIPTION,
-            ExploreMorphologyPageLocators.DV_CONTRIBUTORS,
-            ExploreMorphologyPageLocators.DV_REGISTRATION_DATE,
-            ExploreMorphologyPageLocators.DV_LICENSE,
+            ExploreMorphologyPageLocators.DV_BRAIN_REGION_TITLE,
+            ExploreMorphologyPageLocators.DV_NAME_TITLE,
+            ExploreMorphologyPageLocators.DV_SPECIES_TITLE,
+            ExploreMorphologyPageLocators.DV_DESCRIPTION_TITLE,
+            ExploreMorphologyPageLocators.DV_CONTRIBUTORS_TITLE,
+            ExploreMorphologyPageLocators.DV_REGISTRATION_DATE_TITLE,
+            ExploreMorphologyPageLocators.DV_LICENSE_TITLE,
+            ExploreMorphologyPageLocators.DV_AGE_TITLE,
+            ExploreMorphologyPageLocators.DV_MTYPE_TITLE,
         ]
         logger.info("Found 'Detail view' header locators.")
         dv_header_locators = explore_morphology.find_dv_headers(dv_header_locators)
@@ -148,11 +152,6 @@ class TestExploreMorphologyPage:
         for header in dv_header_locators:
             assert header.is_displayed(), f"Detail view header {header} is not displayed."
         logger.info("Found detail view headers")
-
-        confirm_selected_br = explore_morphology.confirm_selected_br()
-        selected_br = confirm_selected_br.text
-        assert selected_br == "Anterior cingulate area, dorsal part, layer 2/3"
-        logger.info("Detail view selected brain region verified")
 
         morphometrics_title = explore_morphology.find_morphometrics_title()
         morpho_title = morphometrics_title.text

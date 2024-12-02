@@ -186,8 +186,8 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
     def filter_mtype_text_input(self):
         return self.find_element(ExploreMorphologyPageLocators.FILTER_MTYPE_TEXT_INPUT)
 
-    def lv_filter_apply(self):
-        return self.find_element(ExploreMorphologyPageLocators.LV_FILTER_APPLY_BTN)
+    def lv_filter_apply(self, timeout=10):
+        return self.find_element(ExploreMorphologyPageLocators.LV_FILTER_APPLY_BTN, timeout=timeout)
 
     def find_filtered_mtype(self):
         return self.find_all_elements(ExploreMorphologyPageLocators.FILTERED_MTYPE)
