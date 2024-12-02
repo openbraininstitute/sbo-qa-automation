@@ -113,92 +113,92 @@ class TestExploreMorphologyPage:
         assert value_found, (f'The value {expected} is not found in the table after applying the '
                              f'filter')
 
-        # morphology_filter = explore_morphology.morphology_filter()
-        # morphology_filter.click()
-        # logger.info("Filter is toggled open")
-        # clear_filters_btn = explore_morphology.clear_filters_btn().click()
-        #
-        # find_search_input = explore_morphology.find_search_input_search_item()
-        # logger.info("Search input field is found")
-        # browser.execute_script("arguments[0].click();", find_search_input)
-        #
-        # find_search_input.send_keys("mtC070301B_idC")
-        # time.sleep(5)
-        # logger.info("Search input is searching for 'mtC070301B_idC'")
-        # found_name = explore_morphology.search_name()
-        # logger.info("Searching for name")
-        # time.sleep(5)
-        # text_found_name = found_name.text
-        # logger.info(f"Found searched species:{text_found_name}")
-        # found_name.click()
-        # logger.info("Clicked on the researched name")
-        #
-        # dv_header_locators = [
-        #     ExploreMorphologyPageLocators.DV_BRAIN_REGION,
-        #     ExploreMorphologyPageLocators.DV_NAME,
-        #     ExploreMorphologyPageLocators.DV_SPECIES,
-        #     ExploreMorphologyPageLocators.DV_DESCRIPTION,
-        #     ExploreMorphologyPageLocators.DV_CONTRIBUTORS,
-        #     ExploreMorphologyPageLocators.DV_REGISTRATION_DATE,
-        #     ExploreMorphologyPageLocators.DV_LICENSE,
-        # ]
-        # logger.info("Found 'Detail view' header locators.")
-        # dv_header_locators = explore_morphology.find_dv_headers(dv_header_locators)
-        #
-        # for header in dv_header_locators:
-        #     assert header.is_displayed(), f"Detail view header {header} is not displayed."
-        # logger.info("Found detail view headers")
-        #
-        # confirm_selected_br = explore_morphology.confirm_selected_br()
-        # selected_br = confirm_selected_br.text
-        # assert selected_br == "Anterior cingulate area, dorsal part, layer 2/3"
-        # logger.info("Detail view selected brain region verified")
-        #
-        # morphometrics_title = explore_morphology.find_morphometrics_title()
-        # morpho_title = morphometrics_title.text
-        # assert morpho_title == "Morphometrics"
-        #
-        # morphology_titles = [
-        #     ExploreMorphologyPageLocators.DV_NM_TITLE,
-        #     ExploreMorphologyPageLocators.DV_AXON_TITLE,
-        #     ExploreMorphologyPageLocators.DV_BD_TITLE,
-        #     ExploreMorphologyPageLocators.DV_AP_TITLE,
-        #     ExploreMorphologyPageLocators.DV_SOMA_TITLE
-        # ]
-        # logger.info("Found 'Detail view' titles.")
-        # morphology_titles = explore_morphology.find_morphology_titles(morphology_titles)
-        #
-        # for title in morphology_titles:
-        #     assert title.is_displayed(), f"Detail view Morphology title:  {title} is not displayed."
-        # logger.info("Found detail view morphology titles")
-        #
-        # morpho_viewer = explore_morphology.find_morpho_viewer()
-        # logger.info("Morphology viewer is displayed")
-        # morpho_fullscreen_btn = explore_morphology.find_fullscreen_btn()
-        # logger.info("Morphology viewer full screen button is displayed")
-        # morpho_fullscreen_btn.click()
-        # logger.info("Click to view morphology full screen")
-        # morpho_viewer_settings_btn = explore_morphology.morpho_viewer_settings_btn()
-        # morpho_viewer_settings_btn.click()
-        # logger.info("Morphology viewer settings button clicked")
-        # morpho_fullscreen_btn.click()
-        # logger.info("Close full screen")
-        # download_btn = explore_morphology.find_download_btn()
-        # logger.info("Morphology 'Download' button is displayed")
-        #
-        # try:
-        #     back_btn = explore_morphology.find_back_to_list_btn()
-        #     browser.execute_script("arguments[0].scrollIntoView(true);", back_btn)
-        #     logger.info("Found the Back button to go back to list view")
-        #     # 1 sec delay is necessary to ensure scrolling is complete
-        #     time.sleep(1)
-        #     back_btn.click()
-        #     logger.info("'Back to list' button to go back to list view is clicked.")
-        # except TimeoutException:
-        #     print("Timed out waiting for page to load")
-        #     logger.info("The 'Back to list' button was not displayed.")
-        #
-        # back_to_ie = explore_morphology.find_back_to_ie_btn()
-        # logger.info("Back to Interactive exploration button found.")
-        # back_to_ie.click()
-        # logger.info("Returned to the Interactive exploration page.")
+        morphology_filter = explore_morphology.morphology_filter()
+        morphology_filter.click()
+        logger.info("Filter is toggled open")
+        clear_filters_btn = explore_morphology.clear_filters_btn().click()
+
+        find_search_input = explore_morphology.find_search_input_search_item()
+        logger.info("Search input field is found")
+        browser.execute_script("arguments[0].click();", find_search_input)
+
+        find_search_input.send_keys("mtC070301B_idC")
+        time.sleep(5)
+        logger.info("Search input is searching for 'mtC070301B_idC'")
+        found_name = explore_morphology.search_name()
+        logger.info("Searching for name")
+        time.sleep(5)
+        text_found_name = found_name.text
+        logger.info(f"Found searched species:{text_found_name}")
+        found_name.click()
+        logger.info("Clicked on the researched name")
+
+        dv_header_locators = [
+            ExploreMorphologyPageLocators.DV_BRAIN_REGION,
+            ExploreMorphologyPageLocators.DV_NAME,
+            ExploreMorphologyPageLocators.DV_SPECIES,
+            ExploreMorphologyPageLocators.DV_DESCRIPTION,
+            ExploreMorphologyPageLocators.DV_CONTRIBUTORS,
+            ExploreMorphologyPageLocators.DV_REGISTRATION_DATE,
+            ExploreMorphologyPageLocators.DV_LICENSE,
+        ]
+        logger.info("Found 'Detail view' header locators.")
+        dv_header_locators = explore_morphology.find_dv_headers(dv_header_locators)
+
+        for header in dv_header_locators:
+            assert header.is_displayed(), f"Detail view header {header} is not displayed."
+        logger.info("Found detail view headers")
+
+        confirm_selected_br = explore_morphology.confirm_selected_br()
+        selected_br = confirm_selected_br.text
+        assert selected_br == "Anterior cingulate area, dorsal part, layer 2/3"
+        logger.info("Detail view selected brain region verified")
+
+        morphometrics_title = explore_morphology.find_morphometrics_title()
+        morpho_title = morphometrics_title.text
+        assert morpho_title == "Morphometrics"
+
+        morphology_titles = [
+            ExploreMorphologyPageLocators.DV_NM_TITLE,
+            ExploreMorphologyPageLocators.DV_AXON_TITLE,
+            ExploreMorphologyPageLocators.DV_BD_TITLE,
+            ExploreMorphologyPageLocators.DV_AP_TITLE,
+            ExploreMorphologyPageLocators.DV_SOMA_TITLE
+        ]
+        logger.info("Found 'Detail view' titles.")
+        morphology_titles = explore_morphology.find_morphology_titles(morphology_titles)
+
+        for title in morphology_titles:
+            assert title.is_displayed(), f"Detail view Morphology title:  {title} is not displayed."
+        logger.info("Found detail view morphology titles")
+
+        morpho_viewer = explore_morphology.find_morpho_viewer()
+        logger.info("Morphology viewer is displayed")
+        morpho_fullscreen_btn = explore_morphology.find_fullscreen_btn()
+        logger.info("Morphology viewer full screen button is displayed")
+        morpho_fullscreen_btn.click()
+        logger.info("Click to view morphology full screen")
+        morpho_viewer_settings_btn = explore_morphology.morpho_viewer_settings_btn()
+        morpho_viewer_settings_btn.click()
+        logger.info("Morphology viewer settings button clicked")
+        morpho_fullscreen_btn.click()
+        logger.info("Close full screen")
+        download_btn = explore_morphology.find_download_btn()
+        logger.info("Morphology 'Download' button is displayed")
+
+        try:
+            back_btn = explore_morphology.find_back_to_list_btn()
+            browser.execute_script("arguments[0].scrollIntoView(true);", back_btn)
+            logger.info("Found the Back button to go back to list view")
+            # 1 sec delay is necessary to ensure scrolling is complete
+            time.sleep(1)
+            back_btn.click()
+            logger.info("'Back to list' button to go back to list view is clicked.")
+        except TimeoutException:
+            print("Timed out waiting for page to load")
+            logger.info("The 'Back to list' button was not displayed.")
+
+        back_to_ie = explore_morphology.find_back_to_ie_btn()
+        logger.info("Back to Interactive exploration button found.")
+        back_to_ie.click()
+        logger.info("Returned to the Interactive exploration page.")
