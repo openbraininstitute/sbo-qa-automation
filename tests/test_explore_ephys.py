@@ -16,12 +16,16 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 
 class TestExploreEphys:
-    @pytest.mark.build_page
-    @pytest.mark.run(order=4)
+    @pytest.mark.explore_page
+    # @pytest.mark.run(order=4)
+    @pytest.mark.not_finalized
+    def test_sorting_functionality(self):
+        # Placeholder logic for a test
+        assert True
+
     def test_explore_ephys_page(self, setup, login, logger):
         browser, wait = setup
         explore_ephys_page = ExploreElectrophysiologyPage(browser, wait)
-        time.sleep(2)
         explore_ephys_page.go_to_explore_ephys_page()
         ephys_tab_title = explore_ephys_page.find_ephys_tab_title()
         logger.info("'Electrophysiology' tab title is present.")

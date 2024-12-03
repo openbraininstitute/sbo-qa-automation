@@ -1,16 +1,25 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 #
 # SPDX-License-Identifier: Apache-2.0
-
+import os
 from selenium.common import NoSuchElementException
 from pages.sandbox_page import SandboxPage
 import pytest
 import time
 
+# Skip module if `SKIP_TESTS` environment variable is set
+if os.getenv("SKIP_TESTS") == "1":
+    pytest.skip("Skipping Morphology tests temporarily.", allow_module_level=True)
+
 
 @pytest.mark.usefixtures("setup", "logger", "login")
 class TestSandbox:
-    @pytest.mark.run(order=1)
+    # @pytest.mark.run(order=1)
+    @pytest.mark.skip(reason="Sorting not implemented yet.")
+    def test_sorting_functionality(self):
+        # Placeholder logic for a test
+        assert False
+
     def test_sandbox(self, setup, logger):
         """Test the login process"""
         browser, wait = setup

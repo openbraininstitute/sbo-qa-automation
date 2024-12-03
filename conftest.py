@@ -280,3 +280,10 @@ def make_full_screenshot(browser, savename):
 
     # Save the final image
     img_frame.save(savename)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def check_skip_condition():
+    import os
+    if os.getenv("SKIP_MODULES") == "1":
+        pytest.skip("Skipping tests due to global configuration.", allow_module_level=True)

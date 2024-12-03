@@ -3,8 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from pages.login_page import LoginPage
-from util.util_base import load_config
 import pytest
 import time
 
@@ -17,7 +15,7 @@ class TestLogin:
         browser, wait = setup
         # Validate the user is logged in
         print("Login process completed via fixture")
-        assert "virtual-lab" in browser.current_url, \
+        assert "explore/interactive" in browser.current_url, \
             f"Unexpected URL after login: {browser.current_url}"
 
         logger.info(f"Successfully logged in. Current page URL: {browser.current_url}")

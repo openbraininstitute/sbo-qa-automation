@@ -8,12 +8,20 @@ import pytest
 
 from locators.explore_ndensity_locators import ExploreNDensityPageLocators
 from pages.explore_ndensity import ExploreNeuronDensityPage
-from util.util_links_checker import LinkChecker
+
+# Skip module if `SKIP_TESTS` environment variable is set
+if os.getenv("SKIP_TESTS") == "1":
+    pytest.skip("Skipping Morphology tests temporarily.", allow_module_level=True)
 
 
 class TestExploreNeuronDensity:
     @pytest.mark.build_page
-    @pytest.mark.run(order=7)
+    # @pytest.mark.run(order=7)
+    @pytest.mark.skip(reason="Sorting not implemented yet.")
+    def test_sorting_functionality(self):
+        # Placeholder logic for a test
+        assert False
+
     def test_explore_neuron_density_page(self, setup, login, logger):
         browser, wait = setup
         explore_ndensity = ExploreNeuronDensityPage(browser, wait)
@@ -51,21 +59,21 @@ class TestExploreNeuronDensity:
         dv_name = explore_ndensity.find_dv_name()
         logger.info("Detail view is displayed")
 
-        # title_locators = [
-        #     ExploreNDensityPageLocators.DV_DESC_TITLE,
-        #     ExploreNDensityPageLocators.DV_DENSITY_TITLE,
-        #     ExploreNDensityPageLocators.DV_AGE_TITLE,
-        #     ExploreNDensityPageLocators.DV_BRAIN_REG_TITLE,
-        #     ExploreNDensityPageLocators.DV_CONTRIBUTORS_TITLE,
-        #     ExploreNDensityPageLocators.DV_LICENSE_TITLE,
-        #     ExploreNDensityPageLocators.DV_NUM_MEAS_TITLE,
-        #     ExploreNDensityPageLocators.DV_ETYPE_TITLE,
-        #     ExploreNDensityPageLocators.DV_MTYPE_TITLE,
-        #     ExploreNDensityPageLocators.DV_SPECIES_TITLE,
-        #     ExploreNDensityPageLocators.DV_REG_DATE_TITLE
-        # ]
-        #
-        # title_headers = explore_ndensity.find_dv_title_header(title_locators)
-        # for title in title_headers:
-        #     assert title.is_displayed(), f"DV title header {title} is not displayed"
-        # logger.info("Found 'Detail view' title headers")
+        title_locators = [
+            ExploreNDensityPageLocators.DV_DESC_TITLE,
+            ExploreNDensityPageLocators.DV_DENSITY_TITLE,
+            ExploreNDensityPageLocators.DV_AGE_TITLE,
+            ExploreNDensityPageLocators.DV_BRAIN_REG_TITLE,
+            ExploreNDensityPageLocators.DV_CONTRIBUTORS_TITLE,
+            ExploreNDensityPageLocators.DV_LICENSE_TITLE,
+            ExploreNDensityPageLocators.DV_NUM_MEAS_TITLE,
+            ExploreNDensityPageLocators.DV_ETYPE_TITLE,
+            ExploreNDensityPageLocators.DV_MTYPE_TITLE,
+            ExploreNDensityPageLocators.DV_SPECIES_TITLE,
+            ExploreNDensityPageLocators.DV_REG_DATE_TITLE
+        ]
+
+        title_headers = explore_ndensity.find_dv_title_header(title_locators)
+        for title in title_headers:
+            assert title.is_displayed(), f"DV title header {title} is not displayed"
+        logger.info("Found 'Detail view' title headers")

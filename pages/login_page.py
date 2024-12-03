@@ -21,7 +21,7 @@ class LoginPage(CustomBasePage):
         target_url = "https://openbluebrain.com/app"
         # target_url = "https://staging.openbluebrain.com/"
         self.browser.get(target_url)
-        print("Starting URL from PAGES/LOGIN_PAGE.PY:", self.browser.current_url)
+        print("Starting URL from pages/login_page.py:", self.browser.current_url)
         return self.browser.current_url
 
     def find_login_button(self):
