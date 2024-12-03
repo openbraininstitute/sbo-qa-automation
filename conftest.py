@@ -209,8 +209,8 @@ def pytest_addoption(parser):
     parser.addoption(
         "--browser-name",
         action="store",
-        default="firefox",
-        choices=["firefox"],
+        default="chrome",
+        choices=["firefox", "chrome", "safari", "edge"],
         help="Specify the browser to run the tests in",
     )
     parser.addoption(
@@ -219,8 +219,17 @@ def pytest_addoption(parser):
         default=False,
         help="Run tests in headless mode"
     )
-    parser.addoption("--log-file-path", action="store", default=None,
-                     help="Specify the log file path")
+    parser.addoption(
+        "--log-file-path",
+        action="store",
+        default=None,
+        help="Specify the log file path"
+    )
+    parser.addoption(
+        "--base-url",
+        action="store",
+        default="http://localhost:444/wd/hub",
+        help="BAse URL for the Selenium Webdriver server")
 
 
 def make_full_screenshot(browser, savename):
