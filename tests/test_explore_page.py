@@ -18,7 +18,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestExplorePage:
     @pytest.mark.explore_page
-    @pytest.mark.run(order=2)
+    @pytest.mark.run(order=3)
     def test_explore_page(self, setup, login, logger):
         """
         The commented out code below is pending changes in the platform.

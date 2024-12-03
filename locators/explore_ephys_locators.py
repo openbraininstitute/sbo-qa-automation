@@ -11,6 +11,7 @@ class ExploreEphysLocators:
     CHECKBOXES = (By.XPATH, "//input[@class='ant-checkbox-input' and @type='checkbox']")
     DOWNLOAD_RESOURCES = (By.XPATH, "//button[@type='button' and "
                                     "@aria-label='download-resources-button']")
+    DV_AGE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Age']")
     DV_BRAIN_REG_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Brain "
                                     "Region']")
     DV_BR_REG = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Brain "
@@ -29,21 +30,21 @@ class ExploreEphysLocators:
     DV_ID_PLOTS = (By.XPATH, "//div[@class='flex flex-col gap-10 2xl:flex-row']")
     DV_ID_REPETITION_TITLE = (By.XPATH, "//div[@class='flex gap-8']//label[text()='Repetition']")
     DV_ID_STIMULUS_TITLE = (By.XPATH, "//div[@class='flex gap-8']//label[text()='Stimulus']")
-    DV_ID_SWEEP_TITLE = (By.XPATH, "//div[@class='flex gap-8']//span[text()='Sweep ']")
+    DV_ID_SWEEP_TITLE = (By.XPATH, "//div[@class='flex gap-8']//span[text()='Sweep']")
     DV_INTER_DETAILS = (By.XPATH, "//span[contains(text(),' Interactive Details')]")
     DV_LICENSE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
                             ")='License']/following-sibling::div[@class='mt-2']")
     DV_LICENSE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='License']")
-    DV_NAME = (By.XPATH, "//div[@class='flex flex-col text-primary-7']//div[@class='text-2xl "
+    DV_NAME = (By.XPATH, "//div[text()='Name']//following::div[@class='col-span-3 text-2xl "
                          "font-bold']")
     DV_NAME_TITLE = (By.XPATH, "//div[@class='text font-thin' and text()='Name']")
     DV_NUM_MEAS_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='N° of "
                                    "Measurements']")
     DV_OVERVIEW = (By.XPATH, "//span[contains(text(),' Overview')]")
     DV_REG_DATE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Registration "
-                             "date']/following-sibling::div[@class='mt-2']")
+                             "Date']/following-sibling::div[@class='mt-2']")
     DV_REG_DATE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                                   ")='Registration date']")
+                                   ")='Registration Date']")
     DV_SPECIES = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
                             ")='Species']/following-sibling::div[@class='mt-2']")
     DV_SPECIES_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Species']")
