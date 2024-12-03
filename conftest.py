@@ -132,6 +132,12 @@ def navigate_to_login(setup):
     browser, wait = setup
     login_page = LoginPage(browser, wait)
 
+    username = os.environ.get("USERNAME")
+    password = os.environ.get("PASSWORD")
+
+    if not username or not password:
+        raise ValueError("Missing USERNAME or PASSWORD environment variables.")
+
     target_URL = login_page.navigate_to_homepage()
     browser.execute_script("window.stop();")
     print(f"conftest.py fixture - Navigated to: {target_URL}")

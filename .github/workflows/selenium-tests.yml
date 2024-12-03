@@ -45,6 +45,8 @@ jobs:
     - name: Run Selenium tests
       env:
         SELENIUM_REMOTE_URL: http://localhost:4444/wd/hub
+        OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+        OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         BROWSER_NAME: firefox
       run: |
         pytest tests/test_login.py -sv --headless
