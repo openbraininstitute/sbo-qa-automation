@@ -28,8 +28,9 @@ from util.util_base import load_config
 @pytest.fixture(scope="class", autouse=True)
 def setup(request, pytestconfig):
     """Fixture to set up the browser/webdriver"""
-    browser_name = os.environ.get("BROWSER_NAME")
+    browser_name = os.environ.get("BROWSER_NAME", "chrome")
     headless_mode = pytestconfig.getoption("--headless")
+    remote_url = os.environ.get("SELENIUM_REMOTE_URL")
     browser = None
     options = ChromeOptions()  # Default to Chrome options
 
@@ -38,24 +39,39 @@ def setup(request, pytestconfig):
             options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-gpu")
-        service = ChromeService(ChromeDriverManager().install())
-        browser = webdriver.Chrome(service=service, options=options)
+
+        if remote_url:
+            browser = webdriver.Remote(
+                command_executor=remote_url,
+                options=options
+            )
+        else:
+            service = ChromeService(ChromeDriverManager().install())
+            browser = webdriver.Chrome(service=service, options=options)
+
     elif browser_name == "firefox":
         options = FirefoxOptions()
         if headless_mode:
             options.add_argument("--headless")
             options.set_preference("extensions.enabled", False)
-        service = FirefoxService(executable_path=GeckoDriverManager().install())
-        browser = webdriver.Firefox(service=service, options=options)
-    elif browser_name == "headless":
-        options.add_argument("--headless")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-gpu")
-        service = ChromeService(ChromeDriverManager().install())
-        browser = webdriver.Chrome(service=service, options=options)
 
+        if remote_url:
+            browser = webdriver.Remote(
+                command_executor=remote_url,
+                options=options
+            )
+        else:
+            service = FirefoxService(executable_path=GeckoDriverManager().install())
+            browser = webdriver.Firefox(service=service, options=options)
     else:
         raise ValueError("Invalid BROWSER_NAME: {}".format(browser_name))
+
+    # elif browser_name == "headless":
+    #     options.add_argument("--headless")
+    #     options.add_argument("--no-sandbox")
+    #     options.add_argument("--disable-gpu")
+    #     service = ChromeService(ChromeDriverManager().install())
+    #     browser = webdriver.Chrome(service=service, options=options)
 
     wait = WebDriverWait(browser, 10)
 
