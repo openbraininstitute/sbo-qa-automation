@@ -132,8 +132,8 @@ def navigate_to_login(setup):
     browser, wait = setup
     login_page = LoginPage(browser, wait)
 
-    username = os.environ.get("USERNAME")
-    password = os.environ.get("PASSWORD")
+    username = os.environ.get("OBI_USERNAME")
+    password = os.environ.get("OBI_PASSWORD")
 
     if not username or not password:
         raise ValueError("Missing USERNAME or PASSWORD environment variables.")
@@ -154,9 +154,15 @@ def login(setup, navigate_to_login):
     """Fixture to log in and ensure user is authenticated."""
     browser, wait = setup
     login_page = navigate_to_login
+
     config = load_config()
-    username = config['username']
-    password = config['password']
+    if not config:
+        raise ValueError("Failed to load configuration")
+    username = config.get('username')
+    password = config.get('password')
+
+    if not username or not password:
+        raise ValueError("Username or password is missing in the configuration!")
 
     login_page.perform_login(username, password)
     login_page.wait_for_login_complete()
