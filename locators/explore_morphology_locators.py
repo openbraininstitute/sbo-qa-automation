@@ -47,18 +47,18 @@ class ExploreMorphologyPageLocators:
     FILTER_PANEL = (By.XPATH, "//div[@data-testid='listing-view-filter-panel']")
     FIRST_ROW = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]")
     LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
-                                 "Region']")
+                                 "region']")
     LV_CHECKBOX = (By.XPATH, "")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
     LV_FILTER_APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")
-    LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-Type']")
-    LV_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='M-Type']")
+    LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-type']")
+    LV_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='M-type']")
     LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
     LV_PREVIEW = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Preview']")
-    # LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
-    #                                   ")='Registration date']")
-    LV_REGISTRATION_DATE = (By.XPATH, "//span[@class='ant-table-column-title']//div[text("
-                                      ")='Creation Date']")
+    LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
+                                      ")='Registration date']")
+    # LV_REGISTRATION_DATE = (By.XPATH, "//span[@class='ant-table-column-title']//div[text("
+    #                                   ")='Creation Date']")
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
     # LV_THUMBNAIL = (By.XPATH, "//img[starts-with(@alt,'Morphology preview')]")
     LV_THUMBNAIL = (By.XPATH, "//img[@alt='img preview']")

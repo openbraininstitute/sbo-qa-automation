@@ -42,9 +42,9 @@ class ExploreEphysLocators:
                                    "Measurements']")
     DV_OVERVIEW = (By.XPATH, "//span[contains(text(),' Overview')]")
     DV_REG_DATE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Registration "
-                             "Date']/following-sibling::div[@class='mt-2']")
+                             "date']/following-sibling::div[@class='mt-2']")
     DV_REG_DATE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                                   ")='Registration Date']")
+                                   ")='Registration date']")
     DV_SPECIES = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
                             ")='Species']/following-sibling::div[@class='mt-2']")
     DV_SPECIES_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Species']")
@@ -58,7 +58,7 @@ class ExploreEphysLocators:
                                  "'Electrophysiology')]")
     FILTERED_ETYPE = (By.XPATH, "//td[@class='ant-table-cell text-primary-7 cursor-pointer "
                                 "before:!content-none ant-table-cell-ellipsis' and @title='bNAC']")
-    FILTER_ETYPE_BTN = (By.XPATH, "//div[@class='flex items-center gap-3 ']//span[text()='E-Type']")
+    FILTER_ETYPE_BTN = (By.XPATH, "//div[@class='flex items-center gap-3 ']//span[text()='E-type']")
     FILTER_ETYPE_SEARCH_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input"
                                            "'])[2]")
     FILTER_ETYPE_INPUT_TYPE_AREA = (By.XPATH, "//div[@class='ant-select-selection-search']")
@@ -66,14 +66,14 @@ class ExploreEphysLocators:
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
     LV_GRID_VIEW = (By.XPATH, "//div[@data-testid='explore-section-listing-view']")
     LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
-                                 "Region']")
+                                 "region']")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
-    LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-Type']")
+    LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-type']")
     LV_FILTER_APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")
     LV_FILTER_BTN = (By.XPATH, "//button[@type='button' and "
                                "@aria-label='listing-view-filter-button']")
     LV_FILTER_CLOSE_BTN = (By.XPATH, "//button[@type='button' and @aria-label='Close']")
-    LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-Type']")
+    LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-type']")
     LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
     LV_PREVIEW = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Preview']")
     LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
