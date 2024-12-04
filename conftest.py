@@ -66,13 +66,6 @@ def setup(request, pytestconfig):
     else:
         raise ValueError("Invalid BROWSER_NAME: {}".format(browser_name))
 
-    # elif browser_name == "headless":
-    #     options.add_argument("--headless")
-    #     options.add_argument("--no-sandbox")
-    #     options.add_argument("--disable-gpu")
-    #     service = ChromeService(ChromeDriverManager().install())
-    #     browser = webdriver.Chrome(service=service, options=options)
-
     wait = WebDriverWait(browser, 10)
 
     if browser is not None:
@@ -175,8 +168,10 @@ def login(setup, navigate_to_login):
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):
     """
-    Extends the PyTest Plugin to take and embed screenshot in html report, whenever test fails.
-    :param item:
+    Pytest hook implementation to handle test reporting.
+
+    - Captures screenshots when a test fails.
+    - Embeds the screenshot into the HTML report.
     """
     pytest_html = item.config.pluginmanager.getplugin('html')
     outcome = yield
@@ -187,33 +182,66 @@ def pytest_runtest_makereport(item):
         xfail = hasattr(report, 'wasxfail')
         if (report.skipped and xfail) or (report.failed and not xfail):
             print("Test failed - handling it")
-            file_name = "latest_logs/" + report.nodeid.replace("::", "_") + ".png"
+
+            project_root = os.path.abspath(os.path.dirname(__file__))
+            error_logs_dir = os.path.join(project_root, "latest_logs", "errors")
+            os.makedirs(error_logs_dir, exist_ok=True)
+
+            test_name = report.nodeid.replace("::", "_").split("/")[-1]
+            file_name = os.path.join(error_logs_dir, test_name + ".png")
+            print(f"Intended screenshot path: {file_name}")
+
             browser = None
             if hasattr(item, "cls"):
                 browser = getattr(item.cls, "browser", None)
             if not browser:
                 browser = getattr(item, "_browser", None)
+                print(f"Browser found in item attribute")
+
             if browser:
-                print("Browser object found - making screenshot")
-                _capture_screenshot(file_name, browser)
-                if file_name:
-                    html = '<div><img src="%s" alt="screenshot" style="width:304px;height:228px;" ' \
-                           'onclick="window.open(this.src)" align="right"/></div>' % file_name
-                    extra.append(pytest_html.extras.html(html))
+                try:
+                    print("Browser object found - making screenshot")
+                    _capture_screenshot(file_name, browser)
+                    if os.path.exists(file_name):
+                        print(f"Screenshot successfully saved at: {file_name}")
+                        html = ('<div><img src="%s" alt="screenshot" '
+                                'style="width:304px;height:228px;" onclick="window.open(this.src)" ' 
+                                'align="right"/></div>') % os.path.relpath(file_name)
+                        extra.append(pytest_html.extras.html(html))
+                    else:
+                        print(f"Screenshot not found at: {file_name}")
+                except Exception as e:
+                    print(f"Exception occurred while capturing screenshot: {e}")
+            else:
+                print("No browser object found - skipping screenshot capture")
+
         report.extra = extra
 
 
 def _capture_screenshot(name, browser):
-    project_root = os.path.abspath(os.path.dirname(__file__))
-    logs_dir = os.path.join(project_root, "latest_logs")
-    os.makedirs(logs_dir, exist_ok=True)
-    file_path = os.path.join(logs_dir, name)
-    browser.get_full_page_screenshot_as_file(file_path)
+    """
+        Helper function to capture and save a screenshot.
+
+        - Ensures the target directory exists.
+        - Uses the browser object to capture a full-page screenshot.
+        :param name: The full path where the screenshot will be saved.
+        :param browser: The browser object used for screenshot capture.
+        """
+    try:
+        print(f"Creating error  directory at:{os.path.dirname(name)}")
+        os.makedirs(os.path.dirname(name), exist_ok=True)
+        print(f"Saving screenshot to: {name}")
+        # browser.get_full_page_screenshot_as_file(file_path)
+        browser.get_full_page_screenshot_as_file(name)
+        print(f"Screenshot captured: {name}")
+    except Exception as e:
+        print(f"Failed to capture screenshot '{name}': {e}")
 
 
-# Hook to customize the HTML report table row cells
 def pytest_html_results_table_row(report, cells):
-    """Styling for html.report"""
+    """Styling for html report
+    Hook to customize the HTML report table row cells
+    """
     if report.failed:
         cells.insert(1, ("✘", "fail"))
     else:
@@ -222,17 +250,19 @@ def pytest_html_results_table_row(report, cells):
 
 def pytest_sessionstart(session):
     """ Hook to delete previous allure reports before running the tests"""
-    project_root = os.path.abspath(os.path.dirname(__file__))
-    folder_path = os.path.join(project_root, "allure_reports")
-    if os.path.exists(folder_path) and os.listdir(folder_path):
-        for root, dirs, files in os.walk(folder_path, topdown=False):
-            for file in files:
-                os.remove(os.path.join(root, file))
-            for dir in dirs:
-                os.rmdir(os.path.join(root, dir))
+    try:
+        project_root = os.path.abspath(os.path.dirname(__file__))
+        folder_path = os.path.join(project_root, "allure_reports")
+        if os.path.exists(folder_path) and os.listdir(folder_path):
+            for root, dirs, files in os.walk(folder_path, topdown=False):
+                for file in files:
+                    os.remove(os.path.join(root, file))
+                for dir in dirs:
+                    os.rmdir(os.path.join(root, dir))
+    except Exception as e:
+        print(f"Failed to clear allure reports: {e}")
 
 
-# Command-line options
 def pytest_addoption(parser):
     parser.addoption(
         "--browser-name",
@@ -321,6 +351,7 @@ def make_full_screenshot(browser, savename):
 
 @pytest.fixture(scope="session", autouse=True)
 def check_skip_condition():
+    """ Skips a test file from running"""
     import os
     if os.getenv("SKIP_MODULES") == "1":
         pytest.skip("Skipping tests due to global configuration.", allow_module_level=True)
