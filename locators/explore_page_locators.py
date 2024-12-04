@@ -15,7 +15,7 @@ class ExplorePageLocators:
                                          "font-light']")
     BRAIN_REGION_PANEL = (By.XPATH, "//span[text()='Brain region']")
     BRP_CEREBRUM = (By.XPATH, "//span[@title='Cerebrum' and text()='Cerebrum']")
-    CEREBRAL_CORTEX_TITLE = (By.XPATH, "//span[@title='Cerebral Cortex']")
+    CEREBRAL_CORTEX_TITLE = (By.XPATH, "//span[@title='Cerebral cortex']")
     CEREBRUM_BTN = (By.XPATH, "(//button[@type='button' and @aria-expanded='false'])[3]")
     COUNT_SWITCH = (By.CSS_SELECTOR, "button[type='button'][role='switch'][aria-checked='false']")
     EXPERIMENTAL_DATA_BTN = (By.XPATH, "//button[text()='Experimental data']")
