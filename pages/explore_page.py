@@ -95,3 +95,36 @@ class ExplorePage(HomePage, LinkChecker):
 
     def find_selected_brain_region_title(self):
         return self.find_element(ExplorePageLocators.SELECTED_BRAIN_REGION)
+
+    def find_data_panel(self):
+        return self.find_element(ExplorePageLocators.DATA_PANEL)
+
+    def find_panel_emodel(self):
+        return self.find_element(ExplorePageLocators.PANEL_EMODEL)
+
+    def find_panel_memodel(self):
+        return self.find_element(ExplorePageLocators.PANEL_MEMODEL)
+
+    def find_panel_synaptome(self):
+        return self.find_element(ExplorePageLocators.PANEL_SYNAPTOME)
+
+    def find_lit_morphology_tab(self):
+        return self.find_element(ExplorePageLocators.LITERATURE_MORPHOLOGY_TAB)
+
+    def find_lit_ephys_tab(self):
+        return self.find_element(ExplorePageLocators.LITERATURE_EPHYS_TAB)
+
+    def find_lit_ndensity_tab(self):
+        return self.find_element(ExplorePageLocators.LITERATURE_NDENSITY_TAB)
+
+    def find_lit_bdensity_tab(self):
+        return self.find_element(ExplorePageLocators.LITERATURE_BDENSITY_TAB)
+
+    def find_lit_synapses_tab(self):
+        return self.find_element(ExplorePageLocators.LITERATURE_SYNAPSES_TAB)
+
+    def find_literature_panel_data(self, lit_data_locators):
+        result = []
+        for locator in lit_data_locators:
+            result.extend(self.find_all_elements(locator))
+        return result

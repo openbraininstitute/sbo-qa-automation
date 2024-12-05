@@ -27,6 +27,16 @@ class ExplorePageLocators:
     INTERACTIVE_EXPLORATION = (By.XPATH, "//h2[text()='Interactive exploration']")
     LITERATURE = (By.XPATH, "//button[text()='Literature']")
     LITERATURE_LINK = (By.ID, "#explore-navigation-/explore/literature")
+    LITERATURE_MORPHOLOGY_TAB = (By.CSS_SELECTOR, "a[href='/app/explore/interactive/literature"
+                                                  "/morphology']")
+    LITERATURE_EPHYS_TAB = (By.CSS_SELECTOR, "a[href='/app/explore/interactive/literature"
+                                             "/electrophysiology']")
+    LITERATURE_NDENSITY_TAB = (By.CSS_SELECTOR, "a[href='/app/explore/interactive/literature"
+                                                "/neuron-density']")
+    LITERATURE_BDENSITY_TAB = (By.CSS_SELECTOR, "a[href='/app/explore/interactive/literature"
+                                                "/bouton-density']")
+    LITERATURE_SYNAPSES_TAB = (By.CSS_SELECTOR, "a[href='/app/explore/interactive/literature"
+                                                "/synapse-per-connection']")
     MODEL_DATA_BTN = (By.XPATH, "//button[text()='Model data']")
     MORPHOLOGY_NRECORDS = (By.XPATH, "//a[@data-testid='experiment-dataset"
                                      "-ExperimentalNeuronMorphology']//span[@class='mr-2 "
@@ -47,6 +57,9 @@ class ExplorePageLocators:
     NEURON_MORPHOLOGY = (By.XPATH, "//a[@data-testid='experiment-dataset"
                                    "-ExperimentalNeuronMorphology' and "
                                    "@href='/app/explore/interactive/experimental/morphology']")
+    PANEL_EMODEL = (By.CSS_SELECTOR, "a[href='/app/explore/interactive/model/e-model']")
+    PANEL_MEMODEL = (By.CSS_SELECTOR, "a[href='/app/explore/interactive/model/me-model']")
+    PANEL_SYNAPTOME = (By.CSS_SELECTOR, "a[href='/app/explore/interactive/model/synaptome']")
     SELECTED_BRAIN_REGION = (By.XPATH, "//h1[@title='Isocortex']/span[text()='Isocortex']")
     SEARCH_REGION = (By.XPATH, "//input[@class='ant-select-selection-search-input']")
     SYNAPSE_PER_CONNECTION = (By.XPATH, "//a[@data-testid='experiment-dataset"
@@ -56,3 +69,5 @@ class ExplorePageLocators:
     SYNAPSE_PER_CONNECTION_NRECORDS = (By.XPATH, "//a[@data-testid='experiment-dataset"
                                                  "-ExperimentalSynapsePerConnection']//span["
                                                  "@class='mr-2 font-light']")
+    DATA_PANEL = (By.CSS_SELECTOR, "div[id='statistic-panel']")
+

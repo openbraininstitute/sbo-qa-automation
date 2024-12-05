@@ -10,7 +10,6 @@ from selenium.webdriver import Keys
 from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
 
-
 current_directory = os.getcwd()
 relative_file_path = 'scraped_links.txt'
 file_path = os.path.join(current_directory, relative_file_path)
@@ -107,6 +106,50 @@ class TestExplorePage:
         selected_brain_region_title = explore_page.find_selected_brain_region_title()
         assert selected_brain_region_title.text == 'Isocortex'
         logger.info("Found 'Isocortex' in the brain region panel and the title is displayed ")
+        explore_page.wait_for_page_ready(timeout=20)
+        logger.info("Wait for the sorting action to complete.")
+        model_data_tab = explore_page.find_model_data_title()
+        assert model_data_tab.text == "Model data"
+        logger.info("Model data tab is found")
+
+        model_data_tab.click()
+        logger.info("Model data tab is clicked")
+        expected_panel = explore_page.find_data_panel()
+        assert expected_panel.is_displayed(), \
+            "Model data panel did not appear after clicking the tab."
+        logger.info("Model data panel is displayed after clicking the tab.")
+
+        panel_emodel = explore_page.find_panel_emodel()
+        logger.info("E-model is found in the types panel")
+
+        panel_memodel = explore_page.find_panel_memodel()
+        logger.info("ME-model is found in the types panel")
+
+        panel_synaptome = explore_page.find_panel_synaptome()
+        logger.info("Synaptome is found in the types panel")
+
+        liteture_tab = explore_page.literature_title().click()
+        logger.info("Found and clicked on Literature tab")
+
+        expected_panel = explore_page.find_data_panel()
+        assert expected_panel.is_displayed(), \
+            "Literature data panel did not appear after clicking the tab."
+        logger.info("Literature data panel is displayed after clicking the tab.")
+
+        literature_panel_data_titles = [
+            ExplorePageLocators.LITERATURE_MORPHOLOGY_TAB,
+            ExplorePageLocators.LITERATURE_EPHYS_TAB,
+            ExplorePageLocators.LITERATURE_NDENSITY_TAB,
+            ExplorePageLocators.LITERATURE_BDENSITY_TAB,
+            ExplorePageLocators.LITERATURE_SYNAPSES_TAB
+        ]
+        logger.info("Searching for Literature panel data titles")
+        literature_panel = explore_page.find_literature_panel_data(literature_panel_data_titles)
+
+        for panel_title in literature_panel:
+            assert panel_title.is_displayed(), f"Literature panel {panel_title} is not displayed"
+        logger.info("Found Literature panel data titles")
+
         atlas = explore_page.find_3d_atlas()
         assert atlas.is_displayed()
         logger.info("3D Atlas is displayed")

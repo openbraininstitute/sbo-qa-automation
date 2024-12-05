@@ -20,20 +20,20 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
     def find_load_more_btn(self):
         return self.find_element(ExploreNDensityPageLocators.LOAD_MORE_BUTTON)
 
-    # def find_table_rows(self):
-    #     return find_all_elements(self.wait, ExploreNDensityPageLocators.TABLE_ROWS)
-    #
-    # def validate_empty_cells_in_contributors(self):
-    #     empty_cells = self.find_empty_cells_in_contributors_column()
-    #     for cell_index, cell in empty_cells:
-    #         error_message = f'Error: Empty field in cell {cell_index}'
-    #         print(error_message)
-    #
-    # def perform_full_validation(self, max_load_more_clicks=5):
-    #     for _ in range(max_load_more_clicks):
-    #         self.validate_empty_cells_in_contributors()
-    #         load_more_button = self.find_load_more_btn()
-    #         load_more_button.click()
+    def find_table_rows(self):
+        return self.wait.find_all_elements(ExploreNDensityPageLocators.TABLE_ROWS)
+
+    def validate_empty_cells_in_contributors(self):
+        empty_cells = self.find_empty_cells_in_contributors_column()
+        for cell_index, cell in empty_cells:
+            error_message = f'Error: Empty field in cell {cell_index}'
+            print(error_message)
+
+    def perform_full_validation(self, max_load_more_clicks=5):
+        for _ in range(max_load_more_clicks):
+            self.validate_empty_cells_in_contributors()
+            load_more_button = self.find_load_more_btn()
+            load_more_button.click()
 
     def find_ndensity_tab(self):
         return self.find_element(ExploreNDensityPageLocators.NDENSITY_TAB)
@@ -56,6 +56,6 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
     def find_dv_name(self):
         return self.element_visibility(ExploreNDensityPageLocators.DV_NAME)
 
-    def find_cerebrum_brp(self):
-        return self.find_element(ExploreNDensityPageLocators.BRP_CEREBRUM)
+    def find_cerebrum_brp(self, timeout=30):
+        return self.find_element(ExploreNDensityPageLocators.BRP_CEREBRUM, timeout=timeout)
 
