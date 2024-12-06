@@ -26,16 +26,10 @@ class TestExploreModelPage:
         """
         browser, wait = setup
         explore_model = ExploreModelDataPage(browser, wait, logger)
-        time.sleep(5)
-        print("Pause***************")
         explore_model.go_to_explore_model_page()
-        time.sleep(5)
-        print("Go to explore_model_page***************" + browser.current_url)
-
         logger.info("Explore page is loaded")
 
         emodel_tab = explore_model.find_emodel_tab()
-        # assert model_data_tab.text == 'Model data'
-        logger.info("Model data tab is found")
+        logger.info("E-model data tab is found")
 
 

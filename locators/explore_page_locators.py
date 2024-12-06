@@ -18,6 +18,7 @@ class ExplorePageLocators:
     CEREBRAL_CORTEX_TITLE = (By.XPATH, "//span[@title='Cerebral cortex']")
     CEREBRUM_BTN = (By.XPATH, "(//button[@type='button' and @aria-expanded='false'])[3]")
     COUNT_SWITCH = (By.CSS_SELECTOR, "button[type='button'][role='switch'][aria-checked='false']")
+    DATA_PANEL = (By.CSS_SELECTOR, "div[id='statistic-panel']")
     EXPERIMENTAL_DATA_BTN = (By.XPATH, "//button[text()='Experimental data']")
     EXPLORE_LINK1 = (By.XPATH, "//a[@href='/mmb-beta/explore/simulation-campaigns']//h1[text("
                                ")='Brain & cells annotations']")
@@ -42,6 +43,18 @@ class ExplorePageLocators:
                                      "-ExperimentalNeuronMorphology']//span[@class='mr-2 "
                                      "font-light']")
     NEURONS_PANEL = (By.CSS_SELECTOR, "div[id='neurons-panel']")
+    NEURONS_PANEL_MTYPE = (By.XPATH, "(//div[@data-state='closed' and "
+                                     "@data-orientation='vertical' and "
+                                     "starts-with(@data-tree-id,'http://uri')])[1]")
+    NEURONS_PANEL_GRID_MTYPES = (By.CSS_SELECTOR, "div.relative.ml-4.last\\:mb-5")
+    NEURONS_PANEL_MTYPE_BTN = (By.XPATH, "(//div[starts-with(@class,"
+                                         "'secondary-scrollbar')]//button[@type='button' and "
+                                         "starts-with(@class,'accordion-trigger') and "
+                                         "@aria-expanded='false' and "
+                                         "@data-orientation='vertical'])[1]")
+    NEURONS_PANEL_ETYPES_TITLE = (By.XPATH, "//h6[starts-with(@class, 'ml-4 text-sm') and text("
+                                            ")='E-TYPES']")
+    NEURONS_PANEL_ISOCORTEX_MTYPE = (By.XPATH, "//div[text()='L6_TPC:C']")
     NEURON_DENSITY = (By.XPATH, "//a[@data-testid='experiment-dataset-ExperimentalNeuronDensity' "
                                 "and @href='/app/explore/interactive/experimental/neuron-density']")
     NEURON_DENSITY_NRECORDS = (By.XPATH, "//a[@data-testid='experiment-dataset"
@@ -69,5 +82,7 @@ class ExplorePageLocators:
     SYNAPSE_PER_CONNECTION_NRECORDS = (By.XPATH, "//a[@data-testid='experiment-dataset"
                                                  "-ExperimentalSynapsePerConnection']//span["
                                                  "@class='mr-2 font-light']")
-    DATA_PANEL = (By.CSS_SELECTOR, "div[id='statistic-panel']")
-
+    TOTAL_COUNT_DENSITY = (By.XPATH, "//h2[@data-testid='total-count-or-density']")
+    TOTAL_COUNT_N = (By.XPATH, "//small[@class='text-base font-normal text-gray-300']")
+    TOTAL_COUNT_SWITCH = (By.XPATH, "//button[@type='button' and @role='switch' and "
+                                    "@title='density or count' and @aria-checked='false']")

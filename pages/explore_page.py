@@ -128,3 +128,27 @@ class ExplorePage(HomePage, LinkChecker):
         for locator in lit_data_locators:
             result.extend(self.find_all_elements(locator))
         return result
+
+    def find_total_count_density(self):
+        return self.find_element(ExplorePageLocators.TOTAL_COUNT_DENSITY)
+
+    def find_total_count_n(self):
+        return self.find_element(ExplorePageLocators.TOTAL_COUNT_N)
+
+    def find_total_count_switch(self):
+        return self.find_element(ExplorePageLocators.TOTAL_COUNT_SWITCH)
+
+    def find_panel_mtype(self):
+        return self.find_element(ExplorePageLocators.NEURONS_PANEL_MTYPE)
+
+    def list_of_neurons_panel(self):
+        return self.find_all_elements(ExplorePageLocators.NEURONS_PANEL_GRID_MTYPES)
+
+    def find_neurons_mtypes_btn(self):
+        return self.find_element(ExplorePageLocators.NEURONS_PANEL_MTYPE_BTN)
+
+    def find_neurons_etype_title(self):
+        return self.find_element(ExplorePageLocators.NEURONS_PANEL_ETYPES_TITLE)
+
+    def find_neurons_panel_iso_mtype(self):
+        return self.find_element(ExplorePageLocators.NEURONS_PANEL_ISOCORTEX_MTYPE)
