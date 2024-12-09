@@ -59,3 +59,6 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
     def find_cerebrum_brp(self, timeout=30):
         return self.find_element(ExploreNDensityPageLocators.BRP_CEREBRUM, timeout=timeout)
 
+    def find_registration_date(self):
+        return self.find_element(ExploreNDensityPageLocators.LV_REGISTRATION_DATE)
+
