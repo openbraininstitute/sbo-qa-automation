@@ -173,10 +173,9 @@ class TestExplorePage:
 
         count_switch_button = explore_page.find_total_count_switch()
         assert count_switch_button.is_displayed()
-        logger.info(f"Found the switch button")
-        time.sleep(10)
+        logger.info(f"Found the switch count/density button")
         current_state = count_switch_button.get_attribute('aria-checked')
-        logger.info(f"Current state of the total count switch: {count_switch_button}")
+        logger.info(f"Current state of the total count switch: {current_state}")
 
         if current_state == "false":
             count_switch_button.click()
@@ -210,7 +209,7 @@ class TestExplorePage:
             neurons_panel_mtype_btn.click()
             logger.info("Clicked on the M-type toggle arrow")
             etype_title = explore_page.find_neurons_etype_title()
-            logger.info("Searching for the E-type title")
+            logger.info("Searching for the E-type title inside the Neurons panel")
             if etype_title.is_displayed():
                 logger.info("E-Types are displayed")
         else:
@@ -229,5 +228,6 @@ class TestExplorePage:
 
         # Assert the element is within the viewport height
         assert element_top >= 0 and element_bottom <= viewport_height, \
-            f"The element is not fully in the viewport. Element top: {element_top}, Element bottom: {element_bottom}, Viewport height: {viewport_height}"
+            (f"The element is not fully in the viewport. Element top: {element_top}, "
+             f"Element bottom: {element_bottom}, Viewport height: {viewport_height}")
         logger.info(f"Scrolled through the M-types in the Neurons' panel")
