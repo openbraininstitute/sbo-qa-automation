@@ -82,6 +82,7 @@ class ExploreEphysLocators:
                          "before:!content-none ant-table-cell-ellipsis'])[1]")
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
     LV_THUMBNAIL = (By.XPATH, "//img[@alt='img preview']")
+    LV_TOTAL_RESULTS = (By.XPATH, "//div[@class='w-max']")
     SEARCHED_SPECIES = (By.XPATH, "//td[@title='Rattus norvegicus' and contains(text(),'Rattus "
                                   "norvegicus')][1]")
     SEARCH_BUTTON = (By.XPATH, "//span[@aria-label='search']/parent::button[@type='button']")

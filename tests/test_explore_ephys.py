@@ -17,7 +17,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestExploreEphys:
     @pytest.mark.explore_page
-    # @pytest.mark.run(order=4)
+    @pytest.mark.run(order=4)
     def test_explore_ephys_page(self, setup, login, logger):
         browser, wait = setup
         explore_ephys_page = ExploreElectrophysiologyPage(browser, wait)
@@ -110,6 +110,9 @@ class TestExploreEphys:
         value_found = any(expected in row.text for row in filtered_etype)
         assert value_found, (f'The value {expected} is not found in the table after applying the '
                              f'filter')
+        lv_total_results = explore_ephys_page.lv_total_results()
+        lv_total_text = lv_total_results.text
+        logger.info(f"The total results for Ephys/ bNAC is: {lv_total_text}")
 
         lv_row1 = explore_ephys_page.lv_row1().click()
         logger.info("Clicked on row 1 to see 'Detail View'.")
