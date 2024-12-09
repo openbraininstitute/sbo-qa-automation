@@ -49,7 +49,7 @@ jobs:
         OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         BROWSER_NAME: firefox
       run: |
-        pytest tests/test_login.py -sv --headless
+        pytest tests/ -sv --headless
 
     # Step 5: Slack notification on success
     - name: Notify Slack on Success
