@@ -131,6 +131,9 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
     def lv_row1(self):
         return self.find_element(ExploreEphysLocators.LV_ROW1)
 
+    def lv_total_results(self):
+        return self.find_element(ExploreEphysLocators.LV_TOTAL_RESULTS)
+
     def perform_full_validation(self):
         self.validate_empty_cells()
         load_more_button = self.find_load_more_btn()

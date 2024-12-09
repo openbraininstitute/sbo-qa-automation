@@ -19,7 +19,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 
 class TestExploreModelPage:
     @pytest.mark.explore_page
-    # @pytest.mark.run(order=3)
+    @pytest.mark.run(order=7)
     def test_explore_model(self, setup, login, logger):
         """
         The commented out code below is pending changes in the platform.
@@ -31,8 +31,7 @@ class TestExploreModelPage:
 
         emodel_tab = explore_model.find_emodel_tab()
         logger.info("E-model data tab is found")
-
-        cerebrum_title = explore_model.find_cerebrum_title()
+        cerebrum_title = explore_model.find_br_cerebrum_title()
         cerebrum_text = cerebrum_title.text
         logger.info(f"Found text: {cerebrum_text}")
 
@@ -54,4 +53,3 @@ class TestExploreModelPage:
                                                              "found")
         brain_region_panel_close_btn.click()
         logger.info("Brain region panel is toggled close")
-        time.sleep(5)

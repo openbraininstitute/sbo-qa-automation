@@ -29,11 +29,17 @@ class ExploreModelDataPage(ExplorePage, LinkChecker):
     def find_brain_region_search_field(self, timeout=20):
         return self.find_element(ExploreModelPageLocators.SEARCH_REGION, timeout=timeout)
 
-    def find_selected_brain_region_title(self):
-        return self.find_element(ExploreModelPageLocators.SELECTED_BRAIN_REGION)
-
     def find_brain_region_panel(self):
         return self.find_element(ExploreModelPageLocators.BRAIN_REGION_PANEL)
 
+    def find_br_cerebrum_title(self):
+        return self.find_element(ExploreModelPageLocators.BR_CEREBRUM_TITLE)
+
     def brain_region_panel_close_btn(self):
         return self.find_element(ExploreModelPageLocators.CLOSE_BRAIN_REGION_PANEL_BTN)
+
+    def find_selected_brain_region_title(self):
+        return self.find_element(ExploreModelPageLocators.SELECTED_BRAIN_REGION)
+
+
+

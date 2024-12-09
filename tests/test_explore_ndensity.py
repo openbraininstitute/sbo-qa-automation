@@ -16,17 +16,11 @@ if os.getenv("SKIP_TESTS") == "1":
 
 class TestExploreNeuronDensity:
     @pytest.mark.build_page
-    # @pytest.mark.run(order=7)
-    @pytest.mark.skip(reason="Sorting not implemented yet.")
-    def test_sorting_functionality(self):
-        # Placeholder logic for a test
-        assert False
-
+    @pytest.mark.run(order=5)
     def test_explore_neuron_density_page(self, setup, login, logger):
         browser, wait = setup
         explore_ndensity = ExploreNeuronDensityPage(browser, wait)
         explore_ndensity.go_to_explore_neuron_density_page()
-        # validate_table_fields = explore_ndensity_page.perform_full_validation()
         explore_ndensity_tab = explore_ndensity.find_ndensity_tab()
         logger.info("Neuron density tab is displayed")
 
