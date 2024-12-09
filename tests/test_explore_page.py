@@ -176,6 +176,8 @@ class TestExplorePage:
         logger.info(f"Found the switch count/density button")
         current_state = count_switch_button.get_attribute('aria-checked')
         logger.info(f"Current state of the total count switch: {current_state}")
+
+        # Temporarily adding time.sleep()
         time.sleep(2)
         if current_state == "false":
             count_switch_button.click()
