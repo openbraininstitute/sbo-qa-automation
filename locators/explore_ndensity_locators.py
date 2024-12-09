@@ -17,19 +17,20 @@ class ExploreNDensityPageLocators:
                               "density')]")
     LV_THUMBNAIL = (By.XPATH, "//img[starts-with(@alt,'Morphology preview')]")
     LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
-                                 "Region']")
-    LV_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='M-Type']")
-    LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-Type']")
+                                 "region']")
+    LV_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='M-type']")
+    LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-type']")
     LV_DENSITY = (By.XPATH, "//th[@data-testid='column-header']//div[contains(text(),'Density')]")
     LV_NMEASUREMENTS = (By.XPATH, "//th[@data-testid='column-header']//div[contains(text(),'N° of "
-                                  "Measurements')]")
+                                  "measurements')]")
     LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
     LV_AGE = (By.XPATH, "//span[@class='ant-table-column-title']//div[contains(text(),'Age')]")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
-    LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Creation "
-                                      "Date']")
-    LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-Type']")
+    LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
+                                      ")='Registration "
+                                      "date']")
+    LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-type']")
     LV_BR_ROW1 = (By.XPATH, "(//td[starts-with(@class, 'ant-table-cell')])[13]")
     DV_DESC_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Description']")
     DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("

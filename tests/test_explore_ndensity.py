@@ -39,14 +39,19 @@ class TestExploreNeuronDensity:
             ExploreNDensityPageLocators.LV_NAME,
             ExploreNDensityPageLocators.LV_SPECIES,
             ExploreNDensityPageLocators.LV_AGE,
-            ExploreNDensityPageLocators.LV_CONTRIBUTORS,
-            ExploreNDensityPageLocators.LV_REGISTRATION_DATE,
+            ExploreNDensityPageLocators.LV_CONTRIBUTORS
         ]
         column_headers = explore_ndensity.find_column_headers(column_locators)
 
+        found_column_headers = [element.text for element in column_headers]
+        logger.info(f"Found neuron density list view column headers: {found_column_headers}")
         for header in column_headers:
             assert header.is_displayed(), f"Column header {header} is not displayed."
         logger.info("Found 'List view' column headers")
+
+        registration_date = explore_ndensity.find_registration_date()
+        assert registration_date is not None, "The registration date is not visible"
+        logger.info("The Registration date column header is in the DOM")
 
         cerebrum_brp = explore_ndensity.find_cerebrum_brp()
         assert cerebrum_brp.is_displayed()

@@ -5,11 +5,10 @@
 import time
 import os.path
 import pytest
-from selenium.webdriver import Keys
+from selenium.webdriver import Keys, ActionChains
 
 from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
-
 
 current_directory = os.getcwd()
 relative_file_path = 'scraped_links.txt'
@@ -80,7 +79,7 @@ class TestExplorePage:
 
         cerebrum_arrow_btn = explore_page.find_cerebrum_arrow_btn()
         logger.info("Cerebrum - parent arrow button is clicked")
-        browser.execute_script("arguments[0].click();",cerebrum_arrow_btn)
+        browser.execute_script("arguments[0].click();", cerebrum_arrow_btn)
 
         cerebral_cortex_title = explore_page.find_cerebral_cortex_brp()
         logger.info("Found Cerebral cortex as a child of Cerebrum")
@@ -107,6 +106,50 @@ class TestExplorePage:
         selected_brain_region_title = explore_page.find_selected_brain_region_title()
         assert selected_brain_region_title.text == 'Isocortex'
         logger.info("Found 'Isocortex' in the brain region panel and the title is displayed ")
+        explore_page.wait_for_page_ready(timeout=20)
+        logger.info("Wait for the sorting action to complete.")
+        model_data_tab = explore_page.find_model_data_title()
+        assert model_data_tab.text == "Model data"
+        logger.info("Model data tab is found")
+
+        model_data_tab.click()
+        logger.info("Model data tab is clicked")
+        expected_panel = explore_page.find_data_panel()
+        assert expected_panel.is_displayed(), \
+            "Model data panel did not appear after clicking the tab."
+        logger.info("Model data panel is displayed after clicking the tab.")
+
+        panel_emodel = explore_page.find_panel_emodel()
+        logger.info("E-model is found in the types panel")
+
+        panel_memodel = explore_page.find_panel_memodel()
+        logger.info("ME-model is found in the types panel")
+
+        panel_synaptome = explore_page.find_panel_synaptome()
+        logger.info("Synaptome is found in the types panel")
+
+        liteture_tab = explore_page.literature_title().click()
+        logger.info("Found and clicked on Literature tab")
+
+        expected_panel = explore_page.find_data_panel()
+        assert expected_panel.is_displayed(), \
+            "Literature data panel did not appear after clicking the tab."
+        logger.info("Literature data panel is displayed after clicking the tab.")
+
+        literature_panel_data_titles = [
+            ExplorePageLocators.LITERATURE_MORPHOLOGY_TAB,
+            ExplorePageLocators.LITERATURE_EPHYS_TAB,
+            ExplorePageLocators.LITERATURE_NDENSITY_TAB,
+            ExplorePageLocators.LITERATURE_BDENSITY_TAB,
+            ExplorePageLocators.LITERATURE_SYNAPSES_TAB
+        ]
+        logger.info("Searching for Literature panel data titles")
+        literature_panel = explore_page.find_literature_panel_data(literature_panel_data_titles)
+
+        for panel_title in literature_panel:
+            assert panel_title.is_displayed(), f"Literature panel {panel_title} is not displayed"
+        logger.info("Found Literature panel data titles")
+
         atlas = explore_page.find_3d_atlas()
         assert atlas.is_displayed()
         logger.info("3D Atlas is displayed")
@@ -119,3 +162,72 @@ class TestExplorePage:
         logger.info("Fullscreen exit button is found")
         fulscreen_exit.click()
         logger.info("Fullscreen exit button is clicked, atlas is minimized")
+        total_count_density_title = explore_page.find_total_count_density()
+        assert total_count_density_title, "The total neurons count title is not found"
+        logger.info("Title for the total count of neurons is found")
+
+        total_count_number = explore_page.find_total_count_n()
+        neuron_count = total_count_number.text
+        assert neuron_count.strip(), "Total neuron count is empty"
+        logger.info(f"Total number of neurons is: {neuron_count}")
+
+        count_switch_button = explore_page.find_total_count_switch()
+        assert count_switch_button.is_displayed()
+        logger.info(f"Found the switch count/density button")
+        current_state = count_switch_button.get_attribute('aria-checked')
+        logger.info(f"Current state of the total count switch: {current_state}")
+
+        if current_state == "false":
+            count_switch_button.click()
+            logger.info("Switch toggled to 'true'.")
+        elif current_state == "true":
+            count_switch_button.click()
+            logger.info(f"Switch toggled to 'on'.")
+        else:
+            logger.error(f"Unexpected switch state: {current_state}")
+
+        new_state = count_switch_button.get_attribute("aria-checked")
+        logger.info(f"New state of the switch: {new_state}")
+
+        total_count_number = explore_page.find_total_count_n()
+        neuron_count = total_count_number.text
+        assert neuron_count.strip(), "Total neuron DENSITY is empty"
+        logger.info(f"Total DENSITY is: {neuron_count}")
+
+        neuron_panel_one_mtype = explore_page.find_panel_mtype()
+        assert neuron_panel_one_mtype.is_displayed(), "The M-types titles in the panel is not found"
+        logger.info("An M-type in the neurons panel is found")
+
+        neuron_panel_one_mtype.click()
+        logger.info("Clicking inside the viewport of the Neuron panel")
+
+        neurons_panel_mtype_btn = explore_page.find_neurons_mtypes_btn()
+        assert neurons_panel_mtype_btn, "The toggle arrow for M-type is not found"
+        logger.info("M-type arrow button is found")
+
+        if neurons_panel_mtype_btn and neurons_panel_mtype_btn.is_displayed():
+            neurons_panel_mtype_btn.click()
+            logger.info("Clicked on the M-type toggle arrow")
+            etype_title = explore_page.find_neurons_etype_title()
+            logger.info("Searching for the E-type title inside the Neurons panel")
+            if etype_title.is_displayed():
+                logger.info("E-Types are displayed")
+        else:
+            logger.info("The Mtype in the neurons panel was not found and not clicked")
+
+        mtypes_neurons_panel = explore_page.list_of_neurons_panel()
+        logger.info(f"Neurons' panel with a list of M-types is found")
+
+        panel_specific_mtype = explore_page.find_neurons_panel_iso_mtype()
+        logger.info("Specific M-type is found")
+        browser.execute_script("arguments[0].scrollIntoView(true);", panel_specific_mtype)
+        element_location = panel_specific_mtype.location_once_scrolled_into_view
+        viewport_height = browser.execute_script("return window.innerHeight")
+        element_top = element_location['y']
+        element_bottom = element_top + panel_specific_mtype.size['height']
+
+        # Assert the element is within the viewport height
+        assert element_top >= 0 and element_bottom <= viewport_height, \
+            (f"The element is not fully in the viewport. Element top: {element_top}, "
+             f"Element bottom: {element_bottom}, Viewport height: {viewport_height}")
+        logger.info(f"Scrolled through the M-types in the Neurons' panel")
