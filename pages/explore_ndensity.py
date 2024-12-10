@@ -35,6 +35,7 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
     def find_column_headers(self, column_locators):
         column_headers = []
         for locator in column_locators:
+            self.element_visibility(locator), f"Column header with locator {locator} is not visible"
             column_headers.extend(self.find_all_elements(locator))
         return column_headers
 

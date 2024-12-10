@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 #
 # SPDX-License-Identifier: Apache-2.0
+import time
 
 from selenium.common import TimeoutException
 from locators.explore_page_locators import ExplorePageLocators
@@ -14,14 +15,19 @@ class ExplorePage(HomePage, LinkChecker):
         super().__init__(browser, wait)
         self.home_page = HomePage(browser, wait)
 
-    def go_to_explore_page(self):
-        try:
-            self.browser.set_page_load_timeout(90)
-            self.browser.get(self.base_url + "/explore/interactive")
-            self.wait_for_page_ready(timeout=90)
-        except TimeoutException:
-            raise RuntimeError("The Explore page did not load within 60 seconds.")
-        return self.browser.current_url
+    def go_to_explore_page(self, retries=3, delay=5, max_wait_time=90):
+        for attempt in range(retries):
+            try:
+                self.browser.set_page_load_timeout(90)
+                self.browser.get(self.base_url + "/explore/interactive")
+                self.wait_for_page_ready(timeout=90)
+            except TimeoutException:
+                print(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
+                time.sleep(delay)  # Wait before retrying
+                delay *= 2  # Exponentially increase delay (e.g., 5, 10, 20 seconds)
+                if attempt == retries - 1:
+                    raise RuntimeError("The Explore page failed to load after multiple attempts.")
+            return self.browser.current_url
 
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))

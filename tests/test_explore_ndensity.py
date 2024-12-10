@@ -21,7 +21,9 @@ class TestExploreNeuronDensity:
         browser, wait = setup
         explore_ndensity = ExploreNeuronDensityPage(browser, wait)
         explore_ndensity.go_to_explore_neuron_density_page()
-        explore_ndensity_tab = explore_ndensity.find_ndensity_tab()
+        # explore_ndensity_tab = explore_ndensity.find_ndensity_tab()
+        explore_ndensity.element_visibility(ExploreNDensityPageLocators.NDENSITY_TAB,
+                                            timeout=60)
         logger.info("Neuron density tab is displayed")
 
         column_locators = [
