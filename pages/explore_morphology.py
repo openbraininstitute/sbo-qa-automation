@@ -20,8 +20,12 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
         self.logger = logger
 
     def go_to_explore_morphology_page(self):
-        self.go_to_page("/explore/interactive/experimental/morphology")
-        print("pages/morphology: ", self.browser.current_url)
+        try:
+            self.go_to_page("/explore/interactive/experimental/morphology")
+            self.wait_for_page_ready(timeout=60)
+        except TimeoutException:
+            raise RuntimeError("The Explore Morphology page did not load within 60 seconds")
+        return self.browser.current_url
 
     def find_morphology_tab(self):
         return self.find_element(ExploreMorphologyPageLocators.MORPHOLOGY_TAB)

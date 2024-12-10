@@ -20,8 +20,12 @@ class ExploreModelDataPage(ExplorePage, LinkChecker):
         self.logger = logger
 
     def go_to_explore_model_page(self):
-        self.go_to_page("/explore/interactive/model/e-model")
-        print("pages/explore/model data: ", self.browser.current_url)
+        try:
+            self.go_to_page("/explore/interactive/model/e-model")
+            self.wait_for_page_ready(timeout=60)
+        except TimeoutException:
+            raise RuntimeError("The Model data page did not load within 60 seconds.")
+        return self.browser.current_url
 
     def find_emodel_tab(self):
         return self.find_element(ExploreModelPageLocators.EMODEL_TAB)

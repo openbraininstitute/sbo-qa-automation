@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 #
 # SPDX-License-Identifier: Apache-2.0
+from selenium.common import TimeoutException
 
 from locators.explore_ephys_locators import ExploreEphysLocators
 from pages.explore_page import ExplorePage
@@ -15,7 +16,12 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
         self.url_scraper = UrlScraper()
 
     def go_to_explore_ephys_page(self):
-        self.go_to_page("/explore/interactive/experimental/electrophysiology")
+        try:
+            self.go_to_page("/explore/interactive/experimental/electrophysiology")
+            self.wait_for_page_ready(timeout=60)
+        except TimeoutException:
+            raise RuntimeError("The Explore Ephys page did not load within 60 seconds.")
+        return self.browser.current_url
 
     def download_resources(self):
         return self.find_element(ExploreEphysLocators.DOWNLOAD_RESOURCES)
@@ -52,6 +58,9 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
 
     def dv_stim_images(self):
         return self.find_all_elements(ExploreEphysLocators.DV_STIM_IMAGES)
+
+    def dv_stimulus_search(self):
+        return self.find_element(ExploreEphysLocators.DV_STIMULUS_SEARCH)
 
     def find_apply_btn(self):
         return self.find_element(ExploreEphysLocators.APPLY_BTN)

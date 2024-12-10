@@ -38,7 +38,7 @@ class TestExploreNeuronDensity:
         column_headers = explore_ndensity.find_column_headers(column_locators)
 
         found_column_headers = [element.text for element in column_headers]
-        logger.info(f"Found neuron density list view column headers: {found_column_headers}")
+        logger.info(f"Found n.density list view column headers: {found_column_headers}")
         for header in column_headers:
             assert header.is_displayed(), f"Column header {header} is not displayed."
         logger.info("Found 'List view' column headers")

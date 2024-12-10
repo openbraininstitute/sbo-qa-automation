@@ -8,10 +8,10 @@ from selenium.webdriver.common.by import By
 class ExplorePageLocators:
     ATLAS = (By.CSS_SELECTOR, "div[id='3d-area']")
     ATLAS_FULLSCREEN = (By.CSS_SELECTOR, "span[class='anticon anticon-fullscreen h-5 w-5 text-xl']")
-    BOUTON_DENSITY = (By.XPATH, "//a[@data-testid='experiment-dataset-ExperimentsBoutonDensity' "
+    BOUTON_DENSITY = (By.XPATH, "//a[@data-testid='experiment-dataset-ExperimentalBoutonDensity' "
                                 "and @href='/app/explore/interactive/experimental/bouton-density']")
     BOUTON_DENSITY_NRECORDS = (By.XPATH, "//a[@data-testid='experiment-dataset"
-                                         "-ExperimentsBoutonDensity']//span[@class='mr-2 "
+                                         "-ExperimentalBoutonDensity']//span[@class='mr-2 "
                                          "font-light']")
     BRAIN_REGION_PANEL = (By.XPATH, "//span[text()='Brain region']")
     BRP_CEREBRUM = (By.XPATH, "//span[@title='Cerebrum' and text()='Cerebrum']")

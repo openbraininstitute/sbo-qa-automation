@@ -50,6 +50,7 @@ class ExploreEphysLocators:
     DV_SPECIES_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Species']")
     DV_STIMULUS_ALL = (By.XPATH, "//div[@class='ant-select-item-option-content' and text()='All']")
     DV_STIMULUS_BTN = (By.XPATH, "//div[@class='ant-select-selector']")
+    DV_STIMULUS_SEARCH = (By.XPATH, "//input[@id='rc_select_2']")
     DV_STIMULUS_IMG_GRID = (By.XPATH, "//div[@class='flex flex-col gap-10']")
     DV_STIM_IMAGES = (By.XPATH, "//div[@class='flex flex-col gap-3 divide-y "
                                 "divide-neutral-2']//div[@class='grid grid-cols-4 gap-7 pt-5 "

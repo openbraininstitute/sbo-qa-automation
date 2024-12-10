@@ -162,7 +162,7 @@ class TestExploreEphys:
         dv_stimuli_images = explore_ephys_page.dv_stim_images()
         assert dv_stimuli_images, "Stimuli plots are not displayed"
         logger.info("Plots are displayed.")
-
+        dv_stimulus_all.click()
         dv_interactive_details_btn.click()
         logger.info("Clicked 'Interactive details' button.")
         dv_id_plots = explore_ephys_page.dv_id_plots()

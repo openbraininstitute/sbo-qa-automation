@@ -14,6 +14,7 @@ class CustomBasePage:
         self.browser = browser
         self.wait = wait
         self.base_url = "https://openbluebrain.com/app"
+        self.browser.set_page_load_timeout(60)
 
     def go_to_page(self, page_url):
         url = self.base_url + page_url

@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 #
 # SPDX-License-Identifier: Apache-2.0
+from selenium.common import TimeoutException
 
 from pages.explore_page import ExplorePage
 from locators.explore_ndensity_locators import ExploreNDensityPageLocators
@@ -15,7 +16,12 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
         self.url_scraper = UrlScraper()
 
     def go_to_explore_neuron_density_page(self):
-        self.go_to_page("/explore/interactive/experimental/neuron-density")
+        try:
+            self.go_to_page("/explore/interactive/experimental/neuron-density")
+            self.wait_for_page_ready(timeout=60)
+        except TimeoutException:
+            raise RuntimeError("The explore Neuron Density page did not load within 60 seconds.")
+        return self.browser.current_url
 
     def find_load_more_btn(self):
         return self.find_element(ExploreNDensityPageLocators.LOAD_MORE_BUTTON)

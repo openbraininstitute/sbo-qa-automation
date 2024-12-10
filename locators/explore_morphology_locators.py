@@ -10,7 +10,7 @@ class ExploreMorphologyPageLocators:
     BRAIN_REGION_COLUMN_TITLE = (By.XPATH, "//div[text()='Brain Region']")
     BR_SORTED = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]/descendant::td[contains(text("
                            "),'Primary somatosensory area')]")
-    BR_SORT_ARROW = (By.XPATH, "//th[contains(.,'Brain Region')]//div["
+    BR_SORT_ARROW = (By.XPATH, "//th[contains(.,'Brain region')]//div["
                                "@class='ant-table-column-sorters']")
     CELLS = (By.XPATH, "//td[starts-with(@class,'ant-table-cell')]")
     CLEAR_FILTERS_BTN = (By.XPATH, "//button[@type='button']/div[text()='Clear filters']")
@@ -33,9 +33,10 @@ class ExploreMorphologyPageLocators:
     DV_NAME_TITLE = (By.XPATH, "//div[@class='text font-thin' and text()='Name']")
     DV_NM_TITLE = (By.XPATH, "//h2[text()='Neuron Morphology']")
     DV_REGISTRATION_DATE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                                            ")='Registration Date']")
-    DV_SELECTED_BR = (By.XPATH, "//div[@class='grid grid-cols-6 gap-4 break-words']//div[text("
-                                ")='Brain Region']/following-sibling::div[text()='Anterior "
+                                            ")='Registration date']")
+    DV_SELECTED_BR = (By.XPATH, "//div[@class='grid w-1/2 auto-rows-min grid-cols-3 gap-x-8 "
+                                "gap-y-6']//div[text()='Brain Region']/following-sibling::div["
+                                "text()='Anterior"
                                 "cingulate area, dorsal part, layer 2/3']")
     DV_SOMA_TITLE = (By.XPATH, "//h2[text()='Soma']")
     DV_SPECIES_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Species']")
@@ -57,10 +58,7 @@ class ExploreMorphologyPageLocators:
     LV_PREVIEW = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Preview']")
     LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
                                       ")='Registration date']")
-    # LV_REGISTRATION_DATE = (By.XPATH, "//span[@class='ant-table-column-title']//div[text("
-    #                                   ")='Creation Date']")
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
-    # LV_THUMBNAIL = (By.XPATH, "//img[starts-with(@alt,'Morphology preview')]")
     LV_THUMBNAIL = (By.XPATH, "//img[@alt='img preview']")
     MORPHOLOGY_FILTER = (By.XPATH, "//button[@aria-label='listing-view-filter-button']")
     MORPHOLOGY_FILTER_CLOSE_BTN = (By.XPATH, "//div[@data-testid='listing-view-filter-panel"
