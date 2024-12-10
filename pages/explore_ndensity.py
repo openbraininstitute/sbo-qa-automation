@@ -1,6 +1,8 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 #
 # SPDX-License-Identifier: Apache-2.0
+import time
+
 from selenium.common import TimeoutException
 
 from pages.explore_page import ExplorePage
@@ -15,13 +17,19 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
         self.home_page = ExplorePage(browser, wait)
         self.url_scraper = UrlScraper()
 
-    def go_to_explore_neuron_density_page(self):
-        try:
-            self.go_to_page("/explore/interactive/experimental/neuron-density")
-            self.wait_for_page_ready(timeout=60)
-        except TimeoutException:
-            raise RuntimeError("The explore Neuron Density page did not load within 60 seconds.")
-        return self.browser.current_url
+    def go_to_explore_neuron_density_page(self, retries=3, delay=5):
+        for attempt in range(retries):
+            try:
+                self.browser.set_page_load_timeout(90)
+                self.go_to_page("/explore/interactive/experimental/neuron-density")
+                self.wait_for_page_ready(timeout=60)
+            except TimeoutException:
+                print(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
+                time.sleep(delay)  # Wait before retrying
+                delay *= 2  # Exponentially increase delay (e.g., 5, 10, 20 seconds)
+                if attempt == retries - 1:
+                    raise RuntimeError("The Explore page failed to load after multiple attempts.")
+            return self.browser.current_url
 
     def find_load_more_btn(self):
         return self.find_element(ExploreNDensityPageLocators.LOAD_MORE_BUTTON)

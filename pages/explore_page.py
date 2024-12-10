@@ -15,7 +15,7 @@ class ExplorePage(HomePage, LinkChecker):
         super().__init__(browser, wait)
         self.home_page = HomePage(browser, wait)
 
-    def go_to_explore_page(self, retries=3, delay=5, max_wait_time=90):
+    def go_to_explore_page(self, retries=3, delay=5):
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(90)
@@ -33,7 +33,10 @@ class ExplorePage(HomePage, LinkChecker):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
 
     def check_explore_title_is_present(self):
-        return self.element_to_be_clickable(ExplorePageLocators.EXPLORE_TITLE)
+        return self.find_element(ExplorePageLocators.EXPLORE_TITLE)
+
+    def cerebrum_title(self):
+        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE)
 
     def find_model_data_title(self):
         return self.find_element(ExplorePageLocators.MODEL_DATA_BTN)

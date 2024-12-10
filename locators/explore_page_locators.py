@@ -17,6 +17,7 @@ class ExplorePageLocators:
     BRP_CEREBRUM = (By.XPATH, "//span[@title='Cerebrum' and text()='Cerebrum']")
     CEREBRAL_CORTEX_TITLE = (By.XPATH, "//span[@title='Cerebral cortex']")
     CEREBRUM_BTN = (By.XPATH, "(//button[@type='button' and @aria-expanded='false'])[3]")
+    CEREBRUM_TITLE = (By.XPATH, "//span[@class='line-clamp-2' and text()='Cerebrum']")
     COUNT_SWITCH = (By.CSS_SELECTOR, "button[type='button'][role='switch'][aria-checked='false']")
     DATA_PANEL = (By.CSS_SELECTOR, "div[id='statistic-panel']")
     EXPERIMENTAL_DATA_BTN = (By.XPATH, "//button[text()='Experimental data']")
