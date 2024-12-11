@@ -86,10 +86,8 @@ class TestExploreMorphologyPage:
         filter_mtype_text_input.send_keys(Keys.ENTER)
         logger.info("L5_TPC:A is typed in the search field.")
         explore_morphology.wait_for_page_ready(timeout=15)
-        ant_selector = explore_morphology.ant_selector()
-        ant_selector.click()
-        logger.info("CLICKED ON ANT SELECTOR")
-        logger.info("Found filter search field")
+        lv_filter_search_field = explore_morphology.lv_filter_search_field()
+        lv_filter_search_field.click()
         lv_filter_apply_btn = explore_morphology.lv_filter_apply(timeout=10)
         assert lv_filter_apply_btn, f"The APPLY button is not found"
         logger.info("Inside the filter 'Apply' button is FOUND.")
