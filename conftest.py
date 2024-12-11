@@ -65,8 +65,8 @@ def setup(request, pytestconfig):
             browser = webdriver.Firefox(service=service, options=options)
     else:
         raise ValueError("Invalid BROWSER_NAME: {}".format(browser_name))
-
-    wait = WebDriverWait(browser, 10)
+    browser.set_page_load_timeout(60)
+    wait = WebDriverWait(browser, 20)
 
     if browser is not None:
         browser.set_window_position(-1000, 0)
@@ -231,8 +231,8 @@ def _capture_screenshot(name, browser):
         print(f"Creating error  directory at:{os.path.dirname(name)}")
         os.makedirs(os.path.dirname(name), exist_ok=True)
         print(f"Saving screenshot to: {name}")
-        # browser.get_full_page_screenshot_as_file(file_path)
-        browser.get_full_page_screenshot_as_file(name)
+        # browser.get_full_page_screenshot_as_file(name)
+        browser.save_screenshot(name)
         print(f"Screenshot captured: {name}")
     except Exception as e:
         print(f"Failed to capture screenshot '{name}': {e}")

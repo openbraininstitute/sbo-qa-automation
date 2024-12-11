@@ -30,6 +30,9 @@ class TestExplorePage:
         """Checking the titles of the Explore Page"""
         explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
+        cerebrum_title = explore_page.cerebrum_title()
+        assert cerebrum_title, f"Cerebrum title is not found"
+        logger.info("Cerebrum title is displayed")
 
         exp_data_titles = [
             ExplorePageLocators.NEURON_MORPHOLOGY,
@@ -176,6 +179,8 @@ class TestExplorePage:
         logger.info(f"Found the switch count/density button")
         current_state = count_switch_button.get_attribute('aria-checked')
         logger.info(f"Current state of the total count switch: {current_state}")
+
+        # Temporarily adding time.sleep()
         time.sleep(2)
         if current_state == "false":
             count_switch_button.click()

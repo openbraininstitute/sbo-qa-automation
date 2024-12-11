@@ -76,10 +76,9 @@ class TestExploreMorphologyPage:
 
         filter_mtype_text_input = explore_morphology.filter_mtype_text_input()
         if filter_mtype_text_input:
-            assert True
             logger.info("Text input field is found.")
         else:
-            print("input_id is not valid or cannot be found.")
+            logger.error("input_id is not valid or cannot be found.")
         filter_mtype_text_input.click()
         logger.info("Text input field is CLICKED.")
         filter_mtype_text_input.send_keys("L5_TPC:A")
@@ -87,9 +86,11 @@ class TestExploreMorphologyPage:
         filter_mtype_text_input.send_keys(Keys.ENTER)
         logger.info("L5_TPC:A is typed in the search field.")
         explore_morphology.wait_for_page_ready(timeout=15)
+        lv_filter_search_field = explore_morphology.lv_filter_search_field()
+        lv_filter_search_field.click()
         lv_filter_apply_btn = explore_morphology.lv_filter_apply(timeout=10)
+        assert lv_filter_apply_btn, f"The APPLY button is not found"
         logger.info("Inside the filter 'Apply' button is FOUND.")
-        # time.sleep(4)
         lv_filter_apply_btn.click()
         logger.info("Inside the filter 'Apply' button is CLICKED.")
 
@@ -97,7 +98,6 @@ class TestExploreMorphologyPage:
         logger.info("Find button to close the filter.")
         close_filter.click()
         logger.info("Filter panel is CLOSED.")
-        # Assert that the filter panel is no longer visible
         assert explore_morphology.is_filter_panel_closed(), ("Filter panel was not closed "
                                                              "successfully.")
 
