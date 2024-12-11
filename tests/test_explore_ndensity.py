@@ -9,10 +9,6 @@ import pytest
 from locators.explore_ndensity_locators import ExploreNDensityPageLocators
 from pages.explore_ndensity import ExploreNeuronDensityPage
 
-# Skip module if `SKIP_TESTS` environment variable is set
-if os.getenv("SKIP_TESTS") == "1":
-    pytest.skip("Skipping Morphology tests temporarily.", allow_module_level=True)
-
 
 class TestExploreNeuronDensity:
     @pytest.mark.build_page
@@ -21,9 +17,8 @@ class TestExploreNeuronDensity:
         browser, wait = setup
         explore_ndensity = ExploreNeuronDensityPage(browser, wait)
         explore_ndensity.go_to_explore_neuron_density_page()
-        # explore_ndensity_tab = explore_ndensity.find_ndensity_tab()
-        explore_ndensity.element_visibility(ExploreNDensityPageLocators.NDENSITY_TAB,
-                                            timeout=60)
+        # Wait for the neuron density tab
+        explore_ndensity.wait_for_ndensity_tab(timeout=60)
         logger.info("Neuron density tab is displayed")
 
         column_locators = [
@@ -34,8 +29,7 @@ class TestExploreNeuronDensity:
             ExploreNDensityPageLocators.LV_NMEASUREMENTS,
             ExploreNDensityPageLocators.LV_NAME,
             ExploreNDensityPageLocators.LV_SPECIES,
-            ExploreNDensityPageLocators.LV_AGE,
-            ExploreNDensityPageLocators.LV_CONTRIBUTORS
+            ExploreNDensityPageLocators.LV_AGE
         ]
         column_headers = explore_ndensity.find_column_headers(column_locators)
 
@@ -45,9 +39,11 @@ class TestExploreNeuronDensity:
             assert header.is_displayed(), f"Column header {header} is not displayed."
         logger.info("Found 'List view' column headers")
 
-        registration_date = explore_ndensity.find_registration_date()
-        assert registration_date is not None, "The registration date is not visible"
-        logger.info("The Registration date column header is in the DOM")
+        lv_registration_date = explore_ndensity.find_registration_date()
+        assert lv_registration_date is not None, "The registration date is not visible"
+        logger.info("'Registration date' column header is in the DOM")
+        lv_contributors_header = explore_ndensity.find_lv_contributor_header()
+        logger.info("'Contributors' column header is found in the List view")
 
         cerebrum_brp = explore_ndensity.find_cerebrum_brp()
         assert cerebrum_brp.is_displayed()

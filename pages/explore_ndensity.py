@@ -40,11 +40,25 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
     def find_ndensity_tab(self):
         return self.find_element(ExploreNDensityPageLocators.NDENSITY_TAB)
 
-    def find_column_headers(self, column_locators):
+    def wait_for_ndensity_tab(self, timeout=60):
+        """
+        Waits for the neuron density tab to become visible.
+        """
+        self.wait_for_long_load(ExploreNDensityPageLocators.NDENSITY_TAB, timeout)
+
+    def find_column_headers(self, column_locators, timeout=60):
         column_headers = []
         for locator in column_locators:
-            self.element_visibility(locator), f"Column header with locator {locator} is not visible"
-            column_headers.extend(self.find_all_elements(locator))
+            try:
+                self.element_visibility(locator, timeout=timeout),
+                elements = self.find_all_elements(locator)
+                if len(elements) > 1:
+                    column_headers.extend(elements)
+                else:
+                    column_headers.append(elements[0])
+            except TimeoutException:
+                print(f"Column header with locator {locator} is not visible")
+                raise
         return column_headers
 
     def find_dv_title_header(self, title_locators):
@@ -64,4 +78,9 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
 
     def find_registration_date(self):
         return self.find_element(ExploreNDensityPageLocators.LV_REGISTRATION_DATE)
+
+    def find_lv_contributor_header(self):
+        return self.find_element(ExploreNDensityPageLocators.LV_CONTRIBUTORS)
+
+
 

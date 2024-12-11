@@ -191,7 +191,7 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
         return self.find_element(ExploreMorphologyPageLocators.FILTER_MTYPE_TEXT_INPUT)
 
     def lv_filter_apply(self, timeout=10):
-        return self.element_to_be_clickable(ExploreMorphologyPageLocators.LV_FILTER_APPLY_BTN, timeout=timeout)
+        return self.find_element(ExploreMorphologyPageLocators.LV_FILTER_APPLY_BTN, timeout=timeout)
 
     def find_filtered_mtype(self):
         return self.find_all_elements(ExploreMorphologyPageLocators.FILTERED_MTYPE)
@@ -213,3 +213,6 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
             return not filter_panel.is_displayed()
         except TimeoutException:
             return True
+
+    def lv_filter_search(self):
+        return self.find_element(ExploreMorphologyPageLocators.LV_FILTER_SEARCH)

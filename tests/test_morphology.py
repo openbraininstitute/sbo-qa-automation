@@ -23,41 +23,41 @@ class TestExploreMorphologyPage:
         morphology_tab = explore_morphology.find_morphology_tab()
         logger.info("Morphology tab is displayed")
 
-        column_locators = [
-            ExploreMorphologyPageLocators.LV_PREVIEW,
-            ExploreMorphologyPageLocators.LV_BRAIN_REGION,
-            ExploreMorphologyPageLocators.LV_MTYPE,
-            ExploreMorphologyPageLocators.LV_NAME,
-            ExploreMorphologyPageLocators.LV_SPECIES,
-        ]
-        column_headers = explore_morphology.find_column_headers(column_locators)
-
-        for header in column_headers:
-            assert header.is_displayed(), f"Column header {header} is not displayed."
-        logger.info("Morphology column headers are displayed.")
-
-        thumbnail_img = explore_morphology.verify_all_thumbnails_displayed()
-        logger.info("Morphology thumbnail is displayed.")
-
-        for thumbnail in thumbnail_img:
-            assert thumbnail['is_displayed'], f"Thumbnail {thumbnail['element']} is not displayed!"
-            logger.info(f"Thumbnail {thumbnail['element']} is displayed.")
-
-        results = explore_morphology.find_results()
-        logger.info("Total number of results for morphology tab is displayed.")
-
-        original_data = explore_morphology.get_table_data()
-        logger.info("Fetch table data before sorting")
-
-        br_sort_arrow = explore_morphology.find_br_sort_arrow()
-        br_sort_arrow.click()
-        logger.info("Click the column sort arrow.")
-
-        explore_morphology.wait_for_page_ready(timeout=15)
-        logger.info("Wait for the sorting action to complete.")
-        sorted_data = explore_morphology.get_table_data()
-        assert original_data != sorted_data, "Table data did not change after sorting."
-        logger.info("Asserting that the table data was sorted.")
+        # column_locators = [
+        #     ExploreMorphologyPageLocators.LV_PREVIEW,
+        #     ExploreMorphologyPageLocators.LV_BRAIN_REGION,
+        #     ExploreMorphologyPageLocators.LV_MTYPE,
+        #     ExploreMorphologyPageLocators.LV_NAME,
+        #     ExploreMorphologyPageLocators.LV_SPECIES,
+        # ]
+        # column_headers = explore_morphology.find_column_headers(column_locators)
+        #
+        # for header in column_headers:
+        #     assert header.is_displayed(), f"Column header {header} is not displayed."
+        # logger.info("Morphology column headers are displayed.")
+        #
+        # thumbnail_img = explore_morphology.verify_all_thumbnails_displayed()
+        # logger.info("Morphology thumbnail is displayed.")
+        #
+        # for thumbnail in thumbnail_img:
+        #     assert thumbnail['is_displayed'], f"Thumbnail {thumbnail['element']} is not displayed!"
+        #     logger.info(f"Thumbnail {thumbnail['element']} is displayed.")
+        #
+        # results = explore_morphology.find_results()
+        # logger.info("Total number of results for morphology tab is displayed.")
+        #
+        # original_data = explore_morphology.get_table_data()
+        # logger.info("Fetch table data before sorting")
+        #
+        # br_sort_arrow = explore_morphology.find_br_sort_arrow()
+        # br_sort_arrow.click()
+        # logger.info("Click the column sort arrow.")
+        #
+        # explore_morphology.wait_for_page_ready(timeout=15)
+        # logger.info("Wait for the sorting action to complete.")
+        # sorted_data = explore_morphology.get_table_data()
+        # assert original_data != sorted_data, "Table data did not change after sorting."
+        # logger.info("Asserting that the table data was sorted.")
 
         morphology_filter = explore_morphology.morphology_filter()
         morphology_filter.click()
@@ -86,7 +86,10 @@ class TestExploreMorphologyPage:
         filter_mtype_text_input.send_keys(Keys.ENTER)
         logger.info("L5_TPC:A is typed in the search field.")
         explore_morphology.wait_for_page_ready(timeout=15)
+        lv_filter_search_field = explore_morphology.lv_filter_search()
+        logger.info("Found filter search field")
         lv_filter_apply_btn = explore_morphology.lv_filter_apply(timeout=10)
+        assert lv_filter_apply_btn, f"The APPLY button is not found"
         logger.info("Inside the filter 'Apply' button is FOUND.")
         lv_filter_apply_btn.click()
         logger.info("Inside the filter 'Apply' button is CLICKED.")

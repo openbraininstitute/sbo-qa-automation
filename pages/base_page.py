@@ -51,7 +51,7 @@ class CustomBasePage:
         return bool(element)
 
     def wait_for_long_load(self, by_locator, timeout=60):
-        return self.wait.until(EC.visibility_of_element_located(by_locator))
+        return self.wait.until(EC.visibility_of_element_located(by_locator), timeout)
 
     def wait_for_page_ready(self, timeout=10):
         """
