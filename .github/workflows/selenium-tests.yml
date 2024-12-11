@@ -83,11 +83,11 @@ jobs:
           $SLACK_WEBHOOK_URL_PASS
 
     # Step 8: Slack notification on failure
-    - name: Notify Slack on Failure
-      if: failure()
-      env:
-        SLACK_WEBHOOK_URL_FAIL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
-      run: |
-        curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
-          $SLACK_WEBHOOK_URL_FAIL
+#    - name: Notify Slack on Failure
+#      if: failure()
+#      env:
+#        SLACK_WEBHOOK_URL_FAIL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
+#      run: |
+#        curl -X POST -H 'Content-type: application/json' \
+#          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
+#          $SLACK_WEBHOOK_URL_FAIL

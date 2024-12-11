@@ -44,6 +44,7 @@ class ExploreMorphologyPageLocators:
                                 "before:!content-none ant-table-cell-ellipsis' and "
                                 "@title='L5_TPC:A']")
     FILTER_MTYPE_SEARCH = (By.XPATH, "//div[@class='ant-select-selection-overflow']")
+    ANT_SELECT_SELECTOR = (By.XPATH, "(//div[@class='ant-select-selector'])[2]")
     FILTER_MTYPE_TEXT_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input'])[2]")
     FILTER_PANEL = (By.XPATH, "//div[@data-testid='listing-view-filter-panel']")
     FIRST_ROW = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]")

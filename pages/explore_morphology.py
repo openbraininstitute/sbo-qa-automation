@@ -216,3 +216,6 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
 
     def lv_filter_search(self):
         return self.find_element(ExploreMorphologyPageLocators.LV_FILTER_SEARCH)
+
+    def ant_selector(self):
+        return self.find_element(ExploreMorphologyPageLocators.ANT_SELECT_SELECTOR)
