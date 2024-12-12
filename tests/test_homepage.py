@@ -61,6 +61,11 @@ class TestFindLogin:
         assert logo1.is_displayed(), "The logo is not displayed"
         logger.info("Bottom logo is displayed")
 
+        letter_a = home_page.find_a_letter()
+        assert letter_a, f"Letter A is not found"
+        letter_a.click()
+        time.sleep(3)
+
         login_button = home_page.find_login_button()
         assert login_button.is_displayed()
         logger.info("'Login' button is found")
