@@ -59,6 +59,9 @@ class HomePage(CustomBasePage, LinkChecker):
     def find_contributor(self):
         return self.find_element(HomePageLocators.CONTRIBUTOR)
 
+    def find_a_letter(self):
+        return self.find_element(HomePageLocators.A_LETTER)
+
     def find_github_btn(self):
         return self.find_element(HomePageLocators.BB_GITHUB_BTN)
 
