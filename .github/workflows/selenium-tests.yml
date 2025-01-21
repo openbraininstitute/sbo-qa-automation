@@ -26,21 +26,24 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3-dev google-chrome-stable firefox
+          sudo apt-get install -y build-essential python3-dev libffi-dev \
+                                  python3-pip python3-setuptools python3-wheel \
+                                  google-chrome-stable firefox
 
       - name: Install UV Tool
         uses: astral-sh/setup-uv@v5
 
       - name: Set up Python environment
         run: |
-          python -m pip install --upgrade pip
-          uv venv
           python -m pip install --upgrade pip setuptools wheel
+          uv venv -p ${{ matrix.python-version }}
+          python -m pip install --upgrade pip
+          uv pip install pyyaml --only-binary=:all: || uv pip install --no-build-isolation pyyaml
           uv pip install -r requirements.txt
 
       - name: Install required dependencies
