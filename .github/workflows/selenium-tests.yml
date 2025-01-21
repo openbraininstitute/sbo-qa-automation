@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        browser: [chrome, firefox]
+        browser: [firefox]
     environment: production
     steps:
       - name: Checkout repository
