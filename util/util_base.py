@@ -17,10 +17,10 @@ def load_config():
         if os.getenv('CI'):
             print("Running in CI environment (GitHub Actions)")
             # Use GitHub Secrets - these need to be set in the GitHub repository settings
-            config = {
-                'username': os.environ.get("OBI_USERNAME"),
-                'password': os.environ.get("OBI_PASSWORD"),
-            }
+            username = os.environ.get("OBI_USERNAME")
+            password = os.environ.get("OBI_PASSWORD")
+            print(f"Retrieved username: {username}")
+            print(f"Retrieved password: {password}")
         else:
             # Running locally, use config.json file
             print("Running locally")
