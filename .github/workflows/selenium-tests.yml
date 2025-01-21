@@ -46,7 +46,8 @@ jobs:
 
       - name: Prepare artefacts
         run: |
-          cp -r . snapshot/
+          mkdir -p snapshot
+          rsync -a --exclude='snapshot/' ./ snapshot/
           tar -czf repo.tar.gz . -C snapshot .
           tar -czf venv.tar.gz venv
           ls -al
