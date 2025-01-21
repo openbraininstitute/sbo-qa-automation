@@ -28,88 +28,35 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Set up virtual environment
-        run: |
-          python -m venv venv
-          ls -al venv/bin
-
       - name: Install dependencies
         run: |
+          python -m venv venv
           source venv/bin/activate
-          ls -al
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-html
+          ls -al venv/bin
 
-      - name: Package repository
-        run: |
-          echo "Preparing to package the repository..."
-          ls -al  # Debug step to confirm files in the current directory
-          tar --exclude=repo.tar.gz \
-              --exclude=venv \
-              --exclude=.git \
-              --exclude=**/*.log \
-              --exclude=**/*.tmp \
-              --warning=no-file-changed \
-              -czf repo.tar.gz .
-          ls -al repo.tar.gz
-          if [ ! -f repo.tar.gz ]; then
-            echo "repo.tar.gz not found, exiting."
-            exit 1
-          fi
-
-      - name: Upload repository artifact
-        uses: actions/upload-artifact@v3
-        with:
-            name: repo
-            path: repo.tar.gz
-
-      - name: Package virtual environment
-        run: | 
-          tar -czf venv.tar.gz venv
-          ls -al venv.tar.gz # Verify tar file creation
-          if [ ! -f venv.tar.gz ]; then
-            echo "venv.tar.gz not found, exiting." 
-            exit 1 
-          fi
-
-      - name: Upload virtual environment
-        uses: actions/upload-artifact@v3
-        with:
-            name: venv
-            path: venv.tar.gz
 
       - name: Install required dependencies
         run: |
             sudo apt-get update
-            sudo apt-get upgrade 
+            sudo apt-get install -y google-chrome-stable
+            sudo apt-get install -y firefox
 
-      - name: Debug virtual environment
+      - name: Prepare artefacts
         run: |
-          pwd
-          ls -al # list all files in the current directory
-          ls -al /home/runner/work/sbo-qa-automation/sbo-qa-automation
+          tar -czf repo.tar.gz .
+          tar -czf venv.tar.gz venv
 
-      # Install Chrome (needed for Chrome tests)
-      - name: Install Chrome
-        run: |
-          sudo apt-get install -y google-chrome-stable
-
-        # Set up Firefox and GeckoDriver
-      - name: Set up Firefox and GeckoDriver
-        uses: browser-actions/setup-firefox@v1
+      - name: Upload repo and virtual env
+        uses: actions/upload-artifact@v3
         with:
-          firefox-version: 'latest'  # You can specify a specific version or 'latest'
-          install-geckodriver: true
-          install-dependencies: true
+          name: artifacts
+          path: |
+            repo.tar.gz
+            venv.tar.gz    
 
-          # Set environment variables for Firefox
-      - name: Set Firefox environment variables
-        run: |
-          echo "GECKODRIVER_PATH=/usr/local/bin/geckodriver" >> $GITHUB_ENV
-          echo "BROWSER=firefox" >> $GITHUB_ENV
-      - name: Prepare logs directory
-        run: mkdir -p latest_logs
 
   test-production:
     needs: setup-environments
@@ -119,52 +66,24 @@ jobs:
         browser: [chrome, firefox]
     environment: production
     steps:
-      - name: Use shared setup
-        run: echo "Reusing setup from setup-environments job"
-
-      - name: List available artefacts
-        run: echo "Reusing setup from setup-environments job"
-
-      - name: Download Virtual Environment
+      - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: venv
+          name: artifacts
           path: .
 
-      - name: Download Virtual Environment
-        uses: actions/download-artifact@v3
-        with:
-          name: repo
-          path: .
-
-      - name: Extract Virtual Environment
+      - name: Extract repo and virtual environment
         run: |
-          if [ ! -f venv.tar.gz ]; then 
-            echo "venv.tar.gz not found, exiting." 
-            exit 1 
-          fi 
-          tar -xzf venv.tar.gz 
-          ls -al venv/bin # Debugging step to confirm extraction
+          tar -xzf repo.tar.gz
+          tar -xzf venv.tar.gz
+          ls -al venv/bin
 
-      - name: Debug environment variables
-        run: echo $PATH
-
-      - name: Activate virtual environment and verify pytest installation
-        run: |
-          source venv/bin/activate
-          cd /home/runner/work/sbo-qa-automation/sbo-qa-automation  # Change directory to root of repo
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-html
-          which python
-          which pytest  
-          pytest --version
 
       - name: Run tests for production
         env:
           BASE_URL: ${{ vars.PRODUCTION_URL }}
         run: |
-          # source venv/bin/activate
+          source venv/bin/activate
           pytest --version
           python -m pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
             --html=latest_logs/report_production_${{ matrix.browser }}.html \
@@ -184,32 +103,17 @@ jobs:
         browser: [chrome, firefox]
     environment: sauce-labs
     steps:
-      - name: Use shared setup
-        run: echo "Reusing setup from setup-environments job"
-
-      - name: List available artifacts
-        run: ls -al /home/runner/work/sbo-qa-automation/sbo-qa-automation
-
-      - name: Download Repository
+      - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-         name: repo
-         path: .
-
-      - name: Download virtual environment and extract
-        uses: actions/download-artifact@v3
-        with:
-          name: venv
+          name: artifact
           path: .
 
-      - name: Extract virtual environment
+      - name: Extract repo and virtual environment
         run: |
-          if [ ! -f venv.tar.gz ]; then 
-            echo "venv.tar.gz not found, exiting." 
-            exit 1 
-          fi 
-          tar -xzf venv.tar.gz 
-          ls -al venv/bin # Debugging step to confirm extraction
+            tar -xzf repo.tar.gz
+            tar -xzf venv.tar.gz
+            ls -al venv/bin
 
       - name: Run tests for Sauce Labs
         env:
@@ -218,6 +122,7 @@ jobs:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
         run: |
+          source venv/bin/activate
           python -m pytest --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} tests/test_login.py -sv --headless \
             --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
             --self-contained-html --sauce-labs --browser-name=${{ matrix.browser }}
@@ -236,37 +141,23 @@ jobs:
         browser: [chrome, firefox]
     environment: staging
     steps:
-      - name: Use shared setup
-        run: echo "Reusing setup from setup-environments job"
-
-      - name: List available artifacts
-        run: ls -al /home/runner/work/sbo-qa-automation/sbo-qa-automation
-
-      - name: Download repo
+      - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: repo
+          name: artifact
           path: .
 
-      - name: Download virtual environment and extract
-        uses: actions/download-artifact@v3
-        with:
-          name: venv
-          path: .
-
-      - name: Extract virtual environment
+      - name: Extract repo and virtual environment
         run: |
-          if [ ! -f venv.tar.gz ]; then 
-            echo "venv.tar.gz not found, exiting." 
-            exit 1 
-          fi 
-          tar -xzf venv.tar.gz 
-          ls -al venv/bin # Debugging step to confirm extraction
+          tar -xzf repo.tar.gz
+          tar -xzf venv.tar.gz
+          ls -al venv/bin
 
       - name: Run tests for staging
         env:
           BASE_URL: ${{ vars.STAGING_URL }}
         run: |
+          source venv/bin/activate
           python -m pytest --env=staging --env_url=${{ vars.STAGING_URL }} tests/test_login.py -sv --headless \
             --html=latest_logs/report_staging_${{ matrix.browser }}.html \
             --self-contained-html --browser-name=${{ matrix.browser }}
