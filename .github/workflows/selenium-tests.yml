@@ -94,6 +94,8 @@ jobs:
       - name: Run tests for production
         env:
           BASE_URL: ${{ vars.PRODUCTION_URL }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
            uv run pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
             --html=latest_logs/report_production_${{ matrix.browser }}.html \
