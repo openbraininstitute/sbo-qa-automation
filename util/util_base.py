@@ -21,6 +21,12 @@ def load_config():
             password = os.environ.get("OBI_PASSWORD")
             print(f"Retrieved username: {username}")
             print(f"Retrieved password: {password}")
+            if not username or not password:
+                raise ValueError("OBI_USERNAME OR OBI_PASSWORD is missing")
+            config = {
+                'username': username,
+                'password': password
+            }
         else:
             # Running locally, use config.json file
             print("Running locally")
