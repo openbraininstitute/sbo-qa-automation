@@ -57,11 +57,13 @@ jobs:
 #        with:
 #          name: artifacts
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Set up virtual environment and install dependencies
         run: |
           uv venv
-          uv python install selenium pytest
+          uv pip install selenium pytest
 
       - name: Run tests for production
         env:
@@ -91,10 +93,14 @@ jobs:
 #        uses: actions/download-artifact@v3
 #        with:
 #          name: artifact
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Set up virtual environment and install dependencies
         run: |
           uv venv
-          uv python install selenium pytest
+          uv pip install selenium pytest
+      
 
       - name: Run tests for Sauce Labs
         env:
@@ -127,10 +133,14 @@ jobs:
 #        with:
 #          name: artifact
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Set up virtual environment and install dependencies
         run: |
           uv venv
-          uv python install selenium pytest
+          uv pip install selenium pytest
+      
 
       - name: Run tests for staging
         env:
