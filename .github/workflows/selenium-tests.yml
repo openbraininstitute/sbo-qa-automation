@@ -47,7 +47,7 @@ jobs:
           uv venv -p 3.12 
           python -m pip install --upgrade pip setuptools wheel
           uv pip install "cython<3.0.0" wheel
-          uv pip install "pyyaml==6.0.2" --no-build-isolation
+#          uv pip install "pyyaml==6.0.2" --no-build-isolation
           uv pip install -r requirements.txt
 
       - name: Install required dependencies
