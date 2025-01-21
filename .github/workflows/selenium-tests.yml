@@ -28,30 +28,20 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-html
-          ls -al venv/bin
-
-
       - name: Install required dependencies
         run: |
             sudo apt-get update
             sudo apt-get install -y google-chrome-stable
             sudo apt-get install -y firefox
 
-
-      - name: Upload repo and virtual env
-        uses: actions/upload-artifact@v3
-        with:
-          name: artifacts
-          path: |
-            .
-            venv    
+#
+#      - name: Upload repo and virtual env
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: artifacts
+#          path: |
+#            .
+#            venv
 
 
   test-production:
@@ -62,10 +52,16 @@ jobs:
         browser: [chrome, firefox]
     environment: production
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: artifacts
+#      - name: Download artifacts
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: artifacts
+
+
+      - name: Set up virtual environment and install dependencies
+        run: |
+          uv venv
+          uv python install selenium pytest
 
       - name: Run tests for production
         env:
@@ -91,10 +87,14 @@ jobs:
         browser: [chrome, firefox]
     environment: sauce-labs
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: artifact
+#      - name: Download artifacts
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: artifact
+      - name: Set up virtual environment and install dependencies
+        run: |
+          uv venv
+          uv python install selenium pytest
 
       - name: Run tests for Sauce Labs
         env:
@@ -122,10 +122,15 @@ jobs:
         browser: [chrome, firefox]
     environment: staging
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: artifact
+#      - name: Download artifacts
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: artifact
+
+      - name: Set up virtual environment and install dependencies
+        run: |
+          uv venv
+          uv python install selenium pytest
 
       - name: Run tests for staging
         env:
