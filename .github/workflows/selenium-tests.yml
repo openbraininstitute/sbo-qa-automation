@@ -66,6 +66,13 @@ jobs:
           uv venv
           uv pip install selenium pytest
           uv pip sync requirements.txt 
+          
+
+      - name: Define a cache dependency glob
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Run tests for production
         env:
@@ -104,7 +111,12 @@ jobs:
           uv venv
           uv pip install selenium pytest
           uv pip sync requirements.txt 
-      
+
+      - name: Define a cache dependency glob
+        uses: astral-sh/setup-uv@v5
+        with:
+         enable-cache: true
+         cache-dependency-glob: "uv.lock"
 
       - name: Run tests for Sauce Labs
         env:
@@ -146,7 +158,12 @@ jobs:
           uv venv
           uv pip install selenium pytest
           uv pip sync requirements.txt 
-      
+
+      - name: Define a cache dependency glob
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Run tests for staging
         env:
