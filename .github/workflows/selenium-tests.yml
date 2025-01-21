@@ -44,10 +44,10 @@ jobs:
       - name: Package virtual environment
         run: |
           mkdir temp_dir
-          rsync -av --progress ./* temp_dir/ --exclude temp_dir
+          rsync -av . temp_dir/ --exclude temp_dir
           cd temp_dir
           ls -al # List files before packaging
-          tar -czf repo.tar.gz .
+          tar -czf ../repo.tar.gz .
           cd ..
           rm -rf temp_dir
 
@@ -118,7 +118,7 @@ jobs:
           mkdir temp_dir 
           tar -xzf venv.tar.gz -C temp_dir/
           ls -al temp_dir/venv/bin # Debugging step to confirm extraction 
-          rsync -av --progress temp_dir/* . --exclude temp_dir
+          rsync -av temp_dir/* . --exclude temp_dir
           rm -rf temp_dir
 
       - name: Debug environment variables
@@ -173,7 +173,7 @@ jobs:
           mkdir temp_dir 
           tar -xzf venv.tar.gz -C temp_dir/
           ls -al temp_dir/venv/bin # Debugging step to confirm extraction 
-          rsync -av --progress temp_dir/* . --exclude temp_dir
+          rsync -av temp_dir/* . --exclude temp_dir
           rm -rf temp_dir
 
       - name: Run tests for Sauce Labs
@@ -215,7 +215,7 @@ jobs:
           mkdir temp_dir 
           tar -xzf venv.tar.gz -C temp_dir/
           ls -al temp_dir/venv/bin # Debugging step to confirm extraction 
-          rsync -av --progress temp_dir/* . --exclude temp_dir
+          rsync -av temp_dir/* . --exclude temp_dir
           rm -rf temp_dir
 
       - name: Run tests for staging
