@@ -160,6 +160,8 @@ def navigate_to_login(setup):
     browser, wait, base_url = setup
     login_page = LoginPage(browser, wait, base_url)
 
+    config = load_config()
+
     username = os.environ.get("OBI_USERNAME")
     password = os.environ.get("OBI_PASSWORD")
 
