@@ -42,8 +42,16 @@ jobs:
         browser: [chrome, firefox]
     environment: production
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+
+      - name: Verify repository contents
+        run: ls -la
 
       - name: Set up virtual environment and install dependencies
         run: |
@@ -57,7 +65,7 @@ jobs:
         env:
           BASE_URL: ${{ vars.PRODUCTION_URL }}
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           pytest --version
           python -m pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
             --html=latest_logs/report_production_${{ matrix.browser }}.html \
