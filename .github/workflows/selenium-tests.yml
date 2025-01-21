@@ -41,15 +41,14 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-html
 
-      - name: Package virtual environment
+      - name: Package repository
         run: |
-          mkdir temp_dir
-          rsync -av venv/ temp_dir/venv/ --exclude temp_dir
-          cd temp_dir
-          ls -al # List files before packaging
           tar -czf ../repo.tar.gz .
-          cd ..
-          rm -rf temp_dir
+          ls -al repo.tar.gz
+          if [ ! -f repo.tar.gz ]; then
+            echo "repo.tar.gz not found, exiting."
+            exit 1
+          fi
 
       - name: Upload repository artifact
         uses: actions/upload-artifact@v3
@@ -115,6 +114,14 @@ jobs:
       - name: Use shared setup
         run: echo "Reusing setup from setup-environments job"
 
+      - name: List available artefacts
+        run: echo "Reusing setup from setup-environments job"
+
+      - name: Download Virtual Environment
+        uses: actions/download-artifact@v3
+        with:
+          name: venv
+          path: .
 
       - name: Download Virtual Environment
         uses: actions/download-artifact@v3
@@ -172,10 +179,19 @@ jobs:
       - name: Use shared setup
         run: echo "Reusing setup from setup-environments job"
 
+      - name: List available artifacts
+        run: ls -al /home/runner/work/sbo-qa-automation/sbo-qa-automation
+
+      - name: Download Repository
+        uses: actions/download-artifact@v3
+        with:
+         name: repo
+         path: .
+
       - name: Download virtual environment and extract
         uses: actions/download-artifact@v3
         with:
-          name: repo
+          name: venv
           path: .
 
       - name: Extract virtual environment
@@ -215,10 +231,19 @@ jobs:
       - name: Use shared setup
         run: echo "Reusing setup from setup-environments job"
 
-      - name: Download virtual environment and extract
+      - name: List available artifacts
+        run: ls -al /home/runner/work/sbo-qa-automation/sbo-qa-automation
+
+      - name: Download repo
         uses: actions/download-artifact@v3
         with:
           name: repo
+          path: .
+
+      - name: Download virtual environment and extract
+        uses: actions/download-artifact@v3
+        with:
+          name: venv
           path: .
 
       - name: Extract virtual environment
