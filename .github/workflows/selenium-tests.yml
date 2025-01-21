@@ -43,7 +43,7 @@ jobs:
 
       - name: Package repository
         run: |
-          tar -czf ../repo.tar.gz .
+          tar -czf repo.tar.gz .
           ls -al repo.tar.gz
           if [ ! -f repo.tar.gz ]; then
             echo "repo.tar.gz not found, exiting."
