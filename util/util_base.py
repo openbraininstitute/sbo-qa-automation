@@ -4,56 +4,39 @@
 
 import os
 import json
+from pathlib import Path
 
 
 def load_config():
     try:
+        def validate_config(config):
+            if not config.get('username') or not config.get('password'):
+                raise ValueError("Missing 'username' or 'password' in configuration")
+            return config
         # Check if running in CI (e.g., GitHub Actions)
         if os.getenv('CI'):
             print("Running in CI environment (GitHub Actions)")
             # Use GitHub Secrets - these need to be set in the GitHub repository settings
-            username = os.environ.get("OBI_USERNAME")
-            password = os.environ.get("OBI_PASSWORD")
-            if not username or not password:
-                raise ValueError("USERNAME or PASSWORD not set in GitHub Secrets.")
             config = {
-                'username': username,
-                'password': password
+                'username': os.environ.get("OBI_USERNAME"),
+                'password': os.environ.get("OBI_PASSWORD"),
             }
         else:
             # Running locally, use config.json file
             print("Running locally")
-            base_dir = os.path.abspath(os.path.dirname(__file__))
-            config_path = os.path.join(base_dir, '..', 'util', 'config.json')
-            with open(config_path, 'r') as f:
+            base_dir = Path(__file__).resolve().parent
+            config_path = base_dir / '..' / 'util' / 'config.json'
+            if not config_path.exists():
+                raise FileNotFoundError(f"Config file not found: {config_path}")
+            with config_path.open('r') as f:
                 config = json.load(f)
 
-        return config
+            # Validate and return the configuration
+        return validate_config(config)
+
     except Exception as e:
         print(f"Error loading config: {e}")
-        return None
-
-
-# def load_config():
-#     try:
-#         if os.getenv('CI'):
-#             print(""" Running in GitLab CI/CD pipeline""")
-#             username = os.environ['USERNAME']
-#             password = os.environ['PASSWORD']
-#             config = {
-#                 'username': username,
-#                 'password': password
-#             }
-#         else:
-#             print("""Running locally""")
-#             base_dir = os.path.abspath(os.path.dirname(__file__))
-#             config_path = os.path.join(base_dir, '..', 'util', 'config.json')
-#             with open(config_path, 'r') as f:
-#                 config = json.load(f)
-#         return config
-#     except Exception as e:
-#         print(f"Error loading config: {e}")
-#         return None
+        raise
 
 
 
