@@ -74,6 +74,17 @@ jobs:
           ls -la
           uv pip sync requirements.txt
 
+      - name: Create Logs Directory
+        run: mkdir -p latest_logs
+
+      - name: Debug Environment Variables
+        run: echo $BASE_URL
+
+      - name: Verify Browser and Driver Installation
+        run: |
+          google-chrome --version
+          chromedriver --version
+
       - name: Run tests for production
         env:
           BASE_URL: ${{ vars.PRODUCTION_URL }}
