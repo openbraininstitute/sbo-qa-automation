@@ -44,7 +44,7 @@ jobs:
       - name: Package virtual environment
         run: |
           ls -al # List files before packaging
-          tar -czf venv.tar.gz venv
+          tar -czf venv.tar.gz .
 
       - name: Upload virtual environment
         uses: actions/upload-artifact@v3
@@ -99,7 +99,8 @@ jobs:
       - name: Download Virtual Environment
         uses: actions/download-artifact@v3
         with:
-          name: venv
+          name: repo
+          path: .
 
       - name: Extract Virtual Environment
         run: |
@@ -150,7 +151,7 @@ jobs:
       - name: Download virtual environment and extract
         uses: actions/download-artifact@v3
         with:
-          name: venv
+          name: repo
           path: .
 
       - name: Extract virtual environment
@@ -189,7 +190,7 @@ jobs:
       - name: Download virtual environment and extract
         uses: actions/download-artifact@v3
         with:
-          name: venv
+          name: repo
           path: .
 
       - name: Extract virtual environment
