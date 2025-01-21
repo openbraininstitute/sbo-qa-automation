@@ -43,7 +43,13 @@ jobs:
 
       - name: Package repository
         run: |
-          tar -czf repo.tar.gz .
+          echo "Preparing to package the repository..."
+          tar --exclude=repo.tar.gz \
+              --exclude=venv \
+              --exclude=.git \
+              --exclude=**/*.log \
+              --warning=no-file-changed \
+              -czf repo.tar.gz .
           ls -al repo.tar.gz
           if [ ! -f repo.tar.gz ]; then
             echo "repo.tar.gz not found, exiting."
