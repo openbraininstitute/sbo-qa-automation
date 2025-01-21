@@ -74,11 +74,16 @@ jobs:
           uv pip install -r requirements.txt
           ls -la
 
-      - name: Install required dependencies
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install Firefox
+        uses: browser-actions/setup-firefox@v1
+
+      - name: Verify browser installation
         run: |
-            sudo apt-get update
-            sudo apt-get install -y google-chrome-stable
-            sudo apt-get install -y firefox
+          firefox --version
+          google-chrome --version
 
       - name: Create Logs Directory
         run: mkdir -p latest_logs
@@ -86,10 +91,6 @@ jobs:
       - name: Debug Environment Variables
         run: echo $BASE_URL
 
-      - name: Verify Browser and Driver Installation
-        run: |
-          google-chrome --version
-          chromedriver --version
       - name: Run tests for production
         env:
           BASE_URL: ${{ vars.PRODUCTION_URL }}
