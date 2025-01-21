@@ -46,8 +46,10 @@ jobs:
 
       - name: Prepare artefacts
         run: |
-          tar -czf repo.tar.gz .
+          cp -r . snapshot/
+          tar -czf repo.tar.gz . -C snapshot .
           tar -czf venv.tar.gz venv
+          ls -al
 
       - name: Upload repo and virtual env
         uses: actions/upload-artifact@v3
