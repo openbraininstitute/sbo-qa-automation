@@ -44,21 +44,14 @@ jobs:
             sudo apt-get install -y google-chrome-stable
             sudo apt-get install -y firefox
 
-      - name: Prepare artefacts
-        run: |
-          mkdir -p snapshot
-          rsync -a --exclude='snapshot/' ./ snapshot/
-          tar -czf repo.tar.gz . -C snapshot .
-          tar -czf venv.tar.gz venv
-          ls -al
 
       - name: Upload repo and virtual env
         uses: actions/upload-artifact@v3
         with:
           name: artifacts
           path: |
-            repo.tar.gz
-            venv.tar.gz    
+            .
+            venv    
 
 
   test-production:
@@ -73,14 +66,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: artifacts
-          path: .
-
-      - name: Extract repo and virtual environment
-        run: |
-          tar -xzf repo.tar.gz
-          tar -xzf venv.tar.gz
-          ls -al venv/bin
-
 
       - name: Run tests for production
         env:
@@ -110,13 +95,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: artifact
-          path: .
-
-      - name: Extract repo and virtual environment
-        run: |
-            tar -xzf repo.tar.gz
-            tar -xzf venv.tar.gz
-            ls -al venv/bin
 
       - name: Run tests for Sauce Labs
         env:
@@ -148,13 +126,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: artifact
-          path: .
-
-      - name: Extract repo and virtual environment
-        run: |
-          tar -xzf repo.tar.gz
-          tar -xzf venv.tar.gz
-          ls -al venv/bin
 
       - name: Run tests for staging
         env:
