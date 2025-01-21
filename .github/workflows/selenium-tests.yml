@@ -47,7 +47,6 @@ jobs:
         run: |
           uv venv -p 3.12 
           python -m pip install --upgrade pip setuptools wheel
-#          uv pip install pyyaml --only-binary=:all: || uv pip install --no-build-isolation pyyaml
           uv pip install "cython<3.0.0" wheel
           uv pip install "pyyaml==5.4.1" --no-build-isolation
           uv pip install -r requirements.txt
