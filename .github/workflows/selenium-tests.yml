@@ -44,13 +44,19 @@ jobs:
       - name: Package virtual environment
         run: |
           ls -al # List files before packaging
-          tar --exclude=venv -czf repo.tar.gz .
+          tar -czf repo.tar.gz .
+
+      - name: Upload repository artifact
+        uses: actions/upload-artifact@v3
+        with:
+            name: repo
+            path: repo.tar.gz
 
       - name: Upload virtual environment
         uses: actions/upload-artifact@v3
         with:
-          name: venv
-          path: venv.tar.gz
+            name: venv
+            path: venv.tar.gz
 
       - name: Install required dependencies
         run: |
@@ -105,7 +111,7 @@ jobs:
       - name: Extract Virtual Environment
         run: |
           tar -xzf venv.tar.gz
-          ls -al venv/bin
+          ls -al 
 
       - name: Debug environment variables
         run: echo $PATH
