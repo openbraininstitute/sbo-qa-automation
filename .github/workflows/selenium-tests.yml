@@ -57,6 +57,20 @@ jobs:
             name: repo
             path: repo.tar.gz
 
+      - name: Package virtual environment
+        run: | 
+          mkdir temp_dir 
+          rsync -av . temp_dir/ --exclude temp_dir
+          cd temp_dir ls -al # List files before packaging
+          tar -czf ../venv.tar.gz venv 
+          cd .. 
+          ls -al venv.tar.gz # Verify tar file creation 
+          if [ ! -f venv.tar.gz ]; then
+            echo "venv.tar.gz not found, exiting." 
+            exit 1
+          fi
+          rm -rf temp_dir
+
       - name: Upload virtual environment
         uses: actions/upload-artifact@v3
         with:
@@ -115,6 +129,10 @@ jobs:
 
       - name: Extract Virtual Environment
         run: |
+          if [ ! -f venv.tar.gz ]; then
+            echo "venv.tar.gz not found, exiting." 
+            exit 1
+          fi
           mkdir temp_dir 
           tar -xzf venv.tar.gz -C temp_dir/
           ls -al temp_dir/venv/bin # Debugging step to confirm extraction 
@@ -170,6 +188,10 @@ jobs:
 
       - name: Extract virtual environment
         run: |
+          if [ ! -f venv.tar.gz ]; then
+            echo "venv.tar.gz not found, exiting." 
+            exit 1
+          fi
           mkdir temp_dir 
           tar -xzf venv.tar.gz -C temp_dir/
           ls -al temp_dir/venv/bin # Debugging step to confirm extraction 
@@ -212,6 +234,10 @@ jobs:
 
       - name: Extract virtual environment
         run: |
+          if [ ! -f venv.tar.gz ]; then
+            echo "venv.tar.gz not found, exiting." 
+            exit 1
+          fi
           mkdir temp_dir 
           tar -xzf venv.tar.gz -C temp_dir/
           ls -al temp_dir/venv/bin # Debugging step to confirm extraction 
