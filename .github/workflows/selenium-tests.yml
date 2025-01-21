@@ -36,12 +36,15 @@ jobs:
       - name: Install dependencies
         run: |
           source venv/bin/activate
+          ls -al
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-html
 
       - name: Package virtual environment
-        run: tar -czf venv.tar.gz venv
+        run: |
+          ls -al # List files before packaging
+          tar -czf venv.tar.gz venv
 
       - name: Upload virtual environment
         uses: actions/upload-artifact@v3
@@ -53,6 +56,12 @@ jobs:
         run: |
             sudo apt-get update
             sudo apt-get upgrade 
+
+      - name: Debug virtual environment
+        run: |
+          pwd
+          ls -al # list all files in the current directory
+          ls -al /home/runner/work/sbo-qa-automation/sbo-qa-automation
 
       # Install Chrome (needed for Chrome tests)
       - name: Install Chrome
@@ -103,6 +112,7 @@ jobs:
       - name: Activate virtual environment and verify pytest installation
         run: |
           source venv/bin/activate
+          cd /home/runner/work/sbo-qa-automation/sbo-qa-automation  # Change directory to root of repo
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-html
