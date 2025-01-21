@@ -44,7 +44,7 @@ jobs:
       - name: Package virtual environment
         run: |
           ls -al # List files before packaging
-          tar -czf venv.tar.gz .
+          tar --exclude=venv -czf repo.tar.gz .
 
       - name: Upload virtual environment
         uses: actions/upload-artifact@v3
@@ -125,7 +125,7 @@ jobs:
         env:
           BASE_URL: ${{ vars.PRODUCTION_URL }}
         run: |
-          source venv/bin/activate
+          # source venv/bin/activate
           pytest --version
           python -m pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
             --html=latest_logs/report_production_${{ matrix.browser }}.html \
