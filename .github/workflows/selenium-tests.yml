@@ -43,12 +43,9 @@ jobs:
 
       - name: Package repository
         run: |
-          echo "Preparing to package the repository..."
-          tar --exclude=repo.tar.gz \
-              --exclude=venv \
+          tar --exclude=venv \
               --exclude=.git \
               --exclude=**/*.log \
-              --warning=no-file-changed \
               -czf repo.tar.gz .
           ls -al repo.tar.gz
           if [ ! -f repo.tar.gz ]; then
