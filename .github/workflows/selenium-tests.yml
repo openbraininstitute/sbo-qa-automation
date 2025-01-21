@@ -43,9 +43,14 @@ jobs:
 
       - name: Package repository
         run: |
-          tar --exclude=venv \
+          echo "Preparing to package the repository..."
+          ls -al  # Debug step to confirm files in the current directory
+          tar --exclude=repo.tar.gz \
+              --exclude=venv \
               --exclude=.git \
               --exclude=**/*.log \
+              --exclude=**/*.tmp \
+              --warning=no-file-changed \
               -czf repo.tar.gz .
           ls -al repo.tar.gz
           if [ ! -f repo.tar.gz ]; then
