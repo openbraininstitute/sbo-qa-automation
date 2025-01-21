@@ -19,9 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       artifact_path: latest_logs/
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,7 +26,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.12'
 
       - name: Install system dependencies
         run: |
@@ -48,7 +45,7 @@ jobs:
 
       - name: Set up Python environment
         run: |
-          uv venv -p ${{ matrix.python-version }}
+          uv venv -p 3.12 
           python -m pip install --upgrade pip setuptools wheel
           uv pip install pyyaml --only-binary=:all: || uv pip install --no-build-isolation pyyaml
           uv pip install -r requirements.txt
