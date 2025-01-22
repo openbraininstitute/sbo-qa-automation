@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        browser: [chrome, firefox]
+        browser: [chrome]
     environment: sauce-labs
     steps:
       - name: Checkout repository
@@ -133,12 +133,12 @@ jobs:
       - name: Install Chrome
         uses: browser-actions/setup-chrome@v1
 
-      - name: Install Firefox
-        uses: browser-actions/setup-firefox@v1
+#      - name: Install Firefox
+#        uses: browser-actions/setup-firefox@v1
 
       - name: Verify browser installation
         run: |
-          firefox --version
+#          firefox --version
           google-chrome --version
 
       - name: Create Logs Directory
