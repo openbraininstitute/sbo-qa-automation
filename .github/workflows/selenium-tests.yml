@@ -156,7 +156,7 @@ jobs:
         run: |
           uv run python -m pytest --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} tests/test_login.py -sv --headless \
             --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
-            --self-contained-html --sauce-labs --browser-name=${{ matrix.browser }}
+            --self-contained-html --browser-name=${{ matrix.browser }}
 
       - name: Upload Sauce Labs test report
         uses: actions/upload-artifact@v3
