@@ -145,7 +145,10 @@ jobs:
         run: mkdir -p latest_logs
 
       - name: Debug Environment Variables
-        run: echo $BASE_URL
+        run: |
+          echo $BASE_URL
+          echo "SAUCE_USERNAME=${SAUCE_USERNAME}"
+          echo "SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}"
 
       - name: Run tests for Sauce Labs
         env:
