@@ -17,3 +17,4 @@ testresults.xml
 container_venv/
 tests/container_venv
 podman
+venv/
