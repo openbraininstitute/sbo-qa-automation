@@ -93,6 +93,14 @@ jobs:
           name: test-report-production-${{ matrix.browser }}
           path: latest_logs/
 
+      - name: Upload error screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: error-screenshots
+          path: latest_logs/screenshots/
+
+
   test-sauce-labs:
     needs: test-production
     runs-on: ubuntu-latest
@@ -124,14 +132,6 @@ jobs:
 
       - name: Create Logs Directory
         run: mkdir -p latest_logs
-
-      - name: Debug Environment Variables
-        run: |
-          echo $BASE_URL
-          echo "SAUCE_USERNAME=${SAUCE_USERNAME}"
-          echo "SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}"
-          echo "OBI_USERNAME=${{ secrets.OBI_USERNAME }}"
-          echo "OBI_PASSWORD=${{ secrets.OBI_PASSWORD }}"
 
       - name: Run tests for Sauce Labs
         env:
@@ -202,11 +202,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
-      - name: Debug Environment Variables
-        run: |
-          echo $STAGING_URL
-          echo "OBI_USERNAME=${{ secrets.OBI_USERNAME }}"
-          echo "OBI_PASSWORD=${{ secrets.OBI_PASSWORD }}"
       - name: Run tests for staging
         env:
           BASE_URL: ${{ vars.STAGING_URL }}
