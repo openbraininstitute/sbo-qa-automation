@@ -147,6 +147,8 @@ jobs:
           echo $BASE_URL
           echo "SAUCE_USERNAME=${SAUCE_USERNAME}"
           echo "SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}"
+          echo "OBI_USERNAME=${{ secrets.OBI_USERNAME }}"
+          echo "OBI_PASSWORD=${{ secrets.OBI_PASSWORD }}"
 
       - name: Run tests for Sauce Labs
         env:
@@ -154,6 +156,8 @@ jobs:
           SAUCE_LABS_URL: https://ondemand.eu-central-1.saucelabs.com:443/wd/hub
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
           uv run python -m pytest --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} tests/test_login.py -sv --headless \
             --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
