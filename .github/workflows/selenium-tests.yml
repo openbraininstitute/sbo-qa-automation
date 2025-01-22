@@ -30,16 +30,16 @@ jobs:
 
       - name: Install required dependencies
         run: |
-            sudo apt-get update
-            sudo apt-get install -y google-chrome-stable
-            sudo apt-get install -y firefox
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          sudo apt-get install -y firefox
 
   test-production:
     needs: setup-environments
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        browser: [firefox]
+        browser: [ firefox ]
     environment: production
     steps:
       - name: Checkout repository
@@ -83,9 +83,9 @@ jobs:
           OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
           OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
-           uv run pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
-            --html=latest_logs/report_production_${{ matrix.browser }}.html \
-            --self-contained-html --browser-name=${{ matrix.browser }}
+          uv run pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
+           --html=latest_logs/report_production_${{ matrix.browser }}.html \
+           --self-contained-html --browser-name=${{ matrix.browser }}
 
       - name: Upload test report
         uses: actions/upload-artifact@v3
@@ -106,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        browser: [chrome]
+        browser: [ chrome ]
     environment: sauce-labs
     steps:
       - name: Checkout repository
@@ -152,19 +152,26 @@ jobs:
           name: test-report-sauce-labs-${{ matrix.browser }}
           path: latest_logs/
 
+      - name: Upload error screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: error-screenshots
+          path: latest_logs/screenshots/
+
   test-staging:
     needs: test-sauce-labs
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        browser: [firefox]
+        browser: [ firefox ]
     environment: staging
     steps:
 
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-            fetch-depth: 1
+          fetch-depth: 1
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -200,7 +207,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: "uv.lock"
+          cache-dependency-glob: ".venv/uv.lock"
 
       - name: Run tests for staging
         env:
@@ -218,37 +225,9 @@ jobs:
           name: test-report-staging-${{ matrix.browser }}
           path: latest_logs/
 
-
-
-#    - name: Upload error screenshots
-#      if: failure() # Only upload if the job fails
-#      uses: actions/upload-artifact@v3
-#      with:
-#        name: error-screenshots
-#        path: latest_logs/errors/
-#
-#    - name: Upload test report
-#      uses: actions/upload-artifact@v3
-#      with:
-#        name: test-report
-#        path: latest_logs/report.html
-
-#    # Step 7: Slack notification on success
-#    - name: Notify Slack on Success
-#      if: success()
-#      env:
-#        SLACK_WEBHOOK_URL_PASS: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
-#      run: |
-#        curl -X POST -H 'Content-type: application/json' \
-#          --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
-#          $SLACK_WEBHOOK_URL_PASS
-#
-##     Step 8: Slack notification on failure
-#    - name: Notify Slack on Failure
-#      if: failure()
-#      env:
-#        SLACK_WEBHOOK_URL_FAIL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
-#      run: |
-#        curl -X POST -H 'Content-type: application/json' \
-#          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
-#          $SLACK_WEBHOOK_URL_FAIL
+      - name: Upload error screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: error-screenshots
+          path: latest_logs/screenshots/
