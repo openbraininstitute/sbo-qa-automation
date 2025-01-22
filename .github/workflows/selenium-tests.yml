@@ -202,9 +202,16 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
+      - name: Debug Environment Variables
+        run: |
+          echo $STAGING_URL
+          echo "OBI_USERNAME=${{ secrets.OBI_USERNAME }}"
+          echo "OBI_PASSWORD=${{ secrets.OBI_PASSWORD }}"
       - name: Run tests for staging
         env:
           BASE_URL: ${{ vars.STAGING_URL }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
           uv run pytest --env=staging --env_url=${{ vars.STAGING_URL }} tests/test_login.py -sv --headless \
             --html=latest_logs/report_staging_${{ matrix.browser }}.html \
