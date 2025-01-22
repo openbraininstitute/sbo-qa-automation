@@ -147,6 +147,12 @@ jobs:
       - name: Debug Environment Variables
         run: echo $BASE_URL
 
+      - name: Saucectl RUN
+        uses: saucelabs/saucectl-run-action@v4
+        with:
+          working-directory: v1
+          region: eu-central-1
+
       - name: Run tests for Sauce Labs
         env:
           BASE_URL: ${{ vars.SAUCE_LABS_URL }}
