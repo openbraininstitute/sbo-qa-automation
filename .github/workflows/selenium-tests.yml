@@ -103,11 +103,11 @@ jobs:
       - name: Notify slack on success
         if: success()
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
+          SLACK_WEBHOOK_URL_PASS: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
         run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
-          $SLACK_WEBHOOK_URL_PASS
+            curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
+            $SLACK_WEBHOOK_URL_PASS
 
       - name: Notify slack on failure
         if: failure()
