@@ -91,7 +91,7 @@ jobs:
           fi
 
       - name: Print BASE_URL for debugging
-        run: echo "Base_URL is ${{ env.BASE_URL}}
+        run: echo "Base_URL is ${{ env.BASE_URL }}"
 
       - name: Run tests
         env:
