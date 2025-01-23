@@ -103,7 +103,7 @@ jobs:
           OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
           uv run pytest --env=${{ matrix.environment }} --env_url=${{ env.BASE_URL }} \
-            tests/test_login.py -sv --headless \
+            tests/test_login.py -sv --headless --disable-warnings \
             --html=latest_logs/report_${{ matrix.environment }}_${{ matrix.browser }}.html \
             --self-contained-html --browser-name=${{ matrix.browser }}
 
