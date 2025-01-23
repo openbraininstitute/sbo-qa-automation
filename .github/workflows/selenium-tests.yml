@@ -85,6 +85,10 @@ jobs:
           elif [ "${{ matrix.environment }}" = "staging" ]; then
             echo "BASE_URL=${{ secrets.STAGING_URL }}" >> $GITHUB_ENV
           fi
+
+      - name: Print BASE_URL for debugging
+        run: echo "Base_URL is ${{ env.BASE_URL}}
+
       - name: Run tests
         env:
           BASE_URL: ${{ env.BASE_URL }}
