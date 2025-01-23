@@ -81,14 +81,14 @@ jobs:
           PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
           SAUCE_LABS_URL: ${{ secrets.SAUCE_LABS_URL }}
           STAGING_URL: ${{ secrets.STAGING_URL }}
-          run: |
-            if [ "${{ matrix.environment }}" = "production" ]; then
-              echo "BASE_URL=${PRODUCTION_URL}" >> $GITHUB_ENV
-            elif [ "${{ matrix.environment }}" = "sauce-labs" ]; then
-              echo "BASE_URL=${SAUCE_LABS_URL}" >> $GITHUB_ENV
-            elif [ "${{ matrix.environment }}" = "staging" ]; then
-              echo "BASE_URL=${STAGING_URL}" >> $GITHUB_ENV
-            fi
+        run: |
+          if [ "${{ matrix.environment }}" = "production" ]; then
+            echo "BASE_URL=${PRODUCTION_URL}" >> $GITHUB_ENV
+          elif [ "${{ matrix.environment }}" = "sauce-labs" ]; then
+            echo "BASE_URL=${SAUCE_LABS_URL}" >> $GITHUB_ENV
+          elif [ "${{ matrix.environment }}" = "staging" ]; then
+            echo "BASE_URL=${STAGING_URL}" >> $GITHUB_ENV
+          fi
 
       - name: Print BASE_URL for debugging
         run: echo "Base_URL is ${{ env.BASE_URL}}
