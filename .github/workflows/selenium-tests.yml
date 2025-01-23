@@ -39,9 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [production, sauce-labs, staging]
         browser: [ firefox ]
-    environment: ${{ matrix.environment }}
+    environment: production
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -75,179 +74,160 @@ jobs:
       - name: Create Logs Directory
         run: mkdir -p latest_logs
 
-      - name: Set BASE_URL dynamically
-        id: set_base_url
-        env:
-          PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
-          SAUCE_LABS_URL: ${{ secrets.SAUCE_LABS_URL }}
-          STAGING_URL: ${{ secrets.STAGING_URL }}
-        run: |
-          if [ "${{ matrix.environment }}" = "production" ]; then
-            echo "BASE_URL=${PRODUCTION_URL}" >> $GITHUB_ENV
-          elif [ "${{ matrix.environment }}" = "sauce-labs" ]; then
-            echo "BASE_URL=${SAUCE_LABS_URL}" >> $GITHUB_ENV
-          elif [ "${{ matrix.environment }}" = "staging" ]; then
-            echo "BASE_URL=${STAGING_URL}" >> $GITHUB_ENV
-          fi
+      - name: Debug Environment Variables
+        run: echo $BASE_URL
 
-      - name: Print BASE_URL for debugging
-        run: echo "Base_URL is ${{ env.BASE_URL }}"
-
-      - name: Run tests
+      - name: Run tests for production
         env:
-          BASE_URL: ${{ env.BASE_URL }}
-          SAUCE_LABS_URL: https://ondemand.eu-central-1.saucelabs.com:443/wd/hub
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          BASE_URL: ${{ vars.PRODUCTION_URL }}
           OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
           OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
-          uv run pytest --env=${{ matrix.environment }} --env_url=${{ env.BASE_URL }} \
-            tests/test_login.py -sv --headless --disable-warnings \
-            --html=latest_logs/report_${{ matrix.environment }}_${{ matrix.browser }}.html \
-            --self-contained-html --browser-name=${{ matrix.browser }}
+          uv run pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
+           --html=latest_logs/report_production_${{ matrix.browser }}.html \
+           --self-contained-html --browser-name=${{ matrix.browser }}
 
       - name: Upload test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: test-report-production-${{ matrix.browser }}
           path: latest_logs/
 
       - name: Upload error screenshots
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: error-screenshots
           path: latest_logs/screenshots/
 
-#
-#  test-sauce-labs:
-#    needs: test-production
-#    runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        browser: [ chrome ]
-#    environment: sauce-labs
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 1
-#
-#      - name: Install uv
-#        uses: astral-sh/setup-uv@v5
-#
-#      - name: Set up virtual environment and install dependencies
-#        run: |
-#          uv venv -p 3.11
-#          python -m pip install --upgrade pip
-#          uv pip install -r requirements.txt
-#          ls -la
-#
-#      - name: Install Chrome
-#        uses: browser-actions/setup-chrome@v1
-#
-#      - name: Verify browser installation
-#        run: google-chrome --version
-#
-#      - name: Create Logs Directory
-#        run: mkdir -p latest_logs
-#
-#      - name: Run tests for Sauce Labs
-#        env:
-#          BASE_URL: ${{ vars.SAUCE_LABS_URL }}
-#          SAUCE_LABS_URL: https://ondemand.eu-central-1.saucelabs.com:443/wd/hub
-#          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-#          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-#          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-#          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-#        run: |
-#          uv run python -m pytest --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} tests/test_login.py -sv --headless \
-#            --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
-#            --self-contained-html --browser-name=${{ matrix.browser }}
-#
-#      - name: Upload Sauce Labs test report
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: test-report-sauce-labs-${{ matrix.browser }}
-#          path: latest_logs/
-#
-#      - name: Upload error screenshots
-#        if: failure()
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: error-screenshots
-#          path: latest_logs/screenshots/
-#
-#  test-staging:
-#    needs: test-sauce-labs
-#    runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        browser: [ firefox ]
-#    environment: staging
-#    steps:
-#
-#      - name: Checkout repository
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 1
-#
-#      - name: Install uv
-#        uses: astral-sh/setup-uv@v5
-#
-#      - name: Verify repository contents
-#        run: ls -la
-#
-#      - name: Set up virtual environment and install dependencies
-#        run: |
-#          uv venv -p 3.11
-#          python -m pip install --upgrade pip
-#          uv pip install -r requirements.txt
-#          ls -la
-#
-#      - name: Install Chrome
-#        uses: browser-actions/setup-chrome@v1
-#
-#      - name: Install Firefox
-#        uses: browser-actions/setup-firefox@v1
-#
-#      - name: Verify browser installation
-#        run: |
-#          firefox --version
-#          google-chrome --version
-#
-#      - name: Create Logs Directory
-#        run: mkdir -p latest_logs
-#
-#      - name: Debug Environment Variables
-#        run: echo $BASE_URL
-#
-#      - name: Define a cache dependency glob
-#        uses: astral-sh/setup-uv@v5
-#        with:
-#          enable-cache: true
-#          cache-dependency-glob: ".venv/uv.lock"
-#
-#      - name: Run tests for staging
-#        env:
-#          BASE_URL: ${{ vars.STAGING_URL }}
-#          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-#          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-#        run: |
-#          uv run pytest --env=staging --env_url=${{ vars.STAGING_URL }} tests/test_login.py -sv --headless \
-#            --html=latest_logs/report_staging_${{ matrix.browser }}.html \
-#            --self-contained-html --browser-name=${{ matrix.browser }}
-#
-#      - name: Upload Staging test report
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: test-report-staging-${{ matrix.browser }}
-#          path: latest_logs/
-#
-#      - name: Upload error screenshots
-#        if: failure()
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: error-screenshots
-#          path: latest_logs/screenshots/
+
+  test-sauce-labs:
+    needs: test-production
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [ chrome ]
+    environment: sauce-labs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up virtual environment and install dependencies
+        run: |
+          uv venv -p 3.11 
+          python -m pip install --upgrade pip 
+          uv pip install -r requirements.txt
+          ls -la
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Verify browser installation
+        run: google-chrome --version
+
+      - name: Create Logs Directory
+        run: mkdir -p latest_logs
+
+      - name: Run tests for Sauce Labs
+        env:
+          BASE_URL: ${{ vars.SAUCE_LABS_URL }}
+          SAUCE_LABS_URL: https://ondemand.eu-central-1.saucelabs.com:443/wd/hub
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+        run: |
+          uv run python -m pytest --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} tests/test_login.py -sv --headless \
+            --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
+            --self-contained-html --browser-name=${{ matrix.browser }}
+
+      - name: Upload Sauce Labs test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report-sauce-labs-${{ matrix.browser }}
+          path: latest_logs/
+
+      - name: Upload error screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: error-screenshots
+          path: latest_logs/screenshots/
+
+  test-staging:
+    needs: test-sauce-labs
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [ firefox ]
+    environment: staging
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Verify repository contents
+        run: ls -la
+
+      - name: Set up virtual environment and install dependencies
+        run: |
+          uv venv -p 3.11 
+          python -m pip install --upgrade pip 
+          uv pip install -r requirements.txt
+          ls -la
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install Firefox
+        uses: browser-actions/setup-firefox@v1
+
+      - name: Verify browser installation
+        run: |
+          firefox --version
+          google-chrome --version
+
+      - name: Create Logs Directory
+        run: mkdir -p latest_logs
+
+      - name: Debug Environment Variables
+        run: echo $BASE_URL
+
+      - name: Define a cache dependency glob
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: ".venv/uv.lock"
+
+      - name: Run tests for staging
+        env:
+          BASE_URL: ${{ vars.STAGING_URL }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+        run: |
+          uv run pytest --env=staging --env_url=${{ vars.STAGING_URL }} tests/test_login.py -sv --headless \
+            --html=latest_logs/report_staging_${{ matrix.browser }}.html \
+            --self-contained-html --browser-name=${{ matrix.browser }}
+
+      - name: Upload Staging test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report-staging-${{ matrix.browser }}
+          path: latest_logs/
+
+      - name: Upload error screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: error-screenshots
+          path: latest_logs/screenshots/
