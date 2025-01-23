@@ -75,16 +75,26 @@ jobs:
       - name: Create Logs Directory
         run: mkdir -p latest_logs
 
+      - name: Set BASE_URL dynamically
+        id: set_base_url
+        run: |
+          if [ "${{ matrix.environment }}" = "production" ]; then
+            echo "BASE_URL=${{ secrets.PRODUCTION_URL }}" >> $GITHUB_ENV
+          elif [ "${{ matrix.environment }}" = "sauce-labs" ]; then
+            echo "BASE_URL=${{ secrets.SAUCE_LABS_URL }}" >> $GITHUB_ENV
+          elif [ "${{ matrix.environment }}" = "staging" ]; then
+            echo "BASE_URL=${{ secrets.STAGING_URL }}" >> $GITHUB_ENV
+          fi
       - name: Run tests
         env:
-          BASE_URL: ${{ vars[format( '{0}_URL', matrix.environment | upper ) ] }}
+          BASE_URL: ${{ env.BASE_URL }}
           SAUCE_LABS_URL: https://ondemand.eu-central-1.saucelabs.com:443/wd/hub
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
           OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
-          uv run pytest --env=${{ matrix.environment }} --env_url=${{ vars[ format( '{0}_URL', matrix.environment | upper ) ] }} \
+          uv run pytest --env=${{ matrix.environment }} --env_url=${{ env.BASE_URL }} \
             tests/test_login.py -sv --headless \
             --html=latest_logs/report_${{ matrix.environment }}_${{ matrix.browser }}.html \
             --self-contained-html --browser-name=${{ matrix.browser }}
