@@ -100,6 +100,25 @@ jobs:
           name: error-screenshots
           path: latest_logs/screenshots/
 
+      # Step 7: Slack notification on success
+      - name: Notify Slack on Success
+        if: success()
+        env:
+            SLACK_WEBHOOK_URL_PASS: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
+          $SLACK_WEBHOOK_URL_PASS
+
+      #     Step 8: Slack notification on failure
+      - name: Notify Slack on Failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL_FAIL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
+          $SLACK_WEBHOOK_URL_FAIL    
 
   test-sauce-labs:
     needs: test-production
