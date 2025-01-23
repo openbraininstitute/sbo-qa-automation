@@ -108,14 +108,14 @@ jobs:
             --self-contained-html --browser-name=${{ matrix.browser }}
 
       - name: Upload test report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report-production-${{ matrix.browser }}
           path: latest_logs/
 
       - name: Upload error screenshots
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: error-screenshots
           path: latest_logs/screenshots/
