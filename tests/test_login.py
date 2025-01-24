@@ -15,9 +15,8 @@ class TestLogin:
         browser, wait, base_url = setup
         # Validate the user is logged in
         print("Login process completed via fixture")
-        assert "explore/interactive" in browser.current_url, \
+        assert "dev/virtual-lab" in browser.current_url, \
             f"Unexpected URL after login: {browser.current_url}"
 
         logger.info(f"Successfully logged in. Current page URL: {browser.current_url}")
-
 

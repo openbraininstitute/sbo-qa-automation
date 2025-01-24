@@ -62,7 +62,7 @@ def setup(request, pytestconfig):
         if environment == "sauce-labs" and env_url == "staging":
             base_url = "https://staging.openbrainplatform.com"
         elif environment == "sauce-labs" and env_url == "production":
-            base_url = "https://openbluebrain.com/"
+            base_url = "https://openbluebrain.com/app/dev"
         else:
             raise ValueError(f"Invalid `--env_url` for Sauce Labs: {env_url}")
 
@@ -94,7 +94,7 @@ def setup(request, pytestconfig):
         if environment == "staging":
             base_url = "https://staging.openbrainplatform.com/"
         elif environment == "production":
-            base_url = "https://openbluebrain.com/"
+            base_url = "https://openbluebrain.com/app/dev"
         else:
             raise ValueError(f"Invalid `--env_url` for Sauce Labs: {env_url}")
 
@@ -198,7 +198,7 @@ def login(setup, navigate_to_login):
 
     login_page.perform_login(username, password)
     login_page.wait_for_login_complete()
-    assert "/app/explore" in browser.current_url, f"Login failed, current URL: {browser.current_url}"
+    assert "/app/dev/virtual-lab" in browser.current_url, f"Login failed, current URL: {browser.current_url}"
     print("Login successful. Current URL:", browser.current_url)
     yield browser, wait
     login_page.browser.delete_all_cookies()
