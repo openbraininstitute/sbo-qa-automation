@@ -11,9 +11,9 @@ from util.util_links_checker import LinkChecker
 
 
 class ExplorePage(HomePage, LinkChecker):
-    def __init__(self, browser, wait):
-        super().__init__(browser, wait)
-        self.home_page = HomePage(browser, wait)
+    def __init__(self, browser, wait, base_url):
+        super().__init__(browser, wait, base_url)
+        self.home_page = HomePage(browser, wait, base_url)
 
     def go_to_explore_page(self, retries=3, delay=5):
         for attempt in range(retries):

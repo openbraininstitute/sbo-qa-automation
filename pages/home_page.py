@@ -10,8 +10,8 @@ from util.util_scraper import UrlScraper
 
 class HomePage(CustomBasePage, LinkChecker):
 
-    def __init__(self, browser, wait):
-        super().__init__(browser, wait)
+    def __init__(self, browser, wait, base_url):
+        super().__init__(browser, wait, base_url)
         self.url_scraper = UrlScraper()
 
     def go_to_home_page(self):
