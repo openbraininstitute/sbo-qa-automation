@@ -13,9 +13,9 @@ from util.util_scraper import UrlScraper
 
 
 class ExploreMorphologyPage(ExplorePage, LinkChecker):
-    def __init__(self, browser, wait, logger):
-        super().__init__(browser, wait)
-        self.home_page = ExplorePage(browser, wait)
+    def __init__(self, browser, wait, logger, base_url):
+        super().__init__(browser, wait, base_url)
+        self.home_page = ExplorePage(browser, wait, base_url)
         self.url_scraper = UrlScraper()
         self.logger = logger
 

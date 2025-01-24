@@ -20,8 +20,6 @@ class LoginPage(CustomBasePage):
     def navigate_to_homepage(self):
         self.browser.delete_all_cookies()
         target_url = self.base_url
-        # target_url = "https://openbluebrain.com/app"
-        # target_url = "https://staging.openbluebrain.com/"
         self.browser.get(target_url)
         print("Starting URL from pages/login_page.py:", self.browser.current_url)
         return self.browser.current_url
@@ -38,6 +36,9 @@ class LoginPage(CustomBasePage):
                 f"Timeout waiting for URL to contain 'virtual-lab'. Current URL: "
                 f"{self.browser.current_url}")
             raise
+
+    def find_form_container(self):
+        return self.find_element(LoginPageLocators.FORM_CONTAINER)
 
     def find_username_field(self):
         return self.wait.until(EC.presence_of_element_located(LoginPageLocators.USERNAME_FIELD))
@@ -57,6 +58,7 @@ class LoginPage(CustomBasePage):
     def perform_login(self, username, password):
         self.logger.info("Performing login with the provided credentials.")
 
+        self.make_form_visible()
         username_field = self.find_username_field()
         password_field = self.find_password_field()
 
@@ -68,3 +70,20 @@ class LoginPage(CustomBasePage):
         self.wait_for_login_complete()
         self.wait.until(EC.url_contains("/app/explore"))
         # self.wait.until(EC.url_contains("app/virtual-lab"))
+
+    def make_form_visible(self):
+        """Use JavaScript to make the hidden form visible by removing 'display:none'."""
+        form_container = self.find_form_container()
+
+        self.browser.execute_script("arguments[0].style.display = 'block';", form_container)
+        print("Form container made visible via JavaScript.")
+
+    def ensure_element_interactable(self, element):
+        """Ensure the element is visible and interactable, even if hidden."""
+        if not element.is_displayed():
+            print(f"Element {element} is not visible, making it visible via JavaScript.")
+            self.browser.execute_script("arguments[0].style.display = 'block';", element)
+
+        # Ensure the element is enabled before interacting with it
+        if not element.is_enabled():
+            raise Exception(f"Element {element} is not enabled for interaction.")

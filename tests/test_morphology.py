@@ -16,8 +16,8 @@ class TestExploreMorphologyPage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=4)
     def test_explore_morphology(self, setup, login, logger):
-        browser, wait = setup
-        explore_morphology = ExploreMorphologyPage(browser, wait, logger)
+        browser, wait, base_url = setup
+        explore_morphology = ExploreMorphologyPage(browser, wait, logger, base_url)
         explore_morphology.go_to_explore_morphology_page()
         logger.info("Explore morphology page is displayed")
         morphology_tab = explore_morphology.find_morphology_tab()
