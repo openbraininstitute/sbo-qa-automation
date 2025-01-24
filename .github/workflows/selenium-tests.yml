@@ -95,6 +95,16 @@ jobs:
 
       - name: Upload error screenshots
         if: failure()
+        run: |
+          if [ -d "latest_logs/screenshots/" ]; then
+            echo "Screenshots directory found."
+          else
+            echo "No screenshots to upload."
+            exit 0
+          fi
+
+      - name: Upload test artifacts (screenshots)
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: error-screenshots
@@ -171,6 +181,16 @@ jobs:
 
       - name: Upload error screenshots
         if: failure()
+        run: |
+          if [ -d "latest_logs/screenshots/" ]; then
+            echo "Screenshots directory found."
+          else
+            echo "No screenshots to upload."
+            exit 0
+          fi
+
+      - name: Upload test artifacts (screenshots)
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: error-screenshots
@@ -224,7 +244,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: ".venv/uv.lock"
+          cache-dependency-glob: "requirements.txt"
 
       - name: Run tests for staging
         env:
@@ -243,6 +263,16 @@ jobs:
           path: latest_logs/
 
       - name: Upload error screenshots
+        if: failure()
+        run: |
+          if [ -d "latest_logs/screenshots/" ]; then
+            echo "Screenshots directory found."
+          else
+            echo "No screenshots to upload."
+            exit 0
+          fi
+
+      - name: Upload test artifacts (screenshots)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
