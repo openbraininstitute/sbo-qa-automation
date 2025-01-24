@@ -235,7 +235,7 @@ jobs:
           google-chrome --version
 
       - name: Create Logs Directory
-        run: mkdir -p latest_logs
+        run: mkdir -p latest_logs/errors
 
       - name: Debug Environment Variables
         run: echo $BASE_URL
@@ -262,19 +262,16 @@ jobs:
           name: test-report-staging-${{ matrix.browser }}
           path: latest_logs/
 
-      - name: Upload error screenshots
+      - name: Debug Error Directory
         if: failure()
         run: |
-          if [ -d "latest_logs/screenshots/" ]; then
-            echo "Screenshots directory found."
-          else
-            echo "No screenshots to upload."
-            exit 0
-          fi
+          echo "Contents of latest_logs/errors:"
+          ls -la latest_logs/errors || echo "No files in the directory"
 
       - name: Upload test artifacts (screenshots)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: error-screenshots
-          path: latest_logs/screenshots/
+          path: latest_logs/errors
+          if-no-files-found: warn
