@@ -60,7 +60,7 @@ def setup(request, pytestconfig):
         options.set_capability('sauce:options', sauce_options)
         print(f"Sauce Labs Options: {options.to_capabilities()}")
         if environment == "sauce-labs" and env_url == "staging":
-            base_url = "https://staging.openbrainplatform.com"
+            base_url = "https://staging.openbluebrain.com/app/dev"
         elif environment == "sauce-labs" and env_url == "production":
             base_url = "https://openbluebrain.com/app/dev"
         else:
@@ -92,7 +92,7 @@ def setup(request, pytestconfig):
             raise ValueError(f"Unsupported browser: {browser_name}")
 
         if environment == "staging":
-            base_url = "https://staging.openbrainplatform.com/"
+            base_url = "https://staging.openbluebrain.com/app/dev"
         elif environment == "production":
             base_url = "https://openbluebrain.com/app/dev"
         else:
