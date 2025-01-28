@@ -22,6 +22,9 @@ class TestSandbox:
         browser, wait, base_url = setup
         try:
             sandbox_page = SandboxPage(browser, wait, base_url)
+            sandbox_url = sandbox_page.go_to_sandbox_page()
+            print(f"Navigated to the Sandbox Page: {sandbox_url}")
+            assert "/sandbox/home" in sandbox_url, "Failed to navigate t othe sandbox page"
             logger.info(f"Navigated to the Sandbox Page: {browser.current_url}")
 
             sandbox_title = sandbox_page.find_sandbox_banner_title()
@@ -44,7 +47,6 @@ class TestSandbox:
                 time.sleep(0.1)
 
             vl_email_field = sandbox_page.find_vl_email_field()
-            # vl_email_field.send_keys("ayima.okeeva@openbrainintitute.org").send_keys(Keys.ENTER)
             for char in "ayima.okeeva@openbraininstitute.org":
                 vl_email_field.send_keys(char)
                 time.sleep(0.1)
@@ -52,19 +54,39 @@ class TestSandbox:
             for char in "OBI":
                 vl_entity_field.send_keys(char)
                 time.sleep(0.1)
-            time.sleep(5)
+            time.sleep(3)
             modal_next_btn = sandbox_page.modal_next_btn(timeout=15)
-            find_text = modal_next_btn.text
-            print(find_text)
             assert modal_next_btn.is_enabled(),  "The Next button is disabled!"
-            # print("Submit button state:", modal_next_btn.get_attribute("disabled"))
-            # modal_next_btn.is_displayed(), "The submit button is not found"
             browser.execute_script("arguments[0].click();", modal_next_btn)
-            time.sleep(4)
             create_vl = sandbox_page.create_vl().click()
-            time.sleep(25)
+            # vl_banner_title = sandbox_page.vl_banner_title()
+            logger.info("New Virtual Lab is created")
+            vl_overview = sandbox_page.vl_overview()
+            assert vl_overview.is_displayed(), "VL overview is not displayed"
+            vl_menu_projects = sandbox_page.vl_menu_projects()
+            logger.info("In the VL menu, 'Projects' title is displayed")
+            create_project_btn = sandbox_page.create_projects_btn()
+            create_project_btn.click()
+            logger.info("Clicked to create a new project")
 
+            project_name = sandbox_page.input_project_name()
+            counter = getattr(sandbox_page, "project_counter", 0)
+            sandbox_page.project_counter = counter + 1
+            unique_name = f"Project.{sandbox_page.project_counter}"
+            for char in unique_name:
+                project_name.send_keys(char)
+                time.sleep(0.1)
 
+            project_description = sandbox_page.input_project_description()
+            unique_description = f" Project Description for {unique_name}"
+            for char in unique_description:
+                project_description.send_keys(char)
+                time.sleep(0.1)
+            logger.info("New project with its description are created.")
+            click_save_project = sandbox_page.save_project_btn()
+            browser.execute_script("arguments[0].click();", click_save_project)
+            time.sleep(20)
+            logger.info("The new project creation has been saved")
         except NoSuchElementException:
             print(f"An error occurred:")
             raise

@@ -20,14 +20,14 @@ class SandboxPage(HomePage):
         """
         Navigate to the Sandbox page, ensuring the user is logged in.
         """
-        if not self.is_user_logged_in():
-            raise RuntimeError("User is not logged in. Ensure the login fixture is applied.")
+        print("PRINTING THE BASE URL FROM THE SANDBOX PAGE")
+        print(self.base_url)
 
-        self.go_to_page("/virtual-lab/sandbox/home")
-        time.sleep(30)
-        print(f"Before wait: {self.browser.current_url}")
+        sandbox_url = f"{self.base_url}/virtual-lab/sandbox/home"
+        print(f"Navigating to: {sandbox_url}")
+        self.browser.get(sandbox_url)
         self.wait_for_condition(
-            EC.url_contains("/virtual-lab/sandbox/home"),
+            EC.url_contains("/sandbox/home"),
             timeout=15,
             message=f"Expected URL to contain 'sandbox/home', but got: {self.browser.current_url}"
         )
@@ -39,7 +39,9 @@ class SandboxPage(HomePage):
         """
         Check if the user is already logged in by verifying the current URL or cookies.
         """
-        return "sandbox/home" in self.browser.current_url in self.browser.current_url
+        cookies = self.browser.get_cookies()
+        logged_in_cookie = any(cookie['name'] == "session" for cookie in cookies)
+        return logged_in_cookie and "/virtual-lab" in self.browser.current_url
 
     def find_sandbox_banner_title(self):
         return self.find_element(SandboxPageLocators.SANDBOX_BANNER_TITLE)
@@ -69,4 +71,25 @@ class SandboxPage(HomePage):
         return self.find_element(SandboxPageLocators.MODAL_NEXT_BTN, timeout=timeout)
 
     def create_vl(self):
-        return self.is_visible(SandboxPageLocators.CREATE_VL)
+        return self.find_element(SandboxPageLocators.CREATE_VL)
+
+    def vl_banner_title(self):
+        return self.find_element(SandboxPageLocators.VL_BANNER_TITLE)
+
+    def vl_overview(self):
+        return self.find_element(SandboxPageLocators.VL_OVERVIEW)
+
+    def vl_menu_projects(self):
+        return self.find_element(SandboxPageLocators.PROJECTS)
+
+    def create_projects_btn(self):
+        return self.find_element(SandboxPageLocators.CREATE_PROJECT_BTN)
+
+    def input_project_name(self):
+        return self.find_element(SandboxPageLocators.INPUT_PROJECT_NAME)
+
+    def input_project_description(self):
+        return self.find_element(SandboxPageLocators.INPUT_PROJECT_DESCRIPTION)
+
+    def save_project_btn(self):
+        return self.find_element(SandboxPageLocators.SAVE_PROJECT)
