@@ -1,5 +1,6 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
-#
+# Copyright (c) 2025 Open Brain Institute
+
 # SPDX-License-Identifier: Apache-2.0
 
 
@@ -62,7 +63,7 @@ def setup(request, pytestconfig):
         if environment == "sauce-labs" and env_url == "staging":
             base_url = "https://staging.openbluebrain.com/app/dev"
         elif environment == "sauce-labs" and env_url == "production":
-            base_url = "https://openbluebrain.com/app/dev"
+            base_url = "https://openbluebrain.com/app"
         else:
             raise ValueError(f"Invalid `--env_url` for Sauce Labs: {env_url}")
 
@@ -94,7 +95,7 @@ def setup(request, pytestconfig):
         if environment == "staging":
             base_url = "https://staging.openbluebrain.com/app/dev"
         elif environment == "production":
-            base_url = "https://openbluebrain.com/app/dev"
+            base_url = "https://openbluebrain.com/app"
         else:
             raise ValueError(f"Invalid `--env_url` for Sauce Labs: {env_url}")
 
@@ -198,7 +199,7 @@ def login(setup, navigate_to_login):
 
     login_page.perform_login(username, password)
     login_page.wait_for_login_complete()
-    assert "/app/dev/virtual-lab" in browser.current_url, f"Login failed, current URL: {browser.current_url}"
+    assert "/app/virtual-lab" in browser.current_url, f"Login failed, current URL: {browser.current_url}"
     print("Login successful. Current URL:", browser.current_url)
     yield browser, wait
     login_page.browser.delete_all_cookies()

@@ -1,8 +1,11 @@
-# # Copyright (c) 2024 Blue Brain Project/EPFL
-# #
-# # SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2024 Blue Brain Project/EPFL
+# Copyright (c) 2025 Open Brain Institute
+
+# SPDX-License-Identifier: Apache-2.0
 
 import os
+import uuid
+
 from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
 
@@ -69,23 +72,22 @@ class TestSandbox:
             create_project_btn.click()
             logger.info("Clicked to create a new project")
 
-            project_name = sandbox_page.input_project_name()
-            counter = getattr(sandbox_page, "project_counter", 0)
-            sandbox_page.project_counter = counter + 1
-            unique_name = f"Project.{sandbox_page.project_counter}"
+            unique_name = f"Project-{uuid.uuid4().hex[:8]}"
+            logger.info(f"Generated unique project name: {unique_name}")
+
+            project_name = vl_overview.input_project_name()
             for char in unique_name:
                 project_name.send_keys(char)
                 time.sleep(0.1)
 
-            project_description = sandbox_page.input_project_description()
+            project_description = vl_overview.input_project_description()
             unique_description = f" Project Description for {unique_name}"
             for char in unique_description:
                 project_description.send_keys(char)
                 time.sleep(0.1)
             logger.info("New project with its description are created.")
             click_save_project = sandbox_page.save_project_btn()
-            browser.execute_script("arguments[0].click();", click_save_project)
-            time.sleep(20)
+            click_save_project.click()
             logger.info("The new project creation has been saved")
         except NoSuchElementException:
             print(f"An error occurred:")

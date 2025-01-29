@@ -1,5 +1,6 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
-#
+# Copyright (c) 2025 Open Brain Institute
+
 # SPDX-License-Identifier: Apache-2.0
 
 import time
@@ -22,8 +23,8 @@ class TestExplorePage:
         """
         The commented out code below is pending changes in the platform.
         """
-        browser, wait = setup
-        explore_page = ExplorePage(browser, wait)
+        browser, wait, base_url = setup
+        explore_page = ExplorePage(browser, wait, base_url)
         explore_page.go_to_explore_page()
         logger.info("Explore page is loaded")
 
