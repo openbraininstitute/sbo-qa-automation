@@ -91,5 +91,5 @@ class SandboxPage(HomePage):
     def input_project_description(self):
         return self.find_element(SandboxPageLocators.INPUT_PROJECT_DESCRIPTION)
 
-    def save_project_btn(self):
-        return self.find_element(SandboxPageLocators.SAVE_PROJECT)
+    def save_project_btn(self, timeout=30):
+        return self.element_to_be_clickable(SandboxPageLocators.SAVE_PROJECT, timeout)

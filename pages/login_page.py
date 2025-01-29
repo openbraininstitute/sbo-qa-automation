@@ -30,7 +30,7 @@ class LoginPage(CustomBasePage):
     def wait_for_login_complete(self, timeout=30):
         """Wait for login completion by checking a URL or element."""
         try:
-            self.wait.until(EC.url_contains('app/dev/virtual-lab'), timeout)
+            self.wait.until(EC.url_contains('app/virtual-lab'), timeout)
         except TimeoutException:
             print(
                 f"Timeout waiting for URL to contain 'virtual-lab'. Current URL: "
@@ -69,7 +69,7 @@ class LoginPage(CustomBasePage):
 
         self.wait_for_login_complete()
         # self.wait.until(EC.url_contains("/app/explore"))
-        self.wait.until(EC.url_contains("app/dev/virtual-lab"))
+        self.wait.until(EC.url_contains("app/virtual-lab"))
 
     def make_form_visible(self):
         """Use JavaScript to make the hidden form visible by removing 'display:none'."""

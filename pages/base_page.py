@@ -33,7 +33,7 @@ class CustomBasePage:
         return self.wait.until(EC.presence_of_all_elements_located(by_locator), timeout)
 
     def element_to_be_clickable(self, by_locator, timeout=10):
-        self.wait.until(EC.element_to_be_clickable(by_locator), timeout)
+        return self.wait.until(EC.element_to_be_clickable(by_locator), timeout)
 
     def assert_element_text(self, by_locator, expected_text):
         element = self.wait.until(EC.visibility_of_element_located(by_locator))
