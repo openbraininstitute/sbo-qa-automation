@@ -70,15 +70,7 @@ jobs:
       environment-name: "SAUCE-LABS"
       environment-url: ${{ vars.SAUCE_LABS_URL }}
       artifact-name: "Testing in SAUCE-LABS"
-    env:
-      SAUCE_LABS_URL: https://ondemand.eu-central-1.saucelabs.com:443/wd/hub
-      SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-      SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-      OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-      OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-    run: |
-      uv run python -m pytest --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} tests/test_login.py -sv --headless \
-        --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
+    secrets: inherit
 
    
 
