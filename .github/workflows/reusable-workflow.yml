@@ -88,13 +88,13 @@ jobs:
         if: ${{ inputs.env == 'STAGING' }}
         run: |
           echo "Running tests in the ${{ inputs.env }} environment"
-          uv run pytest tests/test_login.py --env=staging --env_url=${{ inputs.env-url }} --headless
+          uv run pytest tests/test_login.py --env=staging --env_url=${{ secrets.ENV_URL }} --headless
 
       - name: Run Tests for Production
         if: ${{ inputs.env == 'PRODUCTION' }}
         run: |
           echo "Running PRODUCTION tests..."
-          pytest run tests/test_login.py --env=production --env_url=${{ inputs.env-url }}
+          uv pytest run tests/test_login.py --env=production --env_url=${{ vars.PRODUCTION_URL }} --headless
 
       - name: Run Tests for Sauce Labs
         if: ${{ inputs.env == 'SAUCE-LABS' }}
@@ -103,4 +103,4 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
         run: |
           echo "Running SAUCE LABS tests..."
-          uv run pytest tests/test_login.py --env=sauce-labs --env_url=${{ inputs.env-url }}
+          uv run pytest tests/test_login.py --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }}
