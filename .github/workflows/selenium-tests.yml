@@ -23,7 +23,7 @@ jobs:
 
   test-staging:
     needs: run-tests
-    uses: ./.github/workflows/reusable-workflow.yml
+    uses: .github/workflows/reusable-workflow.yml
     with:
       environment-name: "STAGING"
       environment-url: ${{ vars.STAGING_URL }}
