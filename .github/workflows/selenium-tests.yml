@@ -15,257 +15,294 @@ on:
     - cron: "0 7 * * 5"  # Every Friday at 7:00 AM UTC (8:00 AM Zurich time during CET)
 
 jobs:
-  setup-environments:
+  run-tests:
     runs-on: ubuntu-latest
     outputs:
       artifact_path: latest_logs/
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install required dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          sudo apt-get install -y firefox
-
-  test-production:
-    needs: setup-environments
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        browser: [ firefox ]
-    environment: production
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-
-      - name: Verify repository contents
-        run: ls -la
-
-      - name: Set up virtual environment and install dependencies
-        run: |
-          uv venv -p 3.11 
-          python -m pip install --upgrade pip 
-          uv pip install -r requirements.txt
-          ls -la
-
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
-
-      - name: Install Firefox
-        uses: browser-actions/setup-firefox@v1
-
-      - name: Verify browser installation
-        run: |
-          firefox --version
-          google-chrome --version
-
-      - name: Create Logs Directory
-        run: mkdir -p latest_logs/errors
-
-      - name: Debug Environment Variables
-        run: echo $BASE_URL
-
-      - name: Run tests for production
-        env:
-          BASE_URL: ${{ vars.PRODUCTION_URL }}
-          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-        run: |
-          uv run pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
-           --html=latest_logs/report_production_${{ matrix.browser }}.html \
-           --self-contained-html --browser-name=${{ matrix.browser }}
-
-      - name: Upload test report
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report-production-${{ matrix.browser }}
-          path: latest_logs/
-
-      - name: Debug Error Directory
-        if: failure()
-        run: |
-          echo "Contents of latest_logs/errors:"
-          ls -la latest_logs/errors || echo "No files in the directory"
-
-      - name: Upload test artifacts (screenshots)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: error-screenshots
-          path: latest_logs/errors
-          if-no-files-found: warn
-
-      - name: Notify slack on success
-        if: success()
-        env:
-          SLACK_WEBHOOK_URL_PASS: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
-        run: |
-            curl -X POST -H 'Content-type: application/json' \
-            --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
-            $SLACK_WEBHOOK_URL_PASS
-
-      - name: Notify slack on failure
-        if: failure()
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
-        run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
-          $SLACK_WEBHOOK_URL
-
-  test-sauce-labs:
-    needs: test-production
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        browser: [ chrome ]
-    environment: sauce-labs
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-
-      - name: Set up virtual environment and install dependencies
-        run: |
-          uv venv -p 3.11 
-          python -m pip install --upgrade pip 
-          uv pip install -r requirements.txt
-          ls -la
-
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
-
-      - name: Verify browser installation
-        run: google-chrome --version
-
-      - name: Create Logs Directory
-        run: mkdir -p latest_logs/errors
-
-      - name: Run tests for Sauce Labs
-        env:
-          BASE_URL: ${{ vars.SAUCE_LABS_URL }}
-          SAUCE_LABS_URL: https://ondemand.eu-central-1.saucelabs.com:443/wd/hub
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-        run: |
-          uv run python -m pytest --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} tests/test_login.py -sv --headless \
-            --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
-            --self-contained-html --browser-name=${{ matrix.browser }}
-
-      - name: Upload Sauce Labs test report
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report-sauce-labs-${{ matrix.browser }}
-          path: latest_logs/
-
-      - name: Debug Error Directory
-        if: failure()
-        run: |
-          echo "Contents of latest_logs/errors:"
-          ls -la latest_logs/errors || echo "No files in the directory"
-
-      - name: Upload test artifacts (screenshots)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: error-screenshots
-          path: latest_logs/errors
-          if-no-files-found: warn
 
   test-staging:
-    needs: test-sauce-labs
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        browser: [ firefox ]
-    environment: staging
-    steps:
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      environment-name: "STAGING"
+      environment-url: ${{ vars.STAGING_URL }}
+      artifact-name: "testing in staging"
+    secrets: inherit
+    env:
+      OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+      OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+    run: |
+      uv run pytest --env=staging --env_url=${{ vars.STAGING_URL }} tests/test_login.py -sv --headless \
+        --html=latest_logs/report_staging_${{ matrix.browser }}.html \
+        --self-contained-html --browser-name=${{ matrix.browser }}
+    
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
+  test-production:
+    needs: run-tests
+    uses: .github/workflows/reusable-workflow.yml
+    with:
+      environment-name: "PRODUCTION"
+      environment-url: ${{ vars.PRODUCTION_URL }}
+      artifact-name: "Testing in Production"
+    secrets: inherit
+    env:
+      OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+      OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+    run: |
+      uv run pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
+       --html=latest_logs/report_production_${{ matrix.browser }}.html \
+       --self-contained-html --browser-name=${{ matrix.browser }}
+    
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
+  test-sauce-labs:
+    needs: run-tests
+    uses: .github/workflows/reusable-workflow.yml
+    with:
+      environment-name: "SAUCE-LABS"
+      environment-url: ${{ vars.SAUCE_LABS_URL }}
+      artifact-name: "Testing in SAUCE-LABS"
+    env:
+      SAUCE_LABS_URL: https://ondemand.eu-central-1.saucelabs.com:443/wd/hub
+      SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+      SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+      OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+      OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+    run: |
+      uv run python -m pytest --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} tests/test_login.py -sv --headless \
+        --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
 
-      - name: Verify repository contents
-        run: ls -la
+   
 
-      - name: Set up virtual environment and install dependencies
-        run: |
-          uv venv -p 3.11 
-          python -m pip install --upgrade pip 
-          uv pip install -r requirements.txt
-          ls -la
+#   strategy:
+#      matrix:
+#        browser: [ firefox ]
+#    environment: production
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 1
+#
+#      - name: Install uv
+#        uses: astral-sh/setup-uv@v5
+#
+#      - name: Verify repository contents
+#        run: ls -la
+#
+#      - name: Set up virtual environment and install dependencies
+#        run: |
+#          uv venv -p 3.11
+#          python -m pip install --upgrade pip
+#          uv pip install -r requirements.txt
+#          ls -la
+#
+#      - name: Install Chrome
+#        uses: browser-actions/setup-chrome@v1
+#
+#      - name: Install Firefox
+#        uses: browser-actions/setup-firefox@v1
+#
+#      - name: Verify browser installation
+#        run: |
+#          firefox --version
+#          google-chrome --version
+#
+#      - name: Create Logs Directory
+#        run: mkdir -p latest_logs/errors
+#
+#      - name: Debug Environment Variables
+#        run: echo $BASE_URL
+#
+#      - name: Run tests for production
+#        env:
+#          BASE_URL: ${{ vars.PRODUCTION_URL }}
+#          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+#          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+#        run: |
+#          uv run pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
+#           --html=latest_logs/report_production_${{ matrix.browser }}.html \
+#           --self-contained-html --browser-name=${{ matrix.browser }}
+#
+#      - name: Upload test report
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: test-report-production-${{ matrix.browser }}
+#          path: latest_logs/
+#
+#      - name: Debug Error Directory
+#        if: failure()
+#        run: |
+#          echo "Contents of latest_logs/errors:"
+#          ls -la latest_logs/errors || echo "No files in the directory"
+#
+#      - name: Upload test artifacts (screenshots)
+#        if: failure()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: error-screenshots
+#          path: latest_logs/errors
+#          if-no-files-found: warn
+#
+#      - name: Notify slack on success
+#        if: success()
+#        env:
+#          SLACK_WEBHOOK_URL_PASS: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
+#        run: |
+#            curl -X POST -H 'Content-type: application/json' \
+#            --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
+#            $SLACK_WEBHOOK_URL_PASS
+#
+#      - name: Notify slack on failure
+#        if: failure()
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
+#        run: |
+#          curl -X POST -H 'Content-type: application/json' \
+#          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
+#          $SLACK_WEBHOOK_URL
+#
+#  test-sauce-labs:
+#    needs: test-production
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        browser: [ chrome ]
+#    environment: sauce-labs
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 1
+#
+#      - name: Install uv
+#        uses: astral-sh/setup-uv@v5
+#
+#      - name: Set up virtual environment and install dependencies
+#        run: |
+#          uv venv -p 3.11
+#          python -m pip install --upgrade pip
+#          uv pip install -r requirements.txt
+#          ls -la
+#
+#      - name: Install Chrome
+#        uses: browser-actions/setup-chrome@v1
+#
+#      - name: Verify browser installation
+#        run: google-chrome --version
+#
+#      - name: Create Logs Directory
+#        run: mkdir -p latest_logs/errors
+#
+#      - name: Run tests for Sauce Labs
+#        env:
+#          BASE_URL: ${{ vars.SAUCE_LABS_URL }}
+#          SAUCE_LABS_URL: https://ondemand.eu-central-1.saucelabs.com:443/wd/hub
+#          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+#          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+#          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+#          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+#        run: |
+#          uv run python -m pytest --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} tests/test_login.py -sv --headless \
+#            --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
+#            --self-contained-html --browser-name=${{ matrix.browser }}
+#
+#      - name: Upload Sauce Labs test report
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: test-report-sauce-labs-${{ matrix.browser }}
+#          path: latest_logs/
+#
+#      - name: Debug Error Directory
+#        if: failure()
+#        run: |
+#          echo "Contents of latest_logs/errors:"
+#          ls -la latest_logs/errors || echo "No files in the directory"
+#
+#      - name: Upload test artifacts (screenshots)
+#        if: failure()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: error-screenshots
+#          path: latest_logs/errors
+#          if-no-files-found: warn
 
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
-
-      - name: Install Firefox
-        uses: browser-actions/setup-firefox@v1
-
-      - name: Verify browser installation
-        run: |
-          firefox --version
-          google-chrome --version
-
-      - name: Create Logs Directory
-        run: mkdir -p latest_logs/errors
-
-      - name: Debug Environment Variables
-        run: echo $BASE_URL
-
-      - name: Define a cache dependency glob
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-          cache-dependency-glob: "requirements.txt"
-
-      - name: Run tests for staging
-        env:
-          BASE_URL: ${{ vars.STAGING_URL }}
-          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-        run: |
-          uv run pytest --env=staging --env_url=${{ vars.STAGING_URL }} tests/test_login.py -sv --headless \
-            --html=latest_logs/report_staging_${{ matrix.browser }}.html \
-            --self-contained-html --browser-name=${{ matrix.browser }}
-
-      - name: Upload Staging test report
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report-staging-${{ matrix.browser }}
-          path: latest_logs/
-
-      - name: Debug Error Directory
-        if: failure()
-        run: |
-          echo "Contents of latest_logs/errors:"
-          ls -la latest_logs/errors || echo "No files in the directory"
-
-      - name: Upload test artifacts (screenshots)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: error-screenshots
-          path: latest_logs/errors
-          if-no-files-found: warn
+#  test-staging:
+#    needs: test-sauce-labs
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        browser: [ firefox ]
+#    environment: staging
+#    steps:
+#
+#      - name: Checkout repository
+#        uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 1
+#
+#      - name: Install uv
+#        uses: astral-sh/setup-uv@v5
+#
+#      - name: Verify repository contents
+#        run: ls -la
+#
+#      - name: Set up virtual environment and install dependencies
+#        run: |
+#          uv venv -p 3.11
+#          python -m pip install --upgrade pip
+#          uv pip install -r requirements.txt
+#          ls -la
+#
+#      - name: Install Chrome
+#        uses: browser-actions/setup-chrome@v1
+#
+#      - name: Install Firefox
+#        uses: browser-actions/setup-firefox@v1
+#
+#      - name: Verify browser installation
+#        run: |
+#          firefox --version
+#          google-chrome --version
+#
+#      - name: Create Logs Directory
+#        run: mkdir -p latest_logs/errors
+#
+#      - name: Debug Environment Variables
+#        run: echo $BASE_URL
+#
+#      - name: Define a cache dependency glob
+#        uses: astral-sh/setup-uv@v5
+#        with:
+#          enable-cache: true
+#          cache-dependency-glob: "requirements.txt"
+#
+#      - name: Run tests for staging
+#        env:
+#          BASE_URL: ${{ vars.STAGING_URL }}
+#          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+#          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+#        run: |
+#          uv run pytest --env=staging --env_url=${{ vars.STAGING_URL }} tests/test_login.py -sv --headless \
+#            --html=latest_logs/report_staging_${{ matrix.browser }}.html \
+#            --self-contained-html --browser-name=${{ matrix.browser }}
+#
+#      - name: Upload Staging test report
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: test-report-staging-${{ matrix.browser }}
+#          path: latest_logs/
+#
+#      - name: Debug Error Directory
+#        if: failure()
+#        run: |
+#          echo "Contents of latest_logs/errors:"
+#          ls -la latest_logs/errors || echo "No files in the directory"
+#
+#      - name: Upload test artifacts (screenshots)
+#        if: failure()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: error-screenshots
+#          path: latest_logs/errors
+#          if-no-files-found: warn
