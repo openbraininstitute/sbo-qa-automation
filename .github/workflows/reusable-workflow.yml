@@ -50,6 +50,7 @@ jobs:
         run: |
           uv venv -p 3.11 
           python -m pip install --upgrade pip 
+          source .venv/bin/activate
           uv pip install -r requirements.txt
           ls -la
 
@@ -78,7 +79,7 @@ jobs:
 
       - name: Set Environment Variables for Test Execution
         env:
-          ENV_URL: ${{ inputs.env-url }}
+          ENV_URL: ${{ secrets.ENV_URL }}
           ENV_NAME: ${{ inputs.env }}
         run: |
           echo "Running in $ENV_NAME environment with URL $ENV_URL"
