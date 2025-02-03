@@ -76,8 +76,30 @@ jobs:
           OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: echo "Logged in to the platform"
 
-      - name: Run Selenium Tests
+      - name: Set Environment Variables for Test Execution
+        env:
+          SAUCE_LABS_URL: ${{ inputs.environment-url }}
+          ENV_NAME: ${{ inputs.environment-name }}
+          run: |
+            echo "Running in $ENV_NAME environment with URL $SAUCE_LABS_URL"
+
+      - name: Run Tests Based on Environment
+        if: ${{ inputs.environment-name == 'STAGING' }}
         run: |
-          uv run pytest --env=${{ inputs.environment-name }} --env_url=${{ inputs.environment-url }} tests/test_login.py -sv --headless \
-                      --html=latest_logs/report_${{ inputs.environment-name }}.html \
-                      --self-contained-html
+          echo "Running STAGING tests..."
+          pytest tests/test_login.py --env=staging --env_url=${{ inputs.environment-url }}
+
+      - name: Run Tests for Production
+        if: ${{ inputs.environment-name == 'PRODUCTION' }}
+        run: |
+          echo "Running PRODUCTION tests..."
+          pytest tests/test_login.py --env=production --env_url=${{ inputs.environment-url }}
+
+      - name: Run Tests for Sauce Labs
+        if: ${{ inputs.environment-name == 'SAUCE-LABS' }}
+        env:
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+        run: |
+          echo "Running SAUCE LABS tests..."
+          pytest tests/test_login.py --env=sauce-labs --env_url=${{ inputs.environment-url }}
