@@ -3,11 +3,11 @@ name: Deploy to Environment
 on:
   workflow_call:
     inputs:
-      environment-name:
+      env:
         description: "The name of environment (eg. STAGING, PRODUCTION, SAUCE-LABS)"
         required: true
         type: string
-      environment-url:
+      env-url:
         description: "The URL of the environment"
         required: true
         type: string
@@ -20,8 +20,8 @@ jobs:
   setup-environments:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ inputs.environment-name }}
-      url: ${{ inputs.environment-url }}
+      name: ${{ inputs.env }}
+      url: ${{ inputs.env-url }}
 
     steps:
       - name: Checkout repo
@@ -78,28 +78,28 @@ jobs:
 
       - name: Set Environment Variables for Test Execution
         env:
-          SAUCE_LABS_URL: ${{ inputs.environment-url }}
-          ENV_NAME: ${{ inputs.environment-name }}
-          run: |
-            echo "Running in $ENV_NAME environment with URL $SAUCE_LABS_URL"
+          SAUCE_LABS_URL: ${{ inputs.env-url }}
+          ENV_NAME: ${{ inputs.env }}
+        run: |
+          echo "Running in $ENV_NAME environment with URL $SAUCE_LABS_URL"
 
       - name: Run Tests Based on Environment
-        if: ${{ inputs.environment-name == 'STAGING' }}
+        if: ${{ inputs.env == 'STAGING' }}
         run: |
-          echo "Running STAGING tests..."
-          pytest tests/test_login.py --env=staging --env_url=${{ inputs.environment-url }}
+          echo "Running tests in the ${{ inputs.env }} environment"
+          uv pytest tests/test_login.py --env=staging --env_url=${{ inputs.env-url }} --headless
 
       - name: Run Tests for Production
-        if: ${{ inputs.environment-name == 'PRODUCTION' }}
+        if: ${{ inputs.env == 'PRODUCTION' }}
         run: |
           echo "Running PRODUCTION tests..."
-          pytest tests/test_login.py --env=production --env_url=${{ inputs.environment-url }}
+          pytest tests/test_login.py --env=production --env_url=${{ inputs.env-url }}
 
       - name: Run Tests for Sauce Labs
-        if: ${{ inputs.environment-name == 'SAUCE-LABS' }}
+        if: ${{ inputs.env == 'SAUCE-LABS' }}
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
         run: |
           echo "Running SAUCE LABS tests..."
-          pytest tests/test_login.py --env=sauce-labs --env_url=${{ inputs.environment-url }}
+          pytest tests/test_login.py --env=sauce-labs --env_url=${{ inputs.env-url }}
