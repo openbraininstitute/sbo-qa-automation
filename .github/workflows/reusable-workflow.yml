@@ -16,68 +16,68 @@ on:
         required: true
         type: string
 
-  jobs:
-    setup-environments:
-      runs-on: ubuntu-latest
-      environment:
-        name: ${{ inputs.environment-name }}
-        url: ${{ inputs.environment-url }}
+jobs:
+  setup-environments:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment-name }}
+      url: ${{ inputs.environment-url }}
 
-      steps:
-        - name: Checkout repo
-          uses: actions/checkout@v3
-          with:
-            fetch-depth: 1
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
-        - name: Set up Python
-          uses: actions/setup-python@v4
-          with:
-            python-version: '3.12'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
 
-        - name: Install required dependencies
-          run: |
-            sudo apt-get update
-            sudo apt-get install -y google-chrome-stable
-            sudo apt-get install -y firefox
+      - name: Install required dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          sudo apt-get install -y firefox
 
-        - name: Install uv
-          uses: astral-sh/setup-uv@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
-        - name: Verify repository contents
-          run: ls -la
+      - name: Verify repository contents
+        run: ls -la
 
-        - name: Set up virtual environment and install dependencies
-          run: |
-            uv venv -p 3.11 
-            python -m pip install --upgrade pip 
-            uv pip install -r requirements.txt
-            ls -la
+      - name: Set up virtual environment and install dependencies
+        run: |
+          uv venv -p 3.11 
+          python -m pip install --upgrade pip 
+          uv pip install -r requirements.txt
+          ls -la
 
-        - name: Install Chrome
-          uses: browser-actions/setup-chrome@v1
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
 
-        - name: Install Firefox
-          uses: browser-actions/setup-firefox@v1
+      - name: Install Firefox
+        uses: browser-actions/setup-firefox@v1
 
-        - name: Verify browser installation
-          run: |
-            firefox --version
-            google-chrome --version
+      - name: Verify browser installation
+        run: |
+          firefox --version
+          google-chrome --version
 
-        - name: Create Logs Directory
-          run: mkdir -p latest_logs/errors
+      - name: Create Logs Directory
+        run: mkdir -p latest_logs/errors
 
-        - name: Debug Environment Variables
-          run: echo $BASE_URL
+      - name: Debug Environment Variables
+        run: echo $BASE_URL
 
-        - name: Log in to the Platform
-          with:
-            OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-            OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-          run: echo "Logged in to the platform"
+      - name: Log in to the Platform
+        with:
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+        run: echo "Logged in to the platform"
 
-        - name: Run Selenium Tests
-          run: |
-            uv run pytest --env=${{ inputs.environment-name }} --env_url=${{ inputs.environment-url }} tests/test_login.py -sv --headless \
-                        --html=latest_logs/report_${{ inputs.environment-name }}.html \
-                        --self-contained-html
+      - name: Run Selenium Tests
+        run: |
+          uv run pytest --env=${{ inputs.environment-name }} --env_url=${{ inputs.environment-url }} tests/test_login.py -sv --headless \
+                      --html=latest_logs/report_${{ inputs.environment-name }}.html \
+                      --self-contained-html
