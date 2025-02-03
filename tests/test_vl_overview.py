@@ -1,11 +1,9 @@
-## Copyright (c) 2024 Blue Brain Project/EPFL
-## Copyright (c) 2025 Open Brain Institute
-## SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2024 Blue Brain Project/EPFL
+# Copyright (c) 2025 Open Brain Institute
+# SPDX-License-Identifier: Apache-2.0
 
 import time
 import uuid
-from datetime import datetime
-
 
 from pages.vl_overview import VLOverview
 import pytest
@@ -30,7 +28,7 @@ class TestVLOverview:
         logger.info("Found Virtual lab banner and clicked")
         create_project = vl_overview.create_project().click()
         logger.info("Redirected to the Virtual lab and clicked on 'Create a project button'")
-
+        time.sleep(200)
         unique_name = f"Project-{uuid.uuid4().hex[:8]}"
         logger.info(f"Generated unique project name: {unique_name}")
 
@@ -47,7 +45,6 @@ class TestVLOverview:
 
         project_member_icon = vl_overview.project_member_icon()
         logger.info("Project member icon is found")
-
         add_member_btn = vl_overview.add_member_btn()
         save_text = vl_overview.save_text()
         logger.info("Text 'Save' button is found")
@@ -58,7 +55,7 @@ class TestVLOverview:
         if enable_save_btn:
             print(f"Button Enabled: {enable_save_btn.is_enabled()}")
             enable_save_btn.click()
+            time.sleep(120)
         else:
             logger.error("Save button was not found or was not clickable")
         logger.info("New project with its description are created.")
-    time.sleep(20)

@@ -1,10 +1,9 @@
-# # Copyright (c) 2024 Blue Brain Project/EPFL
-# #
-# # SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2024 Blue Brain Project/EPFL
+# Copyright (c) 2025 Open Brain Institute
+# SPDX-License-Identifier: Apache-2.0
 
-import time
 
-from selenium.common import TimeoutException, NoSuchElementException
+from selenium.common import NoSuchElementException
 
 from locators.sandbox_locatators import SandboxPageLocators
 from pages.home_page import HomePage

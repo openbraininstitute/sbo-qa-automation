@@ -1,12 +1,9 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
-from selenium.webdriver.support.wait import WebDriverWait
-
 # SPDX-License-Identifier: Apache-2.0
 
 from pages.home_page import HomePage
 from util.util_links_checker import LinkChecker
-from selenium.webdriver.support import expected_conditions as EC
 from locators.vlab_overview_locators import VLOverviewLocators
 from selenium.common import TimeoutException
 

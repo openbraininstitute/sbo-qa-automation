@@ -1,12 +1,9 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
-#
+# Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 import logging
-import time
-
 from selenium.common import TimeoutException
 from selenium.webdriver import Keys
-
 from locators.login_locators import LoginPageLocators
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import CustomBasePage
@@ -68,7 +65,6 @@ class LoginPage(CustomBasePage):
         print("Submitted login credentials")
 
         self.wait_for_login_complete()
-        # self.wait.until(EC.url_contains("/app/explore"))
         self.wait.until(EC.url_contains("app/virtual-lab"))
 
     def make_form_visible(self):
@@ -81,9 +77,6 @@ class LoginPage(CustomBasePage):
     def ensure_element_interactable(self, element):
         """Ensure the element is visible and interactable, even if hidden."""
         if not element.is_displayed():
-            print(f"Element {element} is not visible, making it visible via JavaScript.")
             self.browser.execute_script("arguments[0].style.display = 'block';", element)
-
-        # Ensure the element is enabled before interacting with it
         if not element.is_enabled():
             raise Exception(f"Element {element} is not enabled for interaction.")

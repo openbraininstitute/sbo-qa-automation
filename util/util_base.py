@@ -1,5 +1,5 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
-#
+# Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 
 import os
@@ -29,7 +29,6 @@ def load_config():
             }
         else:
             # Running locally, use config.json file
-            print("Running locally")
             base_dir = Path(__file__).resolve().parent
             config_path = base_dir / '..' / 'util' / 'config.json'
             if not config_path.exists():
