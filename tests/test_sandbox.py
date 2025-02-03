@@ -1,14 +1,10 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
-
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-Lcense-Identifier: Apache-2.0
 
 import os
 import uuid
-
 from selenium.common import NoSuchElementException
-from selenium.webdriver import Keys
-
 from pages.sandbox_page import SandboxPage
 import pytest
 import time
