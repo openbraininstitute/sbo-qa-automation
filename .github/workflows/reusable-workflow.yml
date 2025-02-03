@@ -78,22 +78,22 @@ jobs:
 
       - name: Set Environment Variables for Test Execution
         env:
-          SAUCE_LABS_URL: ${{ inputs.env-url }}
+          ENV_URL: ${{ inputs.env-url }}
           ENV_NAME: ${{ inputs.env }}
         run: |
-          echo "Running in $ENV_NAME environment with URL $SAUCE_LABS_URL"
+          echo "Running in $ENV_NAME environment with URL $ENV_URL"
 
       - name: Run Tests Based on Environment
         if: ${{ inputs.env == 'STAGING' }}
         run: |
           echo "Running tests in the ${{ inputs.env }} environment"
-          uv pytest tests/test_login.py --env=staging --env_url=${{ inputs.env-url }} --headless
+          uv run pytest tests/test_login.py --env=staging --env_url=${{ inputs.env-url }} --headless
 
       - name: Run Tests for Production
         if: ${{ inputs.env == 'PRODUCTION' }}
         run: |
           echo "Running PRODUCTION tests..."
-          pytest tests/test_login.py --env=production --env_url=${{ inputs.env-url }}
+          pytest run tests/test_login.py --env=production --env_url=${{ inputs.env-url }}
 
       - name: Run Tests for Sauce Labs
         if: ${{ inputs.env == 'SAUCE-LABS' }}
@@ -102,4 +102,4 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
         run: |
           echo "Running SAUCE LABS tests..."
-          pytest tests/test_login.py --env=sauce-labs --env_url=${{ inputs.env-url }}
+          uv run pytest tests/test_login.py --env=sauce-labs --env_url=${{ inputs.env-url }}
