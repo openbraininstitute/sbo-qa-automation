@@ -70,11 +70,11 @@ jobs:
       - name: Debug Environment Variables
         run: echo $BASE_URL
 
-      - name: Log in to the Platform
-        with:
-          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-        run: echo "Logged in to the platform"
+#      - name: Log in to the Platform
+#        with:
+#          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+#          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+#        run: echo "Logged in to the platform"
 
       - name: Set Environment Variables for Test Execution
         env:
