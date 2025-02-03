@@ -17,47 +17,47 @@ on:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
-    outputs:
-      artifact_path: latest_logs/
+#    outputs:
+#      artifact_path: latest_logs/
 
 
   test-staging:
     needs: run-tests
-    uses: ./.github/workflows/reusable-workflow.yml
+    uses: sbo-qa-automation/.github/workflows/reusable-workflow.yml@wip/ayimaster
     with:
       environment-name: "STAGING"
       environment-url: ${{ vars.STAGING_URL }}
       artifact-name: "testing in staging"
     secrets: inherit
-    env:
-      OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-      OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-    run: |
-      uv run pytest --env=staging --env_url=${{ vars.STAGING_URL }} tests/test_login.py -sv --headless \
-        --html=latest_logs/report_staging_${{ matrix.browser }}.html \
-        --self-contained-html --browser-name=${{ matrix.browser }}
+#    env:
+#      OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+#      OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+#    run: |
+#      uv run pytest --env=staging --env_url=${{ vars.STAGING_URL }} tests/test_login.py -sv --headless \
+#        --html=latest_logs/report_staging_${{ matrix.browser }}.html \
+#        --self-contained-html --browser-name=${{ matrix.browser }}
     
 
   test-production:
     needs: run-tests
-    uses: .github/workflows/reusable-workflow.yml
+    uses: sbo-qa-automation/.github/workflows/reusable-workflow.yml@wip/ayimaster
     with:
       environment-name: "PRODUCTION"
       environment-url: ${{ vars.PRODUCTION_URL }}
       artifact-name: "Testing in Production"
     secrets: inherit
-    env:
-      OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-      OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-    run: |
-      uv run pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
-       --html=latest_logs/report_production_${{ matrix.browser }}.html \
-       --self-contained-html --browser-name=${{ matrix.browser }}
-    
+#    env:
+#      OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+#      OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+#    run: |
+#      uv run pytest --env=production --env_url=${{ vars.PRODUCTION_URL }} tests/test_login.py -sv --headless \
+#       --html=latest_logs/report_production_${{ matrix.browser }}.html \
+#       --self-contained-html --browser-name=${{ matrix.browser }}
+#
 
   test-sauce-labs:
     needs: run-tests
-    uses: .github/workflows/reusable-workflow.yml
+    uses: sbo-qa-automation/.github/workflows/reusable-workflow.yml@wip/ayimaster
     with:
       environment-name: "SAUCE-LABS"
       environment-url: ${{ vars.SAUCE_LABS_URL }}
