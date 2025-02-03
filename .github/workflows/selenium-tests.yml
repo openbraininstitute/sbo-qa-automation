@@ -57,7 +57,7 @@ jobs:
 
   test-sauce-labs:
     needs: run-tests
-    uses: ./.github/workflows/reusable-workflow.yml@wip/ayimaster
+    uses: ./.github/workflows/reusable-workflow.yml
     with:
       environment-name: "SAUCE-LABS"
       environment-url: ${{ vars.SAUCE_LABS_URL }}
