@@ -59,6 +59,8 @@ jobs:
 
       - name: Install Chrome
         uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: '132.0.6834'
 
       - name: Install Firefox
         uses: browser-actions/setup-firefox@v1
