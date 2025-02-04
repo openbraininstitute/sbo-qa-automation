@@ -31,7 +31,7 @@ jobs:
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "STAGING"
-      env-url: ${{ vars.STAGING_URL }}
+#      env-url: ${{ vars.STAGING_URL }}
       artifact-name: "testing in staging"
     secrets: inherit
 
@@ -41,7 +41,7 @@ jobs:
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "PRODUCTION"
-      env-url: ${{ vars.PRODUCTION_URL }}
+#      env-url: ${{ vars.PRODUCTION_URL }}
       artifact-name: "Testing in Production"
     secrets: inherit
 
@@ -51,7 +51,7 @@ jobs:
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "SAUCE-LABS"
-      env-url: ${{ vars.SAUCE_LABS_URL }}
+#      env-url: ${{ vars.SAUCE_LABS_URL }}
       artifact-name: "Testing in SAUCE-LABS"
     secrets: inherit
 
