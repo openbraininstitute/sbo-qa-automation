@@ -95,7 +95,7 @@ jobs:
           OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
           echo "Running PRODUCTION tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
-          echo "PRODUCTION_URL: $${{vars.PRODUCTION_URL}}" 
+          echo "PRODUCTION_URL: ${{vars.PRODUCTION_URL}}" 
           uv run pytest tests/test_login.py --env=production --env_url=${{ vars.PRODUCTION_URL }} \
           -sv --headless --html=latest_logs/report_production_${{ matrix.browser }}.html \
             --self-contained-html --browser-name=firefox
