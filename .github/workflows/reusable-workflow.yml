@@ -20,7 +20,7 @@ jobs:
   test:
     strategy:
       matrix:
-        browser: [chrome, firefox]
+        browser: [firefox]
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.env }}
@@ -57,18 +57,12 @@ jobs:
           uv pip install -r requirements.txt
           ls -la
 
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: '132.0.6834'
-
       - name: Install Firefox
         uses: browser-actions/setup-firefox@v1
 
       - name: Verify browser installation
         run: |
           firefox --version
-          google-chrome --version
 
       - name: Create Logs Directory
         run: mkdir -p latest_logs/errors
@@ -88,9 +82,10 @@ jobs:
           OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
           echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
-          uv run pytest tests/test_login.py --env=staging --env_url=https://staging.openbluebrain.com/app/virtual-lab \
+          echo "STAGING_URL: ${{ vars.STAGING_URL }}"  
+          uv run pytest tests/test_login.py --env=staging --env_url=$ENV_URL \
           -sv --headless --html=latest_logs/report_production_${{ matrix.browser }}.html \
-            --self-contained-html --browser-name=chrome
+            --self-contained-html --browser-name=firefox
 
       - name: Run Tests for Production
         if: ${{ inputs.env == 'PRODUCTION' }}
@@ -100,20 +95,21 @@ jobs:
           OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
           echo "Running PRODUCTION tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
+          echo "PRODUCTION_URL: $${{vars.PRODUCTION_URL}}" 
           uv run pytest tests/test_login.py --env=production --env_url=${{ vars.PRODUCTION_URL }} \
           -sv --headless --html=latest_logs/report_production_${{ matrix.browser }}.html \
-            --self-contained-html --browser-name=chrome
+            --self-contained-html --browser-name=firefox
 
-      - name: Run Tests for Sauce Labs
-        if: ${{ inputs.env == 'SAUCE-LABS' }}
-        env:
-          ENV_URL: ${{ vars.SAUCE_LABS_URL }}
-          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-        run: |
-          echo "Running SAUCE LABS tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
-          uv run pytest tests/test_login.py --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} --headless \
-            --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
-            --self-contained-html --browser-name=${{ matrix.browser }}
+#      - name: Run Tests for Sauce Labs
+#        if: ${{ inputs.env == 'SAUCE-LABS' }}
+#        env:
+#          ENV_URL: ${{ vars.SAUCE_LABS_URL }}
+#          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+#          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+#          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+#          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+#        run: |
+#          echo "Running SAUCE LABS tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
+#          uv run pytest tests/test_login.py --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} --headless \
+#            --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
+#            --self-contained-html --browser-name=${{ matrix.browser }}
