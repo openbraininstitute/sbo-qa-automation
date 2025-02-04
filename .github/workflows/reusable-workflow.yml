@@ -86,21 +86,32 @@ jobs:
 
       - name: Run Tests Based on Environment
         if: ${{ inputs.env == 'STAGING' }}
+        env:
+          ENV_URL: ${{ vars.STAGING_URL }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
-          echo "Running tests in the ${{ inputs.env }} environment"
+          echo "Running tests in $ENV_URL with Username $OBI_USERNAME"
           uv run pytest tests/test_login.py --env=staging --env_url=${{ secrets.ENV_URL }} --headless
 
       - name: Run Tests for Production
         if: ${{ inputs.env == 'PRODUCTION' }}
+        env:
+          ENV_URL: ${{ vars.PRODUCTION_URL }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
         run: |
-          echo "Running PRODUCTION tests..."
-          uv pytest run tests/test_login.py --env=production --env_url=${{ vars.PRODUCTION_URL }} --headless
+          echo "Running PRODUCTION tests in $ENV_URL with Username $OBI_USERNAME"
+          uv run pytest tests/test_login.py --env=production --env_url=${{ vars.PRODUCTION_URL }} --headless
 
       - name: Run Tests for Sauce Labs
         if: ${{ inputs.env == 'SAUCE-LABS' }}
         env:
+          ENV_URL: ${{ vars.SAUCE_LABS_URL }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
         run: |
-          echo "Running SAUCE LABS tests..."
+          echo "Running SAUCE LABS tests in $ENV_URL with Username $OBI_USERNAME"
           uv run pytest tests/test_login.py --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }}
