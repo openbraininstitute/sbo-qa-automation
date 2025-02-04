@@ -83,7 +83,7 @@ jobs:
         run: |
           echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
           echo "STAGING_URL: ${{ vars.STAGING_URL }}"  
-          uv run pytest tests/test_login.py --env=staging --env_url=$ENV_URL \
+          uv run pytest tests/test_login.py --env=staging --env_url=${{vars.STAGING_URL}} \
           -sv --headless --html=latest_logs/report_production_${{ matrix.browser }}.html \
             --self-contained-html --browser-name=firefox
 
