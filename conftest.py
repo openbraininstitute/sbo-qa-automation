@@ -93,7 +93,7 @@ def setup(request, pytestconfig):
             raise ValueError(f"Unsupported browser: {browser_name}")
 
         if environment == "staging":
-            base_url = "https://staging.openbluebrain.com/app/dev"
+            base_url = "https://staging.openbluebrain.com/app"
         elif environment == "production":
             base_url = "https://openbluebrain.com/app"
         else:
