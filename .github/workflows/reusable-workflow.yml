@@ -100,16 +100,16 @@ jobs:
           -sv --headless --html=latest_logs/report_production_${{ matrix.browser }}.html \
             --self-contained-html --browser-name=firefox
 
-#      - name: Run Tests for Sauce Labs
-#        if: ${{ inputs.env == 'SAUCE-LABS' }}
-#        env:
-#          ENV_URL: ${{ vars.SAUCE_LABS_URL }}
-#          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-#          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-#          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-#          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-#        run: |
-#          echo "Running SAUCE LABS tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
-#          uv run pytest tests/test_login.py --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} --headless \
-#            --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
-#            --self-contained-html --browser-name=${{ matrix.browser }}
+      - name: Run Tests for Sauce Labs
+        if: ${{ inputs.env == 'SAUCE-LABS' }}
+        env:
+          ENV_URL: ${{ vars.SAUCE_LABS_URL }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+        run: |
+          echo "Running SAUCE LABS tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
+          uv run pytest tests/test_login.py --env=sauce-labs --env_url=${{ vars.SAUCE_LABS_URL }} --headless \
+            --html=latest_logs/report_sauce_labs_${{ matrix.browser }}.html \
+            --self-contained-html --browser-name=${{ matrix.browser }}
