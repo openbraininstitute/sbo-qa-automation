@@ -69,7 +69,7 @@ jobs:
 
       - name: Set Environment Variables for Test Execution
         env:
-          ENV_URL: ${{ secrets.ENV_URL }}
+          ENV_URL: ${{ vars.ENV_URL }}
           ENV_NAME: ${{ inputs.env }}
         run: |
           echo "Running in $ENV_NAME environment with URL $ENV_URL"
