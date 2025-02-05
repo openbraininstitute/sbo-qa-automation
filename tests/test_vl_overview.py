@@ -14,7 +14,7 @@ class TestVLOverview:
     @pytest.mark.run(order=3)
     def test_vl_overview(self, setup, login, logger):
         """
-        The commented out code below is pending changes in the platform.
+        Tests Virtual Lab Home
         """
         browser, wait, base_url = setup
         vl_overview = VLOverview(browser, wait, base_url)
@@ -33,6 +33,7 @@ class TestVLOverview:
         logger.info(f"Generated unique project name: {unique_name}")
 
         project_name =  vl_overview.input_project_name()
+        """ time.sleep(0.1) is required to simulate human typing"""
         for char in unique_name:
             project_name.send_keys(char)
             time.sleep(0.1)
