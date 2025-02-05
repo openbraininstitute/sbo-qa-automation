@@ -37,9 +37,11 @@ jobs:
           sudo apt-get install -y google-chrome-stable
           sudo apt-get install -y firefox
 
+      # Installation of 'uv' is required
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
+      # This is temporary for debugging
       - name: Verify repository contents
         run: ls -la
 
@@ -54,10 +56,12 @@ jobs:
       - name: Install Firefox
         uses: browser-actions/setup-firefox@v1
 
+      # This is temporary for debugging
       - name: Verify browser installation
         run: |
           firefox --version
 
+      # Create a directory for logs
       - name: Create Logs Directory
         run: mkdir -p latest_logs/errors
 
@@ -77,3 +81,31 @@ jobs:
           -sv --headless --html=latest_logs/report_$ENV_NAME_${{ matrix.browser }}.html \
             --self-contained-html --browser-name=${{ matrix.browser }}
 
+      # Upload test artifacts (screenshots) if failure
+      - name: Upload test artifacts (screenshots)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-screenshots
+          path: latest_logs/errors
+          if-no-files-found: warn
+
+      # Notify slack on success
+      - name: Notify slack on success
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL_PASS: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
+          $SLACK_WEBHOOK_URL_PASS
+
+      # Notify slack on failure
+      - name: Notify slack on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
+          $SLACK_WEBHOOK_URL
