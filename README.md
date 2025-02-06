@@ -11,7 +11,7 @@
 ## Important Notes for Forked Repositories
 If you’ve forked the repository, make sure to sync it with the original repository:
 
-** Sync Your Fork:** 
+**Sync Your Fork:** 
 
 ```
 git remote add upstream git@github.com:openbraininstitute/sbo-qa-automation.git
@@ -34,7 +34,7 @@ git merge upstream/main
 - Install virtual environment.
 - A json file with login credentials would need to be created. 
 
-**Linux/Unix:**
+** Linux/Unix: **
 - Run: 
 ```
 sudo apt update && sudo apt install python3-pip
