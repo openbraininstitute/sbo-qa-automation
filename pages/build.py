@@ -20,3 +20,30 @@ class Build(HomePage, LinkChecker):
         except TimeoutException:
             raise RuntimeError(f"Failed to load page at {path} within 60 seconds")
         return self.browser.current_url
+
+    def build_menu_title(self):
+        return self.find_element(BuildLocators.BUILD_MENU_TITLE)
+
+    def new_model_tab(self):
+        return self.find_element(BuildLocators.NEW_MODEL_TAB)
+
+    def single_neuron_title(self):
+        return self.find_element(BuildLocators.SINGLE_NEURON_TITLE)
+
+    def single_neuron_build_btn(self):
+        return self.find_element(BuildLocators.BUILD_SINGLE_NEURON_BTN)
+
+    def form_build_single_neuron_title(self):
+        return self.find_element(BuildLocators.FORM_BUILD_NEURON_TITLE)
+
+    def form_name(self):
+        return self.element_visibility(BuildLocators.FORM_NAME)
+
+    def form_description(self):
+        return self.find_element(BuildLocators.FORM_DESCRIPTION)
+
+    def form_brain_region(self):
+        return self.element_to_be_clickable(BuildLocators.FORM_BRAIN_REGION)
+
+    def start_building_btn(self):
+        return self.element_to_be_clickable(BuildLocators.START_BUILDING_BTN)
