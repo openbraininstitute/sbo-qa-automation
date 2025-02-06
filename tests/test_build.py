@@ -47,9 +47,26 @@ class TestBuild:
         form_name = build.form_name()
         form_name.click()
         form_name.send_keys(unique_name)
+        logger.info("Unique name for Single Neuron is provided")
         form_description = build.form_description()
         form_description.click()
         form_description.send_keys(dynamic_description)
+        logger.info("Unique description for Single Neuron is provided")
+
+        created_by_name = build.created_by_name()
+        time.sleep(10)
+        assert any(name.text.strip() for name in created_by_name), "No valid name found under 'Created by' section."
+        logger.info("Verifying 'Created by' is not empty")
+        names = [name.text.strip() for name in created_by_name if name.text.strip()]
+        print(f"Found names: {names}")
+
+        creation_date = build.creation_date()
+        assert "Creation Date".lower() in creation_date.text.lower(), "'Creation Date' title not found."
+        date = build.date()
+        date_text = date.text.strip()
+        assert date_text, "Creation date is missing or empty."
+        logger.info("The 'Date' is not empty")
+        print(f"Creation date found: {date_text}")
 
         form_brain_region = build.form_brain_region()
         form_brain_region.click()
@@ -61,4 +78,34 @@ class TestBuild:
             print("Button clicked!")
         else:
             print("Button is disabled, cannot click.")
-        # time.sleep(20)
+
+        sn_name = build.sn_name()
+        assert sn_name.text.strip(), "Name is missing or empty."
+        print(f"Name: {sn_name.text.strip()}")
+
+        sn_description = build.sn_description()
+        assert sn_description.text.strip(), "Description is missing or empty."
+        print(f"Description: {sn_description.text.strip()}")
+
+        sn_brain_region = build.sn_brain_region()
+        assert sn_brain_region.text.strip(), "Brain region is missing or empty."
+        print(f"Brain Region: {sn_brain_region.text.strip()}")
+
+        sn_created_by = build.sn_created_by()
+        non_empty_names = [element.text.strip() for element in sn_created_by if element.text.strip()]
+        assert non_empty_names, "Created by names are missing or empty."
+        print(f"Created By: {non_empty_names}")
+
+        sn_creation_date = build.sn_creation_date()
+        assert sn_creation_date.text.strip(), "Creation date is missing or empty."
+        print(f"Creation Date: {sn_creation_date.text.strip()}")
+
+        sn_mtype = build.sn_mtype()
+        assert sn_mtype.text.strip(), "M-type is missing or empty."
+        print(f"M-type: {sn_mtype.text.strip()}")
+
+        sn_etype = build.sn_etype()
+        assert sn_etype.text.strip(), "E-type is missing or empty."
+        print(f"E-type: {sn_etype.text.strip()}")
+
+        time.sleep(20)
