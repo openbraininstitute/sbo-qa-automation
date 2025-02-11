@@ -20,14 +20,11 @@ class TestExplorePage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=3)
     def test_explore_page(self, setup, login, logger):
-        """
-        The commented out code below is pending changes in the platform.
-        """
         browser, wait, base_url = setup
         explore_page = ExplorePage(browser, wait, base_url)
         """
-                Dynamic lab and project IDs
-                """
+        Dynamic lab and project IDs
+        """
         lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
         project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
         current_url = explore_page.go_to_explore_page(lab_id, project_id)

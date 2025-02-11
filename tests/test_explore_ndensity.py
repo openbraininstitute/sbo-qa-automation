@@ -14,10 +14,14 @@ class TestExploreNeuronDensity:
     @pytest.mark.build_page
     @pytest.mark.run(order=5)
     def test_explore_neuron_density_page(self, setup, login, logger):
-        browser, wait = setup
-        explore_ndensity = ExploreNeuronDensityPage(browser, wait)
-        explore_ndensity.go_to_explore_neuron_density_page()
-        # Wait for the neuron density tab
+        browser, wait, base_url = setup
+        explore_ndensity = ExploreNeuronDensityPage(browser, wait, base_url)
+        """
+        Dynamic lab and project IDs
+        """
+        lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
+        project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
+        current_url = explore_ndensity.go_to_explore_neuron_density_page(lab_id, project_id)
         explore_ndensity.wait_for_ndensity_tab(timeout=60)
         logger.info("Neuron density tab is displayed")
 
