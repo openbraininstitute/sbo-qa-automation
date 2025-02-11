@@ -71,12 +71,12 @@ class TestSandbox:
             unique_name = f"Project-{uuid.uuid4().hex[:8]}"
             logger.info(f"Generated unique project name: {unique_name}")
 
-            project_name = vl_overview.input_project_name()
+            project_name = sandbox_page.input_project_name()
             for char in unique_name:
                 project_name.send_keys(char)
                 time.sleep(0.1)
 
-            project_description = vl_overview.input_project_description()
+            project_description = sandbox_page.input_project_description()
             unique_description = f" Project Description for {unique_name}"
             for char in unique_description:
                 project_description.send_keys(char)
