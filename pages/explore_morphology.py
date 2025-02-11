@@ -1,6 +1,5 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
-
 # SPDX-License-Identifier: Apache-2.0
 import time
 
@@ -20,9 +19,11 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
         self.url_scraper = UrlScraper()
         self.logger = logger
 
-    def go_to_explore_morphology_page(self):
+    def go_to_explore_morphology_page(self, lab_id: str, project_id: str):
+        path = f"/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/morphology"
         try:
-            self.go_to_page("/explore/interactive/experimental/morphology")
+            self.browser.set_page_load_timeout(90)
+            self.go_to_page(path)
             self.wait_for_page_ready(timeout=60)
         except TimeoutException:
             raise RuntimeError("The Explore Morphology page did not load within 60 seconds")
