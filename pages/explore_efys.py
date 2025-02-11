@@ -1,6 +1,8 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
-#
+# Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+import time
+
 from selenium.common import TimeoutException
 
 from locators.explore_ephys_locators import ExploreEphysLocators
@@ -10,18 +12,25 @@ from util.util_scraper import UrlScraper
 
 
 class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
-    def __init__(self, browser, wait):
-        super().__init__(browser, wait)
-        self.home_page = ExplorePage(browser, wait)
+    def __init__(self, browser, wait, base_url):
+        super().__init__(browser, wait, base_url)
+        self.home_page = ExplorePage(browser, wait, base_url)
         self.url_scraper = UrlScraper()
 
-    def go_to_explore_ephys_page(self):
-        try:
-            self.go_to_page("/explore/interactive/experimental/electrophysiology")
-            self.wait_for_page_ready(timeout=60)
-        except TimeoutException:
-            raise RuntimeError("The Explore Ephys page did not load within 60 seconds.")
-        return self.browser.current_url
+    def go_to_explore_ephys_page(self, lab_id: str, project_id: str, retries=3, delay=5):
+        path = f"/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/electrophysiology"
+        for attempt in range(retries):
+            try:
+                self.browser.set_page_load_timeout(90)
+                self.go_to_page(path)
+                self.wait_for_page_ready(timeout=60)
+            except TimeoutException:
+                print(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
+                time.sleep(delay)  # Wait before retrying
+                delay *= 2  # Exponentially increase delay (e.g., 5, 10, 20 seconds)
+                if attempt == retries - 1:
+                    raise RuntimeError("The Explore Ephys page did not load within 60 seconds.")
+            return self.browser.current_url
 
     def download_resources(self):
         return self.find_element(ExploreEphysLocators.DOWNLOAD_RESOURCES)
