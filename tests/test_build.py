@@ -54,7 +54,7 @@ class TestBuild:
         logger.info("Unique description for Single Neuron is provided")
 
         created_by_name = build.created_by_name()
-        time.sleep(10)
+        # time.sleep(10)
         assert any(name.text.strip() for name in created_by_name), "No valid name found under 'Created by' section."
         logger.info("Verifying 'Created by' is not empty")
         names = [name.text.strip() for name in created_by_name if name.text.strip()]
@@ -108,4 +108,4 @@ class TestBuild:
         assert sn_etype.text.strip(), "E-type is missing or empty."
         print(f"E-type: {sn_etype.text.strip()}")
 
-        time.sleep(20)
+        # time.sleep(20)
