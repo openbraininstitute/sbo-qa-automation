@@ -28,7 +28,7 @@ class TestVLOverview:
         logger.info("Found Virtual lab banner and clicked")
         create_project = vl_overview.create_project().click()
         logger.info("Redirected to the Virtual lab and clicked on 'Create a project button'")
-        time.sleep(200)
+        # time.sleep(200)
         unique_name = f"Project-{uuid.uuid4().hex[:8]}"
         logger.info(f"Generated unique project name: {unique_name}")
 
@@ -56,7 +56,7 @@ class TestVLOverview:
         if enable_save_btn:
             print(f"Button Enabled: {enable_save_btn.is_enabled()}")
             enable_save_btn.click()
-            time.sleep(120)
+            # time.sleep(120)
         else:
             logger.error("Save button was not found or was not clickable")
         logger.info("New project with its description are created.")
