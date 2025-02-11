@@ -18,7 +18,9 @@ class TestExploreMorphologyPage:
     def test_explore_morphology(self, setup, login, logger):
         browser, wait, base_url = setup
         explore_morphology = ExploreMorphologyPage(browser, wait, logger, base_url)
-        explore_morphology.go_to_explore_morphology_page()
+        lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
+        project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
+        explore_morphology.go_to_explore_morphology_page(lab_id, project_id)
         logger.info("Explore morphology page is displayed")
         morphology_tab = explore_morphology.find_morphology_tab()
         logger.info("Morphology tab is displayed")
