@@ -1,5 +1,5 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
-#
+# Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 
 import time
@@ -24,9 +24,11 @@ class TestExploreModelPage:
         """
         The commented out code below is pending changes in the platform.
         """
-        browser, wait = setup
-        explore_model = ExploreModelDataPage(browser, wait, logger)
-        explore_model.go_to_explore_model_page()
+        browser, wait, base_url = setup
+        explore_model = ExploreModelDataPage(browser, wait, logger, base_url)
+        lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
+        project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
+        explore_model.go_to_explore_model_page(lab_id, project_id)
         logger.info("Explore page is loaded")
 
         emodel_tab = explore_model.find_emodel_tab()
