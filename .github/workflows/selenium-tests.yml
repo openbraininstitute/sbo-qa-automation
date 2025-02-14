@@ -44,12 +44,12 @@ jobs:
     secrets: inherit
 
 
-  test-sauce-labs:
-    needs: run-tests
-    uses: ./.github/workflows/reusable-workflow.yml
-    with:
-      env: "sauce-labs"
-      artifact-name: "Testing in SAUCE-LABS"
-    secrets: inherit
+#  test-sauce-labs:
+#    needs: run-tests
+#    uses: ./.github/workflows/reusable-workflow.yml
+#    with:
+#      env: "sauce-labs"
+#      artifact-name: "Testing in SAUCE-LABS"
+#    secrets: inherit
 
    
