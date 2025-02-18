@@ -119,5 +119,11 @@ class TestBuild:
         print(f"E-type: {sn_etype.text.strip()}")
         logger.info("E-type is displayed.")
 
+        search_input = build.find_search_input_search_item()
+        logger.info("Search input field is found")
+        browser.execute_script("arguments[0].click();", search_input)
+        # search_input.send_keys("C060114A5")
+        # time.sleep(10)
+        # logger.info("Searching for 'C060114A5'")
 
-        # time.sleep(20)
+
