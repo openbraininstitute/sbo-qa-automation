@@ -78,3 +78,6 @@ class Build(HomePage, LinkChecker):
     def sn_etype(self):
         return self.find_element(BuildLocators.SN_ETYPE)
 
+    def find_search_input_search_item(self):
+        return self.find_element(BuildLocators.SEARCH_INPUT_FIELD)
+

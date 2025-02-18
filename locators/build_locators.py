@@ -24,5 +24,7 @@ class BuildLocators:
     SN_BRAIN_REGION = (By.XPATH, "//div[contains(@class, 'text-neutral-4') and text()='brain region']/following-sibling::div")
     SN_MTYPE = (By.XPATH, "//div[contains(@class, 'text-neutral-4') and text()='m-type']/following-sibling::div")
     SN_ETYPE = (By.XPATH, "//div[contains(@class, 'text-neutral-4') and text()='e-type']/following-sibling::div")
+    SEARCH_INPUT_FIELD = (By.XPATH, "//input[@placeholder='Search for resources...']")
+    SEARCH_NAME = (By.XPATH, "(//td[@title='C060114A5'])[1]")
 
 
