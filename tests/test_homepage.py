@@ -9,6 +9,7 @@ import requests
 
 from pages.home_page import HomePage
 from util.util_links_checker import LinkChecker
+from util.util_links_handler import LinkHandler
 from util.util_links_writer import write_links_to_file
 from util.util_scraper import UrlScraper
 
@@ -26,7 +27,7 @@ file_path = os.path.join(current_directory, relative_file_path)
 class TestFindLogin:
     @pytest.mark.run(order=2)
     def test_homepage(self, setup, logger):
-        browser, wait = setup
+        browser, wait, base_url = setup
         home_page = HomePage(*setup)
         home_page.go_to_home_page()
         bb_github = home_page.find_github_btn()
@@ -70,3 +71,16 @@ class TestFindLogin:
         assert login_button.is_displayed()
         logger.info("'Login' button is found")
         login_button.click()
+
+    def test_links_on_homepage(self, setup):
+        """Test all links on the homepage and check their statuses."""
+        browser, wait, base_url = setup
+        link_handler = LinkHandler(browser)
+        links = link_handler.scrape_links()
+
+        # Optional: Save links to a file
+        file_path = os.path.join(os.getcwd(), "scraped_links.json")
+        link_handler.write_links_to_file(links, file_path)
+
+        # Validate link status
+        link_handler.check_links(links)
