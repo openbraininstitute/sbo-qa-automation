@@ -33,7 +33,7 @@ class TestExploreMorphologyPage:
             ExploreMorphologyPageLocators.LV_SPECIES,
         ]
         column_headers = explore_morphology.find_column_headers(column_locators)
-
+        # input("⏸ Paused! Press Enter to continue...")
         for header in column_headers:
             assert header.is_displayed(), f"Column header {header} is not displayed."
         logger.info("Morphology column headers are displayed.")
