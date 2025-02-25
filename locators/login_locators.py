@@ -14,3 +14,4 @@ class LoginPageLocators:
     USERNAME_FIELD = (By.XPATH, "//fieldset[@class='login-form-group']/input[@id='username']")
     PASSWORD_FIELD = (By.XPATH, "//fieldset[@class='login-form-group']/input[@id='password']")
     SUBMIT = (By.CSS_SELECTOR, ".login-form-submit")
+    SUBMIT_BUTTON = (By.XPATH, "//input[@name='login']")

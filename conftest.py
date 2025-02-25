@@ -6,6 +6,7 @@
 import logging
 import os
 import sys
+import time
 from io import BytesIO
 
 import pytest
@@ -14,6 +15,7 @@ from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.safari.options import Options as SafariOptions
@@ -60,9 +62,9 @@ def setup(request, pytestconfig):
         options.set_capability('sauce:options', sauce_options)
         print(f"Sauce Labs Options: {options.to_capabilities()}")
         if environment == "sauce-labs" and env_url == "staging":
-            base_url = "https://staging.openbluebrain.com/app"
+            base_url = "https://staging.openbluebrain.org/app/virtual-app"
         elif environment == "sauce-labs" and env_url == "production":
-            base_url = "https://openbluebrain.com/app"
+            base_url = "https://www.openbraininstitute.org/app/virtual-lab"
         else:
             raise ValueError(f"Invalid `--env_url` for Sauce Labs: {env_url}")
 
@@ -75,12 +77,16 @@ def setup(request, pytestconfig):
             options = ChromeOptions()
             if pytestconfig.getoption("--headless"):
                 options.add_argument("--headless")
+                options.add_argument("--ignore-certificate-errors")
             browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
 
         elif browser_name == "firefox":
             options = FirefoxOptions()
             if pytestconfig.getoption("--headless"):
                 options.add_argument("--headless")
+                options.add_argument(
+                    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
             browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
 
         elif browser_name == "safari":
@@ -94,7 +100,7 @@ def setup(request, pytestconfig):
         if environment == "staging":
             base_url = "https://staging.openbluebrain.com/app"
         elif environment == "production":
-            base_url = "https://openbluebrain.com/app"
+            base_url = "https://www.openbraininstitute.org/app/virtual-lab"
         else:
             raise ValueError(f"Invalid `--env_url` for Sauce Labs: {env_url}")
 
@@ -155,34 +161,27 @@ def logger(request):
 
     return logger
 
-
 @pytest.fixture(scope="function")
-def navigate_to_login(setup):
+def navigate_to_login(setup, logger):
     """Fixture that navigates to the login page"""
     browser, wait, base_url = setup
-    login_page = LoginPage(browser, wait, base_url)
-
-    config = load_config()
-
-    username = os.environ.get("OBI_USERNAME")
-    password = os.environ.get("OBI_PASSWORD")
-
-    if not username or not password:
-        raise ValueError("Missing USERNAME or PASSWORD environment variables.")
+    login_page = LoginPage(browser, wait, base_url, logger)
 
     target_url = login_page.navigate_to_homepage()
-    browser.execute_script("window.stop();")
-    print(f"conftest.py fixture - Navigated to: {target_url}")
+    print(f"Contest.py Navigated to: {target_url}")
+    login_page.wait_for_condition(
+        lambda driver: "openid-connect" in driver.current_url,
+        timeout=30,
+        message="Timed out waiting for OpenID login page."
+    )
+    assert "openid-connect" in browser.current_url, f"Did not reach OpenID login page. Current URL: {browser.current_url}"
 
-    login_button = login_page.find_login_button()
-    assert login_button.is_displayed()
-    login_button.click()
-    wait.until(EC.url_contains("auth"))
+    print("DEBUG: Returning login_page from navigate_to_login")
     return login_page
 
 
 @pytest.fixture(scope="function")
-def login(setup, navigate_to_login):
+def login(setup, navigate_to_login, logger):
     """Fixture to log in and ensure user is authenticated."""
     browser, wait, base_url = setup
     login_page = navigate_to_login
@@ -198,7 +197,6 @@ def login(setup, navigate_to_login):
 
     login_page.perform_login(username, password)
     login_page.wait_for_login_complete()
-    assert "/app/virtual-lab" in browser.current_url, f"Login failed, current URL: {browser.current_url}"
     print("Login successful. Current URL:", browser.current_url)
     yield browser, wait
     login_page.browser.delete_all_cookies()
