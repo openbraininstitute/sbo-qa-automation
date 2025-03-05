@@ -119,11 +119,29 @@ class TestBuild:
         print(f"E-type: {sn_etype.text.strip()}")
         logger.info("E-type is displayed.")
 
+        select_m_model = build.select_m_model_btn()
+        if select_m_model.is_displayed():
+            select_m_model.click()
+        else:
+            logger.info("The 'Select m-model' button is not displayed")
         search_input = build.find_search_input_search_item()
         logger.info("Search input field is found")
         browser.execute_script("arguments[0].click();", search_input)
-        # search_input.send_keys("C060114A5")
-        # time.sleep(10)
-        # logger.info("Searching for 'C060114A5'")
+        search_input.send_keys("C060114A5")
+        logger.info("Searching for 'C060114A5'")
+        searched_record = build.searched_record()
+        if searched_record.is_displayed():
+            tick_searched_record = build.tick_search_record().click()
+        else:
+            logger.info("The searched record is not found")
+        select_m_model.click()
+        logger.info("The 'M-model' is selected")
+        select_e_model = build.select_e_model_btn()
+        if select_e_model.is_displayed():
+            select_e_model.click()
+        else:
+            logger.info("The 'Select e-model' button is not displayed")
+
+        time.sleep(3)
 
 

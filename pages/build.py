@@ -13,7 +13,7 @@ class Build(HomePage, LinkChecker):
         self.home_page = HomePage(browser, wait, base_url)
 
     def go_to_build(self, lab_id: str, project_id: str):
-        path = f"/virtual-lab/lab/{lab_id}/project/{project_id}/home"
+        path = f"/lab/{lab_id}/project/{project_id}/home"
         try:
             self.go_to_page(path)
             self.wait_for_page_ready(timeout=60)
@@ -78,6 +78,21 @@ class Build(HomePage, LinkChecker):
     def sn_etype(self):
         return self.find_element(BuildLocators.SN_ETYPE)
 
+    def select_m_model_btn(self):
+        return self.find_element(BuildLocators.SELECT_M_MODEL)
+
+    def select_e_model_btn(self):
+        return self.find_element(BuildLocators.SELECT_E_MODEL)
+
     def find_search_input_search_item(self):
         return self.find_element(BuildLocators.SEARCH_INPUT_FIELD)
+
+    def searched_record(self):
+        return self.find_element(BuildLocators.SEARCHED_RECORD)
+
+    def tick_search_record(self):
+        return self.find_element(BuildLocators.TICK_SEARCHED_RECORD)
+
+    def save_model(self):
+        return self.find_element(BuildLocators.SAVE)
 

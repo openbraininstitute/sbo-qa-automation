@@ -166,7 +166,6 @@ def navigate_to_login(setup, logger):
     """Fixture that navigates to the login page"""
     browser, wait, base_url = setup
     login_page = LoginPage(browser, wait, base_url, logger)
-
     target_url = login_page.navigate_to_homepage()
     print(f"Contest.py Navigated to: {target_url}")
     login_page.wait_for_condition(

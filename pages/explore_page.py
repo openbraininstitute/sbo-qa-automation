@@ -16,7 +16,7 @@ class ExplorePage(HomePage, LinkChecker):
         self.home_page = HomePage(browser, wait, base_url)
 
     def go_to_explore_page(self, lab_id: str, project_id: str, retries=3, delay=5):
-        path = f"/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive"
+        path = f"/lab/{lab_id}/project/{project_id}/explore/interactive"
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(90)
