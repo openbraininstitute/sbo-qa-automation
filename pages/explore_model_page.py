@@ -20,7 +20,7 @@ class ExploreModelDataPage(ExplorePage, LinkChecker):
         self.logger = logger
 
     def go_to_explore_model_page(self, lab_id: str, project_id: str):
-        path = f"/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/model/e-model"
+        path = f"/lab/{lab_id}/project/{project_id}/explore/interactive/model/e-model"
         try:
             self.browser.set_page_load_timeout(90)
             self.go_to_page(path)
