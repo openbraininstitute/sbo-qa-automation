@@ -15,16 +15,15 @@ from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.safari.options import Options as SafariOptions
 from selenium.webdriver.safari.service import Service as SafariService
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
+from pages.landing_page import LandingPage
 from pages.login_page import LoginPage
 from util.util_base import load_config
 
@@ -98,7 +97,7 @@ def setup(request, pytestconfig):
             raise ValueError(f"Unsupported browser: {browser_name}")
 
         if environment == "staging":
-            base_url = "https://staging.openbluebrain.com/app"
+            base_url = "https://staging.openbraininstitute.com/app/virtual-lab"
         elif environment == "production":
             base_url = "https://www.openbraininstitute.org/app/virtual-lab"
         else:
@@ -161,14 +160,33 @@ def logger(request):
 
     return logger
 
+
 @pytest.fixture(scope="function")
-def navigate_to_login(setup, logger):
+def navigate_to_landing_page(setup, logger):
+    """Fixture to open and verify the OBI Landing Page before login."""
+    browser, wait, base_url = setup
+    landing_page = LandingPage(browser, wait, base_url, logger)
+
+    landing_page.go_to_landing_page()
+    assert landing_page.is_landing_page_displayed(), "Landing page did not load correctly."
+
+    logger.info("✅ Successfully loaded the Landing Page.")
+    yield landing_page
+
+
+@pytest.fixture(scope="function")
+def navigate_to_login(setup, logger, navigate_to_landing_page):
     """Fixture that navigates to the login page"""
     browser, wait, base_url = setup
+    landing_page = LandingPage(browser, wait, base_url, logger)
+    landing_page = navigate_to_landing_page
     login_page = LoginPage(browser, wait, base_url, logger)
-    print(f"Conftest_______ {login_page}")
+
+    landing_page.go_to_landing_page()  # Ensure landing page is loaded if needed
+    landing_page.click_go_to_lab()
+    print(f"INFO: conftest.py navigate_to_login method {login_page}")
     target_url = login_page.navigate_to_homepage()
-    print(f"Contest.py Navigated to: {target_url}")
+    print(f"INFO: contest.py Navigated to: {target_url}")
     login_page.wait_for_condition(
         lambda driver: "openid-connect" in driver.current_url,
         timeout=30,

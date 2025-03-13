@@ -17,6 +17,6 @@ class TestLogin:
         print("Login process completed via fixture")
         assert "/virtual-lab" in browser.current_url, \
             f"Unexpected URL after login: {browser.current_url}"
-
+        time.sleep(200)
         logger.info(f"Successfully logged in. Current page URL: {browser.current_url}")
 
