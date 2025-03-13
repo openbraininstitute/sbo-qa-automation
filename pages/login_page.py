@@ -35,7 +35,10 @@ class LoginPage(CustomBasePage):
     def wait_for_login_complete(self, timeout=30):
         """Wait for login completion by checking a URL or element."""
         try:
-            self.wait.until(EC.url_contains('app/virtual-lab'), timeout)
+            # self.wait.until(EC.url_contains('app'), timeout)
+            # print(f"INFO: Redirected to {self.browser.current_url}")
+            self.wait.until(EC.url_contains("app/virtual-lab"))
+            print(f"INFO: Successfully redirected to {self.browser.current_url}")
         except TimeoutException:
             print(
                 f"Timeout waiting for URL to contain 'virtual-lab'. Current URL: "
@@ -81,6 +84,9 @@ class LoginPage(CustomBasePage):
 
         try:
             self.wait_for_login_complete()
+            # if "app/virtual-lab" not in self.browser.current_url:
+            #     print(f"INFO: Manually navigating to /app/virtual-lab")
+            #     self.browser.get(self.base_url + "/app/virtual-lab")
             self.wait.until(EC.url_contains("app/virtual-lab"))
             print("DEBUG: Login should be complete now.")
         except Exception as e:

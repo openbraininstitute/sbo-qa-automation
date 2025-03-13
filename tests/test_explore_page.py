@@ -27,7 +27,7 @@ class TestExplorePage:
         lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
         project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
         current_url = explore_page.go_to_explore_page(lab_id, project_id)
-        logger.info("Explore page is loaded")
+        # logger.info(f"Explore page is loaded, {browser.current_url}")
 
         """Checking the titles of the Explore Page"""
         explore_page.check_explore_title_is_present()
