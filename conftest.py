@@ -152,10 +152,10 @@ def logger(request):
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
-    logger.info('Test started')
+    logger.info("🟢 Test started")
 
     def log_test_finish():
-        logger.info('Test finished')
+        logger.info("🛑 Test finished")
 
     request.addfinalizer(log_test_finish)
 
@@ -166,6 +166,7 @@ def navigate_to_login(setup, logger):
     """Fixture that navigates to the login page"""
     browser, wait, base_url = setup
     login_page = LoginPage(browser, wait, base_url, logger)
+    print(f"Conftest_______ {login_page}")
     target_url = login_page.navigate_to_homepage()
     print(f"Contest.py Navigated to: {target_url}")
     login_page.wait_for_condition(

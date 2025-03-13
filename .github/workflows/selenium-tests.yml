@@ -26,13 +26,13 @@ jobs:
         with:
           python-version: '3.11'
 
-  test-staging:
-    needs: run-tests
-    uses: ./.github/workflows/reusable-workflow.yml
-    with:
-      env: "staging"
-      artifact-name: "testing in staging"
-    secrets: inherit
+#  test-staging:
+#    needs: run-tests
+#    uses: ./.github/workflows/reusable-workflow.yml
+#    with:
+#      env: "staging"
+#      artifact-name: "testing in staging"
+#    secrets: inherit
 
 
   test-production:

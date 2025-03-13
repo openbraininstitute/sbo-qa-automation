@@ -21,8 +21,9 @@ class LoginPage(CustomBasePage):
         print(self.base_url, "PRINTING BASE_URL FROM login_page")
         target_url = self.base_url
         self.browser.get(target_url)
+        print(f"INFO: Login page, target_url:  {target_url}")
         WebDriverWait(self.browser, 30).until(
-            lambda d: "log-in" in d.current_url
+            lambda d: "openid-connect" in d.current_url or "auth" in d.current_url
         )
         self.logger.info(f"INFO: target_url from pages/login_page.py:, {target_url}")
         self.logger.info(f"INFO: Starting URL from pages/login_page.py:, {self.browser.current_url}")
@@ -89,7 +90,6 @@ class LoginPage(CustomBasePage):
     def make_form_visible(self):
         """Use JavaScript to make the hidden form visible by removing 'display:none'."""
         form_container = self.find_form_container()
-
         self.browser.execute_script("arguments[0].style.display = 'block';", form_container)
         print("Form container made visible via JavaScript.")
 
