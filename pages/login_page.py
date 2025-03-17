@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+import time
 
 from selenium.common import TimeoutException
 from selenium.webdriver import Keys
@@ -18,10 +19,9 @@ class LoginPage(CustomBasePage):
 
     def navigate_to_homepage(self):
         self.browser.delete_all_cookies()
-        print(self.base_url, "PRINTING BASE_URL FROM login_page")
+        print(f"INFO: From pages/login_page.py 'self.base_url': {self.base_url}")
         target_url = self.base_url
         self.browser.get(target_url)
-        print(f"INFO: Login page, target_url:  {target_url}")
         WebDriverWait(self.browser, 30).until(
             lambda d: "openid-connect" in d.current_url or "auth" in d.current_url
         )
@@ -35,8 +35,6 @@ class LoginPage(CustomBasePage):
     def wait_for_login_complete(self, timeout=30):
         """Wait for login completion by checking a URL or element."""
         try:
-            # self.wait.until(EC.url_contains('app'), timeout)
-            # print(f"INFO: Redirected to {self.browser.current_url}")
             self.wait.until(EC.url_contains("app/virtual-lab"))
             print(f"INFO: Successfully redirected to {self.browser.current_url}")
         except TimeoutException:
@@ -47,11 +45,9 @@ class LoginPage(CustomBasePage):
 
     def find_form_container(self):
         return self.find_element(LoginPageLocators.FORM_CONTAINER)
-        # return self.find_element(LoginPageLocators.FORM_CONTAINER)
 
     def find_username_field(self):
         return self.find_element(LoginPageLocators.USERNAME_FIELD)
-        # return self.wait.until(EC.presence_of_element_located(LoginPageLocators.USERNAME_FIELD))
 
     def find_password_field(self):
         return self.wait.until(EC.presence_of_element_located(LoginPageLocators.PASSWORD_FIELD))
@@ -84,9 +80,6 @@ class LoginPage(CustomBasePage):
 
         try:
             self.wait_for_login_complete()
-            # if "app/virtual-lab" not in self.browser.current_url:
-            #     print(f"INFO: Manually navigating to /app/virtual-lab")
-            #     self.browser.get(self.base_url + "/app/virtual-lab")
             self.wait.until(EC.url_contains("app/virtual-lab"))
             print("DEBUG: Login should be complete now.")
         except Exception as e:

@@ -1,8 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
-
-
+import json
 import logging
 import os
 import sys
@@ -27,6 +26,36 @@ from pages.landing_page import LandingPage
 from pages.login_page import LoginPage
 from util.util_base import load_config
 
+
+@pytest.fixture(scope="session")
+def test_config(pytestconfig):
+    """Loads config.json and returns the correct environment-specific settings."""
+    config = load_config()
+    print("DEBUG: Loaded config:", config)
+    username = config.get("username")
+    password = config.get("password")
+
+    if not username or not password:
+        raise ValueError("Username or password is missing in the configuration!")
+
+    env = pytestconfig.getoption("env_url")  # "staging" or "production"
+
+    if env not in config:
+        raise KeyError(f"Environment '{env}' not found in configuration!")
+
+    env_config = config[env]
+    lab_id = env_config.get("lab_id")
+    project_id = env_config.get("project_id")
+
+    if not lab_id or not project_id:
+        raise KeyError(f"Missing 'lab_id' or 'project_id' for environment '{env}'")
+
+    return {
+        "username": username,
+        "password": password,
+        "lab_id": lab_id,
+        "project_id": project_id
+    }
 
 @pytest.fixture(scope="class", autouse=True)
 def setup(request, pytestconfig):
@@ -61,7 +90,7 @@ def setup(request, pytestconfig):
         options.set_capability('sauce:options', sauce_options)
         print(f"Sauce Labs Options: {options.to_capabilities()}")
         if environment == "sauce-labs" and env_url == "staging":
-            base_url = "https://staging.openbluebrain.org/app/virtual-app"
+            base_url = "https://staging.openbraininstitute.org/app/virtual-app"
         elif environment == "sauce-labs" and env_url == "production":
             base_url = "https://www.openbraininstitute.org/app/virtual-lab"
         else:
@@ -97,7 +126,7 @@ def setup(request, pytestconfig):
             raise ValueError(f"Unsupported browser: {browser_name}")
 
         if environment == "staging":
-            base_url = "https://staging.openbraininstitute.com/app/virtual-lab"
+            base_url = "https://staging.openbraininstitute.org/app/virtual-lab"
         elif environment == "production":
             base_url = "https://www.openbraininstitute.org/app/virtual-lab"
         else:
@@ -182,11 +211,9 @@ def navigate_to_login(setup, logger, navigate_to_landing_page):
     landing_page = navigate_to_landing_page
     login_page = LoginPage(browser, wait, base_url, logger)
 
-    landing_page.go_to_landing_page()  # Ensure landing page is loaded if needed
+    landing_page.go_to_landing_page()
     landing_page.click_go_to_lab()
-    print(f"INFO: conftest.py navigate_to_login method {login_page}")
     target_url = login_page.navigate_to_homepage()
-    print(f"INFO: contest.py Navigated to: {target_url}")
     login_page.wait_for_condition(
         lambda driver: "openid-connect" in driver.current_url,
         timeout=30,
@@ -194,21 +221,18 @@ def navigate_to_login(setup, logger, navigate_to_landing_page):
     )
     assert "openid-connect" in browser.current_url, f"Did not reach OpenID login page. Current URL: {browser.current_url}"
 
-    print("DEBUG: Returning login_page from navigate_to_login")
+    print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
     return login_page
 
-
 @pytest.fixture(scope="function")
-def login(setup, navigate_to_login, logger):
+def login(setup, navigate_to_login, test_config, logger):
     """Fixture to log in and ensure user is authenticated."""
     browser, wait, base_url = setup
     login_page = navigate_to_login
 
-    config = load_config()
-    if not config:
-        raise ValueError("Failed to load configuration")
-    username = config.get('username')
-    password = config.get('password')
+    # Use test_config instead of calling load_config() again
+    username = test_config.get("username")
+    password = test_config.get("password")
 
     if not username or not password:
         raise ValueError("Username or password is missing in the configuration!")
@@ -216,9 +240,9 @@ def login(setup, navigate_to_login, logger):
     login_page.perform_login(username, password)
     login_page.wait_for_login_complete()
     print("Login successful. Current URL:", browser.current_url)
+
     yield browser, wait
     login_page.browser.delete_all_cookies()
-
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):

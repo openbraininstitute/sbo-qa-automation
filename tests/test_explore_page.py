@@ -18,14 +18,17 @@ file_path = os.path.join(current_directory, relative_file_path)
 class TestExplorePage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=3)
-    def test_explore_page(self, setup, login, logger):
+    def test_explore_page(self, setup, login, logger, test_config):
         browser, wait, base_url = setup
         explore_page = ExplorePage(browser, wait, base_url)
         """
         Dynamic lab and project IDs
         """
-        lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
-        project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
+        # lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
+        # project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
+        lab_id = test_config["lab_id"]
+        project_id = test_config["project_id"]
+        print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         current_url = explore_page.go_to_explore_page(lab_id, project_id)
         # logger.info(f"Explore page is loaded, {browser.current_url}")
 
