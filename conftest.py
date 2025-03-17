@@ -30,22 +30,23 @@ from util.util_base import load_config
 @pytest.fixture(scope="session")
 def test_config(pytestconfig):
     """Loads config.json and returns the correct environment-specific settings."""
-    config = load_config()
-    print("DEBUG: Loaded config:", config)
-    username = config.get("username")
-    password = config.get("password")
+    # config = load_config()
+    # print("DEBUG: Loaded config:", config)
+    username = os.getenv("OBI_USERNAME")
+    password = os.getenv("OBI_PASSWORD")
+    env = pytestconfig.getoption("env_url")
 
     if not username or not password:
         raise ValueError("Username or password is missing in the configuration!")
 
-    env = pytestconfig.getoption("env_url")  # "staging" or "production"
-
-    if env not in config:
-        raise KeyError(f"Environment '{env}' not found in configuration!")
-
-    env_config = config[env]
-    lab_id = env_config.get("lab_id")
-    project_id = env_config.get("project_id")
+    if env == "staging":
+        lab_id = os.getenv("LAB_ID_STAGING")
+        project_id = os.getenv("PROJECT_ID_STAGING")
+    elif env == "production":
+        lab_id = os.getenv("LAB_ID_PRODUCTION")
+        project_id = os.getenv("PROJECT_ID_PRODUCTION")
+    else:
+        raise ValueError(f"Invalid environment: {env}")
 
     if not lab_id or not project_id:
         raise KeyError(f"Missing 'lab_id' or 'project_id' for environment '{env}'")
