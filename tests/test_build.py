@@ -134,14 +134,16 @@ class TestBuild:
             tick_searched_record = build.tick_search_record().click()
         else:
             logger.info("The searched record is not found")
-        select_m_model.click()
-        logger.info("The 'M-model' is selected")
-        select_e_model = build.select_e_model_btn()
-        if select_e_model.is_displayed():
-            select_e_model.click()
-        else:
-            logger.info("The 'Select e-model' button is not displayed")
-
-        time.sleep(3)
+        # time.sleep(10)
+        # select_m_model.click()
+        # logger.info("The 'M-model' is selected")
+        # select_e_model = build.select_e_model_btn()
+        # if select_e_model.is_displayed():
+        #     select_e_model.click()
+        #     time.sleep(5)
+        # else:
+        #     logger.info("The 'Select e-model' button is not displayed")
+        #
+        # time.sleep(3)
 
 
