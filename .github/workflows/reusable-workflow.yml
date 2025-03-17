@@ -73,6 +73,10 @@ jobs:
           OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          LAB_ID_STAGING: ${{ secrets.LAB_ID_STAGING }}
+          PROJECT_ID_STAGING: ${{ secrets.PROJECT_ID_STAGING }}
+          LAB_ID_PRODUCTION: ${{ secrets.LAB_ID_PRODUCTION }}
+          PROJECT_ID_PRODUCTION: ${{ secrets.PROJECT_ID_PRODUCTION }}
         run: |
           echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
           echo "ENV_URL: $ENV_URL"  
@@ -90,22 +94,22 @@ jobs:
           path: latest_logs/errors
           if-no-files-found: warn
 
-      # Notify slack on success
-      - name: Notify slack on success
-        if: success()
-        env:
-          SLACK_WEBHOOK_URL_PASS: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
-        run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
-          $SLACK_WEBHOOK_URL_PASS
-
-      # Notify slack on failure
-      - name: Notify slack on failure
-        if: failure()
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
-        run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
-          $SLACK_WEBHOOK_URL
+#      # Notify slack on success
+#      - name: Notify slack on success
+#        if: success()
+#        env:
+#          SLACK_WEBHOOK_URL_PASS: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
+#        run: |
+#          curl -X POST -H 'Content-type: application/json' \
+#          --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
+#          $SLACK_WEBHOOK_URL_PASS
+#
+#      # Notify slack on failure
+#      - name: Notify slack on failure
+#        if: failure()
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
+#        run: |
+#          curl -X POST -H 'Content-type: application/json' \
+#          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
+#          $SLACK_WEBHOOK_URL

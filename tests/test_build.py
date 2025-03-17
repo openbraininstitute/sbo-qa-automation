@@ -13,15 +13,16 @@ from pages.vl_overview import VLOverview
 import pytest
 
 class TestBuild:
-    def test_build(self, setup, login, logger):
+    def test_build(self, setup, login, logger,test_config):
 
         browser, wait, base_url = setup
         build = Build(browser,wait, base_url)
         """
         Dynamic lab and project IDs
         """
-        lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
-        project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
+        lab_id = test_config["lab_id"]
+        project_id = test_config["project_id"]
+        print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         current_url = build.go_to_build(lab_id, project_id)
 
         # Assert that the correct lab and project are in the URL
