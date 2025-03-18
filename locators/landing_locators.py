@@ -13,7 +13,7 @@ class LandingLocators:
     TITLE_RECONSTRUCT = (By.XPATH, "//h1[normalize-space()='Reconstructing digital brain models']")
     TITLE_WHO = (By.XPATH, "//h1[normalize-space()='Who is behind the Open Brain Institute']")
     TITLE_NEWS = (By.XPATH, "//h1[normalize-space()='News and events']")
-    GOTO_LAB = (By.XPATH, "//a[normalize-space()='Go to your lab']")
+    GOTO_LAB = (By.XPATH, "//*[contains(@class, 'Menu_loginButton__')]")
     P_TEXT1 = (By.XPATH, "(//div[@class='SanityContentPreview_text__ivnWe'])[1]")
     P_TEXT2 = (By.XPATH, "(//div[@class='SanityContentPreview_text__ivnWe'])[2]")
     P_TEXT3 = (By.XPATH, "(//div[@class='SanityContentPreview_text__ivnWe'])[3]")
