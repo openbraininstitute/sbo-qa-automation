@@ -18,14 +18,14 @@ file_path = os.path.join(current_directory, relative_file_path)
 class TestExploreEphys:
     @pytest.mark.explore_page
     @pytest.mark.run(order=4)
-    def test_explore_ephys_page(self, setup, login, logger):
+    def test_explore_ephys_page(self, setup, login, logger, test_config):
         browser, wait, base_url = setup
         explore_ephys_page = ExploreElectrophysiologyPage(browser, wait, base_url)
         """
         Dynamic lab and project IDs
         """
-        lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
-        project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
+        lab_id = test_config["lab_id"]
+        project_id = test_config["project_id"]
         current_url = explore_ephys_page.go_to_explore_ephys_page(lab_id, project_id)
         time.sleep(3)
         ephys_tab_title = explore_ephys_page.find_ephys_tab_title()

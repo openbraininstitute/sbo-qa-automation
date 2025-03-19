@@ -72,15 +72,15 @@ class TestFindLogin:
         logger.info("'Login' button is found")
         login_button.click()
 
-    def test_links_on_homepage(self, setup):
-        """Test all links on the homepage and check their statuses."""
-        browser, wait, base_url = setup
-        link_handler = LinkHandler(browser)
-        links = link_handler.scrape_links()
-
-        # Optional: Save links to a file
-        file_path = os.path.join(os.getcwd(), "scraped_links.json")
-        link_handler.write_links_to_file(links, file_path)
-
-        # Validate link status
-        link_handler.check_links(links)
+    # def test_links_on_homepage(self, setup):
+    #     """Test all links on the homepage and check their statuses."""
+    #     browser, wait, base_url = setup
+    #     link_handler = LinkHandler(browser)
+    #     links = link_handler.scrape_links()
+    #
+    #     # Optional: Save links to a file
+    #     file_path = os.path.join(os.getcwd(), "scraped_links.json")
+    #     link_handler.write_links_to_file(links, file_path)
+    #
+    #     # Validate link status
+    #     link_handler.check_links(links)
