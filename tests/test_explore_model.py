@@ -20,14 +20,14 @@ file_path = os.path.join(current_directory, relative_file_path)
 class TestExploreModelPage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=7)
-    def test_explore_model(self, setup, login, logger):
+    def test_explore_model(self, setup, login, logger, test_config):
         """
         The commented out code below is pending changes in the platform.
         """
         browser, wait, base_url = setup
         explore_model = ExploreModelDataPage(browser, wait, logger, base_url)
-        lab_id = "37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc"
-        project_id = "8abcb1e3-b714-4267-a22c-3b3dc4be5306"
+        lab_id = test_config["lab_id"]
+        project_id = test_config["project_id"]
         explore_model.go_to_explore_model_page(lab_id, project_id)
         logger.info("Explore page is loaded")
 

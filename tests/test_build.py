@@ -25,7 +25,6 @@ class TestBuild:
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         current_url = build.go_to_build(lab_id, project_id)
 
-        # Assert that the correct lab and project are in the URL
         assert lab_id in current_url and project_id in current_url, \
             f"Navigation failed. Expected IDs {lab_id} and {project_id} not found in {current_url}"
 
