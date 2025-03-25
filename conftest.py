@@ -34,7 +34,7 @@ def test_config(pytestconfig):
     # print("DEBUG: Loaded config:", config)
     username = os.getenv("OBI_USERNAME")
     password = os.getenv("OBI_PASSWORD")
-    env = pytestconfig.getoption("env_url")
+    env = pytestconfig.getoption("env")
 
     if not username or not password:
         raise ValueError("Username or password is missing in the configuration!")
