@@ -32,20 +32,17 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
                     raise RuntimeError("The Explore page failed to load after multiple attempts.")
             return self.browser.current_url
 
-    def find_load_more_btn(self):
-        return self.find_element(ExploreNDensityPageLocators.LOAD_MORE_BUTTON)
-
-    def find_table_rows(self):
-        return self.wait.find_all_elements(ExploreNDensityPageLocators.TABLE_ROWS)
-
-    def find_ndensity_tab(self):
-        return self.find_element(ExploreNDensityPageLocators.NDENSITY_TAB)
-
     def wait_for_ndensity_tab(self, timeout=60):
         """
         Waits for the neuron density tab to become visible.
         """
         self.wait_for_long_load(ExploreNDensityPageLocators.NDENSITY_TAB, timeout)
+
+    def find_ai_assistant_panel(self):
+        return self.find_element(ExploreNDensityPageLocators.AI_ASSISTANT_PANEL)
+
+    def find_ai_assistant_panel_close(self):
+        return self.find_element(ExploreNDensityPageLocators.AI_ASSISTANT_PANEL_CLOSE)
 
     def find_column_headers(self, column_locators, timeout=60):
         column_headers = []
@@ -71,17 +68,27 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
     def lv_br_row1(self):
         return self.find_element(ExploreNDensityPageLocators.LV_BR_ROW1)
 
+    def find_cerebrum_brp(self, timeout=30):
+        return self.find_element(ExploreNDensityPageLocators.BRP_CEREBRUM, timeout=timeout)
+
     def find_dv_name(self):
         return self.element_visibility(ExploreNDensityPageLocators.DV_NAME)
 
-    def find_cerebrum_brp(self, timeout=30):
-        return self.find_element(ExploreNDensityPageLocators.BRP_CEREBRUM, timeout=timeout)
+    def find_load_more_btn(self):
+        return self.find_element(ExploreNDensityPageLocators.LOAD_MORE_BUTTON)
+
+    def find_lv_contributor_header(self):
+        return self.find_element(ExploreNDensityPageLocators.LV_CONTRIBUTORS)
+
+    def find_ndensity_tab(self):
+        return self.find_element(ExploreNDensityPageLocators.NDENSITY_TAB)
 
     def find_registration_date(self):
         return self.find_element(ExploreNDensityPageLocators.LV_REGISTRATION_DATE)
 
-    def find_lv_contributor_header(self):
-        return self.find_element(ExploreNDensityPageLocators.LV_CONTRIBUTORS)
+    def find_table_rows(self):
+        return self.wait.find_all_elements(ExploreNDensityPageLocators.TABLE_ROWS)
+
 
 
 

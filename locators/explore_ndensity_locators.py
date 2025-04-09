@@ -6,6 +6,8 @@ from selenium.webdriver.common.by import By
 
 
 class ExploreNDensityPageLocators:
+    AI_ASSISTANT_PANEL = (By.XPATH, "//button[starts-with(@class, 'literature-suggestions')]")
+    AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@class='anticon anticon-minus'])[2]")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
     BRP_CEREBRUM = (By.XPATH, "//span[@title='Cerebrum' and text()='Cerebrum']")
     TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")

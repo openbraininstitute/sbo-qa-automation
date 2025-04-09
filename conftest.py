@@ -29,9 +29,7 @@ from util.util_base import load_config
 
 @pytest.fixture(scope="session")
 def test_config(pytestconfig):
-    """Loads config.json and returns the correct environment-specific settings."""
-    # config = load_config()
-    # print("DEBUG: Loaded config:", config)
+    """Gets credentials and IDS returns the correct environment-specific settings."""
     username = os.getenv("OBI_USERNAME")
     password = os.getenv("OBI_PASSWORD")
     env = pytestconfig.getoption("env")
@@ -39,117 +37,70 @@ def test_config(pytestconfig):
     if not username or not password:
         raise ValueError("Username or password is missing in the configuration!")
 
-    if env == "staging":
+    if env =="staging":
+        base_url = "https://staging.openbraininstitute.org/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_STAGING")
         project_id = os.getenv("PROJECT_ID_STAGING")
     elif env == "production":
+        base_url = "https://www.openbraininstitute.org/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_PRODUCTION")
         project_id = os.getenv("PROJECT_ID_PRODUCTION")
     else:
         raise ValueError(f"Invalid environment: {env}")
 
-    if not lab_id or not project_id:
-        raise KeyError(f"Missing 'lab_id' or 'project_id' for environment '{env}'")
-
     return {
         "username": username,
         "password": password,
+        "base_url": base_url,
         "lab_id": lab_id,
-        "project_id": project_id
+        "project_id": project_id,
     }
 
+
 @pytest.fixture(scope="class", autouse=True)
-def setup(request, pytestconfig):
+def setup(request, pytestconfig, test_config):
     """Fixture to set up the browser/webdriver"""
     environment = pytestconfig.getoption("env")
-    env_url = pytestconfig.getoption("env_url")
     browser_name = pytestconfig.getoption("--browser-name")
-    print(f"Environment passed: {environment}")
-    print(f"Environment passed: {env_url}")
-    print(f"Environment passed: {browser_name}")
-    browser = None
-    base_url = None
+    base_url = test_config["base_url"]
+    lab_id = test_config["lab_id"]
+    project_id = test_config["project_id"]
 
-    if environment == "sauce-labs":
+    print(f"Starting tests in {environment.upper()} mode.")
+    print(f"Base URL: {base_url}")
 
-        print("Setting up Sauce Labs environment")
-        if not os.environ.get("SAUCE_USERNAME") or not os.environ.get("SAUCE_ACCESS_KEY"):
-            raise ValueError("Sauce Labs credentials (SAUCE_USERNAME, SAUCE_ACCESS_KEY) are required")
+    if browser_name == "chrome":
         options = ChromeOptions()
-        options.browser_version = 'latest'
-        options.platform_name = 'Windows 10'
-
-        sauce_options = {
-            'username': os.environ["SAUCE_USERNAME"],
-            'accessKey': os.environ["SAUCE_ACCESS_KEY"],
-            'name': request.node.name  # Sauce job name
-        }
-
-        print(f"SAUCE_USERNAME: {os.environ.get('SAUCE_USERNAME')}")
-        print(f"SAUCE_ACCESS_KEY: {os.environ.get('SAUCE_ACCESS_KEY')}")
-
-        options.set_capability('sauce:options', sauce_options)
-        print(f"Sauce Labs Options: {options.to_capabilities()}")
-        if environment == "sauce-labs" and env_url == "staging":
-            base_url = "https://staging.openbraininstitute.org/app/virtual-app"
-        elif environment == "sauce-labs" and env_url == "production":
-            base_url = "https://www.openbraininstitute.org/app/virtual-lab"
-        else:
-            raise ValueError(f"Invalid `--env_url` for Sauce Labs: {env_url}")
-
-        sauce_url = "https://ondemand.eu-central-1.saucelabs.com:443/wd/hub"
-        print(f"Using Sauce Labs URL: {sauce_url}")
-        browser = webdriver.Remote(command_executor=sauce_url, options=options)
-
+        if pytestconfig.getoption("--headless"):
+            options.add_argument("--headless")
+            options.add_argument("--ignore-certificate-errors")
+        browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+    elif browser_name == "firefox":
+        options = FirefoxOptions()
+        if pytestconfig.getoption("--headless"):
+            options.add_argument("--headless")
+        browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
     else:
-        if browser_name == "chrome":
-            options = ChromeOptions()
-            if pytestconfig.getoption("--headless"):
-                options.add_argument("--headless")
-                options.add_argument("--ignore-certificate-errors")
-            browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-
-        elif browser_name == "firefox":
-            options = FirefoxOptions()
-            if pytestconfig.getoption("--headless"):
-                options.add_argument("--headless")
-                options.add_argument(
-                    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-
-            browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
-
-        elif browser_name == "safari":
-            options = SafariOptions()
-            if pytestconfig.getoption("--headless"):
-                options.add_argument("--headless")
-            browser = webdriver.Safari(service=SafariService(), options=options)
-        else:
-            raise ValueError(f"Unsupported browser: {browser_name}")
-
-        if environment == "staging":
-            base_url = "https://staging.openbraininstitute.org/app/virtual-lab"
-        elif environment == "production":
-            base_url = "https://www.openbraininstitute.org/app/virtual-lab"
-        else:
-            raise ValueError(f"Invalid `--env_url` for Sauce Labs: {env_url}")
+        raise ValueError(f"Unsupported browser: {browser_name}")
 
     browser.set_page_load_timeout(60)
     wait = WebDriverWait(browser, 20)
 
-    if browser is not None:
-        browser.set_window_position(-1000, 0)
-        browser.maximize_window()
-    browser.delete_all_cookies()
+    # Set base URL globally
+    request.cls.base_url = base_url
+    request.cls.lab_id = lab_id
+    request.cls.project_id = project_id
+
 
     request.cls.browser = browser
     request.cls.wait = wait
-    request.cls.base_url = base_url
-    yield browser, wait, base_url
+
+    print(f"🔄 Navigating to Landing Page: {base_url}")
+    browser.get(base_url)
+
+    yield browser, wait, base_url, lab_id, project_id
 
     if browser is not None:
-        if environment == "sauce-labs":
-            sauce_result = "failed" if request.session.testsfailed == 1 else "passed"
-            browser.execute_script(f"sauce:job-result={sauce_result}")
         browser.quit()
 
 
@@ -194,27 +145,24 @@ def logger(request):
 @pytest.fixture(scope="function")
 def navigate_to_landing_page(setup, logger):
     """Fixture to open and verify the OBI Landing Page before login."""
-    browser, wait, base_url = setup
+    browser, wait, base_url, lab_id, project_id = setup
     landing_page = LandingPage(browser, wait, base_url, logger)
 
     landing_page.go_to_landing_page()
-    assert landing_page.is_landing_page_displayed(), "Landing page did not load correctly."
-
-    logger.info("✅ Successfully loaded the Landing Page.")
     yield landing_page
 
 
 @pytest.fixture(scope="function")
-def navigate_to_login(setup, logger, navigate_to_landing_page):
+def navigate_to_login(setup, logger, request):
     """Fixture that navigates to the login page"""
-    browser, wait, base_url = setup
-    landing_page = LandingPage(browser, wait, base_url, logger)
-    landing_page = navigate_to_landing_page
+    browser, wait, base_url, lab_id, project_id = setup
     login_page = LoginPage(browser, wait, base_url, logger)
 
-    landing_page.go_to_landing_page()
-    landing_page.click_go_to_lab()
-    target_url = login_page.navigate_to_homepage()
+    if request.node.get_closest_marker("use_landing_page"):
+        landing_page = LandingPage(browser, wait, base_url, logger)
+        landing_page.go_to_landing_page()
+        landing_page.click_go_to_lab()
+    browser.get(f"{base_url}")
     login_page.wait_for_condition(
         lambda driver: "openid-connect" in driver.current_url,
         timeout=30,
@@ -228,10 +176,9 @@ def navigate_to_login(setup, logger, navigate_to_landing_page):
 @pytest.fixture(scope="function")
 def login(setup, navigate_to_login, test_config, logger):
     """Fixture to log in and ensure user is authenticated."""
-    browser, wait, base_url = setup
+    browser, wait, base_url, lab_id, project_id = setup
     login_page = navigate_to_login
 
-    # Use test_config instead of calling load_config() again
     username = test_config.get("username")
     password = test_config.get("password")
 
@@ -241,7 +188,19 @@ def login(setup, navigate_to_login, test_config, logger):
     login_page.perform_login(username, password)
     login_page.wait_for_login_complete()
     print("Login successful. Current URL:", browser.current_url)
+    login_page = LoginPage(browser, wait, base_url, logger)
+    modal_terms_and_conditions = login_page.terms_modal()
+    assert modal_terms_and_conditions.is_displayed(), "The TOR modal is not displayed for 1st time users"
 
+    if modal_terms_and_conditions:
+        print("Modal appeared for first-time users")
+        modal_tor_link = login_page.terms_modal_link()
+        logger.info('Terms and conditions links is displayed')
+        modal_continue_btn = login_page.terms_modal_continue()
+        modal_continue_btn.click()
+        logger.info("Continue button is clicked")
+    else:
+        print("Modal did NOT appear")
     yield browser, wait
     login_page.browser.delete_all_cookies()
 

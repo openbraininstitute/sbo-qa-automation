@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 
 class ExploreEphysLocators:
     ALL_CHECKBOXES = (By.XPATH, "//span[@class='ant-checkbox ant-wave-target']")
+    AI_ASSISTANT_PANEL = (By.XPATH, "//button[starts-with(@class, 'literature-suggestions')]")
     APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")
     CHECKBOXES = (By.XPATH, "//input[@class='ant-checkbox-input' and @type='checkbox']")
     DOWNLOAD_RESOURCES = (By.XPATH, "//button[@type='button' and "

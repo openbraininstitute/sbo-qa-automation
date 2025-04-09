@@ -19,14 +19,10 @@ class TestExploreEphys:
     @pytest.mark.explore_page
     @pytest.mark.run(order=4)
     def test_explore_ephys_page(self, setup, login, logger, test_config):
-        browser, wait, base_url = setup
+        """ Verifying Explore Electrophysiology Tab """
+        browser, wait, base_url, lab_id, project_id = setup
         explore_ephys_page = ExploreElectrophysiologyPage(browser, wait, base_url)
-        """
-        Dynamic lab and project IDs
-        """
-        lab_id = test_config["lab_id"]
-        project_id = test_config["project_id"]
-        current_url = explore_ephys_page.go_to_explore_ephys_page(lab_id, project_id)
+        explore_ephys_page.go_to_explore_ephys_page(lab_id, project_id)
         time.sleep(3)
         ephys_tab_title = explore_ephys_page.find_ephys_tab_title()
         logger.info("'Electrophysiology' tab title is present.")

@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 
 
 class ExplorePageLocators:
+    AI_ASSISTANT_PANEL = (By.XPATH, "//button[starts-with(@class, 'literature-suggestions')]")
     ATLAS = (By.CSS_SELECTOR, "div[id='3d-area']")
     ATLAS_FULLSCREEN = (By.CSS_SELECTOR, "span[class='anticon anticon-fullscreen h-5 w-5 text-xl']")
     BOUTON_DENSITY_NRECORDS = (By.XPATH, "//a[@data-testid='experiment-dataset"
@@ -22,7 +23,7 @@ class ExplorePageLocators:
     EXPLORE_LINK1 = (By.XPATH, "//a[@href='/mmb-beta/explore/simulation-campaigns']//h1[text("
                                ")='Brain & cells annotations']")
     EXPLORE_TITLE = (By.XPATH, "//a[text()='explore']")
-    EXPLORE_URL = (By.XPATH, "//a[@href='/app/explore']")
+    EXPLORE_URL = (By.XPATH, "//a[@href='/explore']")
     FULLSCREEN_EXIT = (By.CSS_SELECTOR, "span[aria-label='fullscreen-exit']")
     INTERACTIVE_EXPLORATION = (By.XPATH, "//h2[text()='Interactive exploration']")
     LITERATURE = (By.XPATH, "//button[text()='Literature']")
@@ -70,9 +71,10 @@ class ExplorePageLocators:
                                    "@href='/app/virtual-lab/lab/37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc/project/8abcb1e3-b714-4267-a22c-3b3dc4be5306/explore/interactive/experimental/morphology']")
     NEURON_ELECTROPHYSIOLOGY = (By.XPATH, "//a[@data-testid='experiment-dataset-ExperimentalElectroPhysiology' and @href='/app/virtual-lab/lab/37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc/project/8abcb1e3-b714-4267-a22c-3b3dc4be5306/explore/interactive/experimental/electrophysiology']")
     NEURON_DENSITY = (By.XPATH, "//a[@data-testid='experiment-dataset-ExperimentalNeuronDensity'"
-                                "and @href='/app/virtual-lab/lab/37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc/project/8abcb1e3-b714-4267-a22c-3b3dc4be5306/explore/interactive/experimental/neuron-density']")
+                                "and @href='/virtual-lab/lab/37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc/project/8abcb1e3-b714-4267-a22c-3b3dc4be5306/explore/interactive/experimental/neuron-density']")
     BOUTON_DENSITY = (By.XPATH, "//a[@data-testid='experiment-dataset-ExperimentalBoutonDensity' "
                                 "and @href='/app/virtual-lab/lab/37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc/project/8abcb1e3-b714-4267-a22c-3b3dc4be5306/explore/interactive/experimental/bouton-density']")
     SYNAPSE_PER_CONNECTION = (By.XPATH, "//a[@data-testid='experiment-dataset-ExperimentalSynapsePerConnection' and "
                                     "@href='/app/virtual-lab/lab/37a3a2e8-a4b4-456b-8aff-4e23e87a5cbc/project/8abcb1e3-b714-4267-a22c-3b3dc4be5306/explore/interactive/experimental/synapse-per-connection']")
     NEURON_DENSITY_NRECORDS = (By.XPATH, "//a[@data-testid='experiment-dataset-ExperimentalNeuronDensity']//span[@class='mr-2 font-light']")
+

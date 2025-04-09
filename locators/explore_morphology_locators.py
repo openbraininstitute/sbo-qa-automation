@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 
 
 class ExploreMorphologyPageLocators:
+    AI_ASSISTANT_PANEL = (By.XPATH, "//button[starts-with(@class, 'literature-suggestions')]")
     BACK_IE_BTN = (By.XPATH, "//div[.='Back to list']")
     BRAIN_REGION_COLUMN_TITLE = (By.XPATH, "//div[text()='Brain Region']")
     BR_SORTED = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]/descendant::td[contains(text("

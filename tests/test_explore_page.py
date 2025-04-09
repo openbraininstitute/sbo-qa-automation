@@ -19,18 +19,12 @@ class TestExplorePage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=3)
     def test_explore_page(self, setup, login, logger, test_config):
-        browser, wait, base_url = setup
+        """Checking the Explore Page"""
+        browser, wait, base_url, lab_id, project_id = setup
         explore_page = ExplorePage(browser, wait, base_url)
-        """
-        Dynamic lab and project IDs
-        """
-        lab_id = test_config["lab_id"]
-        project_id = test_config["project_id"]
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
-        current_url = explore_page.go_to_explore_page(lab_id, project_id)
+        explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
-
-        """Checking the titles of the Explore Page"""
         explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
         cerebrum_title = explore_page.cerebrum_title()
