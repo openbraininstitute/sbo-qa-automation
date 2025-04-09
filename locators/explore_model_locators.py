@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 
 
 class ExploreModelPageLocators:
+    AI_ASSISTANT_PANEL = (By.XPATH, "//button[starts-with(@class, 'literature-suggestions')]")
     BRAIN_REGION_PANEL = (By.XPATH, "(//div[@class='flex h-screen flex-col bg-primary-8'])[1]")
     BR_SEARCH_FIELD_TYPE = (By.XPATH, "//span[@class='ant-select-selection-search']")
     BR_SEARCH_REGION_SEARCH_FIELD = (By.XPATH, "//div[@class='ant-select-selector']")

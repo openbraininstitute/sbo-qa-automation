@@ -17,11 +17,12 @@ class LandingPage(HomePage, LinkChecker):
 
     def go_to_landing_page(self, retries=3, delay=5):
         """Navigates to the OBI landing page and ensures it loads properly."""
-        landing_url = "https://staging.openbraininstitute.org/"
+        # landing_url = "https://www.openbraininstitute.org/"
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(60)
-                self.browser.get(landing_url)
+                # self.browser.get(landing_url)
+                self.browser.get(self.base_url)
                 self.wait_for_page_ready(timeout=60)
                 self.logger.info("✅ Landing Page loaded successfully.")
                 return

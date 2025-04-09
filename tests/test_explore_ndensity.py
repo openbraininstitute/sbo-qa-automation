@@ -14,16 +14,18 @@ class TestExploreNeuronDensity:
     @pytest.mark.build_page
     @pytest.mark.run(order=5)
     def test_explore_neuron_density_page(self, setup, login, logger, test_config):
-        browser, wait, base_url = setup
+        """Checking the titles of the Neuron Density Tab"""
+        browser, wait, base_url, lab_id, project_id = setup
         explore_ndensity = ExploreNeuronDensityPage(browser, wait, base_url)
-        """
-        Dynamic lab and project IDs
-        """
-        lab_id = test_config["lab_id"]
-        project_id = test_config["project_id"]
-        current_url = explore_ndensity.go_to_explore_neuron_density_page(lab_id, project_id)
+        explore_ndensity.go_to_explore_neuron_density_page(lab_id, project_id)
         explore_ndensity.wait_for_ndensity_tab(timeout=60)
-        logger.info("Neuron density tab is displayed")
+        logger.info(f"Neuron density tab is displayed, {browser.current_url}")
+
+        ai_assistant_panel = explore_ndensity.find_ai_assistant_panel()
+        logger.info("Found Ai Assistant Panel")
+        ai_assistant_panel_close = explore_ndensity.find_ai_assistant_panel_close()
+        ai_assistant_panel_close.click()
+        logger.info("Found the AI assistant close button and clicked")
 
         column_locators = [
             ExploreNDensityPageLocators.LV_BRAIN_REGION,
