@@ -36,7 +36,7 @@ class TestLanding:
 
         p_text1 = landing_page.find_p_text1()
         ptext1_text = p_text1.get_attribute("textContent").strip()
-        logger.info(f"Paragraph content: '{ptext1_text}'")
+        # logger.info(f"Paragraph content: '{ptext1_text}'")
         assert ptext1_text != "", "Paragraph text is empty!"
 
         para_text = landing_page.find_paragraph_text()
@@ -45,3 +45,32 @@ class TestLanding:
             text = para.text.strip()
             assert text, f"Paragraph text {idx} is empty"
 
+        big_img1 = landing_page.find_big_img1()
+        assert big_img1.is_displayed(), "Section 1 big image is not found"
+        logger.info("Accelerating neuroscience research section img is found")
+        big_img2 = landing_page.find_big_img2()
+        assert big_img2.is_displayed(), "Section 2 big image is not found"
+        logger.info("Who is behind OBI img section is found")
+        big_img3 = landing_page.find_big_img3()
+        assert big_img3.is_displayed(), "Section 3 big image is not found"
+        logger.info("How can we collaborate and help you achieve greatness img is found")
+
+        section_btn1 = landing_page.find_section_btn1()
+        assert section_btn1.is_displayed(), "Section 1 button is not displayed"
+        logger.info("'Discover our mission' button is found")
+
+        section_btn2 = landing_page.find_section_btn2()
+        assert section_btn2.is_displayed(), "Section 2 button is not displayed"
+        logger.info("'More about us' button is found")
+
+        section_btn3 = landing_page.find_section_btn3()
+        assert section_btn3.is_displayed(), "Section 3 button is not displayed"
+        logger.info("'Discover our team' button is found")
+
+        section_btn4 = landing_page.find_section_btn4()
+        assert section_btn4.is_displayed(), "Section 4 button is not displayed"
+        logger.info("'Contact us' button is found")
+
+        section_btn5 = landing_page.find_section_btn5()
+        assert section_btn5.is_displayed(), "Section 5 button is not displayed"
+        logger.info("'Discover story in detail' button is found")
