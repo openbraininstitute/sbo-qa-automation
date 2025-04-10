@@ -82,3 +82,83 @@ class LandingPage(HomePage, LinkChecker):
     def find_paragraph_text(self):
         return self.find_all_elements(LandingLocators.PARA_TEXT)
 
+    def find_big_img1(self):
+        return self.find_element(LandingLocators.BIG_IMG1)
+
+    def find_big_img2(self):
+        return self.find_element(LandingLocators.BIG_IMG2)
+
+    def find_big_img3(self):
+        return self.find_element(LandingLocators.BIG_IMG3)
+
+    def find_section_btn1(self):
+        return self.find_element(LandingLocators.SECTION_BTN1)
+
+    def find_section_btn2(self):
+        return self.find_element(LandingLocators.SECTION_BTN2)
+
+    def find_section_btn3(self):
+        return self.find_element(LandingLocators.SECTION_BTN3)
+
+    def find_section_btn4(self):
+        return self.find_element(LandingLocators.SECTION_BTN4)
+
+    def find_section_btn5(self):
+        return self.find_element(LandingLocators.SECTION_BTN5)
+
+    def find_horizontal_cards_section1(self):
+        return self.find_element(LandingLocators.HORIZONTAL_CARDS_SECTION1)
+
+    def find_horizontal_cards_section2(self):
+        return self.find_element(LandingLocators.HORIZONTAL_CARDS_SECTION2)
+
+    def find_news_content1(self):
+        return self.find_element(LandingLocators.NEWS_CARD_CONTENT1)
+
+    def find_news_content2(self):
+        return self.find_element(LandingLocators.NEWS_CARD_CONTENT2)
+
+    def find_news_content3(self):
+        return self.find_element(LandingLocators.NEWS_CARD_CONTENT3)
+
+    def find_news_content4(self):
+        return self.find_element(LandingLocators.NEWS_CARD_CONTENT4)
+
+    def find_news_card_pic1(self):
+        return self.find_element(LandingLocators.NEWS_CARD_PIC1)
+
+    def find_news_card_pic2(self):
+        return self.find_element(LandingLocators.NEWS_CARD_PIC2)
+
+    def find_news_card_pic3(self):
+        return self.find_element(LandingLocators.NEWS_CARD_PIC3)
+
+    def find_news_card_pic4(self):
+        return self.find_element(LandingLocators.NEWS_CARD_PIC4)
+
+    def find_top_menu(self):
+        return self.find_element(LandingLocators.TOP_MENU)
+
+    def find_top_about(self):
+        return self.find_element(LandingLocators.TOP_ABOUT)
+
+    def find_top_mission(self):
+        return self.find_element(LandingLocators.TOP_MISSION)
+
+    def find_top_news(self):
+        return self.find_element(LandingLocators.TOP_NEWS)
+
+    def find_top_pricing(self):
+        return self.find_element(LandingLocators.TOP_PRICING)
+
+    def find_top_team(self):
+        return self.find_element(LandingLocators.TOP_TEAM)
+
+    def find_top_resources(self):
+        return self.find_element(LandingLocators.TOP_RESOURCES)
+
+    def find_top_contact(self):
+        return self.find_element(LandingLocators.TOP_CONTACT)
+
+    def find_menu_logo(self):
+        return self.find_element(LandingLocators.TOP_MENU_LOGO)
