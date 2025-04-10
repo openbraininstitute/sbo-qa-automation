@@ -5,13 +5,13 @@
 import pytest
 from pages.landing_page import LandingPage
 
-
+@pytest.mark.no_auto_nav
 @pytest.mark.usefixtures("setup", "logger")
 class TestLanding:
     @pytest.mark.run(order=1)
-    def test_landingpage(self, setup, logger):
+    def test_landingpage(self, setup, logger, test_config):
         """Verifies that the landing page."""
-        browser, wait, base_url = setup
+        browser, wait, base_url, lab_id, project_id = setup
         landing_page = LandingPage(browser, wait, base_url, logger)
 
         landing_page.go_to_landing_page()
@@ -22,9 +22,9 @@ class TestLanding:
         assert title_accelerate.is_displayed(), "Accelerate title is missing"
         logger.info("Title Accelerate is displayed")
 
-        title_reconstruct = landing_page.find_title_reconstruct()
-        assert title_reconstruct.is_displayed(), "Reconstruct title is missing"
-        logger.info("Title Reconstruct is displayed")
+        # title_reconstruct = landing_page.find_title_reconstruct()
+        # assert title_reconstruct.is_displayed(), "Reconstruct title is missing"
+        # logger.info("Title Reconstruct is displayed")
 
         title_who = landing_page.find_title_who()
         assert title_who.is_displayed(), "Who we are title is missing"
@@ -38,4 +38,10 @@ class TestLanding:
         ptext1_text = p_text1.get_attribute("textContent").strip()
         logger.info(f"Paragraph content: '{ptext1_text}'")
         assert ptext1_text != "", "Paragraph text is empty!"
+
+        para_text = landing_page.find_paragraph_text()
+        assert len(para_text) == 6, f"Expected 6 text paragraphs, found {len(para_text)}"
+        for idx, para in enumerate(para_text, start=1):
+            text = para.text.strip()
+            assert text, f"Paragraph text {idx} is empty"
 

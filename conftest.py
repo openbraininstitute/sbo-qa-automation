@@ -86,17 +86,18 @@ def setup(request, pytestconfig, test_config):
     browser.set_page_load_timeout(60)
     wait = WebDriverWait(browser, 20)
 
-    # Set base URL globally
     request.cls.base_url = base_url
     request.cls.lab_id = lab_id
     request.cls.project_id = project_id
 
-
     request.cls.browser = browser
     request.cls.wait = wait
 
-    print(f"🔄 Navigating to Landing Page: {base_url}")
-    browser.get(base_url)
+    if not request.node.get_closest_marker("no_auto_nav"):
+        print(f"Navigating to Base URL (default): {base_url}")
+        browser.get(base_url)
+    else:
+        print("Skipping automatic navigation to base_url (no_auto_nav)")
 
     yield browser, wait, base_url, lab_id, project_id
 
