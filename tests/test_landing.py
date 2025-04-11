@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+import time
 
 import pytest
 from pages.landing_page import LandingPage
@@ -74,3 +75,16 @@ class TestLanding:
         section_btn5 = landing_page.find_section_btn5()
         assert section_btn5.is_displayed(), "Section 5 button is not displayed"
         logger.info("'Discover story in detail' button is found")
+
+        gotolab = landing_page.go_to_lab()
+        assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
+        gotolab.click()
+        try:
+            landing_page.wait_for_page_ready()
+            redirected = "openid-connect" in landing_page.browser.current_url or "auth" in landing_page.browser.current_url
+            assert redirected, f"Expected to redirect to the login page, got: {landing_page.browser.current_url}"
+            logger.info(f"Redirected to the login page:  {landing_page.browser.current_url}")
+        except Exception as e:
+            logger.error(f"Failed during login redirection: {e}")
+            raise
+
