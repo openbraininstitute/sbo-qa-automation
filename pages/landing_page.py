@@ -9,19 +9,18 @@ from util.util_links_checker import LinkChecker
 
 
 class LandingPage(HomePage, LinkChecker):
-    def __init__(self, browser, wait, base_url, logger):
+    def __init__(self, browser, wait, base_url, landing_url, logger):
         super().__init__(browser, wait, base_url)
         self.home_page = HomePage(browser, wait, base_url)
         self.logger = logger
-
+        self.landing_url = landing_url
 
     def go_to_landing_page(self, retries=3, delay=5):
         """Navigates to the OBI landing page and ensures it loads properly."""
-        landing_url = "https://www.openbraininstitute.org/"
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(60)
-                self.browser.get(landing_url)
+                self.browser.get(self.landing_url)
                 # self.browser.get(self.base_url)
                 self.wait_for_page_ready(timeout=60)
                 self.logger.info("✅ Landing Page loaded successfully.")
