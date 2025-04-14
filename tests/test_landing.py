@@ -1,8 +1,8 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
-import time
 
+import time
 import pytest
 from pages.landing_page import LandingPage
 
@@ -13,9 +13,10 @@ class TestLanding:
     def test_landingpage(self, setup, logger, test_config):
         """Verifies that the landing page."""
         browser, wait, base_url, lab_id, project_id = setup
-        landing_page = LandingPage(browser, wait, base_url, logger)
+        landing_page = LandingPage(browser, wait, base_url, test_config["landing_url"], logger)
 
         landing_page.go_to_landing_page()
+        # time.sleep(10)
         assert landing_page.is_landing_page_displayed(), "Landing Page did not load correctly."
         logger.info("✅ Landing Page loaded successfully.")
 
@@ -80,9 +81,15 @@ class TestLanding:
         assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
         gotolab.click()
         try:
-            landing_page.wait_for_page_ready()
-            redirected = "openid-connect" in landing_page.browser.current_url or "auth" in landing_page.browser.current_url
-            assert redirected, f"Expected to redirect to the login page, got: {landing_page.browser.current_url}"
+            landing_page.wait_for_url_contains("openid-connect", timeout=30)
+            redirected = (
+                    "openid-connect" in landing_page.browser.current_url or
+                    "auth" in landing_page.browser.current_url
+            )
+            assert redirected, (
+                f"Expected to redirect to the login page, "
+                f"got: {landing_page.browser.current_url}"
+            )
             logger.info(f"Redirected to the login page:  {landing_page.browser.current_url}")
         except Exception as e:
             logger.error(f"Failed during login redirection: {e}")

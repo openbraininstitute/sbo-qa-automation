@@ -81,3 +81,15 @@ class CustomBasePage:
             return self.wait.until(condition, message)
         except TimeoutException as e:
             raise RuntimeError(message or f"Condition not met within {timeout} seconds") from e
+
+    def wait_for_url_contains(self, partial_url, timeout=30):
+        return self.wait.until(
+            lambda driver: partial_url in driver.current_url,
+            timeout
+        )
+
+    def wait_for_url_change(self, old_url, timeout=30):
+        return self.wait.until(
+            lambda driver: driver.current_url != old_url,
+            timeout
+        )

@@ -16,15 +16,12 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.safari.options import Options as SafariOptions
-from selenium.webdriver.safari.service import Service as SafariService
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
 from pages.landing_page import LandingPage
 from pages.login_page import LoginPage
-from util.util_base import load_config
 
 
 @pytest.fixture(scope="session")
@@ -38,10 +35,12 @@ def test_config(pytestconfig):
         raise ValueError("Username or password is missing in the configuration!")
 
     if env =="staging":
+        landing_url = "https://staging.openbraininstitute.org"
         base_url = "https://staging.openbraininstitute.org/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_STAGING")
         project_id = os.getenv("PROJECT_ID_STAGING")
     elif env == "production":
+        landing_url = "https://www.openbraininstitute.org"
         base_url = "https://www.openbraininstitute.org/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_PRODUCTION")
         project_id = os.getenv("PROJECT_ID_PRODUCTION")
@@ -51,6 +50,7 @@ def test_config(pytestconfig):
     return {
         "username": username,
         "password": password,
+        "landing_url": landing_url,
         "base_url": base_url,
         "lab_id": lab_id,
         "project_id": project_id,
@@ -62,6 +62,7 @@ def setup(request, pytestconfig, test_config):
     """Fixture to set up the browser/webdriver"""
     environment = pytestconfig.getoption("env")
     browser_name = pytestconfig.getoption("--browser-name")
+    # env_url = pytestconfig.getoption("--env_url")
     base_url = test_config["base_url"]
     lab_id = test_config["lab_id"]
     project_id = test_config["project_id"]
@@ -144,10 +145,10 @@ def logger(request):
 
 
 @pytest.fixture(scope="function")
-def navigate_to_landing_page(setup, logger):
+def navigate_to_landing_page(setup, logger, test_config):
     """Fixture to open and verify the OBI Landing Page before login."""
     browser, wait, base_url, lab_id, project_id = setup
-    landing_page = LandingPage(browser, wait, base_url, logger)
+    landing_page = LandingPage(browser, wait, base_url, test_config["landing_url"], logger)
 
     landing_page.go_to_landing_page()
     yield landing_page
