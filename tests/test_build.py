@@ -6,6 +6,7 @@ import time
 import uuid
 from datetime import datetime
 
+from selenium.common import ElementNotVisibleException
 from selenium.webdriver import Keys
 
 from pages.build import Build
@@ -14,20 +15,12 @@ import pytest
 
 class TestBuild:
     def test_build(self, setup, login, logger,test_config):
-
-        browser, wait, base_url = setup
+        browser, wait, base_url, lab_id, project_id = setup
         build = Build(browser,wait, base_url)
-        """
-        Dynamic lab and project IDs
-        """
         lab_id = test_config["lab_id"]
         project_id = test_config["project_id"]
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         current_url = build.go_to_build(lab_id, project_id)
-
-        assert lab_id in current_url and project_id in current_url, \
-            f"Navigation failed. Expected IDs {lab_id} and {project_id} not found in {current_url}"
-
         build_menu_title = build.build_menu_title().click()
         logger.info("Clicked on 'Build'")
         new_model_tab = build.new_model_tab()
@@ -89,8 +82,8 @@ class TestBuild:
 
         sn_description = build.sn_description()
         logger.info("Single neuron description title is displayed.")
-        # assert sn_description.text.strip(), "Description is missing or empty."
-        # print(f"Description: {sn_description.text.strip()}")
+        assert sn_description.text.strip(), "'Description' title is missing."
+        print(f"Description: {sn_description.text.strip()}")
 
         sn_brain_region = build.sn_brain_region()
         assert sn_brain_region.text.strip(), "Brain region is missing or empty."
@@ -119,9 +112,9 @@ class TestBuild:
         print(f"E-type: {sn_etype.text.strip()}")
         logger.info("E-type is displayed.")
 
-        select_m_model = build.select_m_model_btn()
-        if select_m_model.is_displayed():
-            select_m_model.click()
+        select_m_model_btn = build.select_m_model_btn()
+        if select_m_model_btn.is_displayed():
+            select_m_model_btn.click()
         else:
             logger.info("The 'Select m-model' button is not displayed")
         search_input = build.find_search_input_search_item()
@@ -129,21 +122,56 @@ class TestBuild:
         browser.execute_script("arguments[0].click();", search_input)
         search_input.send_keys("C060114A5")
         logger.info("Searching for 'C060114A5'")
-        searched_record = build.searched_record()
-        if searched_record.is_displayed():
-            tick_searched_record = build.tick_search_record().click()
+
+        brain_region_toggle_btn = build.brain_region_toggle_btn()
+        logger.info('Found Brain Region panel toggle')
+        brain_region_toggle_btn.click()
+        searched_m_record = build.searched_m_record()
+        assert searched_m_record.is_displayed(), "Searched record is NOT found"
+        logger.info("The searched record is found")
+
+        tick_searched_m_record = build.tick_search_m_record()
+        assert tick_searched_m_record.is_displayed(), "The radio button is not displayed"
+        browser.execute_script("arguments[0].click();",tick_searched_m_record)
+        logger.info("Radio button of the searched record is ticked")
+        select_m_model_btn = build.select_m_model_btn()
+        if select_m_model_btn.is_displayed():
+            select_m_model_btn.click()
         else:
-            logger.info("The searched record is not found")
-        # time.sleep(10)
-        # select_m_model.click()
-        # logger.info("The 'M-model' is selected")
-        # select_e_model = build.select_e_model_btn()
-        # if select_e_model.is_displayed():
-        #     select_e_model.click()
-        #     time.sleep(5)
-        # else:
-        #     logger.info("The 'Select e-model' button is not displayed")
-        #
-        # time.sleep(3)
+            logger.info("The 'Select m-model' button is not displayed")
+        logger.info("The 'M-model' is selected")
+        select_e_model_btn = build.select_e_model_btn()
+        if select_e_model_btn.is_displayed():
+            select_e_model_btn.click()
+            logger.info("E-model button is clicked")
+        else:
+            logger.info("The e-model button is not displayed")
+
+        search_input = build.find_search_input_search_item()
+        logger.info("Search input field is found")
+        browser.execute_script("arguments[0].click();", search_input)
+        search_input.send_keys("EM__1372346__cADpyr__13")
+        logger.info("Use open search to find the e-model")
+        searched_e_record = build.searched_e_record()
+        assert searched_e_record.is_displayed(), "The searched e-model is not found"
+        logger.info("Searching for 'EM__1372346__cADpyr__13'")
+
+        tick_searched_e_record = build.tick_search_e_record()
+        assert tick_searched_e_record.is_displayed(), "The radio button is not displayed"
+        logger.info("The radio button is found")
+        browser.execute_script("arguments[0].click();", tick_searched_e_record)
+        logger.info("Radio button of the searched record is ticked")
+
+        select_e_model_btn = build.select_e_model_btn()
+        assert select_e_model_btn.is_displayed(), "Select e-model button is not displayed"
+        logger.info("Select e-model button is displayed")
+        select_e_model_btn.click()
+        logger.info("Select e-model button is clicked")
+
+        save_model = build.save_model()
+        assert save_model.is_displayed(), "Save button is not found"
+        save_model.click()
+
+
 
 

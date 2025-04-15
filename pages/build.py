@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+import time
 
 from pages.home_page import HomePage
 from util.util_links_checker import LinkChecker
@@ -14,6 +15,7 @@ class Build(HomePage, LinkChecker):
 
     def go_to_build(self, lab_id: str, project_id: str):
         path = f"/lab/{lab_id}/project/{project_id}/home"
+        # time.sleep(20)
         try:
             self.go_to_page(path)
             self.wait_for_page_ready(timeout=60)
@@ -79,19 +81,28 @@ class Build(HomePage, LinkChecker):
         return self.find_element(BuildLocators.SN_ETYPE)
 
     def select_m_model_btn(self):
-        return self.find_element(BuildLocators.SELECT_M_MODEL)
+        return self.find_element(BuildLocators.SELECT_M_MODEL_BTN)
 
     def select_e_model_btn(self):
-        return self.find_element(BuildLocators.SELECT_E_MODEL)
+        return self.find_element(BuildLocators.SELECT_E_MODEL_BTN)
 
     def find_search_input_search_item(self):
         return self.find_element(BuildLocators.SEARCH_INPUT_FIELD)
 
-    def searched_record(self):
-        return self.find_element(BuildLocators.SEARCHED_RECORD)
+    def brain_region_toggle_btn(self):
+        return self.find_element(BuildLocators.BRAIN_REGION_PANEL_TOGGLE)
 
-    def tick_search_record(self):
-        return self.find_element(BuildLocators.TICK_SEARCHED_RECORD)
+    def searched_m_record(self):
+        return self.find_element(BuildLocators.SEARCHED_M_RECORD)
+
+    def searched_e_record(self):
+        return self.find_element(BuildLocators.SEARCHED_E_RECORD)
+
+    def tick_search_m_record(self):
+        return self.find_element(BuildLocators.TICK_SEARCHED_M_RECORD)
+
+    def tick_search_e_record(self):
+        return self.find_element(BuildLocators.TICK_SEARCHED_E_RECORD)
 
     def save_model(self):
         return self.find_element(BuildLocators.SAVE)
