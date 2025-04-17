@@ -19,7 +19,7 @@ from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-
+from selenium.webdriver.support import expected_conditions as EC
 from pages.landing_page import LandingPage
 from pages.login_page import LoginPage
 
@@ -62,7 +62,6 @@ def setup(request, pytestconfig, test_config):
     """Fixture to set up the browser/webdriver"""
     environment = pytestconfig.getoption("env")
     browser_name = pytestconfig.getoption("--browser-name")
-    # env_url = pytestconfig.getoption("--env_url")
     base_url = test_config["base_url"]
     lab_id = test_config["lab_id"]
     project_id = test_config["project_id"]
@@ -166,14 +165,17 @@ def navigate_to_login(setup, logger, request):
         landing_page.click_go_to_lab()
     else:
         browser.get(f"{base_url}")
-    login_page.wait_for_condition(
-        lambda driver: "openid-connect" in driver.current_url,
-        timeout=60,
-        message="Timed out waiting for OpenID login page."
-    )
 
-    login_page.find_form_container()
+    login_page.wait.until(EC.url_contains('openid-connect'))
     assert "openid-connect" in browser.current_url, f"Did not reach OpenID login page. Current URL: {browser.current_url}"
+    login_page.find_form_container()
+
+    # login_page.wait_for_condition(
+    #     lambda driver: "openid-connect" in driver.current_url,
+    #     timeout=60,
+    #     message="Timed out waiting for OpenID login page."
+    # )
+
 
     print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
     return login_page

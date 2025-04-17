@@ -5,6 +5,7 @@
 import pytest
 from selenium.common import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 @pytest.mark.usefixtures("setup", "logger")
@@ -22,8 +23,13 @@ class CustomBasePage:
         self.browser.get(url)
 
     def find_element(self, by_locator, timeout=10):
-        return self.wait.until(EC.presence_of_element_located(by_locator), timeout)
+        return WebDriverWait(self.browser, timeout).until(
+            EC.presence_of_element_located(by_locator)
+        )
 
+    # def find_element(self, by_locator, timeout=10):
+#         return self.wait.until(EC.presence_of_element_located(by_locator), timeout)
+#
     def element_visibility(self, by_locator, timeout=10):
         return self.wait.until(EC.visibility_of_element_located(by_locator), timeout)
 
