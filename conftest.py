@@ -160,12 +160,9 @@ def navigate_to_login(setup, logger, request, test_config):
     login_page = LoginPage(browser, wait, base_url, logger)
     browser.get(f"{base_url}")
 
-    login_page.wait_for_condition(
-        lambda driver: "openid-connect" in driver.current_url,
-        timeout=60,
-        retries=3,
-        delay=5,
-        message="Timed out waiting for OpenID login page."
+    WebDriverWait(browser, 120).until(
+        EC.url_contains("openid-connect"),
+        message="Timed out waiting for OpenID login page"
     )
     print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
     return login_page
