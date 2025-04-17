@@ -163,21 +163,23 @@ def navigate_to_login(setup, logger, request, test_config):
         landing_page = LandingPage(browser, wait, base_url, test_config["landing_url"], logger)
         landing_page.go_to_landing_page()
         landing_page.click_go_to_lab()
+        print("INFO: Clicked go to lab")
     else:
         browser.get(f"{base_url}")
 
-
+    wait.until(
+        EC.url_contains("openid-connect"),
+        message="Timed out waiting for OpenID login page redirect"
+    )
+    print("DEBUG: Looking and waiting 20s for form container")
+    login_page.find_form_container(timeout=20)
+    print("INFO: going to the next wait_for_condition OpenIDConnect")
     login_page.wait_for_condition(
         lambda driver: "openid-connect" in driver.current_url,
         timeout=60,
         message="Timed out waiting for OpenID login page."
     )
-    wait.until(
-        EC.url_contains("openid-connect"),
-        message="Timed out waiting for OpenID login page redirect"
-    )
 
-    login_page.find_form_container(timeout=20)
 
     print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
     return login_page

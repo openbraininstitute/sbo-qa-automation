@@ -27,9 +27,6 @@ class CustomBasePage:
             EC.presence_of_element_located(by_locator)
         )
 
-    # def find_element(self, by_locator, timeout=10):
-#         return self.wait.until(EC.presence_of_element_located(by_locator), timeout)
-#
     def element_visibility(self, by_locator, timeout=10):
         return self.wait.until(EC.visibility_of_element_located(by_locator), timeout)
 
