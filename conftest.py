@@ -154,28 +154,30 @@ def navigate_to_landing_page(setup, logger, test_config):
 
 
 @pytest.fixture(scope="function")
-def navigate_to_login(setup, logger, request):
+def navigate_to_login(setup, logger, request, test_config):
     """Fixture that navigates to the login page"""
     browser, wait, base_url, lab_id, project_id = setup
     login_page = LoginPage(browser, wait, base_url, logger)
 
     if request.node.get_closest_marker("use_landing_page"):
-        landing_page = LandingPage(browser, wait, base_url, logger)
+        landing_page = LandingPage(browser, wait, base_url, test_config["landing_url"], logger)
         landing_page.go_to_landing_page()
+        print(f"navigate_to_login/ go_t_landing_page() {browser.current_url}")
         landing_page.click_go_to_lab()
+        print(f"navigate_to_login/ click_go_to_lab {browser.current_url}")
     else:
         browser.get(f"{base_url}")
+        print(f"Else block get {base_url}")
 
-    login_page.wait.until(EC.url_contains('openid-connect'))
+
+    login_page.wait_for_condition(
+        lambda driver: "openid-connect" in driver.current_url,
+        timeout=60,
+        message="Timed out waiting for OpenID login page."
+    )
+
     assert "openid-connect" in browser.current_url, f"Did not reach OpenID login page. Current URL: {browser.current_url}"
     login_page.find_form_container()
-
-    # login_page.wait_for_condition(
-    #     lambda driver: "openid-connect" in driver.current_url,
-    #     timeout=60,
-    #     message="Timed out waiting for OpenID login page."
-    # )
-
 
     print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
     return login_page

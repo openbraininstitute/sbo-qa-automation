@@ -8,7 +8,7 @@ from pages.home_page import HomePage
 from util.util_links_checker import LinkChecker
 
 
-class LandingPage(HomePage, LinkChecker):
+class LandingPage(HomePage):
     def __init__(self, browser, wait, base_url, landing_url, logger):
         super().__init__(browser, wait, base_url)
         self.home_page = HomePage(browser, wait, base_url)
