@@ -43,8 +43,8 @@ class LoginPage(CustomBasePage):
                 f"{self.browser.current_url}")
             raise
 
-    def find_form_container(self):
-        return self.find_element(LoginPageLocators.FORM_CONTAINER)
+    def find_form_container(self, timeout=10):
+        return self.find_element(LoginPageLocators.FORM_CONTAINER, timeout=timeout)
 
     def find_username_field(self):
         return self.find_element(LoginPageLocators.USERNAME_FIELD)
