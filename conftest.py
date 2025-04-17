@@ -175,7 +175,7 @@ def navigate_to_login(setup, logger, request, test_config):
         timeout=60,
         message="Timed out waiting for OpenID login page."
     )
-
+    time.sleep(10)
     assert "openid-connect" in browser.current_url, f"Did not reach OpenID login page. Current URL: {browser.current_url}"
     login_page.find_form_container()
 
