@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
+import time
 from selenium.common import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -72,18 +73,29 @@ class CustomBasePage:
             f"Page did not reach ready state within {timeout} seconds"
         )
 
-    def wait_for_condition(self, condition, timeout=60, message=None):
+    def wait_for_condition(self, condition, timeout=60, retries=3, delay=5, message=None):
         """
-        General-purpose wait function to wait for a specific condition.
+        General-purpose wait function to wait for a specific condition with retries.
+
         :param condition: The condition to wait for (e.g., element presence, URL contains).
-        :param timeout: How long to wait before timing out.
+        :param timeout: How long to wait before timing out (in seconds).
+        :param retries: How many times to retry if the condition isn't met (default is 3).
+        :param delay: Delay in seconds between retries (default is 5 seconds).
         :param message: Custom error message if timeout occurs.
         :return: The result of the condition (e.g., an element or True).
         """
-        try:
-            return self.wait.until(condition, message)
-        except TimeoutException as e:
-            raise RuntimeError(message or f"Condition not met within {timeout} seconds") from e
+        attempt = 0
+        while attempt < retries:
+            try:
+                print(f"Attempt {attempt + 1}/{retries} to wait for condition.")
+                return self.wait.until(condition, message)
+            except TimeoutException:
+                if attempt < retries - 1:
+                    print(f"Condition not met. Retrying in {delay} seconds...")
+                    time.sleep(delay)
+                attempt += 1
+        raise RuntimeError(message or f"Condition not met within {timeout} seconds after {retries} retries.")
+
 
     def wait_for_url_contains(self, partial_url, timeout=30):
         return self.wait.until(
