@@ -13,18 +13,23 @@ from pages.base_page import CustomBasePage
 
 
 class LoginPage(CustomBasePage):
-    def __init__(self, browser, wait, base_url, logger):
-        super().__init__(browser, wait, base_url)
+    def __init__(self, browser, wait, lab_url, logger):
+        super().__init__(browser, wait, lab_url)
         self.logger = logger
 
     def navigate_to_homepage(self):
         self.browser.delete_all_cookies()
-        print(f"INFO: From pages/login_page.py 'self.base_url': {self.base_url}")
-        target_url = self.base_url
+        print(f"INFO: From pages/login_page.py 'self.base_url': {self.lab_url}")
+        target_url = self.lab_url
         self.browser.get(target_url)
-        WebDriverWait(self.browser, 30).until(
-            lambda d: "openid-connect" in d.current_url or "auth" in d.current_url
-        )
+        self.logger.info(f"INFO: Target URL is {target_url}")
+        try:
+            WebDriverWait(self.browser, 30).until(
+                lambda d: "openid-connect" in d.current_url or "auth" in d.current_url
+            )
+            self.logger.info(f"INFO: Successfully reached {self.browser.current_url}")
+        except TimeoutException:
+            self.logger.error(f"ERROR: Timeout while waiting for URL containing 'openid-connect'")
         self.logger.info(f"INFO: target_url from pages/login_page.py:, {target_url}")
         self.logger.info(f"INFO: Starting URL from pages/login_page.py:, {self.browser.current_url}")
         return target_url

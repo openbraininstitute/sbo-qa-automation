@@ -12,14 +12,14 @@ from selenium.webdriver.support.wait import WebDriverWait
 @pytest.mark.usefixtures("setup", "logger")
 class CustomBasePage:
 
-    def __init__(self, browser, wait, base_url):
+    def __init__(self, browser, wait, lab_url):
         self.browser = browser
         self.wait = wait
-        self.base_url = base_url
+        self.lab_url = lab_url
         self.browser.set_page_load_timeout(60)
 
     def go_to_page(self, page_url):
-        url = self.base_url + page_url
+        url = self.lab_url + page_url
         print(f"INFO: CustomPage base_url + page_url = {url}" )
         self.browser.get(url)
 

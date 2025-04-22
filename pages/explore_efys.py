@@ -18,7 +18,7 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
         self.url_scraper = UrlScraper()
 
     def go_to_explore_ephys_page(self, lab_id: str, project_id: str, retries=3, delay=5):
-        path = f"/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/electrophysiology"
+        path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/electrophysiology"
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(90)

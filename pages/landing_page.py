@@ -9,19 +9,18 @@ from util.util_links_checker import LinkChecker
 
 
 class LandingPage(HomePage):
-    def __init__(self, browser, wait, base_url, landing_url, logger):
+    def __init__(self, browser, wait, base_url, lab_url, logger):
         super().__init__(browser, wait, base_url)
         self.home_page = HomePage(browser, wait, base_url)
         self.logger = logger
-        self.landing_url = landing_url
+        self.base_url = base_url
 
     def go_to_landing_page(self, retries=3, delay=5):
         """Navigates to the OBI landing page and ensures it loads properly."""
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(60)
-                self.browser.get(self.landing_url)
-                # self.browser.get(self.base_url)
+                self.browser.get(self.base_url)
                 self.wait_for_page_ready(timeout=60)
                 self.logger.info("✅ Landing Page loaded successfully.")
                 return
@@ -39,8 +38,8 @@ class LandingPage(HomePage):
             self.logger.warning(f"Error loading OBI Landing Page")
             return False
 
-    def go_to_lab(self):
-        return self.find_element(LandingLocators.GOTO_LAB)
+    def go_to_lab(self, timeout=10):
+        return self.find_element(LandingLocators.GOTO_LAB, timeout=timeout)
 
     def click_go_to_lab(self):
         try:
