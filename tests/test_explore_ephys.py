@@ -23,7 +23,6 @@ class TestExploreEphys:
         browser, wait, base_url, lab_id, project_id = setup
         explore_ephys_page = ExploreElectrophysiologyPage(browser, wait, base_url)
         explore_ephys_page.go_to_explore_ephys_page(lab_id, project_id)
-        time.sleep(3)
         ephys_tab_title = explore_ephys_page.find_ephys_tab_title()
         logger.info("'Electrophysiology' tab title is present.")
 
@@ -178,15 +177,4 @@ class TestExploreEphys:
         # dv_id_sweep_title = explore_ephys_page.dv_id_sweep_title()
         # logger.info("Found 'Interactive detail' Sweep.")
 
-    """The below is commented out, due to the changes in the platform"""
-    # def test_links(self):
-    """
-    test_links methods checks the request status
-    Also, writes non-dynamic URLs that are present on the page to a text file.
-    """
-    # test_directory = os.path.dirname(os.path.abspath(__file__))
-    # links_file_path = os.path.join(test_directory, '..', 'links.json')
-    #
-    # link_checker = LinkChecker()
-    # links = link_checker.load_links(links_file_path)['explore_ephys_links']
-    # link_checker.check_links(links)
+

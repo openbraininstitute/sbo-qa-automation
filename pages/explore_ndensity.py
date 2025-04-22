@@ -18,7 +18,7 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
         self.url_scraper = UrlScraper()
 
     def go_to_explore_neuron_density_page(self, lab_id: str, project_id: str, retries=3, delay=5):
-        path = f"/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/neuron-density"
+        path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/neuron-density"
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(90)

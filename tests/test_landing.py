@@ -13,10 +13,9 @@ class TestLanding:
     def test_landingpage(self, setup, logger, test_config):
         """Verifies that the landing page."""
         browser, wait, base_url, lab_id, project_id = setup
-        landing_page = LandingPage(browser, wait, base_url, test_config["landing_url"], logger)
+        landing_page = LandingPage(browser, wait, base_url, test_config["base_url"], logger)
 
         landing_page.go_to_landing_page()
-        # time.sleep(10)
         assert landing_page.is_landing_page_displayed(), "Landing Page did not load correctly."
         logger.info("✅ Landing Page loaded successfully.")
 

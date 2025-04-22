@@ -35,13 +35,13 @@ def test_config(pytestconfig):
         raise ValueError("Username or password is missing in the configuration!")
 
     if env =="staging":
-        landing_url = "https://staging.openbraininstitute.org"
-        base_url = "https://staging.openbraininstitute.org/app/virtual-lab"
+        base_url = "https://staging.openbraininstitute.org"
+        lab_url = f"{base_url}/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_STAGING")
         project_id = os.getenv("PROJECT_ID_STAGING")
     elif env == "production":
-        landing_url = "https://www.openbraininstitute.org"
-        base_url = "https://www.openbraininstitute.org/app/virtual-lab"
+        base_url = "https://www.openbraininstitute.org"
+        lab_url = f"{base_url}/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_PRODUCTION")
         project_id = os.getenv("PROJECT_ID_PRODUCTION")
     else:
@@ -50,8 +50,8 @@ def test_config(pytestconfig):
     return {
         "username": username,
         "password": password,
-        "landing_url": landing_url,
         "base_url": base_url,
+        "lab_url": lab_url,
         "lab_id": lab_id,
         "project_id": project_id,
     }
@@ -93,17 +93,72 @@ def setup(request, pytestconfig, test_config):
     request.cls.browser = browser
     request.cls.wait = wait
 
-    if not request.node.get_closest_marker("no_auto_nav"):
-        print(f"Navigating to Base URL (default): {base_url}")
-        browser.get(base_url)
-    else:
-        print("Skipping automatic navigation to base_url (no_auto_nav)")
-
     yield browser, wait, base_url, lab_id, project_id
 
     if browser is not None:
         browser.quit()
 
+
+@pytest.fixture(scope="function")
+def navigate_to_landing_page(setup, logger, test_config):
+    """Fixture to open and verify the OBI Landing Page before login."""
+    browser, wait, base_url, lab_id, project_id = setup
+    landing_page = LandingPage(browser, wait, base_url, test_config["base_url"], logger)
+
+    landing_page.go_to_landing_page()
+    print(f"DEBUG NAVIGATE TO LANDING PAGE function: {browser.current_url}")
+    yield landing_page
+
+
+@pytest.fixture(scope="function")
+def navigate_to_login(setup, logger, request, test_config):
+    """Fixture that navigates to the login page"""
+    browser, wait, lab_url, lab_id, project_id = setup
+    print(f"DEBUG NAVIGATE TO LOGIN function: {browser.current_url}")
+
+    landing_page = LandingPage(browser, wait, test_config["base_url"], test_config["lab_url"], logger)
+    landing_page.go_to_landing_page()
+    print(f"******DEBUG: NAVIGATE TO LOGIN CONFTEST, current URL: {browser.current_url}")
+    landing_page.click_go_to_lab()
+    print(f"INFO: After clicking go to lab, current URL: {browser.current_url}")
+
+    WebDriverWait(browser, 60).until(
+        EC.url_contains("openid-connect"),
+        message="Timed out waiting for OpenID login page"
+    )
+    print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
+    return LoginPage(browser, wait, test_config["lab_url"], logger)
+
+@pytest.fixture(scope="function")
+def login(setup, navigate_to_login, test_config, logger):
+    """Fixture to log in and ensure user is authenticated."""
+    browser, wait, lab_url, lab_id, project_id = setup
+    login_page = navigate_to_login
+
+    username = test_config.get("username")
+    password = test_config.get("password")
+
+    if not username or not password:
+        raise ValueError("Username or password is missing in the configuration!")
+
+    login_page.perform_login(username, password)
+    login_page.wait_for_login_complete()
+    print("Login successful. Current URL:", browser.current_url)
+    login_page = LoginPage(browser, wait, lab_url, logger)
+    modal_terms_and_conditions = login_page.terms_modal()
+    assert modal_terms_and_conditions.is_displayed(), "The TOR modal is not displayed for 1st time users"
+
+    if modal_terms_and_conditions:
+        print("Modal appeared for first-time users")
+        modal_tor_link = login_page.terms_modal_link()
+        logger.info('Terms and conditions links is displayed')
+        modal_continue_btn = login_page.terms_modal_continue()
+        modal_continue_btn.click()
+        logger.info("Continue button is clicked")
+    else:
+        print("Modal did NOT appear")
+    yield browser, wait
+    login_page.browser.delete_all_cookies()
 
 @pytest.fixture(scope="function")
 def logger(request):
@@ -141,62 +196,6 @@ def logger(request):
     request.addfinalizer(log_test_finish)
 
     return logger
-
-
-@pytest.fixture(scope="function")
-def navigate_to_landing_page(setup, logger, test_config):
-    """Fixture to open and verify the OBI Landing Page before login."""
-    browser, wait, base_url, lab_id, project_id = setup
-    landing_page = LandingPage(browser, wait, base_url, test_config["landing_url"], logger)
-
-    landing_page.go_to_landing_page()
-    yield landing_page
-
-
-@pytest.fixture(scope="function")
-def navigate_to_login(setup, logger, request, test_config):
-    """Fixture that navigates to the login page"""
-    browser, wait, base_url, lab_id, project_id = setup
-    login_page = LoginPage(browser, wait, base_url, logger)
-    browser.get(f"{base_url}")
-
-    WebDriverWait(browser, 120).until(
-        EC.url_contains("openid-connect"),
-        message="Timed out waiting for OpenID login page"
-    )
-    print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
-    return login_page
-
-@pytest.fixture(scope="function")
-def login(setup, navigate_to_login, test_config, logger):
-    """Fixture to log in and ensure user is authenticated."""
-    browser, wait, base_url, lab_id, project_id = setup
-    login_page = navigate_to_login
-
-    username = test_config.get("username")
-    password = test_config.get("password")
-
-    if not username or not password:
-        raise ValueError("Username or password is missing in the configuration!")
-
-    login_page.perform_login(username, password)
-    login_page.wait_for_login_complete()
-    print("Login successful. Current URL:", browser.current_url)
-    login_page = LoginPage(browser, wait, base_url, logger)
-    modal_terms_and_conditions = login_page.terms_modal()
-    assert modal_terms_and_conditions.is_displayed(), "The TOR modal is not displayed for 1st time users"
-
-    if modal_terms_and_conditions:
-        print("Modal appeared for first-time users")
-        modal_tor_link = login_page.terms_modal_link()
-        logger.info('Terms and conditions links is displayed')
-        modal_continue_btn = login_page.terms_modal_continue()
-        modal_continue_btn.click()
-        logger.info("Continue button is clicked")
-    else:
-        print("Modal did NOT appear")
-    yield browser, wait
-    login_page.browser.delete_all_cookies()
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):
