@@ -20,7 +20,7 @@ class ExploreModelDataPage(ExplorePage, LinkChecker):
         self.logger = logger
 
     def go_to_explore_model_page(self, lab_id: str, project_id: str):
-        path = f"app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/model/e-model"
+        path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/model/e-model"
         try:
             self.browser.set_page_load_timeout(90)
             self.go_to_page(path)
@@ -41,11 +41,20 @@ class ExploreModelDataPage(ExplorePage, LinkChecker):
     def find_br_cerebrum_title(self):
         return self.find_element(ExploreModelPageLocators.BR_CEREBRUM_TITLE)
 
+    def find_lv_em_td(self):
+        return self.find_element(ExploreModelPageLocators.LV_EM_TD)
+
     def brain_region_panel_close_btn(self):
         return self.find_element(ExploreModelPageLocators.CLOSE_BRAIN_REGION_PANEL_BTN)
 
     def find_selected_brain_region_title(self):
         return self.find_element(ExploreModelPageLocators.SELECTED_BRAIN_REGION)
+
+    def find_search_for_resources(self):
+        return self.find_element(ExploreModelPageLocators.SEARCH_RESOURCES)
+
+    def find_lv_selected_resource(self):
+        return self.find_element(ExploreModelPageLocators.LV_EM_TD)
 
 
 

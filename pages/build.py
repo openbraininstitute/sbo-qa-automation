@@ -14,7 +14,7 @@ class Build(HomePage, LinkChecker):
         self.home_page = HomePage(browser, wait, base_url)
 
     def go_to_build(self, lab_id: str, project_id: str):
-        path = f"/lab/{lab_id}/project/{project_id}/home"
+        path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/home"
         # time.sleep(20)
         try:
             self.go_to_page(path)

@@ -20,7 +20,7 @@ def load_config():
             username = os.environ.get("OBI_USERNAME")
             password = os.environ.get("OBI_PASSWORD")
             print(f"Retrieved username: {username}")
-            print(f"Retrieved password: {password}")
+
             if not username or not password:
                 raise ValueError("OBI_USERNAME OR OBI_PASSWORD is missing")
             config = {
