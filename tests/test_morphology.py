@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import time
+from asyncio import timeout
 
 import pytest
 from selenium.common import TimeoutException
@@ -24,6 +25,12 @@ class TestExploreMorphologyPage:
         morphology_tab = explore_morphology.find_morphology_tab()
         logger.info("Morphology tab is displayed")
 
+        ai_assistant_panel_close_btn = explore_morphology.find_literature_panel_btn()
+        assert ai_assistant_panel_close_btn.is_displayed(), ("Close button on the AI literature search panel is not "
+                                                             "found")
+        ai_assistant_panel_close_btn.click()
+        logger.info("AI Assistant panel is closed.")
+
         column_locators = [
             ExploreMorphologyPageLocators.LV_PREVIEW,
             ExploreMorphologyPageLocators.LV_BRAIN_REGION,
@@ -32,7 +39,7 @@ class TestExploreMorphologyPage:
             ExploreMorphologyPageLocators.LV_SPECIES,
         ]
         column_headers = explore_morphology.find_column_headers(column_locators)
-        # input("⏸ Paused! Press Enter to continue...")
+
         for header in column_headers:
             assert header.is_displayed(), f"Column header {header} is not displayed."
         logger.info("Morphology column headers are displayed.")

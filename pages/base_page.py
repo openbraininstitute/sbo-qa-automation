@@ -34,8 +34,13 @@ class CustomBasePage:
     def visibility_of_all_elements(self, by_locator, timeout=10):
         return self.wait.until(EC.visibility_of_all_elements_located(by_locator), timeout)
 
+    # def find_all_elements(self, by_locator, timeout=10):
+    #     return self.wait.until(EC.presence_of_all_elements_located(by_locator), timeout)
+
     def find_all_elements(self, by_locator, timeout=10):
-        return self.wait.until(EC.presence_of_all_elements_located(by_locator), timeout)
+        return WebDriverWait(self.browser, timeout).until(
+            EC.presence_of_all_elements_located(by_locator)
+        )
 
     def element_to_be_clickable(self, by_locator, timeout=10):
         return self.wait.until(EC.element_to_be_clickable(by_locator), timeout)
