@@ -1,5 +1,5 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
-#
+# Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 
 from selenium.webdriver.common.by import By
@@ -17,4 +17,6 @@ class ExploreModelPageLocators:
     EMODEL_TAB = (By.XPATH, "//li[@title='E-model']")
     ME_MODEL_TAB = (By.XPATH, "//li[@title='ME-model']")
     SEARCH_REGION = (By.XPATH, "//input[@class='ant-select-selection-search-input']")
+    SEARCH_RESOURCES = (By.CSS_SELECTOR, "input[placeholder='Search for resources...']")
     SELECTED_BRAIN_REGION = (By.XPATH, "//h1[@title='Isocortex']/span[text()='Isocortex']")
+    LV_EM_TD = (By.XPATH, "(//td[@title='cADpyr'][normalize-space()='cADpyr'])[1]")

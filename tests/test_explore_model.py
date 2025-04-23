@@ -21,13 +21,9 @@ class TestExploreModelPage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=7)
     def test_explore_model(self, setup, login, logger, test_config):
-        """
-        The commented out code below is pending changes in the platform.
-        """
-        browser, wait, base_url = setup
+        browser, wait, base_url, lab_id, project_id = setup
         explore_model = ExploreModelDataPage(browser, wait, logger, base_url)
-        lab_id = test_config["lab_id"]
-        project_id = test_config["project_id"]
+        print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         explore_model.go_to_explore_model_page(lab_id, project_id)
         logger.info("Explore page is loaded")
 
@@ -55,3 +51,17 @@ class TestExploreModelPage:
                                                              "found")
         brain_region_panel_close_btn.click()
         logger.info("Brain region panel is toggled close")
+
+        search_for_resources = explore_model.find_search_for_resources()
+        assert search_for_resources.is_displayed(), "Search resources field is not found"
+        search_for_resources.click()
+        searched_emodel = "cadpyr"
+        for char in searched_emodel:
+            search_for_resources.send_keys(char)
+            time.sleep(0.1)
+        logger.info("Searching for 'cadpyr'")
+        lv_searched_emodel = explore_model.find_lv_selected_resource()
+        assert lv_searched_emodel.is_displayed(), "The selected emodel is not found"
+        logger.info("Selected resource found")
+        lv_searched_emodel.click()
+        time.sleep(24)
