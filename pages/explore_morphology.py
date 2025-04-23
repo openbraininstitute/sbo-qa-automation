@@ -20,7 +20,7 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
         self.logger = logger
 
     def go_to_explore_morphology_page(self, lab_id: str, project_id: str):
-        path = f"/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/morphology"
+        path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/morphology"
         try:
             self.browser.set_page_load_timeout(90)
             self.go_to_page(path)
@@ -221,3 +221,6 @@ class ExploreMorphologyPage(ExplorePage, LinkChecker):
 
     def lv_filter_search_field(self):
         return self.find_element(ExploreMorphologyPageLocators.LV_FILTER_SEARCH_FIELD)
+
+    def find_literature_panel_btn(self):
+        return self.find_element(ExploreMorphologyPageLocators.LITERATURE_PANEL_CLOSE_BTN)

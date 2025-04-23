@@ -49,6 +49,7 @@ class ExploreMorphologyPageLocators:
     FILTER_MTYPE_TEXT_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input'])[2]")
     FILTER_PANEL = (By.XPATH, "//div[@data-testid='listing-view-filter-panel']")
     FIRST_ROW = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]")
+    LITERATURE_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[2]")
     LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
                                  "region']")
     LV_CHECKBOX = (By.XPATH, "")
