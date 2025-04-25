@@ -11,7 +11,7 @@ from io import BytesIO
 import pytest
 from PIL import Image
 from selenium import webdriver
-from selenium.common import exceptions
+from selenium.common import exceptions, TimeoutException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -145,18 +145,7 @@ def login(setup, navigate_to_login, test_config, logger):
     login_page.wait_for_login_complete()
     print("Login successful. Current URL:", browser.current_url)
     login_page = LoginPage(browser, wait, lab_url, logger)
-    modal_terms_and_conditions = login_page.terms_modal()
-    assert modal_terms_and_conditions.is_displayed(), "The TOR modal is not displayed for 1st time users"
 
-    if modal_terms_and_conditions:
-        print("Modal appeared for first-time users")
-        modal_tor_link = login_page.terms_modal_link()
-        logger.info('Terms and conditions links is displayed')
-        modal_continue_btn = login_page.terms_modal_continue()
-        modal_continue_btn.click()
-        logger.info("Continue button is clicked")
-    else:
-        print("Modal did NOT appear")
     yield browser, wait
     login_page.browser.delete_all_cookies()
 

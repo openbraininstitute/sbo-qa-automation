@@ -64,4 +64,4 @@ class TestExploreModelPage:
         assert lv_searched_emodel.is_displayed(), "The selected emodel is not found"
         logger.info("Selected resource found")
         lv_searched_emodel.click()
-        time.sleep(24)
+        # time.sleep(24)
