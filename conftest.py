@@ -106,7 +106,6 @@ def navigate_to_landing_page(setup, logger, test_config):
     landing_page = LandingPage(browser, wait, base_url, test_config["base_url"], logger)
 
     landing_page.go_to_landing_page()
-    print(f"DEBUG NAVIGATE TO LANDING PAGE function: {browser.current_url}")
     yield landing_page
 
 
@@ -118,9 +117,7 @@ def navigate_to_login(setup, logger, request, test_config):
 
     landing_page = LandingPage(browser, wait, test_config["base_url"], test_config["lab_url"], logger)
     landing_page.go_to_landing_page()
-    print(f"******DEBUG: NAVIGATE TO LOGIN CONFTEST, current URL: {browser.current_url}")
     landing_page.click_go_to_lab()
-    print(f"INFO: After clicking go to lab, current URL: {browser.current_url}")
 
     WebDriverWait(browser, 60).until(
         EC.url_contains("openid-connect"),

@@ -56,5 +56,31 @@ class ExploreModelDataPage(ExplorePage, LinkChecker):
     def find_lv_selected_resource(self):
         return self.find_element(ExploreModelPageLocators.LV_EM_TD)
 
+    def dv_get_table_headers(self):
+        """Returns the visible text of all column headers."""
+        element = self.find_all_elements(ExploreModelPageLocators.DV_MORPH_TABLE_HEADER_COLUMNS)
+        return [el.text.strip() for el in element if el.text.strip()]
 
+    def find_dv_configuration_tab(self):
+        return self.find_element(ExploreModelPageLocators.DV_CONFIGURATION_TAB)
 
+    def find_dv_analysis_tab(self):
+        return self.find_element(ExploreModelPageLocators.DV_ANALYSIS_TAB)
+
+    def find_dv_simulation_tab(self):
+        return self.find_element(ExploreModelPageLocators.DV_SIMULATION_TAB)
+
+    def find_ai_assistant_panel_close(self):
+        return self.find_element(ExploreModelPageLocators.AI_ASSISTANT_PANEL_BTN)
+
+    def find_dv_name_label(self):
+        return self.find_element(ExploreModelPageLocators.DV_NAME_LABEL)
+
+    def find_dv_name_value(self):
+        return self.find_element(ExploreModelPageLocators.DV_NAME_VALUE)
+
+    def find_dv_description_label(self):
+        return self.find_element(ExploreModelPageLocators.DV_DESCRIPTION_LABEL)
+
+    def find_dv_description_value(self):
+        return self.find_element(ExploreModelPageLocators.DV_DESCRIPTION_VALUE)
