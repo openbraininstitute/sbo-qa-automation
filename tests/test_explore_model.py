@@ -76,23 +76,28 @@ class TestExploreModelPage:
         except NoSuchElementException:
             logger.info("No close button found. Assuming panel is already closed.")
 
-        dv_name_label = explore_model.find_dv_name_label()
-        assert dv_name_label.is_displayed(), "'Name' label is missing"
-        logger.info("Found 'Name' label")
+        label_checks = [
+            ("DESCRIPTION", explore_model.find_dv_description_label, explore_model.find_dv_description_value),
+            ("CONTRIBUTORS", explore_model.find_dv_contributors_label, explore_model.find_dv_contributors_value),
+            ("REGISTRATION DATE", explore_model.find_dv_registration_date_label,
+             explore_model.find_dv_registration_date_value),
+            ("BRAIN REGION", explore_model.find_dv_brain_region_label, explore_model.find_dv_brain_region_value),
+            ("MODEL CUMULATED SCORE", explore_model.find_dv_model_score_label,
+             explore_model.find_dv_model_score_value),
+            ("M-TYPE", explore_model.find_dv_mtype_label, explore_model.find_dv_mtype_value),
+            ("E-TYPE", explore_model.find_dv_etype_label, explore_model.find_dv_etype_value),
+        ]
 
-        dv_name_value = explore_model.find_dv_name_value()
-        assert dv_name_value.is_displayed(), "Name value is missing"
-        logger.info("Found name value")
+        for label_text, find_label_fn, find_value_fn in label_checks:
+            label_el = find_label_fn()
+            assert label_el.is_displayed(), f"'{label_text}' label is missing"
+            assert label_el.text.strip() == label_text, f"Expected label '{label_text}', got '{label_el.text.strip()}'"
 
-        description_label_element = explore_model.find_dv_description_label()
-        assert description_label_element.is_displayed(), "Description label is not displayed"
-        assert description_label_element.text.strip() == "DESCRIPTION", f"Expected label 'Description', but found: {description_label_element.text.strip()}"
-
-        description_value_element = explore_model.find_dv_description_value()
-        assert description_value_element.is_displayed(), "Description value is not displayed"
-        description_text = description_value_element.text.strip()
-        assert description_text != "", "Description value is empty"
-        logger.info(f"Found Description value: {description_text}")
+            value_el = find_value_fn()
+            assert value_el.is_displayed(), f"{label_text} value is not displayed"
+            value = value_el.text.strip()
+            assert value != "", f"{label_text} value is empty"
+            logger.info(f"{label_text} value: {value}")
 
         dv_config_tab = explore_model.find_dv_configuration_tab()
         assert dv_config_tab.is_displayed(), "Emodel detail view confiugration tab is not displayed"
@@ -105,15 +110,7 @@ class TestExploreModelPage:
         dv_simulation_tab = explore_model.find_dv_simulation_tab()
         assert dv_simulation_tab.is_displayed(), "Emodel detail view simulation tab is not displayed"
         logger.info("Detail view simulation tab is found")
-        time.sleep(5)
-        expected_morph_titles = ["PREVIEW", "NAME", "DESCRIPTION", "BRAIN LOCATION", "M-TYPE",
-                                 "CONTRIBUTOR"]
 
-        header_texts = explore_model.dv_get_table_headers()
-        assert len(header_texts) == len(expected_morph_titles), (
-            f"Expected {len(expected_morph_titles)} columns, but found {len(header_texts)}: {header_texts}"
-        )
+        expected_morph_headers = explore_model.verify_exemplar_morphology_headers()
+        expected_exemplar_traces_headers = explore_model.verify_exemplar_traces_table_headers()
 
-        assert header_texts == expected_morph_titles, (
-            f"Expected headers {expected_morph_titles}, but found {header_texts}"
-        )
