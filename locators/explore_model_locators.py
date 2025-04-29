@@ -25,7 +25,31 @@ class ExploreModelPageLocators:
     DV_DESCRIPTION_VALUE = (
     By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Description']/following-sibling::div")
 
+    DV_CONTRIBUTORS_LABEL = (By.XPATH, "//div[text()='Contributors']")
+    DV_CONTRIBUTORS_VALUE = (By.XPATH, "//div[text()='Contributors']/following-sibling::div")
+
+    DV_REGISTRATION_DATE_LABEL = (By.XPATH, "//div[text()='Registration date']")
+    DV_REGISTRATION_DATE_VALUE = (By.XPATH, "//div[text()='Registration date']/following-sibling::div")
+
+    DV_BRAIN_REGION_LABEL = (By.XPATH, "//div[text()='Brain Region']")
+    DV_BRAIN_REGION_VALUE = (By.XPATH, "//div[text()='Brain Region']/following-sibling::div")
+
+    DV_MODEL_SCORE_LABEL = (By.XPATH, "//div[text()='Model cumulated score']")
+    DV_MODEL_SCORE_VALUE = (By.XPATH, "//div[text()='Model cumulated score']/following-sibling::div")
+
+    DV_MTYPE_LABEL = (By.XPATH, "//div[text()='M-Type']")
+    DV_MTYPE_VALUE = (By.XPATH, "//div[text()='M-Type']/following-sibling::div")
+
+    DV_ETYPE_LABEL = (By.XPATH, "//div[text()='E-Type']")
+    DV_ETYPE_VALUE = (By.XPATH, "//div[text()='E-Type']/following-sibling::div")
+
+    DV_SIMULATION_PARAM_LABEL = (By.XPATH, "//div[normalize-space()='Simulation parameters']")
+    DV_EXEMPLAR_TRACE_LABEL = (By.XPATH, "//div[normalize-space()='Exemplar Traces']")
+    DV_OPTIMIZATION_TARGET_LABEL = (By.XPATH, "//div[normalize-space()='Optimization target']")
+    DV_MECHANISMS_LABEL = (By.XPATH, "//div[normalize-space()='Mechanisms']")
+
     DV_MORPH_TABLE_HEADER_COLUMNS = (By.XPATH, "(//thead[@class='ant-table-thead'])[1]//th")
+    DV_EXEMPLAR_TABLE_HEADER_COLUMNS = (By.XPATH, "(//thead[@class='ant-table-thead'])[2]//th")
     EMODEL_TAB = (By.XPATH, "//li[@title='E-model']")
     ME_MODEL_TAB = (By.XPATH, "//li[@title='ME-model']")
     SEARCH_REGION = (By.XPATH, "//input[@class='ant-select-selection-search-input']")

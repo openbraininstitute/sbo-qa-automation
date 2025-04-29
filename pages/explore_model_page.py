@@ -61,6 +61,11 @@ class ExploreModelDataPage(ExplorePage, LinkChecker):
         element = self.find_all_elements(ExploreModelPageLocators.DV_MORPH_TABLE_HEADER_COLUMNS)
         return [el.text.strip() for el in element if el.text.strip()]
 
+    def dv_get_trace_table_headers(self):
+        """Returns the visible text of all column headers in the Exemplar Traces table."""
+        elements = self.find_all_elements(ExploreModelPageLocators.DV_EXEMPLAR_TABLE_HEADER_COLUMNS)
+        return [el.text.strip() for el in elements if el.text.strip()]
+
     def find_dv_configuration_tab(self):
         return self.find_element(ExploreModelPageLocators.DV_CONFIGURATION_TAB)
 
@@ -84,3 +89,55 @@ class ExploreModelDataPage(ExplorePage, LinkChecker):
 
     def find_dv_description_value(self):
         return self.find_element(ExploreModelPageLocators.DV_DESCRIPTION_VALUE)
+
+    def find_dv_contributors_label(self):
+        return self.find_element(ExploreModelPageLocators.DV_CONTRIBUTORS_LABEL)
+
+    def find_dv_contributors_value(self):
+        return self.find_element(ExploreModelPageLocators.DV_CONTRIBUTORS_VALUE)
+
+    def find_dv_registration_date_label(self):
+        return self.find_element(ExploreModelPageLocators.DV_REGISTRATION_DATE_LABEL)
+
+    def find_dv_registration_date_value(self):
+        return self.find_element(ExploreModelPageLocators.DV_REGISTRATION_DATE_VALUE)
+
+    def find_dv_brain_region_label(self):
+        return self.find_element(ExploreModelPageLocators.DV_BRAIN_REGION_LABEL)
+
+    def find_dv_brain_region_value(self):
+        return self.find_element(ExploreModelPageLocators.DV_BRAIN_REGION_VALUE)
+
+    def find_dv_model_score_label(self):
+        return self.find_element(ExploreModelPageLocators.DV_MODEL_SCORE_LABEL)
+
+    def find_dv_model_score_value(self):
+        return self.find_element(ExploreModelPageLocators.DV_MODEL_SCORE_VALUE)
+
+    def find_dv_mtype_label(self):
+        return self.find_element(ExploreModelPageLocators.DV_MTYPE_LABEL)
+
+    def find_dv_mtype_value(self):
+        return self.find_element(ExploreModelPageLocators.DV_MTYPE_VALUE)
+
+    def find_dv_etype_label(self):
+        return self.find_element(ExploreModelPageLocators.DV_ETYPE_LABEL)
+
+    def find_dv_etype_value(self):
+        return self.find_element(ExploreModelPageLocators.DV_ETYPE_VALUE)
+
+    def verify_exemplar_morphology_headers(self):
+        expected_headers = ["PREVIEW", "NAME", "DESCRIPTION", "BRAIN LOCATION", "M-TYPE", "CONTRIBUTOR"]
+        actual_headers = self.dv_get_table_headers()
+        assert actual_headers == expected_headers, (
+            f"Expected morphology headers: {expected_headers}, but got: {actual_headers}"
+        )
+        self.logger.info("Exemplar Morphology headers match expected.")
+
+    def verify_exemplar_traces_table_headers(self):
+        expected_headers = ["PREVIEW", "CELL NAME", "M-TYPE", "E-TYPE", "E-CODE", "SUBJECT SPECIES"]
+        actual_headers = self.dv_get_trace_table_headers()
+        assert actual_headers == expected_headers, (
+            f"Expected trace headers: {expected_headers}, but got: {actual_headers}"
+        )
+        self.logger.info("Exemplar Traces headers match expected.")
