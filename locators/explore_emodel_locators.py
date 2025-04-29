@@ -5,7 +5,7 @@
 from selenium.webdriver.common.by import By
 
 
-class ExploreModelPageLocators:
+class ExploreEModelPageLocators:
     AI_ASSISTANT_PANEL = (By.XPATH, "//button[starts-with(@class, 'literature-suggestions')]")
     AI_ASSISTANT_PANEL_BTN = (By.XPATH, "//span[@class='anticon anticon-minus']")
     BRAIN_REGION_PANEL = (By.XPATH, "(//div[@class='flex h-screen flex-col bg-primary-8'])[1]")

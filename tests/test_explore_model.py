@@ -8,10 +8,8 @@ import pytest
 from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys, ActionChains
 
-from locators.explore_model_locators import ExploreModelPageLocators
-from locators.explore_page_locators import ExplorePageLocators
-from pages.explore_model_page import ExploreModelDataPage
-from pages.explore_page import ExplorePage
+from locators.explore_emodel_locators import ExploreEModelPageLocators
+from pages.explore_emodel_page import ExploreEModelDataPage
 
 
 
@@ -20,10 +18,10 @@ class TestExploreModelPage:
     @pytest.mark.run(order=7)
     def test_explore_model(self, setup, login, logger, test_config):
         browser, wait, base_url, lab_id, project_id = setup
-        explore_model = ExploreModelDataPage(browser, wait, logger, base_url)
+        explore_model = ExploreEModelDataPage(browser, wait, logger, base_url)
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
 
-        explore_model.go_to_explore_model_page(lab_id, project_id)
+        explore_model.go_to_explore_emodel_page(lab_id, project_id)
         logger.info("Explore page is loaded")
 
         emodel_tab = explore_model.find_emodel_tab()
@@ -39,7 +37,7 @@ class TestExploreModelPage:
         logger.info("Bran region panel search field is found")
         brain_region_search_field.send_keys(Keys.ENTER)
         logger.info("Clicked on the brain region search input field")
-        find_input_file_and_wait = ExploreModelPageLocators.SEARCH_REGION
+        find_input_file_and_wait = ExploreEModelPageLocators.SEARCH_REGION
         explore_model.wait_for_long_load(find_input_file_and_wait)
         logger.info("Waiting for page to load")
 
