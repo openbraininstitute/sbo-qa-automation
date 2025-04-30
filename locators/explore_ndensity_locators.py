@@ -35,6 +35,7 @@ class ExploreNDensityPageLocators:
                                       "date']")
     LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-type']")
     LV_BR_ROW1 = (By.XPATH, "(//td[starts-with(@class, 'ant-table-cell')])[13]")
+    DV_NAME_TITLE = (By.XPATH, "//div[@class='text font-thin' and text()='Name']")
     DV_DESC_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Description']")
     DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
                                        ")='Contributors']")
@@ -51,23 +52,17 @@ class ExploreNDensityPageLocators:
     DV_DENSITY_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Density']")
     DV_AGE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Age']")
     DV_DOWNLOAD_BTN = (By.XPATH, "//div[text()='Download']")
-    DV_DESC = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                         ")='Description']/following-sibling::div[@class='mt-2']")
-    DV_BR_REG = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Brain "
-                           "Region']/following-sibling::div[@class='mt-2']")
-    DV_SPECIES = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                            ")='Species']/following-sibling::div[@class='mt-2']")
-    DV_AGE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                        ")='Age']/following-sibling::div[@class='mt-2']")
-    DV_DENSITY = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                            ")='Density']/following-sibling::div[@class='mt-2']")
-    DV_NUM_MEAS = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='N° of "
-                             "Measurements']/following-sibling::div[@class='mt-2']")
-    DV_NAME = (By.XPATH, "//div[@class='text font-thin' and contains(text(), 'Name')]")
-    DV_REG_DATE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Registration "
-                             "date']/following-sibling::div[@class='mt-2']")
-    DV_CONTRIBUTORS = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                                 ")='Contributors']/following-sibling::div[@class='mt-2']")
-    DV_LICENSE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                            ")='License']/following-sibling::div[@class='mt-2']")
+    DV_NAME_VALUE = (By.XPATH,
+                     "//div[@class='text font-thin' and normalize-space(text())='Name']/following-sibling::div//div[contains(@class, 'font-bold')]")
+    DV_DESC_VALUE = (By.XPATH, "//div[div[normalize-space(text())='Description']]/div[2]")
+    DV_CONTRIBUTORS_VALUE = (By.XPATH, "//div[div[normalize-space(text())='Contributors']]/div[2]")
+    DV_REG_DATE_VALUE = (By.XPATH, "//div[div[normalize-space(text())='Registration date']]/div[2]")
+    DV_BRAIN_REG_VALUE = (By.XPATH, "//div[div[normalize-space(text())='Brain Region']]/div[2]")
+    DV_SPECIES_VALUE = (By.XPATH, "//div[div[normalize-space(text())='Species']]/div[2]")
+    DV_LICENSE_VALUE = (By.XPATH, "//div[div[normalize-space(text())='License']]/div[2]")
+    DV_MTYPE_VALUE = (By.XPATH, "//div[div[normalize-space(text())='M-Type']]/div[2]")
+    DV_AGE_VALUE = (By.XPATH, "//div[div[normalize-space(text())='Age']]/div[2]")
+    DV_ETYPE_VALUE = (By.XPATH, "//div[div[normalize-space(text())='E-Type']]/div[2]")
+    DV_DENSITY_VALUE = (By.XPATH, "//div[div[normalize-space(text())='Density']]/div[2]")
+    DV_NUM_MEAS_VALUE = (By.XPATH, "//div[div[normalize-space(text())='N° of Measurements']]/div[2]")
 

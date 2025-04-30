@@ -67,7 +67,7 @@ class TestExploreNeuronDensity:
         browser.execute_script("arguments[0].click();", lv_br_row1)
         logger.info("Clicked on a resource to see detail view")
 
-        dv_name = explore_ndensity.find_dv_name()
+        dv_name = explore_ndensity.find_dv_name_title()
         logger.info("Detail view is displayed")
 
         title_locators = [
@@ -88,3 +88,23 @@ class TestExploreNeuronDensity:
         for title in title_headers:
             assert title.is_displayed(), f"DV title header {title} is not displayed"
         logger.info("Found 'Detail view' title headers")
+
+        value_locators = [
+            ExploreNDensityPageLocators.DV_DESC_VALUE,
+            ExploreNDensityPageLocators.DV_CONTRIBUTORS_VALUE,
+            ExploreNDensityPageLocators.DV_REG_DATE_VALUE,
+            ExploreNDensityPageLocators.DV_BRAIN_REG_VALUE,
+            ExploreNDensityPageLocators.DV_SPECIES_VALUE,
+            ExploreNDensityPageLocators.DV_LICENSE_VALUE,
+            ExploreNDensityPageLocators.DV_MTYPE_VALUE,
+            # ExploreNDensityPageLocators.DV_AGE_VALUE,
+            ExploreNDensityPageLocators.DV_ETYPE_VALUE,
+            ExploreNDensityPageLocators.DV_DENSITY_VALUE,
+            ExploreNDensityPageLocators.DV_NUM_MEAS_VALUE,
+        ]
+
+        for locator in value_locators:
+            element = explore_ndensity.find_element(locator)
+            text = element.text.strip()
+            logger.info(f"Found value for {locator}: '{text}'")
+            assert text, f"Element {locator} is empty or missing text"

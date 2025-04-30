@@ -74,8 +74,8 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
     def find_cerebrum_brp(self, timeout=30):
         return self.find_element(ExploreNDensityPageLocators.BRP_CEREBRUM, timeout=timeout)
 
-    def find_dv_name(self):
-        return self.element_visibility(ExploreNDensityPageLocators.DV_NAME)
+    def find_dv_name_title(self):
+        return self.element_visibility(ExploreNDensityPageLocators.DV_NAME_TITLE)
 
     def find_load_more_btn(self):
         return self.find_element(ExploreNDensityPageLocators.LOAD_MORE_BUTTON)
@@ -92,6 +92,30 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
     def find_table_rows(self):
         return self.wait.find_all_elements(ExploreNDensityPageLocators.TABLE_ROWS)
 
+    def find_name_value(self):
+        return self.find_element(ExploreNDensityPageLocators.DV_NAME_VALUE)
 
+    def find_description_value(self):
+        return self.find_element(ExploreNDensityPageLocators.DV_DESC_VALUE)
 
+    def find_contributors_value(self):
+        return self.find_element(ExploreNDensityPageLocators.DV_CONTRIBUTORS_VALUE)
+
+    def find_registration_date_value(self):
+        return self.find_element(ExploreNDensityPageLocators.DV_REG_DATE_VALUE)
+
+    def find_species_value(self):
+        return self.find_element(ExploreNDensityPageLocators.DV_SPECIES_VALUE)
+
+    def find_mtype_value(self):
+        return self.find_element(ExploreNDensityPageLocators.DV_MTYPE_VALUE)
+
+    def find_etype_value(self):
+        return self.find_element(ExploreNDensityPageLocators.DV_ETYPE_VALUE)
+
+    def find_density_value(self):
+        return self.find_element(ExploreNDensityPageLocators.DV_DENSITY_VALUE)
+
+    def find_num_meas_value(self):
+        return self.find_element(ExploreNDensityPageLocators.DV_NUM_MEAS_VALUE)
 
