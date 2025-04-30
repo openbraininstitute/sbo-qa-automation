@@ -19,11 +19,7 @@ class TestLogin:
         assert "/virtual-lab" in browser.current_url, \
             f"Unexpected URL after login: {browser.current_url}"
         logger.info(f"Successfully logged in. Current page URL: {browser.current_url}")
-
         browser.execute_script("window.localStorage.clear();")
-        print(f"Cleaning local storage to make sure it mimics first-time user")
-        browser.refresh()
-        print(f"Refreshing page to make sure the TOR modal appears")
 
 
 

@@ -27,6 +27,12 @@ class TestExploreNeuronDensity:
         ai_assistant_panel_close.click()
         logger.info("Found the AI assistant close button and clicked")
 
+        brain_regions_panel_btn = explore_ndensity.find_brain_regions_panel_btn()
+        assert brain_regions_panel_btn.is_displayed(), "Button to close Brain regions panel is not found"
+        brain_regions_panel_btn.click()
+        logger.info("Brain regions panel is closed")
+
+
         column_locators = [
             ExploreNDensityPageLocators.LV_BRAIN_REGION,
             ExploreNDensityPageLocators.LV_MTYPE,
@@ -35,7 +41,9 @@ class TestExploreNeuronDensity:
             ExploreNDensityPageLocators.LV_NMEASUREMENTS,
             ExploreNDensityPageLocators.LV_NAME,
             ExploreNDensityPageLocators.LV_SPECIES,
-            ExploreNDensityPageLocators.LV_AGE
+            ExploreNDensityPageLocators.LV_AGE,
+            ExploreNDensityPageLocators.LV_CONTRIBUTORS,
+            ExploreNDensityPageLocators.LV_REGISTRATION_DATE
         ]
         column_headers = explore_ndensity.find_column_headers(column_locators)
 

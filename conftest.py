@@ -57,6 +57,7 @@ def test_config(pytestconfig):
     }
 
 
+
 @pytest.fixture(scope="class", autouse=True)
 def setup(request, pytestconfig, test_config):
     """Fixture to set up the browser/webdriver"""
@@ -388,3 +389,7 @@ def check_skip_condition():
     import os
     if os.getenv("SKIP_MODULES") == "1":
         pytest.skip("Skipping tests due to global configuration.", allow_module_level=True)
+
+def mask_sensitive(config):
+    """Mask sensitive keys like 'password' before logging."""
+    return {k: (v if k != "password" else "***") for k, v in config.items()}
