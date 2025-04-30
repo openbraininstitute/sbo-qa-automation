@@ -44,6 +44,9 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
     def find_ai_assistant_panel_close(self):
         return self.find_element(ExploreNDensityPageLocators.AI_ASSISTANT_PANEL_CLOSE)
 
+    def find_brain_regions_panel_btn(self):
+        return self.find_element(ExploreNDensityPageLocators.BRAIN_REGIONS_PANEL_BTN)
+
     def find_column_headers(self, column_locators, timeout=60):
         column_headers = []
         for locator in column_locators:

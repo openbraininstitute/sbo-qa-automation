@@ -76,12 +76,12 @@ class LoginPage(CustomBasePage):
         username_field = self.find_username_field()
         print(f"DEBUG: Username field visible? {username_field.is_displayed()}")
         password_field = self.find_password_field()
-        print(f"DEBUG: Username field visible? {password_field.is_displayed()}")
+        # print(f"DEBUG: Username field visible? {password_field.is_displayed()}")
 
         username_field.send_keys(username)
         password_field.send_keys(password)
         password_field.send_keys(Keys.ENTER)
-        print("DEBUG: Submitted login credentials")
+        # print("DEBUG: Submitted login credentials")
 
         try:
             self.wait_for_login_complete()
