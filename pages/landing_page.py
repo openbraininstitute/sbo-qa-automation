@@ -9,26 +9,16 @@ from util.util_links_checker import LinkChecker
 
 
 class LandingPage(HomePage):
-    def __init__(self, browser, wait, base_url, lab_url, logger):
-        super().__init__(browser, wait, base_url)
-        self.home_page = HomePage(browser, wait, base_url)
+    def __init__(self, browser, wait, base_url, logger):
+        super().__init__(browser, wait, logger)
+        self.browser = browser
+        self.wait = wait
         self.logger = logger
         self.base_url = base_url
 
-    def go_to_landing_page(self, retries=3, delay=5):
-        """Navigates to the OBI landing page and ensures it loads properly."""
-        for attempt in range(retries):
-            try:
-                self.browser.set_page_load_timeout(60)
-                self.browser.get(self.base_url)
-                self.wait_for_page_ready(timeout=60)
-                self.logger.info("✅ Landing Page loaded successfully.")
-                return
-            except TimeoutException:
-                self.logger.warning(
-                    f"⚠️ Landing Page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                self.wait.sleep(delay)
-        raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
+    def go_to_landing_page(self):
+        self.browser.get(self.base_url)
+        self.wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
 
     def is_landing_page_displayed(self):
         try:

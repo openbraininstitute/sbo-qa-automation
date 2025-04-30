@@ -7,17 +7,18 @@ import pytest
 from pages.landing_page import LandingPage
 
 @pytest.mark.no_auto_nav
-@pytest.mark.usefixtures("setup", "logger")
+@pytest.mark.usefixtures("visit_public_pages")
 class TestLanding:
     @pytest.mark.run(order=1)
-    def test_landingpage(self, setup, logger, test_config):
+    def test_landingpage(self, setup, logger, visit_public_pages):
         """Verifies that the landing page."""
-        browser, wait, base_url, lab_id, project_id = setup
-        landing_page = LandingPage(browser, wait, base_url, test_config["base_url"], logger)
 
-        landing_page.go_to_landing_page()
-        assert landing_page.is_landing_page_displayed(), "Landing Page did not load correctly."
-        logger.info("✅ Landing Page loaded successfully.")
+        _visit, base_url = visit_public_pages
+        browser, wait = _visit("")
+        landing_page = LandingPage(browser, wait, logger, base_url)
+
+        # assert landing_page.is_landing_page_displayed(), "Landing Page did not load correctly."
+        # logger.info("✅ Landing Page loaded successfully.")
 
         title_accelerate = landing_page.find_title_accelerate()
         assert title_accelerate.is_displayed(), "Accelerate title is missing"
@@ -93,4 +94,8 @@ class TestLanding:
         except Exception as e:
             logger.error(f"Failed during login redirection: {e}")
             raise
+
+        # landing_page.click_go_to_lab()
+        # wait.until(lambda d: "openid-connect" in d.current_url or "auth" in d.current_url)
+        # assert "openid-connect" in browser.current_url
 

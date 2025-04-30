@@ -24,6 +24,50 @@ from pages.landing_page import LandingPage
 from pages.login_page import LoginPage
 
 
+
+def create_browser(pytestconfig):
+    browser_name = pytestconfig.getoption("--browser-name")
+
+    if browser_name == "chrome":
+        options = ChromeOptions()
+        if pytestconfig.getoption("--headless"):
+            options.add_argument("--headless")
+            options.add_argument("--ignore-certificate-errors")
+        browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+    elif browser_name == "firefox":
+        options = FirefoxOptions()
+        if pytestconfig.getoption("--headless"):
+            options.add_argument("--headless")
+        browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
+    else:
+        raise ValueError(f"Unsupported browser: {browser_name}")
+
+    browser.set_page_load_timeout(60)
+    wait = WebDriverWait(browser, 20)
+
+    return browser, wait
+
+@pytest.fixture(scope="function")
+def public_browsing(pytestconfig, test_config):
+    browser, wait = create_browser(pytestconfig)
+    yield browser, wait, test_config["base_url"]
+    browser.quit()
+
+
+@pytest.fixture(scope="function")
+def visit_public_pages(public_browsing, logger):
+    browser, wait, base_url = public_browsing
+
+    def _visit(path=""):
+        url = f"{base_url.rstrip('/')}/{path.lstrip('/')}"
+        logger.info(f"Navigating to: {url}")
+        browser.get(url)
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+        return browser, wait
+
+    return _visit, base_url
+
+
 @pytest.fixture(scope="session")
 def test_config(pytestconfig):
     """Gets credentials and IDS returns the correct environment-specific settings."""
@@ -62,7 +106,6 @@ def test_config(pytestconfig):
 def setup(request, pytestconfig, test_config):
     """Fixture to set up the browser/webdriver"""
     environment = pytestconfig.getoption("env")
-    browser_name = pytestconfig.getoption("--browser-name")
     base_url = test_config["base_url"]
     lab_id = test_config["lab_id"]
     project_id = test_config["project_id"]
@@ -70,27 +113,11 @@ def setup(request, pytestconfig, test_config):
     print(f"Starting tests in {environment.upper()} mode.")
     print(f"Base URL: {base_url}")
 
-    if browser_name == "chrome":
-        options = ChromeOptions()
-        if pytestconfig.getoption("--headless"):
-            options.add_argument("--headless")
-            options.add_argument("--ignore-certificate-errors")
-        browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-    elif browser_name == "firefox":
-        options = FirefoxOptions()
-        if pytestconfig.getoption("--headless"):
-            options.add_argument("--headless")
-        browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
-    else:
-        raise ValueError(f"Unsupported browser: {browser_name}")
-
-    browser.set_page_load_timeout(60)
-    wait = WebDriverWait(browser, 20)
+    browser, wait = create_browser(pytestconfig)
 
     request.cls.base_url = base_url
     request.cls.lab_id = lab_id
     request.cls.project_id = project_id
-
     request.cls.browser = browser
     request.cls.wait = wait
 
@@ -101,10 +128,15 @@ def setup(request, pytestconfig, test_config):
 
 
 @pytest.fixture(scope="function")
-def navigate_to_landing_page(setup, logger, test_config):
+def navigate_to_landing_page(public_browsing, logger, test_config):
     """Fixture to open and verify the OBI Landing Page before login."""
-    browser, wait, base_url, lab_id, project_id = setup
-    landing_page = LandingPage(browser, wait, base_url, test_config["base_url"], logger)
+    browser, wait, base_url = public_browsing
+    landing_page = LandingPage(
+        browser=browser,
+        wait=wait,
+        base_url= test_config["base_url"],
+        logger=logger
+    )
 
     landing_page.go_to_landing_page()
     yield landing_page
@@ -116,7 +148,7 @@ def navigate_to_login(setup, logger, request, test_config):
     browser, wait, lab_url, lab_id, project_id = setup
     print(f"DEBUG NAVIGATE TO LOGIN function: {browser.current_url}")
 
-    landing_page = LandingPage(browser, wait, test_config["base_url"], test_config["lab_url"], logger)
+    landing_page = LandingPage(browser, wait, test_config["base_url"], logger)
     landing_page.go_to_landing_page()
     landing_page.click_go_to_lab()
 
@@ -125,7 +157,7 @@ def navigate_to_login(setup, logger, request, test_config):
         message="Timed out waiting for OpenID login page"
     )
     print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
-    return LoginPage(browser, wait, test_config["lab_url"], logger)
+    return LoginPage(browser=browser, wait=wait, lab_url=test_config["lab_url"], logger=logger)
 
 @pytest.fixture(scope="function")
 def login(setup, navigate_to_login, test_config, logger):
