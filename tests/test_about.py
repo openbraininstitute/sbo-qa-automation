@@ -7,7 +7,7 @@ import time
 import uuid
 from datetime import datetime
 
-from selenium.common import ElementNotVisibleException
+from selenium.common import ElementNotVisibleException, NoSuchElementException
 from selenium.webdriver import Keys
 
 from locators.about_locators import AboutLocators
@@ -49,10 +49,28 @@ class TestAbout:
 
         page_buttons = about_page.find_all_page_buttons()
         assert page_buttons, f"No page buttons found"
+        errors = []
 
         for i, button in enumerate(page_buttons, start=1):
-            assert button.is_displayed(), f"Button #{i} is not found."
-            text = button.text
-            no_space_text = re.sub(r'\s+', ' ', text).strip()
-            assert text, f"❌ Button #{i} has no visible text content."
-            logger.info(f"Button #{i} text: '{no_space_text}'")
+            text = re.sub(r'\s+', ' ', button.text).strip()
+            is_visible = button.is_displayed()
+            href = button.get_attribute("href")
+
+            if not is_visible or not text or not href:
+                errors.append(
+                    f"Button #{i} - Visible: {is_visible}, Text: '{text}', Href: '{href}'"
+                )
+
+        assert not errors, f"❌ Some buttons failed checks:\n" + "\n".join(errors)
+
+        portals_cards = about_page.find_portals_cards()
+        assert portals_cards, f"Portal cards are not found"
+        portal_cards_errors = []
+
+        for i, card in enumerate(portals_cards, start=1):
+            info = about_page.extract_card_info(card)
+            if not info["visible"] or not info["title"] or not info["href"]:
+                portal_cards_errors.append(f"Card #{i} failed - {info}")
+                print(f"Card #{i} failed - Title: {info['title']}, Href: {info['href']}, Visible: {info['visible']}")
+
+        assert not portal_cards_errors, f"❌ Some cards failed:\n" + "\n".join(portal_cards_errors)

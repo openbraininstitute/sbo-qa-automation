@@ -2,7 +2,8 @@
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException, NoSuchElementException
+from selenium.webdriver.common.by import By
 
 from locators.about_locators import AboutLocators
 from locators.landing_locators import LandingLocators
@@ -43,3 +44,32 @@ class AboutPage(HomePage):
 
     def find_all_page_buttons(self, timeout=10):
         return self.find_all_elements(AboutLocators.ABOUT_PAGE_BTNS, timeout=timeout)
+
+    def find_portals_cards(self, timeout=10):
+        return self.find_all_elements(AboutLocators.ABOUT_PORTALS_CARDS, timeout=timeout)
+
+    def extract_card_info(self, card_element):
+
+        try:
+            title = card_element.find_element(*AboutLocators.PORTALS_TITLES).text.strip()
+            print(f"Extracted title: '{title}'")
+        except NoSuchElementException:
+            title = ""
+
+        try:
+            content_divs = card_element.find_elements(By.XPATH, ".//div[contains(@class, "
+                                                                    "'PortalCard_content')]/div")
+            description = content_divs[-1].text.strip() if len(content_divs) >= 2 else ""
+            print(f"Extracted title: '{description}'")
+        except NoSuchElementException:
+            description = ""
+
+        href = card_element.get_attribute("href")
+        visible = card_element.is_displayed()
+
+        return {
+            "title": title,
+            "description": description,
+            "href": href,
+            "visible": visible
+        }

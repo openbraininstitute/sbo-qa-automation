@@ -23,3 +23,6 @@ class AboutLocators:
     PARAGRAPH5 = (By.XPATH, "(//div[starts-with(@class,'Text_text')])[5]")
     PARAGRAPH6 = (By.XPATH, "(//div[starts-with(@class,'Text_text')])[6]")
     ABOUT_PAGE_BTNS = (By.XPATH, "//a[starts-with(@class,'OurFoundations_link')]")
+    ABOUT_PORTALS_CARDS = (By.XPATH, "//a[starts-with(@class,'PortalCard_card')]")
+    PORTALS_TITLES = (By.XPATH, ".//h2")
+    PORTALS_CARDS_DESCRIPTION = (By.XPATH, "./div[2]")
