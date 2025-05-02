@@ -7,8 +7,9 @@ import time
 import uuid
 from datetime import datetime
 
-from selenium.common import ElementNotVisibleException, NoSuchElementException
+from selenium.common import ElementNotVisibleException, NoSuchElementException, TimeoutException
 from selenium.webdriver import Keys
+from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.about_locators import AboutLocators
 from pages.about_page import AboutPage
@@ -123,9 +124,19 @@ class TestAbout:
         logger.info("The main hero, background and all Portals images are displayed.")
 
         social_images = about_page.find_all_social_images()
+        for img in social_images:
+            browser.execute_script("arguments[0].scrollIntoView();", img)
         assert len(social_images) == 5, f"Expected 5 social images, but found {len(social_images)}"
 
-        not_displayed = [img for img in social_images if not img.is_displayed()]
-        assert not not_displayed, f"Some social images are not visible: {not_displayed}"
+        not_displayed = []
+        for img in social_images:
+            browser.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", img)
 
-        logger.info("All 4 social icon images are present and visible.")
+            try:
+                WebDriverWait(browser, 5).until(lambda d: img.is_displayed())
+            except TimeoutException:
+                not_displayed.append(img)
+
+        assert not not_displayed, f"Some social images are not visible: {not_displayed}"
+        logger.info("All 5 social icon images are present and visible.")
+
