@@ -79,13 +79,13 @@ jobs:
           PROJECT_ID_PRODUCTION: ${{ secrets.PROJECT_ID_PRODUCTION }}
         run: |
           echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
-          echo "Running make for $ENV_NAME"
-          make $ENV_NAME
-#          echo "ENV_URL: $ENV_URL"
-#          echo "ENV_NAME: $ENV_NAME"
-#          uv run pytest tests/test_login.py --env=$ENV_NAME --env_url=$ENV_URL \
-#          -sv --headless --html=latest_logs/report_$ENV_NAME_${{ matrix.browser }}.html \
-#            --self-contained-html --browser-name=${{ matrix.browser }}
+          echo "ENV_URL: $ENV_URL"
+          echo "ENV_NAME: $ENV_NAME"
+          uv run pytest tests/test_about.py tests/test_landing.py tests/test_login.py \
+          tests/test_explore_ndensity.py tests/test_explore_emodel.py tests/test_build.p \
+          --env=$ENV_NAME --env_url=$ENV_URL \
+          -sv --headless --html=latest_logs/report_$ENV_NAME_${{ matrix.browser }}.html \
+            --self-contained-html --browser-name=${{ matrix.browser }}
 
       # Upload test artifacts (screenshots) if failure
       - name: Upload test artifacts (screenshots)
