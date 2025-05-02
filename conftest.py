@@ -48,8 +48,9 @@ def create_browser(pytestconfig):
     return browser, wait
 
 @pytest.fixture(scope="function")
-def public_browsing(pytestconfig, test_config):
+def public_browsing(pytestconfig, test_config, request):
     browser, wait = create_browser(pytestconfig)
+    request.node._browser = browser
     yield browser, wait, test_config["base_url"]
     browser.quit()
 
@@ -120,7 +121,7 @@ def setup(request, pytestconfig, test_config):
     request.cls.project_id = project_id
     request.cls.browser = browser
     request.cls.wait = wait
-
+    request.node._browser = browser
     yield browser, wait, base_url, lab_id, project_id
 
     if browser is not None:
