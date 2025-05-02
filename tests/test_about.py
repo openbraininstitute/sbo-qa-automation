@@ -74,3 +74,28 @@ class TestAbout:
                 print(f"Card #{i} failed - Title: {info['title']}, Href: {info['href']}, Visible: {info['visible']}")
 
         assert not portal_cards_errors, f"❌ Some cards failed:\n" + "\n".join(portal_cards_errors)
+
+        contributors_panel = about_page.find_contributor_panel()
+        assert contributors_panel.is_displayed(), "Contributors alphabet pane, is not found"
+        logger.info("The alphabet panel with the contributors is displayed")
+
+        contributors_b_btn = about_page.find_and_click_b_btn()
+        logger.info("The B button is clicked to select contributors")
+
+        contributors_list = about_page.find_contributors_list()
+        time.sleep(4)
+        assert contributors_list.is_displayed(), "Contributors' list is not found"
+        contributors_names = about_page.find_contributors_name()
+        contributors_texts = [el.text.strip() for el in contributors_names]
+
+        failures = []
+        for full_name in contributors_texts:
+            name_parts = full_name.split()
+            name_parts = [part for part in name_parts if not re.match(r"^[A-Z]\.?$", part)]
+            last_name_parts = name_parts[1:]
+            sub_parts = re.split(r"[\s\-]", " ".join(last_name_parts))
+
+            if not any(part.upper().startswith("B") for part in sub_parts):
+                failures.append(full_name)
+
+        assert not failures, f"These contributors do not have last names starting with B: {failures}"

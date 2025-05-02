@@ -1,13 +1,16 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+import time
 
 from selenium.common import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.about_locators import AboutLocators
-from locators.landing_locators import LandingLocators
 from pages.home_page import HomePage
+from selenium.webdriver.support import expected_conditions as EC
+
 
 
 class AboutPage(HomePage):
@@ -73,3 +76,25 @@ class AboutPage(HomePage):
             "href": href,
             "visible": visible
         }
+
+    def find_contributor_panel(self):
+        return self.find_element(AboutLocators.CONTRIBUTORS_PANEL)
+
+    def find_contributors_list(self):
+        return self.find_element(AboutLocators.CONTRIBUTORS_LIST)
+
+    def find_contributors_name(self):
+        return self.find_all_elements(AboutLocators.CONTRIBUTORS_NAME)
+
+    def find_and_click_b_btn(self, timeout=10):
+        btn = self.find_element(AboutLocators.B_BTN, timeout=timeout)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
+        print("Looking for the B button")
+        end_time = time.time() + timeout
+        while time.time() < end_time:
+            if btn.is_displayed() and btn.is_enabled() and self.is_clickable_via_js(btn):
+                btn.click()
+                return
+            time.sleep(0.5)
+
+        raise AssertionError("'B' button was not clickable after waiting.")

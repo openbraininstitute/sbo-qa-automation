@@ -113,3 +113,16 @@ class CustomBasePage:
             lambda driver: driver.current_url != old_url,
             timeout
         )
+
+    def is_clickable_via_js(self, element):
+        """
+        Checks if an element is not covered by another element at its center point.
+        Returns True if the element is the topmost element at its center.
+        """
+        return self.browser.execute_script("""
+            const rect = arguments[0].getBoundingClientRect();
+            const x = rect.left + (rect.width / 2);
+            const y = rect.top + (rect.height / 2);
+            const elAtCenter = document.elementFromPoint(x, y);
+            return elAtCenter === arguments[0];
+        """, element)
