@@ -28,17 +28,29 @@ from pages.login_page import LoginPage
 def create_browser(pytestconfig):
     browser_name = pytestconfig.getoption("--browser-name")
 
+    headless = pytestconfig.getoption("--headless")
+
     if browser_name == "chrome":
         options = ChromeOptions()
-        if pytestconfig.getoption("--headless"):
-            options.add_argument("--headless")
+        if headless:
+            options.add_argument("--headless=new")  # modern headless mode
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--window-size=1920,1080")
             options.add_argument("--ignore-certificate-errors")
         browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+
     elif browser_name == "firefox":
         options = FirefoxOptions()
-        if pytestconfig.getoption("--headless"):
+        if headless:
             options.add_argument("--headless")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--window-size=1920,1080")
+
         browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
+
     else:
         raise ValueError(f"Unsupported browser: {browser_name}")
 
