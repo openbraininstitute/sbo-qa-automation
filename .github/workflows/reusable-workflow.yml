@@ -79,11 +79,13 @@ jobs:
           PROJECT_ID_PRODUCTION: ${{ secrets.PROJECT_ID_PRODUCTION }}
         run: |
           echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
-          echo "ENV_URL: $ENV_URL"  
-          echo "ENV_NAME: $ENV_NAME"
-          uv run pytest tests/test_login.py --env=$ENV_NAME --env_url=$ENV_URL \
-          -sv --headless --html=latest_logs/report_$ENV_NAME_${{ matrix.browser }}.html \
-            --self-contained-html --browser-name=${{ matrix.browser }}
+          echo "Running make for $"ENV_NAME"
+          make $ENV_NAME
+#          echo "ENV_URL: $ENV_URL"
+#          echo "ENV_NAME: $ENV_NAME"
+#          uv run pytest tests/test_login.py --env=$ENV_NAME --env_url=$ENV_URL \
+#          -sv --headless --html=latest_logs/report_$ENV_NAME_${{ matrix.browser }}.html \
+#            --self-contained-html --browser-name=${{ matrix.browser }}
 
       # Upload test artifacts (screenshots) if failure
       - name: Upload test artifacts (screenshots)
@@ -93,23 +95,3 @@ jobs:
           name: error-screenshots
           path: latest_logs/errors
           if-no-files-found: warn
-
-#      # Notify slack on success
-#      - name: Notify slack on success
-#        if: success()
-#        env:
-#          SLACK_WEBHOOK_URL_PASS: ${{ secrets.SLACK_WEBHOOK_URL_PASS }}
-#        run: |
-#          curl -X POST -H 'Content-type: application/json' \
-#          --data "{\"text\":\":white_check_mark: Test pipeline succeeded in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":rocket:\"}" \
-#          $SLACK_WEBHOOK_URL_PASS
-#
-#      # Notify slack on failure
-#      - name: Notify slack on failure
-#        if: failure()
-#        env:
-#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_FAIL }}
-#        run: |
-#          curl -X POST -H 'Content-type: application/json' \
-#          --data "{\"text\":\":x: Test pipeline failed in *${{ github.repository }}*. Branch: *${{ github.ref_name }}*. Check the logs for details.\", \"username\":\"GitHub Actions\", \"icon_emoji\":\":warning:\"}" \
-#          $SLACK_WEBHOOK_URL
