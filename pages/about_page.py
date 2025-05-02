@@ -99,6 +99,22 @@ class AboutPage(HomePage):
 
         raise AssertionError("'B' button was not clickable after waiting.")
 
+    # def click_load_more_until_done(self, max_attempts=10):
+    #     attempts = 0
+    #     while attempts < max_attempts:
+    #         try:
+    #             load_more = WebDriverWait(self.browser, 10).until(
+    #                 EC.element_to_be_clickable((By.CSS_SELECTOR, AboutLocators.LOAD_MORE_BTN))
+    #             )
+    #
+    #             self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", load_more)
+    #             load_more.click()
+    #             attempts += 1
+    #         except Exception as e:
+    #             # Log the error and break out of the loop
+    #             self.logger.error(f"Unexpected error while clicking 'Load More': {str(e)}")
+    #             break
+
     def find_all_social_images(self):
         return self.find_all_elements(AboutLocators.IMG_VIGNETTE)
 

@@ -84,8 +84,10 @@ class TestAbout:
         logger.info("The B button is clicked to select contributors")
 
         contributors_list = about_page.find_contributors_list()
-        time.sleep(4)
         assert contributors_list.is_displayed(), "Contributors' list is not found"
+
+        # click_load = about_page.click_load_more_until_done()
+
         contributors_names = about_page.find_contributors_name()
         contributors_texts = [el.text.strip() for el in contributors_names]
 
