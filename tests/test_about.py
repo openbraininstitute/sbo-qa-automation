@@ -99,3 +99,33 @@ class TestAbout:
                 failures.append(full_name)
 
         assert not failures, f"These contributors do not have last names starting with B: {failures}"
+
+        image_locators = [
+            AboutLocators.IMG1,
+            AboutLocators.IMG2,
+            AboutLocators.IMG3,
+            AboutLocators.IMG4,
+            AboutLocators.IMG5,
+            AboutLocators.IMG6,
+            AboutLocators.IMG7,
+            AboutLocators.IMG8,
+            AboutLocators.IMG_HERO,
+            AboutLocators.IMG_BACKGROUND
+
+        ]
+        failures = []
+        for locator in image_locators:
+            img = about_page.get_image(locator)
+            if not img.is_displayed():
+                failures.append(locator)
+
+        assert not failures, f"These images are not visible: {failures}"
+        logger.info("The main hero, background and all Portals images are displayed.")
+
+        social_images = about_page.find_all_social_images()
+        assert len(social_images) == 5, f"Expected 5 social images, but found {len(social_images)}"
+
+        not_displayed = [img for img in social_images if not img.is_displayed()]
+        assert not not_displayed, f"Some social images are not visible: {not_displayed}"
+
+        logger.info("All 4 social icon images are present and visible.")

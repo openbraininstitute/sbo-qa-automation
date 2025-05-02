@@ -98,3 +98,10 @@ class AboutPage(HomePage):
             time.sleep(0.5)
 
         raise AssertionError("'B' button was not clickable after waiting.")
+
+    def find_all_social_images(self):
+        return self.find_all_elements(AboutLocators.IMG_VIGNETTE)
+
+    def get_image(self, locator):
+        return self.find_element(locator)
+
