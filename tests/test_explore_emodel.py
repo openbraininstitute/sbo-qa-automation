@@ -16,7 +16,7 @@ from pages.explore_emodel_page import ExploreEModelDataPage
 class TestExploreModelPage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=7)
-    def test_explore_model(self, setup, login, logger, test_config):
+    def test_explore_emodel(self, setup, login, logger, test_config):
         browser, wait, base_url, lab_id, project_id = setup
         explore_model = ExploreEModelDataPage(browser, wait, logger, base_url)
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
