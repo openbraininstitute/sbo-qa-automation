@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
-
+import re
 
 from selenium.common import TimeoutException
 from selenium.webdriver.support.wait import WebDriverWait
@@ -18,9 +18,13 @@ class TestAbout:
         about_page.go_to_page()
         assert "About" in browser.title
 
-        about_main_page_title = about_page.about_main_title()
+        main_hero_video = about_page.main_hero_video()
+        assert main_hero_video, "The page main video is not found."
+        logger.info("Main page video is displayed.")
+
+        about_main_page_title = about_page.main_title()
         assert about_main_page_title.is_displayed(), f"The main page title is found"
-        about_main_text = about_page.about_main_page_text()
+        about_main_text = about_page.main_page_text()
         assert about_main_text.is_displayed(), f"The main page text is found"
 
         title_paragraphs = [

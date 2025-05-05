@@ -28,6 +28,7 @@ class AboutLocators:
     IMG7 = (By.CSS_SELECTOR, "img[alt='The Thalamus Studio']")
     IMG8 = (By.CSS_SELECTOR, "img[alt='The Hippocampus Hub']")
     LOAD_MORE_BTN = (By.XPATH, "//button[normalize-space()='Load more']")
+    MAIN_HERO_VIDEO = (By.XPATH, "//video[starts-with(@class,'Hero_show')]")
     PARAGRAPH1 = (By.XPATH, "//div[starts-with(@class,'Text_text')]/p[contains(text(),'Founded in 2025')]")
     PARAGRAPH2 = (By.XPATH, "(//div[starts-with(@class,'Text_text') and contains(text(), 'Henry Markram is a')])")
     PARAGRAPH3 = (By.XPATH, "(//div[starts-with(@class,'Text_text')])[3]")

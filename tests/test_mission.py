@@ -4,8 +4,6 @@
 import os
 import time
 
-from selenium.common import NoSuchElementException
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from pages.mission_page import MissionPage
 from selenium.webdriver.support import expected_conditions as EC
@@ -20,6 +18,10 @@ class TestMission:
         mission_page.go_to_page()
         assert "Our mission" in browser.title
         logger.info("Mission page is loaded")
+
+        main_hero_video = mission_page.main_hero_video()
+        assert main_hero_video, "The page main video is not found."
+        logger.info("Main page video is displayed.")
 
         main_title = mission_page.mission_main_title()
         assert main_title.is_displayed(), "Mission main title is not found."

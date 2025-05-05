@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 
 class MissionLocators:
     BTN_DOWNLOAD_MISSION = (By.XPATH, "//button[starts-with(@class,'MissionStatement')]")
+    MAIN_HERO_VIDEO = (By.XPATH, "//video[starts-with(@class,'Hero_show')]")
     MISSION_PAGE_TITLE = (By.XPATH, "//div[starts-with(@class,'Hero_text')]//h1[text()='Mission']")
     MISSION_MAIN_TEXT = (By.XPATH, "//*[starts-with(@class,'Hero_content') and contains(text(), 'The Open Brain Institute')]")
     MAIN_TITLES = (By.XPATH, "//h1[starts-with(@class,'styles_blockSmall')]")
