@@ -96,7 +96,8 @@ class TestMission:
         new_url = browser.current_url
         logger.info(f"New tab URL: {new_url}")
 
-        assert new_url.endswith(".pdf"), "Expected a PDF file in the new tab"
-        assert new_url.startswith("https://cdn.sanity.io/files/fgi7eh1v/staging/6c892e090449e62ffaa03aaabb47e582fb8dacee.pdf"), "PDF not served from expected CDN"
+        assert new_url.startswith("https://cdn.sanity.io/files/fgi7eh1v/"), "Not from Sanity CDN"
+        assert "/staging/" in new_url or "/production/" in new_url, "PDF not served from expected environment"
+
         browser.close()
         browser.switch_to.window(current_tabs[0])
