@@ -1,21 +1,13 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
-import random
-import re
-import time
-import uuid
-from datetime import datetime
 
-from selenium.common import ElementNotVisibleException, NoSuchElementException, TimeoutException
-from selenium.webdriver import Keys
+
+from selenium.common import TimeoutException
 from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.about_locators import AboutLocators
 from pages.about_page import AboutPage
-from pages.build import Build
-from pages.vl_overview import VLOverview
-import pytest
 
 class TestAbout:
     def test_about(self, visit_public_pages, logger):

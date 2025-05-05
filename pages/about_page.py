@@ -28,7 +28,7 @@ class AboutPage(HomePage):
                 self.browser.set_page_load_timeout(60)
                 self.browser.get(about_url)
                 self.wait_for_page_ready(timeout=60)
-                self.logger.info("✅ Landing Page loaded successfully.")
+                self.logger.info("✅ About Page loaded successfully.")
                 return
             except TimeoutException:
                 self.logger.warning(
