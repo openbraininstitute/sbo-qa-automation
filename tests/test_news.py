@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+
 import time
 
 from selenium.common import TimeoutException
@@ -9,7 +10,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from pages.news_page import NewsPage
 
 
-class TestAbout:
+class TestNews:
     def test_news(self, visit_public_pages, logger):
         _visit, base_url = visit_public_pages
         browser, wait = _visit("/news")
@@ -37,19 +38,15 @@ class TestAbout:
         # Verify that all initial cards have required elements
         for i, card in enumerate(initial_cards):
             try:
-                # Check for Main Title
                 title = news_page.cards_main_titles()[i]
                 assert title.is_displayed(), f"Card {i + 1} does not have a visible title."
 
-                # Check for Text Paragraph
                 text = news_page.cards_text()[i]
                 assert text.is_displayed(), f"Card {i + 1} does not have a visible text paragraph."
 
-                # Check for Image
                 img = news_page.cards_img()[i]
                 assert img.is_displayed(), f"Card {i + 1} does not have a visible image."
 
-                # Check for Read More Button
                 read_more_btn = news_page.cards_read_more_btn()[i]
                 assert read_more_btn.is_displayed(), f"Card {i + 1} does not have a visible 'Read more' button."
 
@@ -71,19 +68,15 @@ class TestAbout:
 
             for i, card in enumerate(updated_cards[len(initial_cards):]):
                 try:
-                    # Check for Main Title
                     title = news_page.cards_main_titles()[len(initial_cards) + i]
                     assert title.is_displayed(), f"Card {len(initial_cards) + i + 1} does not have a visible title."
 
-                    # Check for Text Paragraph
                     text = news_page.cards_text()[len(initial_cards) + i]
                     assert text.is_displayed(), f"Card {len(initial_cards) + i + 1} does not have a visible text paragraph."
 
-                    # Check for Image
                     img = news_page.cards_img()[len(initial_cards) + i]
                     assert img.is_displayed(), f"Card {len(initial_cards) + i + 1} does not have a visible image."
 
-                    # Check for Read More Button
                     read_more_btn = news_page.cards_read_more_btn()[len(initial_cards) + i]
                     assert read_more_btn.is_displayed(), f"Card {len(initial_cards) + i + 1} does not have a visible 'Read more' button."
 

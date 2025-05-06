@@ -115,7 +115,11 @@ class TestAbout:
         failures = []
         for locator in image_locators:
             img = about_page.get_image(locator)
-            if not img.is_displayed():
+            try:
+                about_page.wait_for_image_to_load(img)
+                if not img.is_displayed():
+                    failures.append(locator)
+            except TimeoutException:
                 failures.append(locator)
 
         assert not failures, f"These images are not visible: {failures}"
@@ -131,7 +135,7 @@ class TestAbout:
             browser.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", img)
 
             try:
-                WebDriverWait(browser, 5).until(lambda d: img.is_displayed())
+                about_page.wait_for_image_to_load(img)
             except TimeoutException:
                 not_displayed.append(img)
 

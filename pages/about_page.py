@@ -124,3 +124,9 @@ class AboutPage(HomePage):
     def get_image(self, locator):
         return self.find_element(locator)
 
+    def wait_for_image_to_load(self, img_element, timeout=10):
+        WebDriverWait(self.browser, timeout).until(
+            lambda d: d.execute_script(
+                "return arguments[0].complete && arguments[0].naturalWidth > 0;", img_element
+            )
+        )

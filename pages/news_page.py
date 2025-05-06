@@ -38,7 +38,6 @@ class NewsPage(HomePage):
     def main_hero_video(self,timeout=10):
         return self.element_visibility(NewsLocators.HERO_VIDEO, timeout=timeout)
 
-
     def hero_img(self):
         return self.find_element(NewsLocators.HERO_IMG)
 
