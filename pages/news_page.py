@@ -35,11 +35,11 @@ class NewsPage(HomePage):
                 self.wait.sleep(delay)
         raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
 
-    def main_hero_video(self,timeout=10):
+    def main_hero_video(self,timeout=15):
         return self.element_visibility(NewsLocators.HERO_VIDEO, timeout=timeout)
 
-    def hero_img(self):
-        return self.find_element(NewsLocators.HERO_IMG)
+    def hero_img(self, timeout=10):
+        return self.element_visibility(NewsLocators.HERO_IMG, timeout=timeout)
 
     def main_title(self):
         return self.find_element(NewsLocators.HERO_MAIN_TITLE)

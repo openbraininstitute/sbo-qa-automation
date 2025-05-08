@@ -16,11 +16,11 @@ class TestNews:
         browser, wait = _visit("/news")
         news_page = NewsPage(browser, wait, base_url, logger=logger)
 
-        main_hero_video = news_page.main_hero_video(timeout=10)
+        main_hero_video = news_page.main_hero_video(timeout=15)
         assert main_hero_video.is_displayed(), "Main page video is not found."
         logger.info("Main page video is displayed.")
 
-        main_page_image = news_page.hero_img()
+        main_page_image = news_page.hero_img(timeout=10)
         assert main_page_image.is_displayed(), "Main page image is not found."
         logger.info("Main page image is displayed.")
 

@@ -19,7 +19,7 @@ class TestMission:
         assert "Our mission" in browser.title
         logger.info("Mission page is loaded")
 
-        main_hero_video = mission_page.main_hero_video()
+        main_hero_video = mission_page.main_hero_video(timeout=15)
         assert main_hero_video, "The page main video is not found."
         logger.info("Main page video is displayed.")
 

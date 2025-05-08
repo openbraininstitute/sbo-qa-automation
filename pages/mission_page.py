@@ -38,8 +38,8 @@ class MissionPage(HomePage):
     def mission_main_page_text(self):
         return self.find_element(MissionLocators.MISSION_MAIN_TEXT)
 
-    def main_hero_video(self):
-        return self.find_element(MissionLocators.MAIN_HERO_VIDEO)
+    def main_hero_video(self, timeout=15):
+        return self.element_visibility(MissionLocators.MAIN_HERO_VIDEO, timeout=timeout)
 
     def main_page_paragraph(self):
         return self.find_element(MissionLocators.MAIN_PAGE_PARAGRAPH)
