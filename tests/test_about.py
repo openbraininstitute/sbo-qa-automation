@@ -24,22 +24,6 @@ class TestAbout:
         about_main_text = about_page.main_page_text()
         assert about_main_text.is_displayed(), f"The main page text is found"
 
-        # last_height = browser.execute_script("return document.body.scrollHeight")
-        # logger.info("Executing scroll to bottom for lazyloaded images")
-        #
-        # while True:
-        #     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        #     time.sleep(0.2)
-        #
-        #     # Calculate new scroll height and compare with last scroll height
-        #     new_height = browser.execute_script("return document.body.scrollHeight")
-        #     if new_height == last_height:
-        #         break
-        #     last_height = new_height
-        # main_hero_video = about_page.main_hero_video(timeout=15)
-        main_hero_video = about_page.scroll_into_view_and_click(AboutLocators.MAIN_HERO_VIDEO)
-        assert main_hero_video, "The page main video is not found."
-        logger.info("Main page video is displayed.")
 
         title_paragraphs = [
             (AboutLocators.TITLE1, AboutLocators.PARAGRAPH1),
@@ -178,4 +162,19 @@ class TestAbout:
 
         assert not not_displayed, f"Some social images are not visible: {not_displayed}"
         logger.info("All 5 social icon images are present and visible.")
+
+        last_height = browser.execute_script("return document.body.scrollHeight")
+        logger.info("Executing scroll to bottom for lazyloaded images")
+
+        while True:
+            browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(0.2)
+
+            new_height = browser.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+            last_height = new_height
+        main_hero_video = about_page.main_hero_video(timeout=15)
+        assert main_hero_video, "The page main video is not found."
+        logger.info("Main page video is displayed.")
 
