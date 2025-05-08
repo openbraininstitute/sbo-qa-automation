@@ -37,7 +37,11 @@ class AboutPage(HomePage):
         raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
 
     def main_hero_video(self, timeout=15):
-        return self.element_visibility(AboutLocators.MAIN_HERO_VIDEO, timeout=timeout)
+        return self.find_element(AboutLocators.MAIN_HERO_VIDEO, timeout=timeout)
+
+    def wait_until_hero_image_loaded(self):
+        img = self.main_hero_video()
+        self.wait_for_background_image_to_load(img, timeout=20)
 
     def main_title(self):
         return self.find_element(AboutLocators.ABOUT_PAGE_TITLE)

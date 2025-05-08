@@ -151,3 +151,10 @@ class CustomBasePage:
             time.sleep(0.5)
         raise TimeoutException(f"Element {by_locator} was not clickable after waiting {timeout} seconds.")
 
+    def wait_for_background_image_to_load(self, element, timeout=10):
+        def background_image_is_set(driver):
+            bg_image = element.value_of_css_property("background-image")
+            return bg_image and bg_image != "none"
+
+        WebDriverWait(self.browser, timeout).until(background_image_is_set)
+
