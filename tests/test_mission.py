@@ -19,10 +19,6 @@ class TestMission:
         assert "Our mission" in browser.title
         logger.info("Mission page is loaded")
 
-        main_hero_video = mission_page.main_hero_video(timeout=15)
-        assert main_hero_video, "The page main video is not found."
-        logger.info("Main page video is displayed.")
-
         main_title = mission_page.mission_main_title()
         assert main_title.is_displayed(), "Mission main title is not found."
         logger.info("Mission main 'hero' title is displayed")
@@ -30,6 +26,10 @@ class TestMission:
         mission_main_text = mission_page.mission_main_page_text()
         assert mission_main_text.is_displayed(), "Mission main text is not found."
         logger.info("Mission main 'hero' text is displayed")
+
+        main_hero_video = mission_page.main_hero_video(timeout=15)
+        assert main_hero_video, "The page main video is not found."
+        logger.info("Main page video is displayed.")
 
         main_page_paragraph = mission_page.main_page_paragraph()
         assert main_page_paragraph.is_displayed(), "The main paragraph describing the mission is not found."

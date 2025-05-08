@@ -19,14 +19,14 @@ class TestAbout:
         about_page.go_to_page()
         assert "About" in browser.title
 
-        main_hero_video = about_page.main_hero_video(timeout=15)
-        assert main_hero_video, "The page main video is not found."
-        logger.info("Main page video is displayed.")
-
         about_main_page_title = about_page.main_title()
         assert about_main_page_title.is_displayed(), f"The main page title is found"
         about_main_text = about_page.main_page_text()
         assert about_main_text.is_displayed(), f"The main page text is found"
+
+        main_hero_video = about_page.main_hero_video(timeout=15)
+        assert main_hero_video, "The page main video is not found."
+        logger.info("Main page video is displayed.")
 
         title_paragraphs = [
             (AboutLocators.TITLE1, AboutLocators.PARAGRAPH1),

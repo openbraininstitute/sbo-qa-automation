@@ -229,6 +229,28 @@ def logger(request):
 
     return logger
 
+
+failed_tests = []
+
+def pytest_runtest_logstart(nodeid, location):
+    """Hook to clearly display the test file starting"""
+    test_file = location[0].upper()
+    print(f"\033[95m\n🚀 STARTING TEST FILE: {test_file}\033[0m\n")
+
+def pytest_runtest_logreport(report):
+    """Capture failed tests during runtime"""
+    if report.failed and report.when == "call":
+        failed_tests.append(report.nodeid)
+
+def pytest_sessionfinish(session, exitstatus):
+    """Print failed test summary at the end of the session"""
+    if failed_tests:
+        print("\n\033[91m❌ FAILED TEST SUMMARY:\033[0m")
+        for test in failed_tests:
+            print(f"\033[91m- {test}\033[0m")
+    else:
+        print("\n\033[92m✅ ALL TESTS PASSED\033[0m")
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):
     """

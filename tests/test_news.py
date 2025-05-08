@@ -16,6 +16,14 @@ class TestNews:
         browser, wait = _visit("/news")
         news_page = NewsPage(browser, wait, base_url, logger=logger)
 
+        main_page_title = news_page.main_title()
+        assert main_page_title.is_displayed(), "Main page title is not found."
+        logger.info("Main page title is displayed.")
+
+        main_page_text = news_page.main_page_text()
+        assert main_page_text.is_displayed(), "Main page text is not found."
+        logger.info("Main page text is displayed.")
+
         main_hero_video = news_page.main_hero_video(timeout=15)
         assert main_hero_video.is_displayed(), "Main page video is not found."
         logger.info("Main page video is displayed.")
@@ -24,13 +32,6 @@ class TestNews:
         assert main_page_image.is_displayed(), "Main page image is not found."
         logger.info("Main page image is displayed.")
 
-        main_page_title = news_page.main_title()
-        assert main_page_title.is_displayed(), "Main page title is not found."
-        logger.info("Main page title is displayed.")
-
-        main_page_text = news_page.main_page_text()
-        assert main_page_text.is_displayed(),"Main page text is not found."
-        logger.info("Main page text is displayed.")
 
         initial_cards = news_page.page_cards()
         assert len(initial_cards) == 10, "There should be exactly 10 cards on the page initially."
