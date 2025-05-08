@@ -24,9 +24,6 @@ class TestAbout:
         about_main_text = about_page.main_page_text()
         assert about_main_text.is_displayed(), f"The main page text is found"
 
-        hero_img = about_page.wait_until_hero_image_loaded()
-        logger.info("Waiting for the Hero background image to load")
-
         title_paragraphs = [
             (AboutLocators.TITLE1, AboutLocators.PARAGRAPH1),
             (AboutLocators.TITLE2, AboutLocators.PARAGRAPH2),
@@ -165,7 +162,7 @@ class TestAbout:
         assert not not_displayed, f"Some social images are not visible: {not_displayed}"
         logger.info("All 5 social icon images are present and visible.")
 
-        # main_hero_video = about_page.main_hero_video(timeout=15)
-        # assert main_hero_video, "The page main video is not found."
-        # logger.info("Main page video is displayed.")
+        main_hero_video = about_page.main_hero_video(timeout=15)
+        assert main_hero_video, "The page main video is not found."
+        logger.info("Main page video is displayed.")
 
