@@ -163,17 +163,9 @@ class TestAbout:
         assert not not_displayed, f"Some social images are not visible: {not_displayed}"
         logger.info("All 5 social icon images are present and visible.")
 
-        last_height = browser.execute_script("return document.body.scrollHeight")
-        logger.info("Executing scroll to bottom for lazyloaded images")
+        top_element = about_page.main_title()
+        browser.execute_script("arguments[0].scrollIntoView({block: 'start'});", top_element)
 
-        while True:
-            browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(0.2)
-
-            new_height = browser.execute_script("return document.body.scrollHeight")
-            if new_height == last_height:
-                break
-            last_height = new_height
         main_hero_video = about_page.main_hero_video(timeout=15)
         assert main_hero_video, "The page main video is not found."
         logger.info("Main page video is displayed.")
