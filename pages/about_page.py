@@ -89,34 +89,14 @@ class AboutPage(HomePage):
     def find_contributors_name(self):
         return self.find_all_elements(AboutLocators.CONTRIBUTORS_NAME)
 
-    def find_and_click_b_btn(self, timeout=10):
-        btn = self.find_element(AboutLocators.B_BTN, timeout=timeout)
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
-        print("Looking for the B button")
-        end_time = time.time() + timeout
-        while time.time() < end_time:
-            if btn.is_displayed() and btn.is_enabled() and self.is_clickable_via_js(btn):
-                btn.click()
-                return
-            time.sleep(0.5)
+    def click_b_btn(self, timeout=20):
+        return self.wait_and_click(AboutLocators.B_BTN, timeout=timeout)
 
-        raise AssertionError("'B' button was not clickable after waiting.")
+    def find_load_more_column(self, timeout=10):
+        return self.find_element(AboutLocators.LOAD_MORE_COLUMN, timeout=timeout)
 
-    # def click_load_more_until_done(self, max_attempts=10):
-    #     attempts = 0
-    #     while attempts < max_attempts:
-    #         try:
-    #             load_more = WebDriverWait(self.browser, 10).until(
-    #                 EC.element_to_be_clickable((By.CSS_SELECTOR, AboutLocators.LOAD_MORE_BTN))
-    #             )
-    #
-    #             self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", load_more)
-    #             load_more.click()
-    #             attempts += 1
-    #         except Exception as e:
-    #             # Log the error and break out of the loop
-    #             self.logger.error(f"Unexpected error while clicking 'Load More': {str(e)}")
-    #             break
+    def find_load_more_btn(self, timeout=20):
+        return self.wait_and_click(AboutLocators.LOAD_MORE_BTN, timeout=timeout)
 
     def find_all_social_images(self):
         return self.find_all_elements(AboutLocators.IMG_VIGNETTE)

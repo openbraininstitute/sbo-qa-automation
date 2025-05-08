@@ -32,8 +32,11 @@ class CustomBasePage:
         return WebDriverWait(self.browser, timeout).until(
             EC.visibility_of_element_located(by_locator)
         )
+
     def visibility_of_all_elements(self, by_locator, timeout=10):
-        return self.wait.until(EC.visibility_of_all_elements_located(by_locator), timeout)
+        return WebDriverWait(self.browser, timeout).until(
+            EC.visibility_of_all_elements_located(by_locator)
+        )
 
     def find_all_elements(self, by_locator, timeout=10):
         return WebDriverWait(self.browser, timeout).until(
@@ -41,7 +44,9 @@ class CustomBasePage:
         )
 
     def element_to_be_clickable(self, by_locator, timeout=10):
-        return self.wait.until(EC.element_to_be_clickable(by_locator), timeout)
+        return WebDriverWait(self.browser, timeout).until(
+            EC.element_to_be_clickable(by_locator)
+        )
 
     def assert_element_text(self, by_locator, expected_text):
         element = self.wait.until(EC.visibility_of_element_located(by_locator))
@@ -124,3 +129,25 @@ class CustomBasePage:
             const elAtCenter = document.elementFromPoint(x, y);
             return elAtCenter === arguments[0];
         """, element)
+
+    def scroll_into_view_and_click(self, locator, timeout=10):
+        el = self.element_to_be_clickable(locator, timeout=timeout)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
+        el.click()
+        return el
+
+    def wait_and_click(self, by_locator, timeout=20):
+        """Wait until element is visible and enabled, then click."""
+        end_time = time.time() + timeout
+        while time.time() < end_time:
+            try:
+                elem = self.browser.find_element(*by_locator)
+                if elem.is_displayed() and elem.is_enabled():
+                    self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", elem)
+                    elem.click()
+                    return
+            except Exception:
+                pass
+            time.sleep(0.5)
+        raise TimeoutException(f"Element {by_locator} was not clickable after waiting {timeout} seconds.")
+
