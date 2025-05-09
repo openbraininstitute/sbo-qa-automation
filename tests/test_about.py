@@ -162,6 +162,8 @@ class TestAbout:
         assert not not_displayed, f"Some social images are not visible: {not_displayed}"
         logger.info("All 5 social icon images are present and visible.")
 
+        about_page.scroll_to_bottom_and_back()
+
         main_hero_video = about_page.main_hero_video(timeout=15)
         assert main_hero_video, "The page main video is not found."
         logger.info("Main page video is displayed.")

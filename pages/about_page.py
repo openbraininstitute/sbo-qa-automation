@@ -114,3 +114,16 @@ class AboutPage(HomePage):
                 "return arguments[0].complete && arguments[0].naturalWidth > 0;", img_element
             )
         )
+
+    def scroll_to_bottom_and_back(self):
+        pos_a = -1
+        pos_b = 0
+        scroll_pos = 0
+
+        while pos_a != pos_b:
+            pos_a = self.browser.execute_script("return window.scrollY;")
+            scroll_pos += 300
+            self.browser.execute_script(f"window.scrollTo(0, {scroll_pos});")
+            pos_b = self.browser.execute_script("return window.scrollY;")
+
+        self.browser.execute_script("window.scrollTo(0, 0);")
