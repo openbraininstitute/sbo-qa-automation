@@ -5,6 +5,7 @@ import random
 import time
 import uuid
 from datetime import datetime
+from urllib.parse import urlparse
 
 from selenium.common import ElementNotVisibleException
 from selenium.webdriver import Keys
@@ -171,6 +172,17 @@ class TestBuild:
         save_model = build.save_model()
         assert save_model.is_displayed(), "Save button is not found"
         save_model.click()
+
+        build.wait_for_url_contains("/explore/interactive/model/me-model")
+        current_url = browser.current_url
+        logger.info(f"Current URL after save: {current_url}")
+        parsed_url = urlparse(current_url)
+
+        if "/explore/interactive/model/me-model" in parsed_url.path:
+            logger.info("The new me-model is built")
+        else:
+            logger.error(f"Unexpected path: {parsed_url.path}")
+
 
 
 

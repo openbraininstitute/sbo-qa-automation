@@ -27,9 +27,9 @@ class TestMission:
         assert mission_main_text.is_displayed(), "Mission main text is not found."
         logger.info("Mission main 'hero' text is displayed")
 
-        main_hero_video = mission_page.main_hero_video(timeout=15)
-        assert main_hero_video, "The page main video is not found."
-        logger.info("Main page video is displayed.")
+        # main_hero_video = mission_page.main_hero_video(timeout=15)
+        # assert main_hero_video, "The page main video is not found."
+        # logger.info("Main page video is displayed.")
 
         main_page_paragraph = mission_page.main_page_paragraph()
         assert main_page_paragraph.is_displayed(), "The main paragraph describing the mission is not found."

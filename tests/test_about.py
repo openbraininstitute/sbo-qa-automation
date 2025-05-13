@@ -24,6 +24,13 @@ class TestAbout:
         about_main_text = about_page.main_page_text()
         assert about_main_text.is_displayed(), f"The main page text is found"
 
+        about_page.wait_for_hero_image()
+        logger.info("Hero image has loaded successfully")
+
+        about_page.wait_for_hero_video()
+        logger.info("Hero video has loaded successfully")
+
+
         title_paragraphs = [
             (AboutLocators.TITLE1, AboutLocators.PARAGRAPH1),
             (AboutLocators.TITLE2, AboutLocators.PARAGRAPH2),
@@ -136,7 +143,7 @@ class TestAbout:
         for locator in image_locators:
             img = about_page.get_image(locator)
             try:
-                about_page.wait_for_image_to_load(img)
+                about_page.wait_for_card_image_to_load(img)
                 if not img.is_displayed():
                     failures.append(locator)
             except TimeoutException:
@@ -155,16 +162,13 @@ class TestAbout:
             browser.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", img)
 
             try:
-                about_page.wait_for_image_to_load(img)
+                about_page.wait_for_card_image_to_load(img)
             except TimeoutException:
                 not_displayed.append(img)
 
         assert not not_displayed, f"Some social images are not visible: {not_displayed}"
         logger.info("All 5 social icon images are present and visible.")
 
-        about_page.scroll_to_bottom_and_back()
 
-        main_hero_video = about_page.main_hero_video(timeout=15)
-        assert main_hero_video, "The page main video is not found."
-        logger.info("Main page video is displayed.")
+
 

@@ -36,12 +36,11 @@ class AboutPage(HomePage):
                 self.wait.sleep(delay)
         raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
 
-    def main_hero_video(self, timeout=15):
-        return self.find_element(AboutLocators.MAIN_HERO_VIDEO, timeout=timeout)
+    def wait_for_hero_image(self, timeout=20):
+        self.wait_for_image_to_load(AboutLocators.IMG_HERO, timeout=timeout)
 
-    def wait_until_hero_image_loaded(self):
-        img = self.main_hero_video()
-        self.wait_for_background_image_to_load(img, timeout=20)
+    def wait_for_hero_video(self, timeout=20):
+        self.wait_for_video_to_load(AboutLocators.MAIN_HERO_VIDEO, timeout=timeout)
 
     def main_title(self):
         return self.find_element(AboutLocators.ABOUT_PAGE_TITLE)
@@ -108,7 +107,7 @@ class AboutPage(HomePage):
     def get_image(self, locator):
         return self.find_element(locator)
 
-    def wait_for_image_to_load(self, img_element, timeout=10):
+    def wait_for_card_image_to_load(self, img_element, timeout=10):
         WebDriverWait(self.browser, timeout).until(
             lambda d: d.execute_script(
                 "return arguments[0].complete && arguments[0].naturalWidth > 0;", img_element

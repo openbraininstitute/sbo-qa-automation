@@ -151,10 +151,16 @@ class CustomBasePage:
             time.sleep(0.5)
         raise TimeoutException(f"Element {by_locator} was not clickable after waiting {timeout} seconds.")
 
-    def wait_for_background_image_to_load(self, element, timeout=10):
-        def background_image_is_set(driver):
-            bg_image = element.value_of_css_property("background-image")
-            return bg_image and bg_image != "none"
+    def wait_for_image_to_load(self, img_locator, timeout=20):
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: driver.find_element(*img_locator).get_attribute("src") and
+                           driver.find_element(*img_locator).is_displayed()
+        )
 
-        WebDriverWait(self.browser, timeout).until(background_image_is_set)
-
+    def wait_for_video_to_load(self, video_locator, timeout=20):
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: driver.execute_script(
+                "const video = arguments[0]; return video.readyState >= 3;",
+                driver.find_element(*video_locator)
+            )
+        )

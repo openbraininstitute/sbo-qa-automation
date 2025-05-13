@@ -1,5 +1,5 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
-#
+# Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 
 from selenium.webdriver.common.by import By
@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 
 class ExplorePageLocators:
     AI_ASSISTANT_PANEL = (By.XPATH, "//button[starts-with(@class, 'literature-suggestions')]")
+    AI_ASSISTANT_PANEL_BTN = (By.XPATH, "//span[@class='anticon anticon-minus']")
     ATLAS = (By.CSS_SELECTOR, "div[id='3d-area']")
     ATLAS_FULLSCREEN = (By.CSS_SELECTOR, "span[class='anticon anticon-fullscreen h-5 w-5 text-xl']")
     BOUTON_DENSITY_NRECORDS = (By.XPATH, "//a[@data-testid='experiment-dataset"
