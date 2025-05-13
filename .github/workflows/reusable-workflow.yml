@@ -82,23 +82,23 @@ jobs:
           echo "ENV_URL: $ENV_URL"
           echo "ENV_NAME: $ENV_NAME"
           uv run pytest \
-          tests/test_about.py \
-          tests/test_mission.py \
-          tests/test_news.py \
-          tests/test_landing.py \
-          tests/test_login.py \
-          tests/test_explore_page.py \
-          tests/test_explore_ndensity.py \
-          tests/test_explore_emodel.py \
-          tests/test_build.py \
-          tests/test_outside_explore.py \
-          --env="$ENV_NAME" \
-          --env_url="$ENV_URL" \
-          -sv \
-          --headless \
-          --html="latest_logs/report_${ENV_NAME}_firefox.html" \
-          --self-contained-html \
-         --browser-name=firefox
+            tests/test_about.py \
+            tests/test_mission.py \
+            tests/test_news.py \
+            tests/test_landing.py \
+            tests/test_login.py \
+            tests/test_explore_page.py \
+            tests/test_explore_ndensity.py \
+            tests/test_explore_emodel.py \
+            tests/test_build.py \
+            tests/test_outside_explore.py \
+            --env="$ENV_NAME" \
+            --env_url="$ENV_URL" \
+            -sv \
+            --headless \
+            --html="latest_logs/report_${ENV_NAME}_firefox.html" \
+            --self-contained-html \
+           --browser-name=firefox
 
 
       # Upload test artifacts (screenshots) if failure
