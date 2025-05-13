@@ -33,15 +33,13 @@ class TestExplorePage:
         logger.info("Cerebrum title is displayed")
 
         ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=10)
-        if ai_assistant_panel.is_displayed():
-            logger.info("AI Assistant panel is open. Attempting to close it.")
-            close_btn = explore_page.find_ai_assistant_panel_close(timeout=10)
-            close_btn.click()
-            ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
-            assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
-            logger.info("AI Assistant open button is displayed, means the panel is closed.")
-        else:
-                logger.info("AI Assistant panel is already closed.")
+
+        logger.info("AI Assistant panel is open. Attempting to close it.")
+        close_btn = explore_page.find_ai_assistant_panel_close(timeout=10)
+        close_btn.click()
+        ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
+        assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
+        logger.info("AI Assistant open button is displayed, means the panel is closed.")
 
         cerebrum_title_main_page = explore_page.find_cerebrum_title_main_page(timeout=10)
         assert cerebrum_title_main_page.is_displayed(), "Cerebrum title on the main page is not displayed."
