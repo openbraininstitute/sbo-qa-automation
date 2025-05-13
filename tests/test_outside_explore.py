@@ -29,10 +29,10 @@ class TestOutsideExplorePage:
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
         try:
-            ai_assistant_panel = outside_explore.find_ai_assistant_panel()
+            ai_assistant_panel = outside_explore.find_ai_assistant_panel(timeout=10)
             if ai_assistant_panel.is_displayed():
                 logger.info("AI Assistant panel is open. Attempting to close it.")
-                close_btn = outside_explore.find_ai_assistant_panel_close()
+                close_btn = outside_explore.find_ai_assistant_panel_close(timeout=10)
                 close_btn.click()
                 ai_assistant_open_btn = outside_explore.find_ai_assistant_panel_open()
                 assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
@@ -51,6 +51,9 @@ class TestOutsideExplorePage:
         assert cerebrum_title, f"Cerebrum title is not found"
         logger.info("Cerebrum title is displayed")
 
+        cerebrum_title_main_page = outside_explore.find_cerebrum_title_main_page()
+        assert cerebrum_title_main_page.is_displayed(), "Cerebrum title on the main page is not displayed."
+
         exp_data_titles = [
             ExplorePageLocators.NEURON_MORPHOLOGY,
             ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY,
@@ -59,7 +62,7 @@ class TestOutsideExplorePage:
             ExplorePageLocators.SYNAPSE_PER_CONNECTION
         ]
         logger.info("Searching for Experimental Data types")
-        exp_data_elements = outside_explore.find_experimental_data_titles(exp_data_titles)
+        exp_data_elements = outside_explore.find_experimental_data_titles(exp_data_titles, timeout=15)
 
         found_titles = [element.text for element in exp_data_elements]
         logger.info(f"Found experimental data titles: {found_titles}")

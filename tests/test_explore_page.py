@@ -47,6 +47,9 @@ class TestExplorePage:
         assert cerebrum_title, f"Cerebrum title is not found"
         logger.info("Cerebrum title is displayed")
 
+        cerebrum_title_main_page = explore_page.find_cerebrum_title_main_page()
+        assert cerebrum_title_main_page.is_displayed(), "Cerebrum title on the main page is not displayed."
+
         exp_data_titles = [
             ExplorePageLocators.NEURON_MORPHOLOGY,
             ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY,

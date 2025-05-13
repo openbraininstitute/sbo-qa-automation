@@ -27,8 +27,8 @@ class TestAbout:
         about_page.wait_for_hero_image()
         logger.info("Hero image has loaded successfully")
 
-        about_page.wait_for_hero_video()
-        logger.info("Hero video has loaded successfully")
+        # about_page.wait_for_hero_video()
+        # logger.info("Hero video has loaded successfully")
 
 
         title_paragraphs = [

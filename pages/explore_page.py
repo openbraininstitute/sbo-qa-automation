@@ -87,6 +87,9 @@ class ExplorePage(HomePage, LinkChecker):
     def find_cerebrum_arrow_btn(self):
         return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB)
 
+    def find_cerebrum_title_main_page(self):
+        return self.element_visibility(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE)
+
     def find_3d_atlas(self):
         return self.find_element(ExplorePageLocators.ATLAS)
 

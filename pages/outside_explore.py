@@ -33,14 +33,17 @@ class OutsideExplorePage(HomePage, LinkChecker):
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
 
-    def find_ai_assistant_panel(self):
-        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL)
+    def find_ai_assistant_panel(self, timeout=15):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
 
-    def find_ai_assistant_panel_close(self):
-        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE)
+    def find_ai_assistant_panel_close(self, timeout=15):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=timeout)
 
     def find_ai_assistant_panel_open(self):
         return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_BTN_OPEN)
+
+    def find_cerebrum_title_main_page(self):
+        return self.element_visibility(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE)
 
     def check_explore_title_is_present(self):
         return self.find_element(ExplorePageLocators.EXPLORE_TITLE)
@@ -51,22 +54,16 @@ class OutsideExplorePage(HomePage, LinkChecker):
     def find_model_data_title(self):
         return self.find_element(ExplorePageLocators.MODEL_DATA_BTN)
 
-    def literature_title(self):
-        return self.find_element(ExplorePageLocators.LITERATURE)
-
-    def literature_link(self):
-        return self.find_element(ExplorePageLocators.LITERATURE_LINK)
-
     def find_explore_page_titles(self, page_locators):
         elements_list = []
         for locator in page_locators:
             elements_list.extend(self.find_all_elements(locator))
         return elements_list
 
-    def find_experimental_data_titles(self, exp_data_locators):
+    def find_experimental_data_titles(self, exp_data_locators, timeout=10):
         result = []
         for locator in exp_data_locators:
-            result.extend(self.find_all_elements(locator))
+            result.extend(self.find_all_elements(locator, timeout))
         return result
 
     def get_experiment_record_count(self, record_count_locators):
