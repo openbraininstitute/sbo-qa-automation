@@ -28,21 +28,17 @@ class TestOutsideExplorePage:
         outside_explore.go_to_outside_explore_page()
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
-        try:
-            ai_assistant_panel = outside_explore.find_ai_assistant_panel(timeout=10)
-            if ai_assistant_panel.is_displayed():
-                logger.info("AI Assistant panel is open. Attempting to close it.")
-                close_btn = outside_explore.find_ai_assistant_panel_close(timeout=10)
-                close_btn.click()
-                ai_assistant_open_btn = outside_explore.find_ai_assistant_panel_open()
-                assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
-                logger.info("AI Assistant open button is displayed, means the panel is closed.")
-            else:
-                logger.info("AI Assistant panel is already closed.")
-        except Exception as e:
-            logger.error(f"Failed to close AI Assistant panel: {e}")
-            raise
 
+        ai_assistant_panel = outside_explore.find_ai_assistant_panel(timeout=10)
+        if ai_assistant_panel.is_displayed():
+            logger.info("AI Assistant panel is open. Attempting to close it.")
+            close_btn = outside_explore.find_ai_assistant_panel_close(timeout=10)
+            close_btn.click()
+            ai_assistant_open_btn = outside_explore.find_ai_assistant_panel_open()
+            assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
+            logger.info("AI Assistant open button is displayed, means the panel is closed.")
+        else:
+            logger.info("AI Assistant panel is already closed.")
 
         outside_explore.check_explore_title_is_present()
         logger.info("Explore page title is present")
