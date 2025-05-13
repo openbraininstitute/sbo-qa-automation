@@ -19,6 +19,7 @@ class ExplorePageLocators:
     BRP_CEREBRUM = (By.XPATH, "//span[@title='Cerebrum' and text()='Cerebrum']")
     CEREBRAL_CORTEX_TITLE = (By.XPATH, "//span[@title='Cerebral cortex']")
     CEREBRUM_BTN = (By.XPATH, "(//button[@type='button' and @aria-expanded='false'])[4]")
+    CEREBRUM_BTN_VLAB = (By.XPATH, "(//button[@type='button' and @aria-expanded='false'])[5]")
     CEREBRUM_TITLE = (By.XPATH, "//span[@title='Cerebrum' and text()='Cerebrum']")
     COUNT_SWITCH = (By.CSS_SELECTOR, "button[type='button'][role='switch'][aria-checked='false']")
     DATA_PANEL = (By.CSS_SELECTOR, "div[id='statistic-panel']")
@@ -26,6 +27,7 @@ class ExplorePageLocators:
     EXPLORE_LINK1 = (By.XPATH, "//a[@href='/mmb-beta/explore/simulation-campaigns']//h1[text("
                                ")='Brain & cells annotations']")
     EXPLORE_TITLE = (By.XPATH, "//div[@class='select-none' and text()='Explore']")
+    EXPLORE_TITLE_VLAB = (By.XPATH, "//a[normalize-space()='explore']")
     EXPLORE_URL = (By.XPATH, "//a[@href='/explore']")
     FULLSCREEN_EXIT = (By.CSS_SELECTOR, "span[aria-label='fullscreen-exit']")
     INTERACTIVE_EXPLORATION = (By.XPATH, "//h2[text()='Interactive exploration']")

@@ -25,11 +25,28 @@ class TestExplorePage:
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
+        try:
+            ai_assistant_panel = explore_page.find_ai_assistant_panel()
+            if ai_assistant_panel.is_displayed():
+                logger.info("AI Assistant panel is open. Attempting to close it.")
+                close_btn = explore_page.find_ai_assistant_panel_close()
+                close_btn.click()
+                ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
+                assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
+                logger.info("AI Assistant open button is displayed, means the panel is closed.")
+            else:
+                logger.info("AI Assistant panel is already closed.")
+        except Exception as e:
+            logger.error(f"Failed to close AI Assistant panel: {e}")
+            raise
+
         explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
+
         cerebrum_title = explore_page.cerebrum_title()
         assert cerebrum_title, f"Cerebrum title is not found"
         logger.info("Cerebrum title is displayed")
+
         exp_data_titles = [
             ExplorePageLocators.NEURON_MORPHOLOGY,
             ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY,
@@ -48,8 +65,7 @@ class TestExplorePage:
 
         page_titles = [
             ExplorePageLocators.EXPERIMENTAL_DATA_BTN,
-            ExplorePageLocators.MODEL_DATA_BTN,
-            ExplorePageLocators.LITERATURE
+            ExplorePageLocators.MODEL_DATA_BTN
         ]
         logger.info("Searching for Explore Page titles")
         explore_page_titles = explore_page.find_explore_page_titles(page_titles)
@@ -127,27 +143,10 @@ class TestExplorePage:
         panel_synaptome = explore_page.find_panel_synaptome()
         logger.info("Synaptome is found in the types panel")
 
-        liteture_tab = explore_page.literature_title().click()
-        logger.info("Found and clicked on Literature tab")
-
         expected_panel = explore_page.find_data_panel()
         assert expected_panel.is_displayed(), \
             "Literature data panel did not appear after clicking the tab."
         logger.info("Literature data panel is displayed after clicking the tab.")
-
-        literature_panel_data_titles = [
-            ExplorePageLocators.LITERATURE_MORPHOLOGY_TAB,
-            ExplorePageLocators.LITERATURE_EPHYS_TAB,
-            ExplorePageLocators.LITERATURE_NDENSITY_TAB,
-            ExplorePageLocators.LITERATURE_BDENSITY_TAB,
-            ExplorePageLocators.LITERATURE_SYNAPSES_TAB
-        ]
-        logger.info("Searching for Literature panel data titles")
-        literature_panel = explore_page.find_literature_panel_data(literature_panel_data_titles)
-
-        for panel_title in literature_panel:
-            assert panel_title.is_displayed(), f"Literature panel {panel_title} is not displayed"
-        logger.info("Found Literature panel data titles")
 
         atlas = explore_page.find_3d_atlas()
         assert atlas.is_displayed()

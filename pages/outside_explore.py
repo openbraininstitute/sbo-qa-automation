@@ -42,9 +42,6 @@ class OutsideExplorePage(HomePage, LinkChecker):
     def find_ai_assistant_panel_open(self):
         return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_BTN_OPEN)
 
-    # def find_brain_regions_panel_btn(self):
-    #     return self.find_element(ExplorePageLocators.BRAIN_REGIONS_PANEL_BTN)
-
     def check_explore_title_is_present(self):
         return self.find_element(ExplorePageLocators.EXPLORE_TITLE)
 

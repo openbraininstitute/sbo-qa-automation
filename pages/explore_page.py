@@ -33,20 +33,23 @@ class ExplorePage(HomePage, LinkChecker):
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
 
+    def find_ai_assistant_panel(self):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL)
+
+    def find_ai_assistant_panel_close(self):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE)
+
+    def find_ai_assistant_panel_open(self):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_BTN_OPEN)
+
     def check_explore_title_is_present(self):
-        return self.find_element(ExplorePageLocators.EXPLORE_TITLE)
+        return self.find_element(ExplorePageLocators.EXPLORE_TITLE_VLAB)
 
     def cerebrum_title(self):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE)
 
     def find_model_data_title(self):
         return self.find_element(ExplorePageLocators.MODEL_DATA_BTN)
-
-    def literature_title(self):
-        return self.find_element(ExplorePageLocators.LITERATURE)
-
-    def literature_link(self):
-        return self.find_element(ExplorePageLocators.LITERATURE_LINK)
 
     def find_explore_page_titles(self, page_locators):
         elements_list = []
@@ -82,7 +85,7 @@ class ExplorePage(HomePage, LinkChecker):
         return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE)
 
     def find_cerebrum_arrow_btn(self):
-        return self.find_element(ExplorePageLocators.CEREBRUM_BTN)
+        return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB)
 
     def find_3d_atlas(self):
         return self.find_element(ExplorePageLocators.ATLAS)
