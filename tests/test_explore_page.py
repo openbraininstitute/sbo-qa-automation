@@ -25,10 +25,10 @@ class TestExplorePage:
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
-        ai_assistant_panel = explore_page.find_ai_assistant_panel()
+        ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=10)
         if ai_assistant_panel.is_displayed():
             logger.info("AI Assistant panel is open. Attempting to close it.")
-            close_btn = explore_page.find_ai_assistant_panel_close()
+            close_btn = explore_page.find_ai_assistant_panel_close(timeout=10)
             close_btn.click()
             ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
             assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."

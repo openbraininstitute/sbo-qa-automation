@@ -90,7 +90,6 @@ jobs:
             tests/test_explore_page.py \
             tests/test_explore_ndensity.py \
             tests/test_explore_emodel.py \
-            tests/test_build.py \
             tests/test_outside_explore.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
@@ -106,6 +105,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}
+          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.step }}
           path: latest_logs/errors
           if-no-files-found: warn

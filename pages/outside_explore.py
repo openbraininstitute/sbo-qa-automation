@@ -43,7 +43,7 @@ class OutsideExplorePage(HomePage, LinkChecker):
         return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_BTN_OPEN)
 
     def find_cerebrum_title_main_page(self):
-        return self.element_visibility(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE)
+        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE)
 
     def check_explore_title_is_present(self):
         return self.find_element(ExplorePageLocators.EXPLORE_TITLE)

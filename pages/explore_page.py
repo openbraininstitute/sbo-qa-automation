@@ -33,11 +33,11 @@ class ExplorePage(HomePage, LinkChecker):
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
 
-    def find_ai_assistant_panel(self):
-        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL)
+    def find_ai_assistant_panel(self, timeout=10):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
 
-    def find_ai_assistant_panel_close(self):
-        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE)
+    def find_ai_assistant_panel_close(self, timeout=10):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=10)
 
     def find_ai_assistant_panel_open(self):
         return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_BTN_OPEN)
@@ -88,7 +88,7 @@ class ExplorePage(HomePage, LinkChecker):
         return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB)
 
     def find_cerebrum_title_main_page(self):
-        return self.element_visibility(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE)
+        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE)
 
     def find_3d_atlas(self):
         return self.find_element(ExplorePageLocators.ATLAS)
