@@ -28,6 +28,12 @@ class TestOutsideExplorePage:
         outside_explore.go_to_outside_explore_page()
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
+        outside_explore.check_explore_title_is_present()
+        logger.info("Explore page title is present")
+
+        cerebrum_title = outside_explore.cerebrum_title()
+        assert cerebrum_title, f"Cerebrum title is not found"
+        logger.info("Cerebrum title is displayed")
 
         ai_assistant_panel = outside_explore.find_ai_assistant_panel(timeout=10)
         if ai_assistant_panel.is_displayed():
@@ -40,14 +46,7 @@ class TestOutsideExplorePage:
         else:
             logger.info("AI Assistant panel is already closed.")
 
-        outside_explore.check_explore_title_is_present()
-        logger.info("Explore page title is present")
-
-        cerebrum_title = outside_explore.cerebrum_title()
-        assert cerebrum_title, f"Cerebrum title is not found"
-        logger.info("Cerebrum title is displayed")
-
-        cerebrum_title_main_page = outside_explore.find_cerebrum_title_main_page()
+        cerebrum_title_main_page = outside_explore.find_cerebrum_title_main_page(timeout=10)
         assert cerebrum_title_main_page.is_displayed(), "Cerebrum title on the main page is not displayed."
 
         exp_data_titles = [

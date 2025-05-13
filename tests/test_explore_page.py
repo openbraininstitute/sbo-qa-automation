@@ -25,6 +25,13 @@ class TestExplorePage:
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
+
+        explore_page.check_explore_title_is_present()
+        logger.info("Explore page title is present")
+        cerebrum_title = explore_page.cerebrum_title()
+        assert cerebrum_title, f"Cerebrum title is not found"
+        logger.info("Cerebrum title is displayed")
+
         ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=10)
         if ai_assistant_panel.is_displayed():
             logger.info("AI Assistant panel is open. Attempting to close it.")
@@ -36,14 +43,7 @@ class TestExplorePage:
         else:
                 logger.info("AI Assistant panel is already closed.")
 
-        explore_page.check_explore_title_is_present()
-        logger.info("Explore page title is present")
-
-        cerebrum_title = explore_page.cerebrum_title()
-        assert cerebrum_title, f"Cerebrum title is not found"
-        logger.info("Cerebrum title is displayed")
-
-        cerebrum_title_main_page = explore_page.find_cerebrum_title_main_page()
+        cerebrum_title_main_page = explore_page.find_cerebrum_title_main_page(timeout=10)
         assert cerebrum_title_main_page.is_displayed(), "Cerebrum title on the main page is not displayed."
 
         exp_data_titles = [
