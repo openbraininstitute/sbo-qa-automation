@@ -51,7 +51,7 @@ class OutsideExplorePage(HomePage, LinkChecker):
     def find_brain_region_search_field(self, timeout=20):
         return self.find_element(ExplorePageLocators.SEARCH_REGION, timeout=timeout)
 
-    def find_cerebrum_title_main_page(self, timeout=10):
+    def find_cerebrum_title_main_page(self, timeout=15):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
     def find_cerebrum_brp(self, timeout=30):

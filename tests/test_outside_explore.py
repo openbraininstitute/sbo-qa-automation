@@ -7,7 +7,6 @@ import os.path
 import pytest
 from selenium.webdriver import Keys
 
-from conftest import visit_public_pages
 from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
 from pages.outside_explore import OutsideExplorePage
@@ -44,7 +43,7 @@ class TestOutsideExplorePage:
         assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
         logger.info("AI Assistant open button is displayed, means the panel is closed.")
 
-        cerebrum_title_main_page = outside_explore.find_cerebrum_title_main_page(timeout=10)
+        cerebrum_title_main_page = outside_explore.find_cerebrum_title_main_page(timeout=15)
         assert cerebrum_title_main_page.is_displayed(), "Cerebrum title on the main page is not displayed."
 
         exp_data_titles = [

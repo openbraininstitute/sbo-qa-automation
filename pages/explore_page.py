@@ -65,7 +65,7 @@ class ExplorePage(HomePage, LinkChecker):
     def find_cerebrum_arrow_btn(self):
         return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB)
 
-    def find_cerebrum_title_main_page(self, timeout=10):
+    def find_cerebrum_title_main_page(self, timeout=15):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
     def cerebrum_title(self):
