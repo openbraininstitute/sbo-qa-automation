@@ -137,19 +137,56 @@ class CustomBasePage:
         return el
 
     def wait_and_click(self, by_locator, timeout=20):
-        """Wait until element is visible and enabled, then click."""
+        """Wait until element is visible and enabled, then click (with JS fallback)."""
         try:
+
+            WebDriverWait(self.browser, 10).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
+            time.sleep(2)
+
             WebDriverWait(self.browser, timeout).until(
                 EC.presence_of_element_located(by_locator)
             )
             WebDriverWait(self.browser, timeout).until(
                 EC.element_to_be_clickable(by_locator)
             )
+
             elem = self.browser.find_element(*by_locator)
             self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", elem)
-            elem.click()
+            time.sleep(2)
+
+            try:
+                elem.click()
+            except Exception as click_error:
+                print(f"Standard click failed: {click_error}. Trying JavaScript click...")
+                self.browser.execute_script("arguments[0].click();", elem)
+
+            return
+
         except Exception as e:
-            self.browser.save_screenshot("error_wait_and_click.png")
+            timestamp = int(time.time())
+            self.browser.save_screenshot(f"error_wait_and_click_{timestamp}.png")
+            with open(f"error_wait_and_click_{timestamp}.html", "w", encoding="utf-8") as f:
+                f.write(self.browser.page_source)
+
+            try:
+                elem = self.browser.find_element(*by_locator)
+                location = elem.location_once_scrolled_into_view
+                top_element = self.browser.execute_script(
+                    "return document.elementFromPoint(arguments[0], arguments[1]);",
+                    location['x'], location['y']
+                )
+                print("Top element at click point:", top_element.get_attribute('outerHTML'))
+            except Exception as diag_error:
+                print("Could not inspect top element:", diag_error)
+
+            try:
+                for entry in self.browser.get_log('browser'):
+                    print(entry)
+            except Exception as log_error:
+                print("Browser logs not available:", log_error)
+
             raise TimeoutException(f"Element {by_locator} was not clickable after {timeout}s. Error: {e}")
 
     def wait_for_image_to_load(self, img_locator, timeout=20):
