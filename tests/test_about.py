@@ -84,6 +84,10 @@ class TestAbout:
         assert contributors_list.is_displayed(), "Contributors' list is not found"
         logger.info("Contributors' list is displayed.")
 
+        about_page.browser.save_screenshot("before_click_b_btn.png")
+        with open("before_click_b_btn.html", "w", encoding="utf-8") as f:
+            f.write(about_page.browser.page_source)
+
         b_btn = about_page.click_b_btn(timeout=20)
         logger.info("The B button is clicked to select contributors")
 
