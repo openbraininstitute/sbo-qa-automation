@@ -16,7 +16,7 @@ jobs:
   test:
     strategy:
       matrix:
-        browser: [firefox]
+        browser: [chrome]
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
 
@@ -34,8 +34,9 @@ jobs:
       - name: Install required dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          sudo apt-get install -y firefox
+#          sudo apt-get install -y google-chrome-stable
+          sudo apt-get install -y unzip wget
+#          sudo apt-get install -y firefox
 
       # Installation of 'uv' is required
       - name: Install uv
@@ -53,8 +54,11 @@ jobs:
           uv pip install -r requirements.txt
           ls -la
 
-      - name: Install Firefox
-        uses: browser-actions/setup-firefox@v1
+#      - name: Install Firefox
+#        uses: browser-actions/setup-firefox@v1
+
+      - name: Verify Chrome installation
+        run: google-chrome --version
 
       # This is temporary for debugging
       - name: Verify browser installation
@@ -95,9 +99,9 @@ jobs:
             --env_url="$ENV_URL" \
             -sv \
             --headless \
-            --html="latest_logs/report_${ENV_NAME}_firefox.html" \
+            --html="latest_logs/report_${ENV_NAME}_chrome.html" \
             --self-contained-html \
-           --browser-name=firefox
+           --browser-name=chrome
 
 
       # Upload test artifacts (screenshots) if failure
