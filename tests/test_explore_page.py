@@ -26,7 +26,6 @@ class TestExplorePage:
         explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
-        # time.sleep(20)
         explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
         cerebrum_title = explore_page.cerebrum_title()

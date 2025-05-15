@@ -18,7 +18,6 @@ class TestAbout:
 
         about_page.go_to_page()
         assert "About" in browser.title
-
         about_main_page_title = about_page.main_title()
         assert about_main_page_title.is_displayed(), f"The main page title is found"
         about_main_text = about_page.main_page_text()
@@ -87,6 +86,9 @@ class TestAbout:
 
         b_btn = about_page.click_b_btn(timeout=20)
         logger.info("The B button is clicked to select contributors")
+
+        find_b_btn_again = about_page.b_button(timeout=20)
+        logger.info("Find the B-button again, to give time for the page to load.")
 
         initial_contributors = about_page.find_contributors_name()
         initial_count = len(initial_contributors)

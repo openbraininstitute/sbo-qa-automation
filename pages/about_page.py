@@ -36,26 +36,29 @@ class AboutPage(HomePage):
                 self.wait.sleep(delay)
         raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
 
-    def wait_for_hero_image(self, timeout=20):
-        self.wait_for_image_to_load(AboutLocators.IMG_HERO, timeout=timeout)
-
-    def wait_for_hero_video(self, timeout=20):
-        self.wait_for_video_to_load(AboutLocators.MAIN_HERO_VIDEO, timeout=timeout)
-
-    def main_title(self):
-        return self.find_element(AboutLocators.ABOUT_PAGE_TITLE)
-
-    def main_page_text(self):
-        return self.find_element(AboutLocators.ABOUT_MAIN_TEXT)
-
-    def get_element(self, locator):
-        return self.find_element(locator)
+    def find_all_social_images(self):
+        return self.find_all_elements(AboutLocators.IMG_VIGNETTE)
 
     def find_all_page_buttons(self, timeout=10):
         return self.find_all_elements(AboutLocators.ABOUT_PAGE_BTNS, timeout=timeout)
 
-    def find_portals_cards(self, timeout=10):
-        return self.find_all_elements(AboutLocators.ABOUT_PORTALS_CARDS, timeout=timeout)
+    def b_button(self, timeout=20):
+        return self.element_visibility(AboutLocators.B_BTN, timeout=timeout)
+
+    def click_b_btn(self, timeout=20):
+        return self.wait_and_click(AboutLocators.B_BTN, timeout=timeout)
+
+    def find_contributor_panel(self):
+        return self.find_element(AboutLocators.CONTRIBUTORS_PANEL)
+
+    def find_contributors_list(self):
+        return self.find_element(AboutLocators.CONTRIBUTORS_LIST)
+
+    def find_contributors_name(self):
+        return self.find_all_elements(AboutLocators.CONTRIBUTORS_NAME)
+
+    def get_element(self, locator):
+        return self.find_element(locator)
 
     def extract_card_info(self, card_element):
 
@@ -83,17 +86,8 @@ class AboutPage(HomePage):
             "visible": visible
         }
 
-    def find_contributor_panel(self):
-        return self.find_element(AboutLocators.CONTRIBUTORS_PANEL)
-
-    def find_contributors_list(self):
-        return self.find_element(AboutLocators.CONTRIBUTORS_LIST)
-
-    def find_contributors_name(self):
-        return self.find_all_elements(AboutLocators.CONTRIBUTORS_NAME)
-
-    def click_b_btn(self, timeout=20):
-        return self.wait_and_click(AboutLocators.B_BTN, timeout=timeout)
+    def get_image(self, locator):
+        return self.find_element(locator)
 
     def find_load_more_column(self, timeout=10):
         return self.find_element(AboutLocators.LOAD_MORE_COLUMN, timeout=timeout)
@@ -101,18 +95,20 @@ class AboutPage(HomePage):
     def find_load_more_btn(self, timeout=20):
         return self.wait_and_click(AboutLocators.LOAD_MORE_BTN, timeout=timeout)
 
-    def find_all_social_images(self):
-        return self.find_all_elements(AboutLocators.IMG_VIGNETTE)
+    def main_title(self):
+        return self.find_element(AboutLocators.ABOUT_PAGE_TITLE)
 
-    def get_image(self, locator):
-        return self.find_element(locator)
+    def main_page_text(self):
+        return self.find_element(AboutLocators.ABOUT_MAIN_TEXT)
 
-    def wait_for_card_image_to_load(self, img_element, timeout=10):
-        WebDriverWait(self.browser, timeout).until(
-            lambda d: d.execute_script(
-                "return arguments[0].complete && arguments[0].naturalWidth > 0;", img_element
-            )
-        )
+    def find_portals_cards(self, timeout=10):
+        return self.find_all_elements(AboutLocators.ABOUT_PORTALS_CARDS, timeout=timeout)
+
+    def wait_for_hero_image(self, timeout=20):
+        self.wait_for_image_to_load(AboutLocators.IMG_HERO, timeout=timeout)
+
+    def wait_for_hero_video(self, timeout=20):
+        self.wait_for_video_to_load(AboutLocators.MAIN_HERO_VIDEO, timeout=timeout)
 
     def scroll_to_bottom_and_back(self):
         pos_a = -1
@@ -126,3 +122,10 @@ class AboutPage(HomePage):
             pos_b = self.browser.execute_script("return window.scrollY;")
 
         self.browser.execute_script("window.scrollTo(0, 0);")
+
+    def wait_for_card_image_to_load(self, img_element, timeout=10):
+        WebDriverWait(self.browser, timeout).until(
+            lambda d: d.execute_script(
+                "return arguments[0].complete && arguments[0].naturalWidth > 0;", img_element
+            )
+        )
