@@ -39,7 +39,8 @@ def create_browser(pytestconfig):
             options.add_argument("--disable-gpu")
             options.add_argument("--window-size=1920,1080")
             options.add_argument("--ignore-certificate-errors")
-        browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager(version="135.0.0.0").install()), options=options)
+        # browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager(version="135.0.0.0").install()), options=options)
+        browser = webdriver.Chrome(options=options)
 
     elif browser_name == "firefox":
         options = FirefoxOptions()
