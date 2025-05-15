@@ -138,18 +138,19 @@ class CustomBasePage:
 
     def wait_and_click(self, by_locator, timeout=20):
         """Wait until element is visible and enabled, then click."""
-        end_time = time.time() + timeout
-        while time.time() < end_time:
-            try:
-                elem = self.browser.find_element(*by_locator)
-                if elem.is_displayed() and elem.is_enabled():
-                    self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", elem)
-                    elem.click()
-                    return
-            except Exception:
-                pass
-            time.sleep(0.5)
-        raise TimeoutException(f"Element {by_locator} was not clickable after waiting {timeout} seconds.")
+        try:
+            WebDriverWait(self.browser, timeout).until(
+                EC.presence_of_element_located(by_locator)
+            )
+            WebDriverWait(self.browser, timeout).until(
+                EC.element_to_be_clickable(by_locator)
+            )
+            elem = self.browser.find_element(*by_locator)
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", elem)
+            elem.click()
+        except Exception as e:
+            self.browser.save_screenshot("error_wait_and_click.png")
+            raise TimeoutException(f"Element {by_locator} was not clickable after {timeout}s. Error: {e}")
 
     def wait_for_image_to_load(self, img_locator, timeout=20):
         WebDriverWait(self.browser, timeout).until(
