@@ -34,9 +34,7 @@ jobs:
       - name: Install required dependencies
         run: |
           sudo apt-get update
-#          sudo apt-get install -y google-chrome-stable
           sudo apt-get install -y unzip wget
-#          sudo apt-get install -y firefox
 
       # Installation of 'uv' is required
       - name: Install uv
