@@ -97,6 +97,7 @@ class TestExploreNeuronDensity:
             ExploreNDensityPageLocators.DV_SPECIES_VALUE,
             ExploreNDensityPageLocators.DV_LICENSE_VALUE,
             ExploreNDensityPageLocators.DV_MTYPE_VALUE,
+            # ExploreNDensityPageLocators.DV_AGE_VALUE,
             ExploreNDensityPageLocators.DV_ETYPE_VALUE,
             ExploreNDensityPageLocators.DV_DENSITY_VALUE,
             ExploreNDensityPageLocators.DV_NUM_MEAS_VALUE,

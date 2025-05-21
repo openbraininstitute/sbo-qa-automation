@@ -460,4 +460,4 @@ def check_skip_condition():
 
 def mask_sensitive(config):
     """Mask sensitive keys like 'password' before logging."""
-    return {k: (v if k != "password" else "***") for k, v in config.items()}
+    return {k: (v if "pass" in k.lower() else "***") for k, v in config.items()}

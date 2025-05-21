@@ -38,6 +38,9 @@ class CustomBasePage:
             EC.visibility_of_all_elements_located(by_locator)
         )
 
+    # def find_all_elements(self, by_locator, timeout=10):
+    #     return self.wait.until(EC.presence_of_all_elements_located(by_locator), timeout)
+
     def find_all_elements(self, by_locator, timeout=10):
         return WebDriverWait(self.browser, timeout).until(
             EC.presence_of_all_elements_located(by_locator)

@@ -36,4 +36,3 @@ staging:
 	 uv run pytest tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py \
 		 tests/test_login.py tests/test_explore_ndensity.py tests/test_explore_emodel.py tests/test_build.py \
 		 --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-
