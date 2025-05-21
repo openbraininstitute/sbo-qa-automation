@@ -29,10 +29,14 @@ class CustomBasePage:
         )
 
     def element_visibility(self, by_locator, timeout=10):
-        return self.wait.until(EC.visibility_of_element_located(by_locator), timeout)
+        return WebDriverWait(self.browser, timeout).until(
+            EC.visibility_of_element_located(by_locator)
+        )
 
     def visibility_of_all_elements(self, by_locator, timeout=10):
-        return self.wait.until(EC.visibility_of_all_elements_located(by_locator), timeout)
+        return WebDriverWait(self.browser, timeout).until(
+            EC.visibility_of_all_elements_located(by_locator)
+        )
 
     # def find_all_elements(self, by_locator, timeout=10):
     #     return self.wait.until(EC.presence_of_all_elements_located(by_locator), timeout)
@@ -43,7 +47,9 @@ class CustomBasePage:
         )
 
     def element_to_be_clickable(self, by_locator, timeout=10):
-        return self.wait.until(EC.element_to_be_clickable(by_locator), timeout)
+        return WebDriverWait(self.browser, timeout).until(
+            EC.element_to_be_clickable(by_locator)
+        )
 
     def assert_element_text(self, by_locator, expected_text):
         element = self.wait.until(EC.visibility_of_element_located(by_locator))
@@ -112,4 +118,90 @@ class CustomBasePage:
         return self.wait.until(
             lambda driver: driver.current_url != old_url,
             timeout
+        )
+
+    def is_clickable_via_js(self, element):
+        """
+        Checks if an element is not covered by another element at its center point.
+        Returns True if the element is the topmost element at its center.
+        """
+        return self.browser.execute_script("""
+            const rect = arguments[0].getBoundingClientRect();
+            const x = rect.left + (rect.width / 2);
+            const y = rect.top + (rect.height / 2);
+            const elAtCenter = document.elementFromPoint(x, y);
+            return elAtCenter === arguments[0];
+        """, element)
+
+    def scroll_into_view_and_click(self, locator, timeout=10):
+        el = self.element_to_be_clickable(locator, timeout=timeout)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
+        el.click()
+        return el
+
+    def wait_and_click(self, by_locator, timeout=20):
+        """Wait until element is visible and enabled, then click (with JS fallback)."""
+        try:
+
+            WebDriverWait(self.browser, 10).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
+            time.sleep(2)
+
+            WebDriverWait(self.browser, timeout).until(
+                EC.presence_of_element_located(by_locator)
+            )
+            WebDriverWait(self.browser, timeout).until(
+                EC.element_to_be_clickable(by_locator)
+            )
+
+            elem = self.browser.find_element(*by_locator)
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", elem)
+            time.sleep(2)
+
+            try:
+                elem.click()
+            except Exception as click_error:
+                print(f"Standard click failed: {click_error}. Trying JavaScript click...")
+                self.browser.execute_script("arguments[0].click();", elem)
+
+            return
+
+        except Exception as e:
+            timestamp = int(time.time())
+            self.browser.save_screenshot(f"error_wait_and_click_{timestamp}.png")
+            with open(f"error_wait_and_click_{timestamp}.html", "w", encoding="utf-8") as f:
+                f.write(self.browser.page_source)
+
+            try:
+                elem = self.browser.find_element(*by_locator)
+                location = elem.location_once_scrolled_into_view
+                top_element = self.browser.execute_script(
+                    "return document.elementFromPoint(arguments[0], arguments[1]);",
+                    location['x'], location['y']
+                )
+                print("Top element at click point:", top_element.get_attribute('outerHTML'))
+            except Exception as diag_error:
+                print("Could not inspect top element:", diag_error)
+
+            try:
+                for entry in self.browser.get_log('browser'):
+                    print(entry)
+            except Exception as log_error:
+                print("Browser logs not available:", log_error)
+
+            raise TimeoutException(f"Element {by_locator} was not clickable after {timeout}s. Error: {e}")
+
+    def wait_for_image_to_load(self, img_locator, timeout=20):
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: driver.find_element(*img_locator).get_attribute("src") and
+                           driver.find_element(*img_locator).is_displayed()
+        )
+
+    def wait_for_video_to_load(self, video_locator, timeout=20):
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: driver.execute_script(
+                "const video = arguments[0]; return video.readyState >= 3;",
+                driver.find_element(*video_locator)
+            )
         )
