@@ -2,17 +2,12 @@
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 import random
-import time
-import uuid
 from datetime import datetime
 from urllib.parse import urlparse
 
-from selenium.common import ElementNotVisibleException
 from selenium.webdriver import Keys
 
 from pages.build import Build
-from pages.vl_overview import VLOverview
-import pytest
 
 class TestBuild:
     def test_build(self, setup, login, logger,test_config):

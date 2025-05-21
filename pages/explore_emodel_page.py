@@ -29,8 +29,14 @@ class ExploreEModelDataPage(ExplorePage, LinkChecker):
             raise RuntimeError("The Model data page did not load within 60 seconds.")
         return self.browser.current_url
 
-    def find_emodel_tab(self):
-        return self.find_element(ExploreEModelPageLocators.EMODEL_TAB)
+    def brain_region_panel_close_btn(self):
+        return self.find_element(ExploreEModelPageLocators.CLOSE_BRAIN_REGION_PANEL_BTN)
+
+    def find_ai_assistant_panel(self, timeout=10):
+        return self.find_element(ExploreEModelPageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
+
+    def find_ai_assistant_panel_close_btn(self):
+        return self.find_element(ExploreEModelPageLocators.AI_ASSISTANT_PANEL_CLOSE_BTN)
 
     def find_brain_region_search_field(self, timeout=20):
         return self.find_element(ExploreEModelPageLocators.SEARCH_REGION, timeout=timeout)
@@ -41,20 +47,29 @@ class ExploreEModelDataPage(ExplorePage, LinkChecker):
     def find_br_cerebrum_title(self):
         return self.find_element(ExploreEModelPageLocators.BR_CEREBRUM_TITLE)
 
-    def find_lv_em_td(self):
-        return self.find_element(ExploreEModelPageLocators.LV_EM_TD)
+    def find_dv_analysis_tab(self):
+        return self.find_element(ExploreEModelPageLocators.DV_ANALYSIS_TAB)
 
-    def brain_region_panel_close_btn(self):
-        return self.find_element(ExploreEModelPageLocators.CLOSE_BRAIN_REGION_PANEL_BTN)
+    def find_dv_brain_region_label(self):
+        return self.find_element(ExploreEModelPageLocators.DV_BRAIN_REGION_LABEL)
 
-    def find_selected_brain_region_title(self):
-        return self.find_element(ExploreEModelPageLocators.SELECTED_BRAIN_REGION)
+    def find_dv_brain_region_value(self):
+        return self.find_element(ExploreEModelPageLocators.DV_BRAIN_REGION_VALUE)
 
-    def find_search_for_resources(self):
-        return self.find_element(ExploreEModelPageLocators.SEARCH_RESOURCES)
+    def find_dv_configuration_tab(self):
+        return self.find_element(ExploreEModelPageLocators.DV_CONFIGURATION_TAB)
 
-    def find_lv_selected_resource(self):
-        return self.find_element(ExploreEModelPageLocators.LV_EM_TD)
+    def find_dv_contributors_label(self):
+        return self.find_element(ExploreEModelPageLocators.DV_CONTRIBUTORS_LABEL)
+
+    def find_dv_contributors_value(self):
+        return self.find_element(ExploreEModelPageLocators.DV_CONTRIBUTORS_VALUE)
+
+    def find_dv_description_label(self):
+        return self.find_element(ExploreEModelPageLocators.DV_DESCRIPTION_LABEL)
+
+    def find_dv_description_value(self):
+        return self.find_element(ExploreEModelPageLocators.DV_DESCRIPTION_VALUE)
 
     def dv_get_table_headers(self):
         """Returns the visible text of all column headers."""
@@ -66,47 +81,11 @@ class ExploreEModelDataPage(ExplorePage, LinkChecker):
         elements = self.find_all_elements(ExploreEModelPageLocators.DV_EXEMPLAR_TABLE_HEADER_COLUMNS)
         return [el.text.strip() for el in elements if el.text.strip()]
 
-    def find_dv_configuration_tab(self):
-        return self.find_element(ExploreEModelPageLocators.DV_CONFIGURATION_TAB)
-
-    def find_dv_analysis_tab(self):
-        return self.find_element(ExploreEModelPageLocators.DV_ANALYSIS_TAB)
-
-    def find_dv_simulation_tab(self):
-        return self.find_element(ExploreEModelPageLocators.DV_SIMULATION_TAB)
-
-    def find_ai_assistant_panel_close(self):
-        return self.find_element(ExploreEModelPageLocators.AI_ASSISTANT_PANEL_BTN)
-
     def find_dv_name_label(self):
         return self.find_element(ExploreEModelPageLocators.DV_NAME_LABEL)
 
     def find_dv_name_value(self):
         return self.find_element(ExploreEModelPageLocators.DV_NAME_VALUE)
-
-    def find_dv_description_label(self):
-        return self.find_element(ExploreEModelPageLocators.DV_DESCRIPTION_LABEL)
-
-    def find_dv_description_value(self):
-        return self.find_element(ExploreEModelPageLocators.DV_DESCRIPTION_VALUE)
-
-    def find_dv_contributors_label(self):
-        return self.find_element(ExploreEModelPageLocators.DV_CONTRIBUTORS_LABEL)
-
-    def find_dv_contributors_value(self):
-        return self.find_element(ExploreEModelPageLocators.DV_CONTRIBUTORS_VALUE)
-
-    def find_dv_registration_date_label(self):
-        return self.find_element(ExploreEModelPageLocators.DV_REGISTRATION_DATE_LABEL)
-
-    def find_dv_registration_date_value(self):
-        return self.find_element(ExploreEModelPageLocators.DV_REGISTRATION_DATE_VALUE)
-
-    def find_dv_brain_region_label(self):
-        return self.find_element(ExploreEModelPageLocators.DV_BRAIN_REGION_LABEL)
-
-    def find_dv_brain_region_value(self):
-        return self.find_element(ExploreEModelPageLocators.DV_BRAIN_REGION_VALUE)
 
     def find_dv_model_score_label(self):
         return self.find_element(ExploreEModelPageLocators.DV_MODEL_SCORE_LABEL)
@@ -125,6 +104,30 @@ class ExploreEModelDataPage(ExplorePage, LinkChecker):
 
     def find_dv_etype_value(self):
         return self.find_element(ExploreEModelPageLocators.DV_ETYPE_VALUE)
+
+    def find_dv_registration_date_label(self):
+        return self.find_element(ExploreEModelPageLocators.DV_REGISTRATION_DATE_LABEL)
+
+    def find_dv_registration_date_value(self):
+        return self.find_element(ExploreEModelPageLocators.DV_REGISTRATION_DATE_VALUE)
+
+    def find_dv_simulation_tab(self):
+        return self.find_element(ExploreEModelPageLocators.DV_SIMULATION_TAB)
+
+    def find_emodel_tab(self):
+        return self.find_element(ExploreEModelPageLocators.EMODEL_TAB)
+
+    def find_lv_em_td(self):
+        return self.find_element(ExploreEModelPageLocators.LV_EM_TD)
+
+    def find_lv_selected_resource(self):
+        return self.find_element(ExploreEModelPageLocators.LV_EM_TD)
+
+    def find_selected_brain_region_title(self):
+        return self.find_element(ExploreEModelPageLocators.SELECTED_BRAIN_REGION)
+
+    def find_search_for_resources(self):
+        return self.find_element(ExploreEModelPageLocators.SEARCH_RESOURCES)
 
     def verify_exemplar_morphology_headers(self):
         expected_headers = ["PREVIEW", "NAME", "DESCRIPTION", "BRAIN LOCATION", "M-TYPE", "CONTRIBUTOR"]
