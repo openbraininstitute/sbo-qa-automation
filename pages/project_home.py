@@ -17,7 +17,7 @@ class ProjectHome(HomePage):
             self.go_to_page(path)
             self.wait_for_page_ready(timeout=60)
         except TimeoutException:
-            raise RuntimeError("The Model data page did not load within 60 seconds.")
+            raise RuntimeError("The Project Home data page did not load within 60 seconds.")
         return self.browser.current_url
 
     def project_menu_titles(self, titles, timeout=10):
