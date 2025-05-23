@@ -93,6 +93,8 @@ jobs:
             tests/test_explore_ndensity.py \
             tests/test_explore_emodel.py \
             tests/test_outside_explore.py \
+            tests/test_project_home.py \
+            tests/test_project_notebooks.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
             -sv \
