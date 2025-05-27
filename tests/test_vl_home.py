@@ -4,6 +4,7 @@
 
 
 import random
+import time
 from datetime import datetime
 from urllib.parse import urlparse
 from selenium.webdriver import Keys
@@ -13,7 +14,7 @@ from pages.vl_home import VlabHome
 class TestVlabHome:
     def test_vl_home(self, setup, login, logger,test_config):
         browser, wait, base_url, lab_id, project_id = setup
-        vlab_home = VlabHome(browser,wait, base_url)
+        vlab_home = VlabHome(browser,wait, base_url, logger=logger)
         lab_id = test_config["lab_id"]
         project_id = test_config["project_id"]
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
@@ -52,19 +53,36 @@ class TestVlabHome:
             else:
                 logger.info("Go to your lab button is not displayed because the user has no virtual labs.")
 
+        tutorials_carrousel = vlab_home.find_tutorials_carrousel()
+        assert tutorials_carrousel.is_displayed(), f"Tutorials carrousel is not displayed."
+        logger.info("Tutorials carrousel is displayed.")
+
+        tutorials_title = vlab_home.find_tutorials_title()
+        assert tutorials_title.is_displayed(), f"Tutorials title is not displayed."
+        logger.info("Tutorials title is displayed.")
+
+        tutorials_cards = vlab_home.find_tutorials_carts()
+        assert len(tutorials_cards) == 3, f"Tutorials cards are not displayed."
+
+        for idx, card in enumerate(tutorials_cards):
+            print(f"Card {idx + 1} content: {card.text}")
+
+        vlab_home.validate_and_return()
 
         qna_btn = vlab_home.find_qna_btn()
-        if qna_btn.is_displayed():
-            qna_btn.click()
-            logger.info("Q&A button is clicked.")
-            menu_about = vlab_home.find_menu_about_btn()
-            logger.info("Menu about button is displayed.")
-            menu_contact = vlab_home.find_menu_contact_btn()
-            logger.info("Menu contact button is displayed.")
-            menu_terms = vlab_home.find_menu_terms_btn()
-            logger.info("Menu terms button is displayed.")
-        else:
-            logger.info("Q&A button is not displayed.")
+        assert qna_btn.is_displayed(), f"Q&A button is not displayed."
+        logger.info("Q&A button is displayed.")
+
+        qna_btn.click()
+        logger.info("Q&A button is clicked.")
+        menu_terms = vlab_home.find_menu_terms_btn()
+        assert menu_terms.is_displayed(), f"Menu about button is not displayed."
+        logger.info("Menu about button is displayed.")
+        menu_terms.click()
+
+        browser.back()
+        current_url = browser.current_url
+        logger.info(f"Navigated back from {current_url}.")
 
         home_btn = vlab_home.find_home_btn()
         assert home_btn.is_displayed(), f"Home button is not displayed."
@@ -74,3 +92,9 @@ class TestVlabHome:
         assert profile_btn.is_displayed(), f"Profile button is not displayed."
         logger.info("Profile button is displayed.")
 
+        profile_btn.click()
+
+        profile_menu_buttons = vlab_home.find_profile_menu_btns()
+        for idx, (key, btn) in enumerate(profile_menu_buttons.items()):
+            assert btn.is_displayed(), f"Profile menu button '{key}' is not displayed."
+            logger.info(f"Profile menu button '{key}' ({idx + 1}) is displayed.")
