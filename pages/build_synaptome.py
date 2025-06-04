@@ -37,3 +37,33 @@ class BuildSynaptomePage(HomePage):
 
     def find_synaptome_build_btn(self):
         return self.find_element(BuildSynaptomeLocators.SYNAPTOME_BUILD_BTN)
+
+    def synaptome_form(self):
+        return self.find_element(BuildSynaptomeLocators.SYNAPTOME_FORM)
+
+    def new_synaptome_title(self):
+        return self.find_element(BuildSynaptomeLocators.NEW_SYNAPTOME_TITLE)
+
+    def input_name_field(self):
+        return self.find_element(BuildSynaptomeLocators.INPUT_NAME_FIELD)
+
+    def description_title(self):
+        return self.find_element(BuildSynaptomeLocators.DESCRIPTION_TITLE)
+
+    def input_description_field(self):
+        return self.find_element(BuildSynaptomeLocators.INPUT_DESCRIPTION_FIELD)
+
+    def form_created_by(self):
+        return self.find_element(BuildSynaptomeLocators.FORM_CREATED_BY)
+
+    def form_value_created_by(self):
+        return self.find_all_elements(BuildSynaptomeLocators.FORM_VALUE_CREATED_BY)
+
+    def form_creation_date(self):
+        return self.find_element(BuildSynaptomeLocators.FORM_CREATION_DATE)
+
+    def form_value_creation_date(self):
+        return self.find_element(BuildSynaptomeLocators.FORM_VALUE_CREATION_DATE)
+
+    def start_building_button(self):
+        return self.element_to_be_clickable(BuildSynaptomeLocators.START_BUILDING_BTN)
