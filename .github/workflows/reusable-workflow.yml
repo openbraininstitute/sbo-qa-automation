@@ -95,6 +95,8 @@ jobs:
             tests/test_outside_explore.py \
             tests/test_project_home.py \
             tests/test_project_notebooks.py \
+            tests/test_build.py \
+            tests/test_build_synaptome.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
             -sv \
