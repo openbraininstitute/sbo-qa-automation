@@ -19,7 +19,7 @@ class VLOverview(HomePage, LinkChecker):
             self.go_to_page("")
             self.wait_for_page_ready(timeout=60)
         except TimeoutException:
-            raise RuntimeError("The Explore Morphology page did not load within 60 seconds")
+            raise RuntimeError("The Virtual lab overview page did not load within 60 seconds")
         return self.browser.current_url
 
     def vl_overview_title(self):

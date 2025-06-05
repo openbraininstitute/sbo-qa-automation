@@ -23,20 +23,11 @@ class Build(HomePage, LinkChecker):
             raise RuntimeError(f"Failed to load page at {path} within 60 seconds")
         return self.browser.current_url
 
+    def brain_region_toggle_btn(self):
+        return self.find_element(BuildLocators.BRAIN_REGION_PANEL_TOGGLE)
+
     def build_menu_title(self):
         return self.find_element(BuildLocators.BUILD_MENU_TITLE)
-
-    def new_model_tab(self):
-        return self.find_element(BuildLocators.NEW_MODEL_TAB)
-
-    def single_neuron_title(self):
-        return self.find_element(BuildLocators.SINGLE_NEURON_TITLE)
-
-    def single_neuron_build_btn(self):
-        return self.find_element(BuildLocators.BUILD_SINGLE_NEURON_BTN)
-
-    def form_build_single_neuron_title(self):
-        return self.find_element(BuildLocators.FORM_BUILD_NEURON_TITLE)
 
     def created_by_name(self):
         return self.find_all_elements(BuildLocators.CREATED_BY_NAME)
@@ -47,23 +38,47 @@ class Build(HomePage, LinkChecker):
     def date(self):
         return self.find_element(BuildLocators.DATE)
 
-    def form_name(self):
-        return self.element_visibility(BuildLocators.FORM_NAME)
-
-    def form_description(self):
-        return self.find_element(BuildLocators.FORM_DESCRIPTION)
+    def find_search_input_search_item(self):
+        return self.find_element(BuildLocators.SEARCH_INPUT_FIELD)
 
     def form_brain_region(self):
         return self.element_to_be_clickable(BuildLocators.FORM_BRAIN_REGION)
 
-    def start_building_btn(self):
-        return self.element_to_be_clickable(BuildLocators.START_BUILDING_BTN)
+    def form_build_single_neuron_title(self):
+        return self.find_element(BuildLocators.FORM_BUILD_NEURON_TITLE)
 
-    def sn_name(self):
-        return self.find_element(BuildLocators.SN_NAME)
+    def form_description(self):
+        return self.find_element(BuildLocators.FORM_DESCRIPTION)
 
-    def sn_description(self):
-        return self.find_element(BuildLocators.SN_DESCRIPTION)
+    def form_name(self):
+        return self.element_visibility(BuildLocators.FORM_NAME)
+
+    def new_model_tab(self):
+        return self.find_element(BuildLocators.NEW_MODEL_TAB)
+
+    def save_model(self):
+        return self.find_element(BuildLocators.SAVE)
+
+    def searched_e_record(self):
+        return self.find_element(BuildLocators.SEARCHED_E_RECORD)
+
+    def searched_m_record(self):
+        return self.find_element(BuildLocators.SEARCHED_M_RECORD)
+
+    def select_e_model_btn(self):
+        return self.find_element(BuildLocators.SELECT_E_MODEL_BTN)
+
+    def select_m_model_btn(self):
+        return self.find_element(BuildLocators.SELECT_M_MODEL_BTN)
+
+    def single_neuron_build_btn(self):
+        return self.find_element(BuildLocators.BUILD_SINGLE_NEURON_BTN)
+
+    def single_neuron_title(self):
+        return self.find_element(BuildLocators.SINGLE_NEURON_TITLE)
+
+    def sn_brain_region(self):
+        return self.find_element(BuildLocators.SN_BRAIN_REGION)
 
     def sn_creation_date(self):
         return self.find_element(BuildLocators.SN_CREATION_DATE)
@@ -71,39 +86,23 @@ class Build(HomePage, LinkChecker):
     def sn_created_by(self):
         return self.find_all_elements(BuildLocators.SN_CREATED_BY)
 
-    def sn_brain_region(self):
-        return self.find_element(BuildLocators.SN_BRAIN_REGION)
-
-    def sn_mtype(self):
-        return self.find_element(BuildLocators.SN_MTYPE)
+    def sn_description(self):
+        return self.find_element(BuildLocators.SN_DESCRIPTION)
 
     def sn_etype(self):
         return self.find_element(BuildLocators.SN_ETYPE)
 
-    def select_m_model_btn(self):
-        return self.find_element(BuildLocators.SELECT_M_MODEL_BTN)
+    def sn_mtype(self):
+        return self.find_element(BuildLocators.SN_MTYPE)
 
-    def select_e_model_btn(self):
-        return self.find_element(BuildLocators.SELECT_E_MODEL_BTN)
+    def sn_name(self):
+        return self.find_element(BuildLocators.SN_NAME)
 
-    def find_search_input_search_item(self):
-        return self.find_element(BuildLocators.SEARCH_INPUT_FIELD)
-
-    def brain_region_toggle_btn(self):
-        return self.find_element(BuildLocators.BRAIN_REGION_PANEL_TOGGLE)
-
-    def searched_m_record(self):
-        return self.find_element(BuildLocators.SEARCHED_M_RECORD)
-
-    def searched_e_record(self):
-        return self.find_element(BuildLocators.SEARCHED_E_RECORD)
-
-    def tick_search_m_record(self):
-        return self.find_element(BuildLocators.TICK_SEARCHED_M_RECORD)
+    def start_building_btn(self):
+        return self.element_to_be_clickable(BuildLocators.START_BUILDING_BTN)
 
     def tick_search_e_record(self):
         return self.find_element(BuildLocators.TICK_SEARCHED_E_RECORD)
 
-    def save_model(self):
-        return self.find_element(BuildLocators.SAVE)
-
+    def tick_search_m_record(self):
+        return self.find_element(BuildLocators.TICK_SEARCHED_M_RECORD)
