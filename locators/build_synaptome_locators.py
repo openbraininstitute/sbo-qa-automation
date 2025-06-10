@@ -21,6 +21,10 @@ class BuildSynaptomeLocators:
     FORM_VALUE_CREATION_DATE = (By.XPATH, "//span[text()='creation date']/following-sibling::div[normalize-space() != '']")
     START_BUILDING_BTN = (By.XPATH, "(//button[normalize-space()='Start building'])[1]")
     SELECT_SINGLE_NEURON_MODEL_TITLE = (By.XPATH, "//h1[contains(text(),'Select a single neuron model to build a synaptome ')]")
-    BRAIN_REGION_COLUMN_HEADER = (By.XPATH, "//div[contains(text(),'Brain region')]")
+    BRAIN_REGION_COLUMN_HEADER = (By.XPATH, "(//div[@class='ant-table-column-sorters'])[2]")
+    ROW2 = (By.XPATH, "//tr[starts-with(@class,'ant-table-row ant-table-row-level-0')]")
+    ROW1 = (By.XPATH, "//tr[position()=1]")
+    TABLE_ROW = (By.XPATH, "//tr[starts-with(@class,'ant-table-row ant-table-row-level-0')]")
+    TABLE = (By.XPATH, "//table[@aria-label='listing-view-table']")
 
 

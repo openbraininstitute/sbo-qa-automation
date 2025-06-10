@@ -97,10 +97,30 @@ class TestBuildSynaptome:
         start_building_btn = build_synaptome.start_building_button()
         if start_building_btn.get_attribute('disabled') is None:
             start_building_btn.click()
-            print("Button clicked!")
+            logger.info("Button clicked!")
         else:
-            print("Button is disabled, cannot click.")
+           logger.info("Button is disabled, cannot click.")
         logger.info("'Start building' button is clicked.")
+
+        brain_region_column_header = build_synaptome.brain_region_column_header()
+        assert brain_region_column_header.is_displayed(), "'Brain region' column header is not displayed."
+        logger.info("'Brain region' column header is displayed.")
+
+        initial_table_content = build_synaptome.get_table_content()
+        logger.info(f"Initial table content: {initial_table_content}")
+
+        brain_region_column_header.click()
+        logger.info("Clicked on 'Brain region' column header.")
+
+        updated_table_content = build_synaptome.get_table_content()
+        logger.info(f"Updated table content: {updated_table_content}")
+
+        if initial_table_content == updated_table_content:
+            raise Exception("The table content did not update after sorting.")
+        else:
+            logger.info("The table content changed successfully after sorting.")
+
+        time.sleep(5)
 
         '''
         This is commented out because it will be used at a later point.

@@ -214,3 +214,12 @@ class CustomBasePage:
                 driver.find_element(*video_locator)
             )
         )
+
+    def find_child_elements(self, parent_element, by_locator, timeout=10):
+        """
+        Finds child elements within a given parent element, waiting for them to fully load.
+        """
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: len(parent_element.find_elements(*by_locator)) > 0
+        )
+        return parent_element.find_elements(*by_locator)
