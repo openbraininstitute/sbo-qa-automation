@@ -1,7 +1,7 @@
 import time
 
 import pytest
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException, StaleElementReferenceException
 from selenium.webdriver import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -120,7 +120,117 @@ class TestBuildSynaptome:
         else:
             logger.info("The table content changed successfully after sorting.")
 
-        time.sleep(5)
+        radio_button_me_model = build_synaptome.radio_btn(timeout=10)
+        assert radio_button_me_model.is_displayed(), "'M-model' radio button is not displayed."
+        logger.info("'M-model' radio button is displayed.")
+
+        radio_button_me_model.click()
+        logger.info("Clicked on 'M-model' radio button.")
+
+        use_sn_model_btn = build_synaptome.use_sn_model_btn()
+        assert use_sn_model_btn.is_displayed(), "'Use synaptome model' button is not displayed."
+        logger.info("'Use synaptome model' button is displayed.")
+
+        use_sn_model_btn.click()
+        logger.info("Clicked on 'Use synaptome model' button.")
+
+        configure_model_label = build_synaptome.configure_model()
+        assert configure_model_label.is_displayed(), "'Configure model' label is not displayed."
+        logger.info("'Configure model' label is displayed.")
+
+        name_your_set = build_synaptome.name_your_set()
+        assert name_your_set.is_displayed(), "'Name your set' label is not displayed."
+        logger.info("'Name your set' label is displayed.")
+
+        name_your_set.click()
+        logger.info("Clicked on 'Name your set' label.")
+
+        name_your_set.send_keys("soma")
+        logger.info("Provided 'soma' as name for the set.")
+
+        time.sleep(3)
+        target_select = build_synaptome.target_select()
+        logger.info("'Target select' is displayed.")
+
+        print("attempting to click on target select")
+        target_select.click()
+        logger.info("Clicked on 'Target select'.")
+
+        target_list = build_synaptome.target_list(timeout=10)
+        assert target_list.is_displayed(), "'Target' list is not displayed."
+        logger.info("'Target' list is displayed.")
+
+        target_soma = build_synaptome.target_soma()
+        assert target_soma.is_displayed(), "'Target soma' is not displayed."
+        logger.info("'Target soma' is displayed.")
+
+        target_soma.click()
+        logger.info("Clicked on 'Target soma' option.")
+
+        type_field = build_synaptome.type_field()
+        logger.info("'Type' field is displayed.")
+
+        time.sleep(3)
+        type_field.click()
+        logger.info("Clicked on 'Type' field.")
+
+        type_excitatory = build_synaptome.type_excitatory()
+        assert type_excitatory.is_displayed(), "'Type excitatory' is not displayed."
+        logger.info("'Type excitatory' is displayed.")
+
+        type_excitatory.click()
+        logger.info("Clicked on 'Type excitatory' option.")
+
+        filter_synapses = build_synaptome.filter_synapses_btn()
+        assert filter_synapses.is_displayed(), "'Filter synapses' button is not displayed."
+        logger.info("'Filter synapses' button is displayed.")
+        filter_synapses.click()
+        logger.info("Clicked on 'Filter synapses' button.")
+
+        greater = build_synaptome.synapse_greater_value()
+        logger.info("'Synapse greater than' value is displayed.")
+        greater.click()
+        logger.info("Clicked on 'Synapse greater than' value.")
+        greater.send_keys("100")
+        logger.info("Provided '100' as value for 'Synapse greater than' option.")
+
+        smaller = build_synaptome.synapse_smaller_value()
+        logger.info("'Synapse smaller than' value is displayed.")
+        smaller.click()
+        logger.info("Clicked on 'Synapse smaller than' value.")
+        smaller.send_keys("500")
+        logger.info("Provided '500' as value for 'Synapse smaller than' option.")
+
+        apply_changes = build_synaptome.apply_changes_btn()
+        logger.info("'Apply changes' button is displayed.")
+        apply_changes.click()
+        logger.info("Clicked on 'Apply changes' button.")
+
+        add_new_synapse_set = build_synaptome.add_new_synapse_set()
+        logger.info("'Add new synapse set' button is displayed.")
+        add_new_synapse_set.click()
+        logger.info("Clicked on 'Add new synapse set' button.")
+
+        synapse_set2 = build_synaptome.synapse_set()
+        assert synapse_set2.is_displayed(), "'Synapse set' is not displayed."
+        logger.info("'Synapse set' is displayed.")
+
+        delete_synapse_set2= build_synaptome.delete_synapse_set(timeout=20)
+        assert delete_synapse_set2.is_displayed(), "'Delete synapse set' is not displayed."
+        logger.info("'Delete synapse set' is displayed.")
+        delete_synapse_set2.click()
+        logger.info("Clicked on 'Delete synapse set' button.")
+
+        synapse_set_num = build_synaptome.synapse_set_num()
+        logger.info("'Synapse set' is equal to 1 again.")
+
+        save_synaptome = build_synaptome.save_btn()
+        assert save_synaptome.is_displayed(), "'Save' button is not displayed."
+        logger.info("'Save' button is displayed.")
+
+        save_synaptome.click()
+        logger.info("Clicked on 'Save' button.")
+
 
         '''
         This is commented out because it will be used at a later point.
