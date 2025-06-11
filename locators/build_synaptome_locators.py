@@ -5,6 +5,10 @@
 from selenium.webdriver.common.by import By
 
 class BuildSynaptomeLocators:
+    ADD_RULE_BTN = (By.CSS_SELECTOR, "button[aria-label='Add new rule']")
+    ADD_SYNAPSES_BTN = (By.CSS_SELECTOR, "button[aria-label='Add Synapse']")
+    APPLY_CHANGES = (By.XPATH, "//button[starts-with(@class,'ant-btn ant-btn-default ant-btn-lg h-14 cursor-pointer self-end bg-primary-8')]")
+    DELETE_SYNAPSE_SET2 = (By.CSS_SELECTOR, "div[id='synaptic-input-1'] button[title='Delete Synapse']")
     MENU_BUILD = (By.XPATH, "//div[@class='mx-4' and text()='Build']")
     SYNAPTOME_BOX = (By.XPATH,"//div[@class='mb-5 mt-8 grid grid-cols-3 gap-5']//div[contains(text(),'Synaptome')]")
     SYNAPTOME_BUILD_BTN = (By.XPATH, "(//button[text()='Build'])")
@@ -15,6 +19,7 @@ class BuildSynaptomeLocators:
     INPUT_NAME_FIELD = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_name")
     DESCRIPTION_TITLE = (By.CSS_SELECTOR, "label[for='synaptome-model-configuration-form_description']")
     INPUT_DESCRIPTION_FIELD = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_description")
+    FILTER_SYNAPSES_BTN = (By.CSS_SELECTOR, "#exclusion-rules-header")
     FORM_CREATED_BY = (By.XPATH, "//span[text()='created by']")
     FORM_VALUE_CREATED_BY = (By.XPATH, "//span[text()='created by']/following-sibling::div[normalize-space() != '']")
     FORM_CREATION_DATE = (By.XPATH, "//span[text()='creation date']")
@@ -26,5 +31,24 @@ class BuildSynaptomeLocators:
     ROW1 = (By.XPATH, "//tr[position()=1]")
     TABLE_ROW = (By.XPATH, "//tr[starts-with(@class,'ant-table-row ant-table-row-level-0')]")
     TABLE = (By.XPATH, "//table[@aria-label='listing-view-table']")
+    RADIO_BTN_ME_MODEL = (By.XPATH, "(//span[@class='ant-radio ant-wave-target'])[2]")
+    USE_SN_MODEL_BTN = (By.XPATH, "//button[text()='Use single neuron model']")
+    CONFIGURE_MODEL = (By.XPATH, "//div[contains(text(),'configure model')]")
+    NAME_YOUR_SET_FIELD = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_name")
+    SAVE_SYNAPTOME_MODEL = (By.CSS_SELECTOR, "button[type='submit']")
+    SYNAPSE_GREATER_VALUE = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_exclusion_rules_0_distance_soma_gte")
+    SYNAPSE_SMALLER_VALUE = (By.CSS_SELECTOR,
+                         "#synaptome-model-configuration-form_synapses_0_exclusion_rules_0_distance_soma_lte")
+    SYNAPSE_SETS = (By.CSS_SELECTOR, "#synaptic-input-1")
+    SYNAPSE_SET_NUM = (By.XPATH, "//span[text()='Synapses sets']/span[text()='(1)']")
+    SYNAPSE_FORMULA = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_formula")
+    TARGET_FIELD = (By.XPATH, "(//div[starts-with(@class, 'ant-select ant-select-lg ant-select-outline')])[1]")
+    TARGET_SELECT = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_target")
+    TARGET_ARROW = (By.XPATH, "(//span[@class='ant-select-arrow'])[1]")
+    TARGET_LIST = (By.XPATH, "//div[@class='rc-virtual-list']")
+    TARGET_SOMA = (By.XPATH, "//div[@class='ant-select-item-option-content' and text()='Soma']")
+    TYPE_FIELD = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_type")
+    TYPE_EXCITATORY = (By.CSS_SELECTOR, "div[title='Excitatory Synapses']")
+
 
 

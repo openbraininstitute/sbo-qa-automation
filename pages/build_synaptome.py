@@ -2,6 +2,7 @@
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 import time
+from tkinter.constants import RADIOBUTTON
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -30,11 +31,26 @@ class BuildSynaptomePage(HomePage):
             raise RuntimeError("The Build page did not load within 60 seconds.")
         return self.browser.current_url
 
+    def apply_changes_btn(self):
+        return self.find_element(BuildSynaptomeLocators.APPLY_CHANGES)
+
+    def add_new_synapse_set(self):
+        return self.find_element(BuildSynaptomeLocators.ADD_SYNAPSES_BTN)
+
     def brain_region_column_header(self):
         return self.find_element(BuildSynaptomeLocators.BRAIN_REGION_COLUMN_HEADER)
 
+    def configure_model(self):
+        return self.find_element(BuildSynaptomeLocators.CONFIGURE_MODEL)
+
+    def delete_synapse_set(self, timeout=20):
+        return self.find_element(BuildSynaptomeLocators.DELETE_SYNAPSE_SET2, timeout=timeout)
+
     def description_title(self):
         return self.find_element(BuildSynaptomeLocators.DESCRIPTION_TITLE)
+
+    def filter_synapses_btn(self):
+        return self.find_element(BuildSynaptomeLocators.FILTER_SYNAPSES_BTN)
 
     def find_menu_build(self):
         return self.find_element(BuildSynaptomeLocators.MENU_BUILD)
@@ -57,21 +73,6 @@ class BuildSynaptomePage(HomePage):
     def form_value_creation_date(self):
         return self.find_element(BuildSynaptomeLocators.FORM_VALUE_CREATION_DATE)
 
-    def input_name_field(self):
-        return self.find_element(BuildSynaptomeLocators.INPUT_NAME_FIELD)
-
-    def input_description_field(self):
-        return self.find_element(BuildSynaptomeLocators.INPUT_DESCRIPTION_FIELD)
-
-    def new_synaptome_title(self):
-        return self.find_element(BuildSynaptomeLocators.NEW_SYNAPTOME_TITLE)
-
-    def start_building_button(self):
-        return self.element_to_be_clickable(BuildSynaptomeLocators.START_BUILDING_BTN)
-
-    def synaptome_form(self):
-        return self.find_element(BuildSynaptomeLocators.SYNAPTOME_FORM)
-
     def get_table_content(self):
         table = self.find_element(BuildSynaptomeLocators.TABLE, timeout=10)
         rows = self.find_child_elements(table, (By.TAG_NAME, "tr"), timeout=10)
@@ -90,6 +91,67 @@ class BuildSynaptomePage(HomePage):
             """
             first_cell = self.find_element(BuildSynaptomeLocators.ROW1)
             return first_cell.text.strip()
+
+    def input_name_field(self):
+        return self.find_element(BuildSynaptomeLocators.INPUT_NAME_FIELD)
+
+    def input_description_field(self):
+        return self.find_element(BuildSynaptomeLocators.INPUT_DESCRIPTION_FIELD)
+
+    def name_your_set(self):
+        return self.find_element(BuildSynaptomeLocators.NAME_YOUR_SET_FIELD)
+
+    def new_synaptome_title(self):
+        return self.find_element(BuildSynaptomeLocators.NEW_SYNAPTOME_TITLE)
+
+    def radio_btn(self, timeout=10):
+        return self.element_to_be_clickable(BuildSynaptomeLocators.RADIO_BTN_ME_MODEL, timeout=timeout)
+
+    def save_btn(self):
+        return self.find_element(BuildSynaptomeLocators.SAVE_SYNAPTOME_MODEL)
+
+    def start_building_button(self):
+        return self.element_to_be_clickable(BuildSynaptomeLocators.START_BUILDING_BTN)
+
+    def synaptome_form(self):
+        return self.find_element(BuildSynaptomeLocators.SYNAPTOME_FORM)
+
+    def synapse_formula(self):
+        return self.find_element(BuildSynaptomeLocators.SYNAPSE_FORMULA)
+
+    def synapse_greater_value(self):
+        return self.find_element(BuildSynaptomeLocators.SYNAPSE_GREATER_VALUE)
+
+    def synapse_smaller_value(self):
+        return self.find_element(BuildSynaptomeLocators.SYNAPSE_SMALLER_VALUE)
+
+    def synapse_set(self, timeout=15):
+        return self.find_element(BuildSynaptomeLocators.SYNAPSE_SETS, timeout=timeout)
+
+    def synapse_set_num(self):
+        return self.find_element(BuildSynaptomeLocators.SYNAPSE_SET_NUM)
+
+    def target_field(self):
+        return self.find_element(BuildSynaptomeLocators.TARGET_FIELD)
+
+    def target_list(self, timeout=10):
+        return self.find_element(BuildSynaptomeLocators.TARGET_LIST, timeout=timeout)
+
+    def target_soma(self):
+        return self.find_element(BuildSynaptomeLocators.TARGET_SOMA)
+
+    def target_select(self):
+        return WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located(BuildSynaptomeLocators.TARGET_SELECT))
+
+    def type_field(self):
+        return self.find_element(BuildSynaptomeLocators.TYPE_FIELD)
+
+    def type_excitatory(self):
+        return self.element_to_be_clickable(BuildSynaptomeLocators.TYPE_EXCITATORY)
+
+    def use_sn_model_btn(self):
+        return self.element_to_be_clickable(BuildSynaptomeLocators.USE_SN_MODEL_BTN)
 
     def wait_for_table_sorting_to_complete(self, timeout=30):
         """
@@ -112,3 +174,4 @@ class BuildSynaptomePage(HomePage):
                 f"Timeout: {timeout} seconds"
             )
             raise Exception(error_message)
+
