@@ -16,19 +16,15 @@ class TestVLOverview:
         """
         Tests Virtual Lab Home
         """
-        browser, wait, base_url = setup
+        browser, wait, base_url, lab_id, project_id = setup
         vl_overview = VLOverview(browser, wait, base_url)
-        vl_overview.go_to_vloverview()
+        vl_overview.go_to_vloverview(lab_id, project_id)
         logger.info("Virtual Lab Overview page is loaded")
 
         vl_overview_title = vl_overview.vl_overview_title()
         logger.info("'Your Virtual Labs and Projects' title is found")
 
-        vl_banner = vl_overview.vl_banner().click()
-        logger.info("Found Virtual lab banner and clicked")
-        create_project = vl_overview.create_project().click()
         logger.info("Redirected to the Virtual lab and clicked on 'Create a project button'")
-        # time.sleep(200)
         unique_name = f"Project-{uuid.uuid4().hex[:8]}"
         logger.info(f"Generated unique project name: {unique_name}")
 
