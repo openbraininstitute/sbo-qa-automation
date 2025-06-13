@@ -31,6 +31,9 @@ regression:
 feature:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_explore_emodel.py tests/test_morphology.py"
 
+feature-staging:
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_page.py"
+
 # Main test runner
 run-tests:
 	@echo "Running tests in environment: $(ENV)"

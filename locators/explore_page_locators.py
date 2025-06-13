@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 
 class ExplorePageLocators:
-    AI_ASSISTANT_PANEL = (By.XPATH, "//button[starts-with(@class, 'literature-suggestions')]")
+    AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant_literatureSuggestions')]")
     AI_ASSISTANT_PANEL_BTN = (By.XPATH, "//span[@class='anticon anticon-minus']")
     AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[2]")
     AI_ASSISTANT_PANEL_BTN_OPEN = (By.CSS_SELECTOR, "span[aria-label='plus']")
