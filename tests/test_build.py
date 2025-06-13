@@ -1,12 +1,11 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+
 import random
 from datetime import datetime
 from urllib.parse import urlparse
-
 from selenium.webdriver import Keys
-
 from pages.build import Build
 
 class TestBuild:

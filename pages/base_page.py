@@ -38,9 +38,6 @@ class CustomBasePage:
             EC.visibility_of_all_elements_located(by_locator)
         )
 
-    # def find_all_elements(self, by_locator, timeout=10):
-    #     return self.wait.until(EC.presence_of_all_elements_located(by_locator), timeout)
-
     def find_all_elements(self, by_locator, timeout=10):
         return WebDriverWait(self.browser, timeout).until(
             EC.presence_of_all_elements_located(by_locator)
@@ -223,3 +220,10 @@ class CustomBasePage:
             lambda driver: len(parent_element.find_elements(*by_locator)) > 0
         )
         return parent_element.find_elements(*by_locator)
+
+    def wait_for_element_to_disappear(self, by_locator, timeout=30):
+        """Wait for the element to disappear (become invisible) using explicit wait."""
+        WebDriverWait(self.browser, timeout).until(
+            EC.invisibility_of_element_located(by_locator),
+            message=f"Element {by_locator} did not disappear within {timeout} seconds."
+        )
