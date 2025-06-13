@@ -1,3 +1,12 @@
+# Common test command template
+TEST_CMD = uv run pytest $(TEST) --env=$(ENV) --env_url=$(ENV_URL) --browser-name=firefox $(HEADLESS) -sv
+
+# Default variables
+ENV ?= production
+ENV_URL ?= production
+HEADLESS ?=
+
+
 setup:
 	uv install --upgrade
 	uv lint
@@ -5,36 +14,39 @@ setup:
 
 
 production:
-	# uv run pytest tests/test_build_synaptome.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_about.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-#	 uv run pytest tests/test_mission.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-#	 uv run pytest tests/test_news.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-#	 uv run pytest tests/test_landing.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_build.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_explore_page.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_outside_explore.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_explore_emodel.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_morphology.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_explore_ndensity.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_vl_overview.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py \
-#	 tests/test_login.py tests/test_explore_ndensity.py \
-#	 tests/test_explore_emodel.py tests/test_build.py --env=production --env_url=production --browser-name=firefox $(HEADLESS) -sv
-
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py"
 
 staging:
-	uv run pytest tests/test_build_synaptome.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_outside_explore.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_explore_page.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_about.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_mission.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_news.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_landing.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_build.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_explore_ndensity.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_landing.py tests/test_login.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_morphology.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_explore_emodel.py --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
-	# uv run pytest tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py \
-#		 tests/test_login.py tests/test_explore_ndensity.py tests/test_explore_emodel.py tests/test_build.py \
-#		 --env=staging --env_url=staging --browser-name=firefox $(HEADLESS) -sv
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_*.py"
+
+smoke:
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_build_synaptome.py tests/test_about.py"
+
+smoke-staging:
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_build_synaptome.py tests/test_about.py"
+
+regression:
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py"
+
+feature:
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_explore_emodel.py tests/test_morphology.py"
+
+# Main test runner
+run-tests:
+	@echo "Running tests in environment: $(ENV)"
+	$(TEST_CMD)
+
+# Help
+help:
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "Targets:"
+	@echo "  setup        Install environment dependencies."
+	@echo "  production   Run all tests in the production environment."
+	@echo "  staging      Run all tests in the staging environment."
+	@echo "  smoke        Run smoke tests (basic group) in production."
+	@echo "  smoke-staging Run smoke tests (basic group) in staging."
+	@echo "  regression   Run full regression suite."
+	@echo "  feature      Run feature-specific tests."
+	@echo "  run-tests    Run a specific test or test pattern. Specify TEST, ENV, etc."
+
