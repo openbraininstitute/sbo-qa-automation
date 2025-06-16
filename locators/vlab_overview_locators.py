@@ -23,6 +23,8 @@ class VLOverviewLocators:
     PROJECT_MEMBER_ICON = (By.XPATH, "//div[@data-testid='virtual-lab-member-icon']")
     ADD_MEMBER = (By.XPATH, "//div[text()='Add Member']")
     SAVE_TXT = (By.XPATH, "//span[contains(text(), 'Save')]" )
+    MEMBERS_SECTION_TITLE = (By.XPATH, "(//div[@class='flex flex-col'])[4]/div[text()='Members']")
+    MEMBERS_SECTION_ADMIN_NAME = (By.XPATH, "//p[@class='capitalize text-gray-500 hidden' and text()='administrator']")
     MENU_PROJECTS = (By.CSS_SELECTOR, "a[href='projects']")
     MENU_TEAM = (By.CSS_SELECTOR, "a[href='team']")
     MENU_ADMIN = (By.CSS_SELECTOR, "a[href='admin']")

@@ -53,7 +53,14 @@ class TestVLOverview:
         vl_banner_credit_balance_label = vl_overview.vl_banner_credit_balance_label()
         assert vl_banner_credit_balance_label, "VLAB credit balance label is not found."
         logger.info("VLAB credit balance is found.")
-        
+
+        members_section_title = vl_overview.members_section_title()
+        assert members_section_title, "Members section title is not found."
+        logger.info("Members section title is found.")
+
+        members_section_admin_name = vl_overview.members_section_admin_name()
+        assert members_section_admin_name is not None, "Members section admin name is not found."
+        logger.info("Members section admin name is found.")
         
         
         

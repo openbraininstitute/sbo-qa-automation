@@ -45,6 +45,12 @@ class VLOverview(HomePage):
     def input_project_description(self):
         return self.find_element(VLOverviewLocators.INPUT_PROJECT_DESCRIPTION)
 
+    def members_section_title(self):
+        return self.find_element(VLOverviewLocators.MEMBERS_SECTION_TITLE)
+
+    def members_section_admin_name(self):
+        return self.find_element(VLOverviewLocators.MEMBERS_SECTION_ADMIN_NAME)
+
     def menu_projects_label(self):
         return self.find_element(VLOverviewLocators.MENU_PROJECTS)
 
