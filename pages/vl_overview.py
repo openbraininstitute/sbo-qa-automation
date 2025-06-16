@@ -2,6 +2,7 @@
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 import time
+from socket import send_fds
 
 from pages.home_page import HomePage
 from util.util_links_checker import LinkChecker
@@ -33,11 +34,14 @@ class VLOverview(HomePage):
     def add_member_btn(self):
         return self.find_element(VLOverviewLocators.ADD_MEMBER)
 
+    def free_plan_create_project_btn(self):
+        return self.find_element(VLOverviewLocators.FREE_PLAN_CREATE_PROJECT_BTN)
+
     def vl_overview_title(self):
         return self.find_element(VLOverviewLocators.VLOVERVIEW_TITLE)
 
     def create_project(self):
-        return self.find_element(VLOverviewLocators.VL_CREATE_PROJECT_BTN)
+        return self.find_element(VLOverviewLocators.CREATE_PROJECT_BTN_BANNER)
 
     def input_project_name(self):
         return self.find_element(VLOverviewLocators.INPUT_PROJECT_NAME)
@@ -59,6 +63,21 @@ class VLOverview(HomePage):
 
     def menu_admin_label(self):
         return self.find_element(VLOverviewLocators.MENU_ADMIN)
+
+    def nav_information_btn(self):
+        return self.find_element(VLOverviewLocators.NAV_INFORMATION_BTN)
+
+    def nav_members_btn(self):
+        return self.find_element(VLOverviewLocators.NAV_MEMBERS_BTN)
+
+    def next_btn(self):
+        return self.find_element(VLOverviewLocators.NEXT)
+
+    def project_creation_back_btn(self):
+        return self.find_element(VLOverviewLocators.PROJECT_CREATION_BACK_BTN)
+
+    def form_project_create_btn(self):
+        return self.find_element(VLOverviewLocators.CREATE_PROJECT_BTN)
 
     def project_member_icon(self):
         return self.find_element(VLOverviewLocators.PROJECT_MEMBER_ICON)
