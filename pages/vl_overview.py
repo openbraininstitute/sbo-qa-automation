@@ -30,14 +30,11 @@ class VLOverview(HomePage):
                     raise RuntimeError("The Explore page failed to load after multiple attempts.")
             return self.browser.current_url
 
+    def add_member_btn(self):
+        return self.find_element(VLOverviewLocators.ADD_MEMBER)
+
     def vl_overview_title(self):
         return self.find_element(VLOverviewLocators.VLOVERVIEW_TITLE)
-
-    def vl_banner(self):
-        return self.find_element(VLOverviewLocators.VL_BANNER)
-
-    def vl_banner_name_label(self):
-        return self.find_element(VLOverviewLocators.VL_BANNER_NAME_LABEL)
 
     def create_project(self):
         return self.find_element(VLOverviewLocators.VL_CREATE_PROJECT_BTN)
@@ -48,11 +45,17 @@ class VLOverview(HomePage):
     def input_project_description(self):
         return self.find_element(VLOverviewLocators.INPUT_PROJECT_DESCRIPTION)
 
+    def menu_projects_label(self):
+        return self.find_element(VLOverviewLocators.MENU_PROJECTS)
+
+    def menu_team_label(self):
+        return self.find_element(VLOverviewLocators.MENU_TEAM)
+
+    def menu_admin_label(self):
+        return self.find_element(VLOverviewLocators.MENU_ADMIN)
+
     def project_member_icon(self):
         return self.find_element(VLOverviewLocators.PROJECT_MEMBER_ICON)
-
-    def add_member_btn(self):
-        return self.find_element(VLOverviewLocators.ADD_MEMBER)
 
     def save_text(self):
         return self.find_element(VLOverviewLocators.SAVE_TXT)
@@ -67,3 +70,24 @@ class VLOverview(HomePage):
         except TimeoutException:
             print("Save button was not found or not clickable")
             return None
+
+    def vl_banner(self):
+        return self.find_element(VLOverviewLocators.VL_BANNER)
+
+    def vl_banner_name_label(self):
+        return self.find_element(VLOverviewLocators.VL_BANNER_NAME_LABEL)
+
+    def vl_banner_description_value(self):
+        return self.find_element(VLOverviewLocators.VL_BANNER_DESCRIPTION_VALUE)
+
+    def vl_banner_member_label(self):
+        return self.find_element(VLOverviewLocators.VL_BANNER_MEMBERS_LABEL)
+
+    def vl_banner_admin_label(self):
+        return self.find_element(VLOverviewLocators.VL_BANNER_ADMIN_LABEL)
+
+    def vl_banner_creation_date(self):
+        return self.find_element(VLOverviewLocators.VL_BANNER_CREATION_DATE_LABEL)
+
+    def vl_banner_credit_balance_label(self):
+        return self.find_element(VLOverviewLocators.VL_BANNER_CREDIT_BALANCE_LABEL)

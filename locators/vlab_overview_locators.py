@@ -12,9 +12,9 @@ class VLOverviewLocators:
     VL_BANNER_NAME_VALUE = (By.XPATH, "//span[@data-testid='lab-detail-banner-name-element']")
     VL_BANNER_DESCRIPTION_VALUE = (By.XPATH, "//p[@data-testid='lab-detail-banner-description-element']")
     VL_BANNER_MEMBERS_LABEL = (By.XPATH, "//div[@class='text-primary-3'][normalize-space()='Members']")
-    VL_BANNER_ADMIN_LABEL = (By.XPATH, "//div[@class='text-primary-3'][normalize-space()='Admins']")
-    VL_BANNER_CREATION_DATE_LABEL = (By.XPATH, "//div[@class='text-primary-3'][normalize-space()='Creation Date']")
-    VL_BANNER_CREDIT_BALANCE_LABEL = (By.XPATH, "//div[@class='text-primary-3'][normalize-space()='Credit Balance']")
+    VL_BANNER_ADMIN_LABEL = (By.XPATH, "//div[@class='text-primary-3'][normalize-space()='Admin']")
+    VL_BANNER_CREATION_DATE_LABEL = (By.XPATH, "//div[@class='text-primary-3'][normalize-space()='Creation date']")
+    VL_BANNER_CREDIT_BALANCE_LABEL = (By.XPATH, "//div[@class='text-primary-3'][normalize-space()='Credit balance']")
 
 
     INPUT_PROJECT_NAME = (By.XPATH, "//input[@id='name']")
@@ -23,6 +23,6 @@ class VLOverviewLocators:
     PROJECT_MEMBER_ICON = (By.XPATH, "//div[@data-testid='virtual-lab-member-icon']")
     ADD_MEMBER = (By.XPATH, "//div[text()='Add Member']")
     SAVE_TXT = (By.XPATH, "//span[contains(text(), 'Save')]" )
-    MENU_PROJECTS = (By.CSS_SELECTOR, "a[href='/projects']")
-    MENU_TEAM = (By.CSS_SELECTOR, "a[href='/team']")
-    MENU_ADMIN = (By.CSS_SELECTOR, "a[href='/admin']")
+    MENU_PROJECTS = (By.CSS_SELECTOR, "a[href='projects']")
+    MENU_TEAM = (By.CSS_SELECTOR, "a[href='team']")
+    MENU_ADMIN = (By.CSS_SELECTOR, "a[href='admin']")
