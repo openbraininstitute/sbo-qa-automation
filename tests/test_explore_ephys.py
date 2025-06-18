@@ -8,11 +8,6 @@ import pytest
 from selenium.webdriver import Keys
 from locators.explore_ephys_locators import ExploreEphysLocators
 from pages.explore_efys import ExploreElectrophysiologyPage
-from util.util_links_checker import LinkChecker
-
-current_directory = os.getcwd()
-relative_file_path = 'scraped_links.txt'
-file_path = os.path.join(current_directory, relative_file_path)
 
 
 class TestExploreEphys:
@@ -21,7 +16,7 @@ class TestExploreEphys:
     def test_explore_ephys_page(self, setup, login, logger, test_config):
         """ Verifying Explore Electrophysiology Tab """
         browser, wait, base_url, lab_id, project_id = setup
-        explore_ephys_page = ExploreElectrophysiologyPage(browser, wait, base_url)
+        explore_ephys_page = ExploreElectrophysiologyPage(browser, wait, logger, base_url)
         explore_ephys_page.go_to_explore_ephys_page(lab_id, project_id)
         ephys_tab_title = explore_ephys_page.find_ephys_tab_title()
         logger.info("'Electrophysiology' tab title is present.")

@@ -9,14 +9,11 @@ from locators.explore_ephys_locators import ExploreEphysLocators
 from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
 from util.util_links_checker import LinkChecker
-from util.util_scraper import UrlScraper
 
 
-class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
-    def __init__(self, browser, wait, base_url):
-        super().__init__(browser, wait, base_url)
-        self.home_page = ExplorePage(browser, wait, base_url)
-        self.url_scraper = UrlScraper()
+class ExploreElectrophysiologyPage(ExplorePage):
+    def __init__(self, browser, wait, logger, base_url):
+        super().__init__(browser, wait, logger, base_url)
 
     def go_to_explore_ephys_page(self, lab_id: str, project_id: str, retries=3, delay=5):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/electrophysiology"

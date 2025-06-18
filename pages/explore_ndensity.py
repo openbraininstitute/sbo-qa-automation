@@ -12,10 +12,9 @@ from util.util_scraper import UrlScraper
 
 
 class ExploreNeuronDensityPage(ExplorePage):
-    def __init__(self, browser, wait, base_url):
-        super().__init__(browser, wait, base_url)
-        self.home_page = ExplorePage(browser, wait, base_url)
-        self.url_scraper = UrlScraper()
+    def __init__(self, browser, wait, logger, base_url):
+        super().__init__(browser, wait, logger, base_url)
+        self.logger = logger
 
     def go_to_explore_neuron_density_page(self, lab_id: str, project_id: str, retries=3, delay=5):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/neuron-density"
@@ -47,19 +46,26 @@ class ExploreNeuronDensityPage(ExplorePage):
     def find_brain_regions_panel_btn(self):
         return self.find_element(ExploreNDensityPageLocators.BRAIN_REGIONS_PANEL_BTN)
 
-    def find_column_headers(self, column_locators, timeout=60):
+    def find_column_headers(self, column_locators, timeout=30):
+
         column_headers = []
         for locator in column_locators:
+            self.logger.info(f"Checking locator: {locator}")
             try:
-                self.element_visibility(locator, timeout=timeout),
+                self.element_visibility(locator, timeout=timeout)  # Debug visibility
                 elements = self.find_all_elements(locator)
+                if not elements:
+                    self.logger.warning(f"No elements found with locator {locator}")
+                    continue
                 if len(elements) > 1:
+                    self.logger.info(f"Found multiple elements for {locator}")
                     column_headers.extend(elements)
                 else:
                     column_headers.append(elements[0])
             except TimeoutException:
-                print(f"Column header with locator {locator} is not visible")
+                self.logger.error(f"Timeout: Column header with locator {locator} is not visible after {timeout}s")
                 raise
+        self.logger.info(f"Found {len(column_headers)} column headers")
         return column_headers
 
     def find_dv_title_header(self, title_locators):

@@ -12,12 +12,10 @@ from pages.home_page import HomePage
 from util.util_links_checker import LinkChecker
 
 
-class ExplorePage(HomePage, LinkChecker):
+class ExplorePage(HomePage):
     def __init__(self, browser, wait, logger, base_url):
         super().__init__(browser, wait, base_url)
-        self.home_page = HomePage(browser, wait, base_url)
         self.logger = logger
-
 
     def go_to_explore_page(self, lab_id: str, project_id: str, retries=3, delay=5):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive"

@@ -42,9 +42,7 @@ class ExplorePageLocators:
     NEURON_EPHYS_NRECORDS = (
     By.CSS_SELECTOR, "a[data-testid='dataset-electrical_cell_recording'] span[class='mr-2 font-light']")
     NEURONS_PANEL = (By.CSS_SELECTOR, "div[id='neurons-panel']")
-    NEURONS_PANEL_MTYPE = (By.XPATH, "(//div[@data-state='closed' and "
-                                     "@data-orientation='vertical' and "
-                                     "starts-with(@data-tree-id,'http://uri')])[1]")
+    NEURONS_PANEL_MTYPE = (By.XPATH, "//h6[normalize-space()='M-TYPES']")
     NEURONS_PANEL_GRID_MTYPES = (By.CSS_SELECTOR, "div.relative.ml-4.last\\:mb-5")
     NEURONS_PANEL_MTYPE_BTN = (By.XPATH, "(//div[starts-with(@class,"
                                          "'secondary-scrollbar')]//button[@type='button' and "

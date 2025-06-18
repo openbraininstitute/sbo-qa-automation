@@ -19,8 +19,7 @@ class ExploreNDensityPageLocators:
     NDENSITY_TAB = (By.XPATH, "//span[@class='ant-menu-title-content' and contains(text(),'Neuron "
                               "density')]")
     LV_THUMBNAIL = (By.XPATH, "//img[starts-with(@alt,'Morphology preview')]")
-    LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
-                                 "region']")
+    LV_BRAIN_REGION = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class, 'explore-module') and text()='Brain region']")
     LV_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='M-type']")
     LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-type']")
     LV_DENSITY = (By.XPATH, "//th[@data-testid='column-header']//div[contains(text(),'Density')]")
@@ -28,7 +27,7 @@ class ExploreNDensityPageLocators:
                                   "measurements')]")
     LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
-    LV_AGE = (By.XPATH, "//span[@class='ant-table-column-title']//div[contains(text(),'Age')]")
+    LV_AGE = (By.XPATH, "//th[@data-testid='column-header']//div[contains(text(),'Age')]")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
     LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
                                       ")='Registration "

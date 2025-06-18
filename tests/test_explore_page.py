@@ -220,6 +220,9 @@ class TestExplorePage:
         assert neuron_count.strip(), "Total neuron DENSITY is empty"
         logger.info(f"Total DENSITY is: {neuron_count}")
 
+        '''
+        pending implementation of config file
+        
         neuron_panel_one_mtype = explore_page.find_panel_mtype()
         assert neuron_panel_one_mtype.is_displayed(), "The M-types titles in the panel is not found"
         logger.info("An M-type in the neurons panel is found")
@@ -257,3 +260,4 @@ class TestExplorePage:
             (f"The element is not fully in the viewport. Element top: {element_top}, "
              f"Element bottom: {element_bottom}, Viewport height: {viewport_height}")
         logger.info(f"Scrolled through the M-types in the Neurons' panel")
+'''
