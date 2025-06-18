@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 
 class ExploreNDensityPageLocators:
-    AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant_literatureSuggestions')]")
+    AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
     AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[2]")
     BRAIN_REGIONS_PANEL_BTN = (By.XPATH, "(//span[@class='anticon anticon-minus'])[1]")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")

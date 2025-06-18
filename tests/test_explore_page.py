@@ -28,8 +28,8 @@ class TestExplorePage:
 
         explore_page.check_explore_title_is_present()
         logger.info("Explore page title is present")
-        cerebrum_title = explore_page.cerebrum_title()
-        assert cerebrum_title, f"Cerebrum title is not found"
+        cerebrum_title_br_panel = explore_page.cerebrum_title_br_panel()
+        assert cerebrum_title_br_panel, f"Cerebrum title is not found"
         logger.info("Cerebrum title is displayed")
 
         ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=10)

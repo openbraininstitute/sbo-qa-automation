@@ -68,8 +68,8 @@ class ExplorePage(HomePage, LinkChecker):
     def find_cerebrum_title_main_page(self, timeout=15):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
-    def cerebrum_title(self):
-        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE)
+    def cerebrum_title_br_panel(self):
+        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL)
 
     def find_data_panel(self):
         return self.find_element(ExplorePageLocators.DATA_PANEL)

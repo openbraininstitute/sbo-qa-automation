@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 
 class ExplorePageLocators:
-    AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant_literatureSuggestions')]")
+    AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
     AI_ASSISTANT_PANEL_BTN = (By.XPATH, "//span[@class='anticon anticon-minus']")
     AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[2]")
     AI_ASSISTANT_PANEL_BTN_OPEN = (By.CSS_SELECTOR, "span[aria-label='plus']")
@@ -20,7 +20,7 @@ class ExplorePageLocators:
     CEREBRAL_CORTEX_TITLE = (By.XPATH, "//span[@title='Cerebral cortex']")
     CEREBRUM_BTN = (By.XPATH, "(//button[@type='button' and @aria-expanded='false'])[4]")
     CEREBRUM_BTN_VLAB = (By.XPATH, "(//button[@type='button' and @aria-expanded='false'])[5]")
-    CEREBRUM_TITLE = (By.XPATH, "//span[@title='Cerebrum' and text()='Cerebrum']")
+    CEREBRUM_TITLE_BRAIN_REGION_PANEL = (By.XPATH, "//span[@class='text-base line-clamp-1' and text()='Cerebrum']")
     CEREBRUM_TITLE_MAIN_PAGE = (By.CSS_SELECTOR, ".line-clamp-2")
     COUNT_SWITCH = (By.CSS_SELECTOR, "button[type='button'][role='switch'][aria-checked='false']")
     DATA_PANEL = (By.CSS_SELECTOR, "div[id='statistic-panel']")

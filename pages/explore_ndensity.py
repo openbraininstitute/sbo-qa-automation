@@ -11,7 +11,7 @@ from util.util_links_checker import LinkChecker
 from util.util_scraper import UrlScraper
 
 
-class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
+class ExploreNeuronDensityPage(ExplorePage):
     def __init__(self, browser, wait, base_url):
         super().__init__(browser, wait, base_url)
         self.home_page = ExplorePage(browser, wait, base_url)
@@ -38,11 +38,11 @@ class ExploreNeuronDensityPage(ExplorePage, LinkChecker):
         """
         self.wait_for_long_load(ExploreNDensityPageLocators.NDENSITY_TAB, timeout)
 
-    def find_ai_assistant_panel(self):
-        return self.find_element(ExploreNDensityPageLocators.AI_ASSISTANT_PANEL)
+    def find_ai_assistant_panel(self, timeout=10):
+        return self.find_element(ExploreNDensityPageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
 
-    def find_ai_assistant_panel_close(self):
-        return self.find_element(ExploreNDensityPageLocators.AI_ASSISTANT_PANEL_CLOSE)
+    def find_ai_assistant_panel_close(self, timeout=10):
+        return self.find_element(ExploreNDensityPageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=timeout)
 
     def find_brain_regions_panel_btn(self):
         return self.find_element(ExploreNDensityPageLocators.BRAIN_REGIONS_PANEL_BTN)

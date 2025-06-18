@@ -6,6 +6,7 @@ import time
 from selenium.common import TimeoutException
 
 from locators.explore_ephys_locators import ExploreEphysLocators
+from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
 from util.util_links_checker import LinkChecker
 from util.util_scraper import UrlScraper
@@ -34,6 +35,12 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
 
     def download_resources(self):
         return self.find_element(ExploreEphysLocators.DOWNLOAD_RESOURCES)
+
+    def find_ai_assistant_panel(self, timeout=10):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
+
+    def find_ai_assistant_panel_close(self, timeout=10):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=timeout)
 
     def wait_for_element(self, locator):
         return self.visibility_of_all_elements(locator)

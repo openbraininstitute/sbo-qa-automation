@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 
 class ExploreEModelPageLocators:
-    AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant_literatureSuggestions')]")
+    AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
     AI_ASSISTANT_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[2]")
     BRAIN_REGION_PANEL = (By.XPATH, "(//div[@class='flex h-screen flex-col bg-primary-8'])[1]")
     BR_SEARCH_FIELD_TYPE = (By.XPATH, "//span[@class='ant-select-selection-search']")

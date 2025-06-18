@@ -59,8 +59,8 @@ class VlabHome(HomePage, LinkChecker):
     def find_profile_btn(self):
         return self.find_element(VLHomeLocators.PROFILE_BTN)
 
-    def find_public_projects(self):
-        return self.find_element(VLHomeLocators.PUBLIC_PROJECTS)
+    def find_public_projects(self, timeout=10):
+        return self.find_element(VLHomeLocators.PUBLIC_PROJECTS, timeout=timeout)
 
     def find_qna_btn(self):
         return self.find_element(VLHomeLocators.QNA_BTN)
