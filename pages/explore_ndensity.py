@@ -71,10 +71,26 @@ class ExploreNeuronDensityPage(ExplorePage):
     def find_cerebrum_brp(self, timeout=30):
         return self.is_visible(ExploreNDensityPageLocators.BR_VERTICAL_PANEL_CEREBRUM, timeout=timeout)
 
-    def find_dv_title_header(self, title_locators):
+    def find_dv_title_header(self, title_locators, timeout=30):
         title_headers = []
-        for title in title_locators:
-            title_headers.extend(self.find_all_elements(title))
+
+        for locator in title_locators:
+            self.logger.info(f"Checking locator: {locator}")
+            try:
+                self.element_visibility(locator, timeout=timeout)
+                elements = self.find_all_elements(locator)
+                if not elements:
+                    self.logger.warning(f"No elements found with locator: {locator}")
+                    continue
+                if len(elements) > 1:
+                    self.logger.info(f"Found multiple elements for: {locator}")
+                    title_headers.extend(elements)
+                else:
+                    title_headers.append(elements[0])
+            except TimeoutException:
+                self.logger.error(f"Timeout: Title header with locator {locator} is not visible after {timeout}s")
+                raise
+        self.logger.info(f"Found {len(title_headers)} DV title headers")
         return title_headers
 
     def find_dv_name_title(self):

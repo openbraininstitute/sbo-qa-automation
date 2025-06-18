@@ -36,21 +36,21 @@ class ExploreNDensityPageLocators:
     LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-type']")
     LV_BR_ROW1 = (By.XPATH, "(//td[starts-with(@class, 'ant-table-cell')])[13]")
     DV_NAME_TITLE = (By.XPATH, "//div[@class='text font-thin' and text()='Name']")
-    DV_DESC_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Description']")
-    DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
+    DV_DESC_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Description']")
+    DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text("
                                        ")='Contributors']")
-    DV_REG_DATE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
+    DV_REG_DATE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text("
                                    ")='Registration date']")
-    DV_BRAIN_REG_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Brain "
+    DV_BRAIN_REG_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Brain "
                                     "Region']")
-    DV_LICENSE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='License']")
-    DV_SPECIES_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Species']")
-    DV_NUM_MEAS_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='N° of "
+    DV_LICENSE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='License']")
+    DV_SPECIES_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Species']")
+    DV_NUM_MEAS_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='N° of "
                                    "Measurements']")
-    DV_MTYPE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='M-Type']")
-    DV_ETYPE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='E-Type']")
-    DV_DENSITY_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Density']")
-    DV_AGE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Age']")
+    DV_MTYPE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='M-Type']")
+    DV_ETYPE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='E-Type']")
+    DV_DENSITY_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Density']")
+    DV_AGE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Age']")
     DV_DOWNLOAD_BTN = (By.XPATH, "//div[text()='Download']")
     DV_NAME_VALUE = (By.XPATH,
                      "//div[@class='text font-thin' and normalize-space(text())='Name']/following-sibling::div//div[contains(@class, 'font-bold')]")

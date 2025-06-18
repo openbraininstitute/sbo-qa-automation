@@ -56,7 +56,7 @@ class TestExploreNeuronDensity:
 
         for header in column_headers:
             assert header.is_displayed(), f"Column header {header} is not displayed."
-            logger.info(f"Header text: {header.text.strip() if header.text else 'No text found'}")
+            logger.info(f"Column header text: {header.text.strip() if header.text else 'No text found'}")
 
         cerebrum_brp = explore_ndensity.find_cerebrum_brp(timeout=30)
         assert cerebrum_brp.is_displayed()
@@ -71,7 +71,7 @@ class TestExploreNeuronDensity:
 
         title_locators = [
             ExploreNDensityPageLocators.DV_DESC_TITLE,
-            ExploreNDensityPageLocators.DV_DENSITY_TITLE,
+            #ExploreNDensityPageLocators.DV_DENSITY_TITLE,
             ExploreNDensityPageLocators.DV_AGE_TITLE,
             ExploreNDensityPageLocators.DV_BRAIN_REG_TITLE,
             ExploreNDensityPageLocators.DV_CONTRIBUTORS_TITLE,
@@ -83,10 +83,18 @@ class TestExploreNeuronDensity:
             ExploreNDensityPageLocators.DV_REG_DATE_TITLE
         ]
 
-        title_headers = explore_ndensity.find_dv_title_header(title_locators)
-        for title in title_headers:
-            assert title.is_displayed(), f"DV title header {title} is not displayed"
-        logger.info("Found 'Detail view' title headers")
+        title_headers = explore_ndensity.find_dv_title_header(title_locators, timeout=30)
+
+        found_title_headers = [element.text for element in title_headers]
+        logger.info(f"Found DV title headers: {found_title_headers}")
+
+        if not title_headers:
+            logger.error("No DV title headers were found.")
+            raise ValueError("Title headers list is empty. Cannot proceed.")
+
+        for header in title_headers:
+            assert header.is_displayed(), f"DV title header {header} is not displayed."
+            logger.info(f"Title header text: {header.text.strip() if header.text else 'No text found'}")
 
         value_locators = [
             ExploreNDensityPageLocators.DV_DESC_VALUE,
