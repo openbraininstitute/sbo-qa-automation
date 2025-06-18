@@ -93,7 +93,7 @@ def test_config(pytestconfig):
         raise ValueError("Username or password is missing in the configuration!")
 
     if env =="staging":
-        base_url = "https://staging.openbraininstitute.org"
+        base_url = "https://next.staging.openbraininstitute.org"
         lab_url = f"{base_url}/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_STAGING")
         project_id = os.getenv("PROJECT_ID_STAGING")
