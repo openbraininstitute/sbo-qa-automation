@@ -11,8 +11,7 @@ class ExploreEModelPageLocators:
     BRAIN_REGION_PANEL = (By.XPATH, "(//div[@class='flex h-screen flex-col bg-primary-8'])[1]")
     BR_SEARCH_FIELD_TYPE = (By.XPATH, "//span[@class='ant-select-selection-search']")
     BR_SEARCH_REGION_SEARCH_FIELD = (By.XPATH, "//div[@class='ant-select-selector']")
-    BR_CEREBRUM_TITLE = (By.XPATH, "//button[starts-with(@class, 'flex h-auto "
-                                   "items-center')]/span[contains(.,'Cerebrum')]")
+    BR_CEREBRUM_TITLE = (By.XPATH, "//div[@title='Cerebrum']//button")
     CLOSE_BRAIN_REGION_PANEL_BTN = (By.XPATH, "(//button[starts-with(@class, 'ant-btn')]/span["
                                               "@class='ant-btn-icon'])[1]")
     DV_ANALYSIS_TAB = (By.CSS_SELECTOR, "li[title='Analysis']")
