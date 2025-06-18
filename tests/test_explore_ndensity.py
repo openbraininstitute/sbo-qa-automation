@@ -58,7 +58,7 @@ class TestExploreNeuronDensity:
             assert header.is_displayed(), f"Column header {header} is not displayed."
             logger.info(f"Header text: {header.text.strip() if header.text else 'No text found'}")
 
-        cerebrum_brp = explore_ndensity.find_cerebrum_brp()
+        cerebrum_brp = explore_ndensity.find_cerebrum_brp(timeout=30)
         assert cerebrum_brp.is_displayed()
         logger.info("Cerebrum is found")
         lv_br_row1 = explore_ndensity.lv_br_row1()

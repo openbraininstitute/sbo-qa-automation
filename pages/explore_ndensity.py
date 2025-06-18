@@ -68,17 +68,14 @@ class ExploreNeuronDensityPage(ExplorePage):
         self.logger.info(f"Found {len(column_headers)} column headers")
         return column_headers
 
+    def find_cerebrum_brp(self, timeout=30):
+        return self.is_visible(ExploreNDensityPageLocators.BR_VERTICAL_PANEL_CEREBRUM, timeout=timeout)
+
     def find_dv_title_header(self, title_locators):
         title_headers = []
         for title in title_locators:
             title_headers.extend(self.find_all_elements(title))
         return title_headers
-
-    def lv_br_row1(self):
-        return self.find_element(ExploreNDensityPageLocators.LV_BR_ROW1)
-
-    def find_cerebrum_brp(self, timeout=30):
-        return self.find_element(ExploreNDensityPageLocators.BRP_CEREBRUM, timeout=timeout)
 
     def find_dv_name_title(self):
         return self.element_visibility(ExploreNDensityPageLocators.DV_NAME_TITLE)
@@ -125,3 +122,5 @@ class ExploreNeuronDensityPage(ExplorePage):
     def find_num_meas_value(self):
         return self.find_element(ExploreNDensityPageLocators.DV_NUM_MEAS_VALUE)
 
+    def lv_br_row1(self):
+        return self.find_element(ExploreNDensityPageLocators.LV_BR_ROW1)

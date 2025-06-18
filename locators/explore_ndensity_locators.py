@@ -10,7 +10,8 @@ class ExploreNDensityPageLocators:
     AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[2]")
     BRAIN_REGIONS_PANEL_BTN = (By.XPATH, "(//span[@class='anticon anticon-minus'])[1]")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
-    BRP_CEREBRUM = (By.XPATH, "//div[@class='whitespace-nowrap text-sm text-secondary-4' and text()='Cerebrum']")
+    BR_VERTICAL_PANEL_CEREBRUM = (By.XPATH, "//div[@class='text-secondary-4 text-sm whitespace-nowrap' and text("
+                                       ")='Cerebrum']")
     TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
     TABLE_CELLS = (
         By.CSS_SELECTOR,

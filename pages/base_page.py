@@ -59,12 +59,9 @@ class CustomBasePage:
     def enter_text(self, by_locator, text):
         return self.wait.until(EC.visibility_of_element_located(by_locator)).send_keys(text)
 
-    def is_visible(self, by_locator):
-        element = self.wait.until(EC.visibility_of_element_located(by_locator))
-        return bool(element)
-
-    # def wait_for_long_load(self, by_locator, timeout=60):
-    #     return self.wait.until(EC.visibility_of_element_located(by_locator), timeout)
+    def is_visible(self, by_locator, timeout=10):
+        return WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located(by_locator)
+        )
 
     def wait_for_long_load(self, element_locator, timeout=60):
         try:
