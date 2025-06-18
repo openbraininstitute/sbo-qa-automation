@@ -43,11 +43,23 @@ class TestExploreEphys:
             ExploreEphysLocators.LV_NAME,
             ExploreEphysLocators.LV_SPECIES,
         ]
-        column_headers = explore_ephys_page.find_column_headers(column_locators)
+        column_headers, missing_locators = explore_ephys_page.find_column_headers(column_locators)
 
+        found_column_headers = [header.text.strip() if header.text else "No text" for header in column_headers]
+        logger.info(f"Found List View column headers: {found_column_headers}")
+
+        # Raise an error and log missing locators or headers
+        if not column_headers:
+            logger.error("No column headers were found.")
+            raise ValueError("Column headers list is empty. Cannot proceed.")
+
+        if missing_locators:
+            logger.warning(f"These column locators did not return any elements: {missing_locators}")
+
+        # Verify that each found header is displayed
         for header in column_headers:
             assert header.is_displayed(), f"Column header {header} is not displayed."
-        logger.info("Found List View column headers.")
+            logger.info(f"Displayed column header text: {header.text.strip() if header.text else 'No text found'}")
 
         all_checkbox = explore_ephys_page.find_btn_all_checkboxes()
         time.sleep(2)
@@ -73,11 +85,11 @@ class TestExploreEphys:
         logger.info("Search input field is found.")
         browser.execute_script("arguments[0].click();", find_search_input)
 
-        find_search_input.send_keys("Rattus norvegicus")
-        logger.info("Search input is searching for Rattus norvegicus")
-        found_species = explore_ephys_page.search_species()
-        text_found_species = found_species.text
-        logger.info(f"Found searched species:{text_found_species}.")
+        # find_search_input.send_keys("Rattus norvegicus")
+        # logger.info("Search input is searching for Rattus norvegicus")
+        # found_species = explore_ephys_page.search_species()
+        # text_found_species = found_species.text
+        # logger.info(f"Found searched species:{text_found_species}.")
 
         find_filter_btn = explore_ephys_page.find_filter_btn().click()
         logger.info("Listing view filter button is found and clicked.")

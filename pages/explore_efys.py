@@ -113,9 +113,19 @@ class ExploreElectrophysiologyPage(ExplorePage):
 
     def find_column_headers(self, column_locators):
         column_headers = []
+        missing_locators = []  # To track locators that find no elements
+
         for locator in column_locators:
-            column_headers.extend(self.find_all_elements(locator))
-        return column_headers
+            elements = self.find_all_elements(locator)  # Try to find elements
+            if elements:
+                self.logger.info(f"Found {len(elements)} elements for locator: {locator}")
+                column_headers.extend(elements)
+            else:
+                self.logger.warning(f"No elements found for locator: {locator}")
+                missing_locators.append(locator)  # Add missing locators to the list
+
+        return column_headers, missing_locators
+
 
     def find_explore_section_grid(self):
         return self.element_visibility(ExploreEphysLocators.LV_GRID_VIEW)
