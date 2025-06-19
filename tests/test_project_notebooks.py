@@ -24,6 +24,7 @@ class TestProjectNotebooks:
             "Scale",
             "Authors",
             "Creation date",
+            ""
         ]
 
         project_notebooks.validate_table_headers(expected_headers)
