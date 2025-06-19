@@ -15,7 +15,7 @@ class ExplorePageLocators:
     BOUTON_DENSITY_NRECORDS = (By.CSS_SELECTOR, "a[data-testid='dataset-experimental_bouton_density'] span[class='mr-2 font-light']")
     BRAIN_REGION_PANEL = (By.XPATH, "//span[text()='Brain region']")
     CEREBRAL_CORTEX_TITLE = (By.XPATH, "//div[@title='Cerebral cortex']/button")
-    CEREBRUM_BTN = (By.XPATH, "(//button[@type='button' and @aria-expanded='false'])[4]")
+    CEREBRUM_BTN = (By.XPATH, "//div[@title='Cerebrum' and @aria-label='Cerebrum']//button[@type='button' and starts-with(@class,'ml-auto flex flex-shrink-0 items-center')]")
     CEREBRUM_BTN_VLAB = (By.XPATH, "//div[@title='Cerebrum']/button")
     CEREBRUM_TITLE_BRAIN_REGION_PANEL = (By.XPATH, "//span[@class='text-base line-clamp-1' and text()='Cerebrum']")
     CEREBRUM_TITLE_MAIN_PAGE = (By.CSS_SELECTOR, ".line-clamp-2")
@@ -24,7 +24,7 @@ class ExplorePageLocators:
     EXPERIMENTAL_DATA_BTN = (By.XPATH, "//button[text()='Experimental data']")
     EXPLORE_LINK1 = (By.XPATH, "//a[@href='/mmb-beta/explore/simulation-campaigns']//h1[text("
                                ")='Brain & cells annotations']")
-    EXPLORE_TITLE = (By.XPATH, "//div[@class='select-none' and text()='Explore']")
+    EXPLORE_TITLE = (By.XPATH, "//div[@class='flex items-center justify-center select-none' and text()='Explore']")
     EXPLORE_TITLE_VLAB = (By.XPATH, "//a[normalize-space()='explore']")
     EXPLORE_URL = (By.XPATH, "//a[@href='/explore']")
     FULLSCREEN_EXIT = (By.CSS_SELECTOR, "span[aria-label='fullscreen-exit']")

@@ -55,7 +55,7 @@ class OutsideExplorePage(HomePage, LinkChecker):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
     def find_cerebrum_brp(self, timeout=30):
-        return self.find_element(ExplorePageLocators.BRP_CEREBRUM, timeout=timeout)
+        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL, timeout=timeout)
 
     def find_cerebral_cortex_brp(self):
         return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE)
@@ -70,7 +70,7 @@ class OutsideExplorePage(HomePage, LinkChecker):
         return self.find_element(ExplorePageLocators.EXPLORE_TITLE)
 
     def cerebrum_title(self):
-        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE)
+        return self.find_element(ExplorePageLocators. CEREBRUM_TITLE_MAIN_PAGE)
 
     def find_explore_page_titles(self, page_locators):
         elements_list = []

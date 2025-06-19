@@ -122,7 +122,6 @@ class TestExplorePage:
 
         logger.info("Number of records for data types have been processed.")
 
-
         neurons_panel = explore_page.find_neurons_panel()
         assert neurons_panel.is_displayed()
         logger.info("Neurons panel is displayed")

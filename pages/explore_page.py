@@ -32,6 +32,9 @@ class ExplorePage(HomePage):
                     raise RuntimeError("The Explore page failed to load after multiple attempts.")
             return self.browser.current_url
 
+    def cerebrum_title_br_panel(self):
+        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL)
+
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
 
@@ -46,9 +49,6 @@ class ExplorePage(HomePage):
 
     def find_atlas_fullscreen_bt(self, timeout=20):
         return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN, timeout=timeout)
-
-    def find_count_switch(self):
-        return self.find_element(ExplorePageLocators.COUNT_SWITCH)
 
     def find_brain_region_panel(self):
         return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL)
@@ -68,8 +68,8 @@ class ExplorePage(HomePage):
     def find_cerebrum_title_main_page(self, timeout=15):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
-    def cerebrum_title_br_panel(self):
-        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL)
+    def find_count_switch(self):
+        return self.find_element(ExplorePageLocators.COUNT_SWITCH)
 
     def find_data_panel(self):
         return self.find_element(ExplorePageLocators.DATA_PANEL)
