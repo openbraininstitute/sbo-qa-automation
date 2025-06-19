@@ -14,5 +14,8 @@ class ProjectNotebooksLocators:
     COLUMN_SCALE_HEADER = (By.XPATH, "//th[@aria-label='Scale']")
     COLUMN_AUTHORS_HEADER = (By.XPATH, "//th[@aria-label='Authors']")
     COLUMN_CREATION_DATE_HEADER = (By.XPATH, "//th[@aria-label='Creation date']")
+    ROW1 = (By.XPATH, "//tr[contains(@class, 'ant-table-row')]")
+    SEARCH_NOTEBOOK = (By.CSS_SELECTOR, "input[placeholder='Search for notebooks']")
+    TABLE_CONTAINER = (By.CSS_SELECTOR, "#table-container")
     TH = (By.XPATH, "//th")
 

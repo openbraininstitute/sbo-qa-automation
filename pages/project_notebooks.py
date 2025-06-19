@@ -54,3 +54,10 @@ class ProjectNotebooks(HomePage):
         except TimeoutException:
             self.logger.error("The table element was not found on the Project Notebooks page.")
             raise RuntimeError("The table element was not loaded within the timeout.")
+
+    def row1(self):
+        return self.find_element(ProjectNotebooksLocators.ROW1)
+
+    def search_input(self):
+        return self.find_element(ProjectNotebooksLocators.SEARCH_NOTEBOOK)
+
