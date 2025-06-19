@@ -47,5 +47,46 @@ class TestProjectNotebooks:
         assert search_notebook.get_attribute("value") == "", "Search input is not empty after clearing"
         logger.info("Search input is confirmed to be empty")
 
+        page_filter = project_notebooks.page_filter()
+        assert page_filter.is_displayed(), "Page filter is not displayed"
+        logger.info("Page filter is found")
 
+        page_filter.click()
+        logger.info("Page filter is clicked")
 
+        filter_name_input = project_notebooks.filter_name_input()
+        assert filter_name_input.is_displayed(), "Filter name input is not displayed"
+        logger.info("Filter name input is found")
+
+        filter_name_input.send_keys("Metabolism")
+        logger.info("Filter name input is filled")
+
+        filter_scale_input = project_notebooks.filter_scale_input()
+        assert filter_scale_input.is_displayed(), "Filter scale input is not displayed"
+        logger.info("Filter scale input is found")
+        filter_scale_input.click()
+
+        filter_scale_menu_metabolism = project_notebooks.filter_scale_menu_metabolism()
+        assert filter_scale_menu_metabolism.is_displayed(), "Filter scale input is not displayed"
+        filter_scale_menu_metabolism.click()
+        logger.info("Filter scale input is selected")
+
+        filter_close_btn = project_notebooks.filter_close_btn()
+        assert filter_close_btn.is_displayed(), "Filter close button is not displayed"
+        logger.info("Filter close button is found")
+        filter_close_btn.click()
+        logger.info("Filter is closed")
+
+        data_search_result = project_notebooks.table_search_result()
+        assert data_search_result.is_displayed(), "Table search result is not displayed"
+        logger.info("Table search result is found")
+
+        page_filter.click()
+        logger.info("Page filter is clicked")
+
+        filter_clear_btn = project_notebooks.filter_clear_btn()
+        assert filter_clear_btn.is_displayed(), "Filter clear button is not displayed"
+        logger.info("Filter clear button is found")
+        filter_clear_btn.click()
+        logger.info("Filter is cleared")
+        time.sleep(2)
