@@ -47,6 +47,10 @@ class TestProjectNotebooks:
         assert search_notebook.get_attribute("value") == "", "Search input is not empty after clearing"
         logger.info("Search input is confirmed to be empty")
 
+        rows_before_filter = project_notebooks.rows()
+        total_rows_before_filter = len(rows_before_filter)
+        logger.info(f"Total rows before filter: {total_rows_before_filter}")
+
         page_filter = project_notebooks.page_filter()
         assert page_filter.is_displayed(), "Page filter is not displayed"
         logger.info("Page filter is found")
@@ -81,6 +85,10 @@ class TestProjectNotebooks:
         assert data_search_result.is_displayed(), "Table search result is not displayed"
         logger.info("Table search result is found")
 
+        filtered_rows = project_notebooks.rows()
+        total_filtered_rows = len(filtered_rows)
+        logger.info(f"Total filtered rows: {total_filtered_rows}")
+
         page_filter.click()
         logger.info("Page filter is clicked")
 
@@ -89,4 +97,16 @@ class TestProjectNotebooks:
         logger.info("Filter clear button is found")
         filter_clear_btn.click()
         logger.info("Filter is cleared")
+
+        rows_after_filter = project_notebooks.rows()
+        total_rows_after_filter = len(rows_after_filter)
+        logger.info(f"Total rows after filter: {total_rows_after_filter}")
+
+        assert total_rows_after_filter == total_rows_before_filter, ("Total rows before filtering and after clearing "
+                                                                     "filter are not equal")
+        logger.info("Total rows before and after filtering are equal")
+
+
+
+
         time.sleep(2)

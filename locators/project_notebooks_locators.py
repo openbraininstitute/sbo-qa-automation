@@ -36,6 +36,7 @@ class ProjectNotebooksLocators:
     OBI_NOTEBOOKS_TAB = (By.XPATH, "//a[normalize-space()='OBI Notebooks']")
     PAGE_FILTER = (By.CSS_SELECTOR, "button[aria-label='listing-view-filter-button']")
     ROW1 = (By.XPATH, "//tr[contains(@class, 'ant-table-row')]")
+    ROWS = (By.XPATH, "//tr[@class='ant-table-row ant-table-row-level-0']")
     SEARCH_NOTEBOOK = (By.CSS_SELECTOR, "input[placeholder='Search for notebooks']")
     TABLE_ELEMENT = (By.XPATH, "//table//thead")
     TABLE_CONTAINER = (By.CSS_SELECTOR, "#table-container")

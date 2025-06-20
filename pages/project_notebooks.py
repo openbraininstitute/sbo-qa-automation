@@ -48,8 +48,12 @@ class ProjectNotebooks(HomePage):
     def row1(self):
         return self.find_element(ProjectNotebooksLocators.ROW1)
 
+    def rows(self):
+        return self.find_all_elements(ProjectNotebooksLocators.ROWS)
+
     def table_search_result(self):
         return self.find_element(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT)
+
     def search_input(self):
         return self.find_element(ProjectNotebooksLocators.SEARCH_NOTEBOOK)
 
