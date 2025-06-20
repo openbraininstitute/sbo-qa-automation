@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 
 class ExploreEphysLocators:
     ALL_CHECKBOXES = (By.XPATH, "//span[@class='ant-checkbox ant-wave-target']")
-    AI_ASSISTANT_PANEL = (By.XPATH, "//button[starts-with(@class, 'literature-suggestions')]")
+    AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
     APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")
     CHECKBOXES = (By.XPATH, "//input[@class='ant-checkbox-input' and @type='checkbox']")
     DOWNLOAD_RESOURCES = (By.XPATH, "//button[@type='button' and "
@@ -60,15 +60,16 @@ class ExploreEphysLocators:
                                  "'Electrophysiology')]")
     FILTERED_ETYPE = (By.XPATH, "//td[@class='ant-table-cell text-primary-7 cursor-pointer "
                                 "before:!content-none ant-table-cell-ellipsis' and @title='bNAC']")
-    FILTER_ETYPE_BTN = (By.XPATH, "//div[@class='flex items-center gap-3 ']//span[text()='E-type']")
+    FILTER_ETYPE_BTN = (By.XPATH,
+                    "//button[starts-with(@class, 'filters-module__') and starts-with(@id, 'radix-') and @type='button']//span[text()='E-type']")
+
     FILTER_ETYPE_SEARCH_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input"
                                            "'])[2]")
     FILTER_ETYPE_INPUT_TYPE_AREA = (By.XPATH, "//div[@class='ant-select-selection-search']")
     FILTER_ETYPE_SEARCH = (By.XPATH, "//div[@class='ant-select-selection-overflow']")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
     LV_GRID_VIEW = (By.XPATH, "//div[@data-testid='explore-section-listing-view']")
-    LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
-                                 "region']")
+    LV_BRAIN_REGION = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Brain region']")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
     LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-type']")
     LV_FILTER_APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")

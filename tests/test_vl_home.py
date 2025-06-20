@@ -19,7 +19,7 @@ class TestVlabHome:
         project_id = test_config["project_id"]
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
 
-        public_projects = vlab_home.find_public_projects()
+        public_projects = vlab_home.find_public_projects(timeout=10)
         assert public_projects.is_displayed(), f"Public projects are not displayed."
         logger.info("Public projects are displayed.")
 

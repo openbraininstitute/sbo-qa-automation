@@ -26,6 +26,37 @@ class ProjectNotebooks(HomePage):
             raise RuntimeError("The Project Notebooks page did not load within 60 seconds.")
         return self.browser.current_url
 
+
+    def filter_clear_btn(self):
+        return self.find_element(ProjectNotebooksLocators.FILTER_CLEAR_BTN)
+
+    def filter_close_btn(self):
+        return self.find_element(ProjectNotebooksLocators.FILTER_CLOSE_BTN)
+
+    def filter_name_input(self):
+        return self.find_element(ProjectNotebooksLocators.FILTER_NAME_INPUT)
+
+    def filter_scale_input(self):
+        return self.find_element(ProjectNotebooksLocators.FILTER_SELECT_SCALE_INPUT)
+
+    def filter_scale_menu_metabolism(self):
+        return self.find_element(ProjectNotebooksLocators.FILTER_SCALE_MENU_METABOLISM)
+
+    def page_filter(self):
+        return self.find_element(ProjectNotebooksLocators.PAGE_FILTER)
+
+    def row1(self):
+        return self.find_element(ProjectNotebooksLocators.ROW1)
+
+    def rows(self):
+        return self.find_all_elements(ProjectNotebooksLocators.ROWS)
+
+    def table_search_result(self):
+        return self.find_element(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT)
+
+    def search_input(self):
+        return self.find_element(ProjectNotebooksLocators.SEARCH_NOTEBOOK)
+
     def validate_table_headers(self, expected_headers):
         """
         Validates the column headers of the table. Logs an error if the headers do not match.
@@ -54,3 +85,5 @@ class ProjectNotebooks(HomePage):
         except TimeoutException:
             self.logger.error("The table element was not found on the Project Notebooks page.")
             raise RuntimeError("The table element was not loaded within the timeout.")
+
+

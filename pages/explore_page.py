@@ -12,10 +12,10 @@ from pages.home_page import HomePage
 from util.util_links_checker import LinkChecker
 
 
-class ExplorePage(HomePage, LinkChecker):
-    def __init__(self, browser, wait, base_url):
+class ExplorePage(HomePage):
+    def __init__(self, browser, wait, logger, base_url):
         super().__init__(browser, wait, base_url)
-        self.home_page = HomePage(browser, wait, base_url)
+        self.logger = logger
 
     def go_to_explore_page(self, lab_id: str, project_id: str, retries=3, delay=5):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive"
@@ -32,6 +32,9 @@ class ExplorePage(HomePage, LinkChecker):
                     raise RuntimeError("The Explore page failed to load after multiple attempts.")
             return self.browser.current_url
 
+    def cerebrum_title_br_panel(self):
+        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL)
+
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
 
@@ -47,9 +50,6 @@ class ExplorePage(HomePage, LinkChecker):
     def find_atlas_fullscreen_bt(self, timeout=20):
         return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN, timeout=timeout)
 
-    def find_count_switch(self):
-        return self.find_element(ExplorePageLocators.COUNT_SWITCH)
-
     def find_brain_region_panel(self):
         return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL)
 
@@ -57,19 +57,19 @@ class ExplorePage(HomePage, LinkChecker):
         return self.find_element(ExplorePageLocators.SEARCH_REGION, timeout=timeout)
 
     def find_cerebrum_brp(self, timeout=30):
-        return self.find_element(ExplorePageLocators.BRP_CEREBRUM, timeout=timeout)
+        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL, timeout=timeout)
 
     def find_cerebral_cortex_brp(self):
         return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE)
 
-    def find_cerebrum_arrow_btn(self):
-        return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB)
+    def find_cerebrum_arrow_btn(self, timeout=20):
+        return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB, timeout=timeout)
 
     def find_cerebrum_title_main_page(self, timeout=15):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
-    def cerebrum_title(self):
-        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE)
+    def find_count_switch(self):
+        return self.find_element(ExplorePageLocators.COUNT_SWITCH)
 
     def find_data_panel(self):
         return self.find_element(ExplorePageLocators.DATA_PANEL)
@@ -92,10 +92,12 @@ class ExplorePage(HomePage, LinkChecker):
     def get_experiment_record_count(self, record_count_locators):
         record_counts = []
         for locator in record_count_locators:
-            record = self.find_element(locator)
-            record_text = record.text.strip()
+            record_text = ""
+
             try:
-                # record_number = int(''.join(filter(str.isdigit, record_text)))
+                record_element = self.find_element(locator, timeout=20)
+                record_text = record_element.text.strip()
+                self.logger.info(f"Record text retrieved for locator {locator}: '{record_text}'")
                 record_number = int(''.join(filter(lambda c: c.isdigit(), record_text)))
             except ValueError:
                 raise ValueError(f"Unable to parse record count from text: {record_text}")
@@ -129,6 +131,9 @@ class ExplorePage(HomePage, LinkChecker):
     def find_neurons_panel_iso_mtype(self):
         return self.find_element(ExplorePageLocators.NEURONS_PANEL_ISOCORTEX_MTYPE)
 
+    def find_panel_circuit(self):
+        return self.find_element(ExplorePageLocators.PANEL_CIRCUIT)
+
     def find_panel_emodel(self):
         return self.find_element(ExplorePageLocators.PANEL_EMODEL)
 
@@ -149,4 +154,10 @@ class ExplorePage(HomePage, LinkChecker):
 
     def find_total_count_switch(self):
         return self.find_element(ExplorePageLocators.TOTAL_COUNT_SWITCH)
+
+    def wait_for_locators_to_have_text(self, browser, locators, timeout=20):
+        for locator in locators:
+            WebDriverWait(self.browser, timeout).until(
+                EC.text_to_be_present_in_element(locator, '')
+            )
 

@@ -38,9 +38,6 @@ class CustomBasePage:
             EC.visibility_of_all_elements_located(by_locator)
         )
 
-    # def find_all_elements(self, by_locator, timeout=10):
-    #     return self.wait.until(EC.presence_of_all_elements_located(by_locator), timeout)
-
     def find_all_elements(self, by_locator, timeout=10):
         return WebDriverWait(self.browser, timeout).until(
             EC.presence_of_all_elements_located(by_locator)
@@ -62,12 +59,9 @@ class CustomBasePage:
     def enter_text(self, by_locator, text):
         return self.wait.until(EC.visibility_of_element_located(by_locator)).send_keys(text)
 
-    def is_visible(self, by_locator):
-        element = self.wait.until(EC.visibility_of_element_located(by_locator))
-        return bool(element)
-
-    # def wait_for_long_load(self, by_locator, timeout=60):
-    #     return self.wait.until(EC.visibility_of_element_located(by_locator), timeout)
+    def is_visible(self, by_locator, timeout=10):
+        return WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located(by_locator)
+        )
 
     def wait_for_long_load(self, element_locator, timeout=60):
         try:
@@ -213,4 +207,20 @@ class CustomBasePage:
                 "const video = arguments[0]; return video.readyState >= 3;",
                 driver.find_element(*video_locator)
             )
+        )
+
+    def find_child_elements(self, parent_element, by_locator, timeout=10):
+        """
+        Finds child elements within a given parent element, waiting for them to fully load.
+        """
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: len(parent_element.find_elements(*by_locator)) > 0
+        )
+        return parent_element.find_elements(*by_locator)
+
+    def wait_for_element_to_disappear(self, by_locator, timeout=30):
+        """Wait for the element to disappear (become invisible) using explicit wait."""
+        WebDriverWait(self.browser, timeout).until(
+            EC.invisibility_of_element_located(by_locator),
+            message=f"Element {by_locator} did not disappear within {timeout} seconds."
         )

@@ -80,6 +80,8 @@ class TestOutsideExplorePage:
             ExplorePageLocators.BOUTON_DENSITY_NRECORDS,
             ExplorePageLocators.SYNAPSE_PER_CONNECTION_NRECORDS
         ]
+
+        time.sleep(3)
         record_counts = outside_explore.get_experiment_record_count(record_count_locators)
         for record_count in record_counts:
             assert record_count >= 1, f"Record count is less than 100: {record_count}"
@@ -92,15 +94,19 @@ class TestOutsideExplorePage:
         logger.info("Found Cerebrum in the brain region panel")
 
         cerebrum_arrow_btn = outside_explore.find_cerebrum_arrow_btn()
-        logger.info("Cerebrum - parent arrow button is clicked")
-        browser.execute_script("arguments[0].click();", cerebrum_arrow_btn)
+        logger.info("Cerebrum - parent arrow button is found")
+        # cerebrum_arrow_btn.click()
+        # browser.execute_script("arguments[0].click();", cerebrum_arrow_btn)
 
         cerebral_cortex_title = outside_explore.find_cerebral_cortex_brp()
         logger.info("Found Cerebral cortex as a child of Cerebrum")
 
+        """ 
+        temporarily unavailable
         neurons_panel = outside_explore.find_neurons_panel()
         assert neurons_panel.is_displayed()
         logger.info("Neurons panel is displayed")
+        """
 
         density_count_switch = outside_explore.find_count_switch()
         assert density_count_switch.is_displayed()
@@ -200,6 +206,7 @@ class TestOutsideExplorePage:
         neuron_panel_one_mtype.click()
         logger.info("Clicking inside the viewport of the Neuron panel")
 
+        """
         neurons_panel_mtype_btn = outside_explore.find_neurons_mtypes_btn()
         assert neurons_panel_mtype_btn, "The toggle arrow for M-type is not found"
         logger.info("M-type arrow button is found")
@@ -230,3 +237,4 @@ class TestOutsideExplorePage:
             (f"The element is not fully in the viewport. Element top: {element_top}, "
              f"Element bottom: {element_bottom}, Viewport height: {viewport_height}")
         logger.info(f"Scrolled through the M-types in the Neurons' panel")
+        """

@@ -6,16 +6,14 @@ import time
 from selenium.common import TimeoutException
 
 from locators.explore_ephys_locators import ExploreEphysLocators
+from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
 from util.util_links_checker import LinkChecker
-from util.util_scraper import UrlScraper
 
 
-class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
-    def __init__(self, browser, wait, base_url):
-        super().__init__(browser, wait, base_url)
-        self.home_page = ExplorePage(browser, wait, base_url)
-        self.url_scraper = UrlScraper()
+class ExploreElectrophysiologyPage(ExplorePage):
+    def __init__(self, browser, wait, logger, base_url):
+        super().__init__(browser, wait, logger, base_url)
 
     def go_to_explore_ephys_page(self, lab_id: str, project_id: str, retries=3, delay=5):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/electrophysiology"
@@ -34,6 +32,12 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
 
     def download_resources(self):
         return self.find_element(ExploreEphysLocators.DOWNLOAD_RESOURCES)
+
+    def find_ai_assistant_panel(self, timeout=10):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
+
+    def find_ai_assistant_panel_close(self, timeout=10):
+        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=timeout)
 
     def wait_for_element(self, locator):
         return self.visibility_of_all_elements(locator)
@@ -109,9 +113,19 @@ class ExploreElectrophysiologyPage(ExplorePage, LinkChecker):
 
     def find_column_headers(self, column_locators):
         column_headers = []
+        missing_locators = []  # To track locators that find no elements
+
         for locator in column_locators:
-            column_headers.extend(self.find_all_elements(locator))
-        return column_headers
+            elements = self.find_all_elements(locator)  # Try to find elements
+            if elements:
+                self.logger.info(f"Found {len(elements)} elements for locator: {locator}")
+                column_headers.extend(elements)
+            else:
+                self.logger.warning(f"No elements found for locator: {locator}")
+                missing_locators.append(locator)  # Add missing locators to the list
+
+        return column_headers, missing_locators
+
 
     def find_explore_section_grid(self):
         return self.element_visibility(ExploreEphysLocators.LV_GRID_VIEW)
