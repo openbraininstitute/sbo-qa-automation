@@ -126,3 +126,4 @@ jobs:
 
           path: latest_logs/errors
           if-no-files-found: warn
+          overwrite: true
