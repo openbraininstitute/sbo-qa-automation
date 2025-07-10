@@ -108,7 +108,7 @@ jobs:
       - name: Run tests and capture output
         run: |
           mkdir -p latest_logs/errors
-          pytest tests/ > latest_logs/errors/result.log
+          pytest tests/ --tb=short -rF > latest_logs/errors/result.log
           
           echo "======SUMMARY OF FAILURES======="
           if grep -A 5 "FAILED" latest_logs/errors/result.log; then
