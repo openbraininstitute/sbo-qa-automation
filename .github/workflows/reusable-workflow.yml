@@ -122,6 +122,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.step }}
+          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.run_attempt }}
+
           path: latest_logs/errors
           if-no-files-found: warn
