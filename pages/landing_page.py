@@ -39,6 +39,21 @@ class LandingPage(HomePage):
             self.logger.error(f"❌ Failed to click 'Go to Lab' button: {e}")
             raise
 
+    def digital_brains_video(self):
+        return self.is_visible(LandingLocators.DIGITAL_BRAINS_VIDEO)
+
+    def digital_brains_play_btn(self):
+        return self.is_visible(LandingLocators.DIGITAL_BRAINS_PLAY_BTN)
+
+    def digital_brains_pause_btn(self):
+        return self.find_element(LandingLocators.DIGITAL_BRAINS_PAUSE_BTN)
+
+    def digital_brains_current_step(self):
+        return self.find_element(LandingLocators.DIGITAL_BRAINS_VIDEO_CURRENT_STEP)
+
+    def digital_brains_steps(self):
+        return self.find_all_elements(LandingLocators.DIGITAL_BRAINS_VIDEO_STEP)
+
     def find_banner_title(self):
         return self.find_element(LandingLocators.BANNER_TITLE)
 
@@ -158,3 +173,6 @@ class LandingPage(HomePage):
 
     def hero_background_video(self):
         return self.find_element(LandingLocators.HERO_BACKGROUND_VIDEO)
+
+    def video_title1(self):
+        return self.find_element(LandingLocators.VIDEO_TITLE1)

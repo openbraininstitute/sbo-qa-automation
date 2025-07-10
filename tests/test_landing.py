@@ -4,6 +4,8 @@
 
 import time
 import pytest
+
+from locators.landing_locators import LandingLocators
 from pages.landing_page import LandingPage
 
 @pytest.mark.no_auto_nav
@@ -56,9 +58,11 @@ class TestLanding:
         big_img1 = landing_page.find_big_img1()
         assert big_img1.is_displayed(), "Section 1 big image is not found"
         logger.info("Accelerating neuroscience research section img is found")
+
         big_img2 = landing_page.find_big_img2()
         assert big_img2.is_displayed(), "Section 2 big image is not found"
         logger.info("Who is behind OBI img section is found")
+
         big_img3 = landing_page.find_big_img3()
         assert big_img3.is_displayed(), "Section 3 big image is not found"
         logger.info("How can we collaborate and help you achieve greatness img is found")
@@ -83,6 +87,43 @@ class TestLanding:
         assert section_btn5.is_displayed(), "Section 5 button is not displayed"
         logger.info("'Discover story in detail' button is found")
 
+        digital_brains_video = landing_page.digital_brains_video()
+        assert digital_brains_video, "The digital brains video is not found (line 107)"
+        logger.info("The digital brains video is displayed")
+
+        video_title = landing_page.video_title1()
+        logger.info("Looking for video title 1")
+
+        play_button = landing_page.digital_brains_play_btn()
+        location = play_button.location
+        y_position = location['y']
+
+        landing_page.browser.execute_script(f"window.scrollTo(0, {y_position - 100});")
+        time.sleep(1)  # Wait for scroll animation/layout
+
+        play_button.click()
+
+        logger.info("Video play button is clicked")
+        digital_brains_play_btn = landing_page.digital_brains_play_btn()
+        assert digital_brains_play_btn, "The Digital Brains video play button is not found"
+        logger.info("The digital brains video's play button is displayed")
+
+        logger.info("Video play button is clicked")
+        digital_brains_pause_btn = landing_page.digital_brains_pause_btn()
+        if digital_brains_pause_btn.is_displayed():
+            logger.info("The video is being played")
+        else:
+            logger.info("It is not possible to play the video")
+
+        digital_brains_steps = landing_page.digital_brains_steps()
+        assert digital_brains_steps, "No digital brains video steps found!"
+        assert len(digital_brains_steps) == 5, f"Expected 5 steps, found {len(digital_brains_steps)}"
+
+        for idx, step in enumerate(digital_brains_steps, start=1):
+            text = step.text.strip()
+            logger.info(f"Step {idx} text: '{text}'")
+            assert text != "", f"Step {idx} text is empty!"
+
         gotolab = landing_page.go_to_lab()
         assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
         gotolab.click()
@@ -101,7 +142,5 @@ class TestLanding:
             logger.error(f"Failed during login redirection: {e}")
             raise
 
-        # landing_page.click_go_to_lab()
-        # wait.until(lambda d: "openid-connect" in d.current_url or "auth" in d.current_url)
-        # assert "openid-connect" in browser.current_url
+
 
