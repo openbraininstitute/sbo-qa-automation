@@ -109,6 +109,13 @@ jobs:
         run: |
           mkdir -p latest_logs/errors
           pytest tests/ > latest_logs/errors/result.log
+          
+          echo "======SUMMARY OF FAILURES======="
+          if grep -A 5 "FAILED" latest_logs/errors/result.log; then
+            echo "Found test failures."
+          else
+             echo "All tests passed."
+          fi
 
       # Upload test artifacts (screenshots) if failure
       - name: Upload test artifacts (screenshots)
@@ -118,13 +125,3 @@ jobs:
           name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.step }}
           path: latest_logs/errors
           if-no-files-found: warn
-
-      - name: Display summary of failures
-        if: always()
-        run: |
-          echo "======SUMMARY OF FAILURES======="
-          if [ -f latest_logs/errors/result.log ]; then
-             grep -A 5 "FAILED" latest_logs/errors/result.log || echo "✅ All tests passed"
-          else
-             echo "❌ latest_logs/errors/result.log not found"
-          fi
