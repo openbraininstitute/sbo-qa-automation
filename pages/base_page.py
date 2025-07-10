@@ -15,6 +15,7 @@ class CustomBasePage:
     def __init__(self, browser, wait, lab_url):
         self.browser = browser
         self.wait = wait
+        # self.logger = logger
         self.lab_url = lab_url
         self.browser.set_page_load_timeout(60)
 
@@ -22,6 +23,14 @@ class CustomBasePage:
         url = self.lab_url + page_url
         print(f"INFO: CustomPage base_url + page_url = {url}" )
         self.browser.get(url)
+
+    def assert_visible(self, element, description, file_path=None, line=None):
+        if not element.is_displayed():
+            loc = f"{file_path}:{line}" if file_path and line else ""
+            raise AssertionError(f"❌ {description} not visible {f'@ {loc}' if loc else ''}")
+        else:
+            # self.logger.info(f"✅ {description} is visible.")
+            print(f"✅ {description} is visible.")
 
     def find_element(self, by_locator, timeout=10):
         return WebDriverWait(self.browser, timeout).until(

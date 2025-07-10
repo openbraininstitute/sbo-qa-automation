@@ -39,6 +39,7 @@ class TestExplorePage:
 
         logger.info("AI Assistant panel is open. Attempting to close it.")
         close_btn = explore_page.find_ai_assistant_panel_close(timeout=10)
+        explore_page.assert_visible(close_btn, "Close button on AI assistant panel", "pages/explore_page", 42)
         close_btn.click()
         ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
         assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."

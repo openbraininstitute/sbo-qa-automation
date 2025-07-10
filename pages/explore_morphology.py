@@ -8,15 +8,12 @@ from selenium.common import ElementNotVisibleException, TimeoutException, \
 
 from pages.explore_page import ExplorePage
 from locators.explore_morphology_locators import ExploreMorphologyPageLocators
-from util.util_links_checker import LinkChecker
-from util.util_scraper import UrlScraper
 
 
-class ExploreMorphologyPage(ExplorePage, LinkChecker):
+class ExploreMorphologyPage(ExplorePage):
     def __init__(self, browser, wait, logger, base_url):
-        super().__init__(browser, wait, base_url)
-        self.home_page = ExplorePage(browser, wait, base_url)
-        self.url_scraper = UrlScraper()
+        super().__init__(browser, wait, logger, base_url)
+        # self.home_page = ExplorePage(browser, wait, logger, base_url)
         self.logger = logger
 
     def go_to_explore_morphology_page(self, lab_id: str, project_id: str):

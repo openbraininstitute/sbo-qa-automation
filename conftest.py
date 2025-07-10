@@ -10,6 +10,7 @@ from io import BytesIO
 
 import pytest
 from PIL import Image
+from _pytest.terminal import TerminalReporter
 from selenium import webdriver
 from selenium.common import exceptions, TimeoutException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
@@ -93,7 +94,7 @@ def test_config(pytestconfig):
         raise ValueError("Username or password is missing in the configuration!")
 
     if env =="staging":
-        base_url = "https://next.staging.openbraininstitute.org"
+        base_url = "https://staging.openbraininstitute.org"
         lab_url = f"{base_url}/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_STAGING")
         project_id = os.getenv("PROJECT_ID_STAGING")
@@ -241,7 +242,33 @@ def pytest_runtest_logstart(nodeid, location):
 def pytest_runtest_logreport(report):
     """Capture failed tests during runtime"""
     if report.failed and report.when == "call":
-        failed_tests.append(report.nodeid)
+        try:
+            message = str(report.longrepr.reprcrash.message)
+        except Exception:
+            message = "Error message not available"
+        failed_tests.append((report.nodeid, message))
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    summary = []
+
+    for report in terminalreporter.getreports("failed"):
+        if not hasattr(report, "longrepr") or not report.longrepr:
+            continue
+
+        nodeid = report.nodeid
+        if hasattr(report.longrepr, "reprcrash"):
+            error_msg = report.longrepr.reprcrash.message.strip()
+        else:
+            error_msg = str(report.longrepr).strip().splitlines()[-1]
+
+        summary.append(f"FAILED {nodeid} - {error_msg}")
+
+    if summary:
+        terminalreporter.write_sep("=", "FAILURE SUMMARY")
+        for line in summary:
+            terminalreporter.write_line(line)
+
 
 def pytest_sessionfinish(session, exitstatus):
     """Print failed test summary at the end of the session"""

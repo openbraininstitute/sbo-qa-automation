@@ -114,3 +114,13 @@ jobs:
           name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.step }}
           path: latest_logs/errors
           if-no-files-found: warn
+
+      - name: Display summary of failures
+        if: always()
+        run: |
+          echo "======SUMMARY OF FAILURES======="
+          if [ -f result.log ]; then
+             grep -A 5 "FAILED" result.log || echo "✅ All tests passed"
+          else
+              echo "result.log not found"
+          fi

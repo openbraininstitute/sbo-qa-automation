@@ -5,7 +5,6 @@
 from selenium.common import TimeoutException
 from locators.landing_locators import LandingLocators
 from pages.home_page import HomePage
-from util.util_links_checker import LinkChecker
 
 
 class LandingPage(HomePage):
