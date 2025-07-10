@@ -45,8 +45,8 @@ class LandingPage(HomePage):
     def find_title_accelerate(self):
         return self.find_element(LandingLocators.TITLE_ACCELERATE)
 
-    def find_title_reconstruct(self):
-        return self.find_element(LandingLocators.TITLE_RECONSTRUCT)
+    def find_title_dig_brain(self):
+        return self.find_element(LandingLocators.TITLE_DIG_BRAIN)
 
     def find_title_who(self):
         return self.find_element(LandingLocators.TITLE_WHO)
@@ -65,6 +65,9 @@ class LandingPage(HomePage):
 
     def find_p_text4(self):
         return self.find_element(LandingLocators.P_TEXT4)
+
+    def find_p_text5(self):
+        return self.find_element(LandingLocators.P_TEXT5)
 
     def find_paragraph_text(self):
         return self.find_all_elements(LandingLocators.PARA_TEXT)
@@ -149,3 +152,9 @@ class LandingPage(HomePage):
 
     def find_menu_logo(self):
         return self.find_element(LandingLocators.TOP_MENU_LOGO)
+
+    def hero_background_img(self):
+        return self.find_element(LandingLocators.HERO_BACKGROUND_IMG)
+
+    def hero_background_video(self):
+        return self.find_element(LandingLocators.HERO_BACKGROUND_VIDEO)

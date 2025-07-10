@@ -17,16 +17,25 @@ class TestLanding:
         browser, wait = _visit("")
         landing_page = LandingPage(browser, wait, logger, base_url)
 
-        # assert landing_page.is_landing_page_displayed(), "Landing Page did not load correctly."
-        # logger.info("✅ Landing Page loaded successfully.")
+        assert landing_page.is_landing_page_displayed(), "Landing Page did not load correctly."
+        logger.info("✅ Landing Page loaded successfully.")
+
+        background_page_image = landing_page.hero_background_img()
+        landing_page.assert_visible(background_page_image, "The page background image is not displayed")
+
+        background_page_video = landing_page.hero_background_video()
+        landing_page.assert_visible(background_page_video, "The page background video is not displayed")
+
+        banner_title = landing_page.find_banner_title()
+        landing_page.assert_visible(banner_title, "Page main banner title is not found")
 
         title_accelerate = landing_page.find_title_accelerate()
         assert title_accelerate.is_displayed(), "Accelerate title is missing"
         logger.info("Title Accelerate is displayed")
 
-        # title_reconstruct = landing_page.find_title_reconstruct()
-        # assert title_reconstruct.is_displayed(), "Reconstruct title is missing"
-        # logger.info("Title Reconstruct is displayed")
+        title_reconstruct = landing_page.find_title_dig_brain()
+        assert title_reconstruct.is_displayed(), "Reconstruct title is missing"
+        logger.info("Title Reconstruct is displayed")
 
         title_who = landing_page.find_title_who()
         assert title_who.is_displayed(), "Who we are title is missing"
@@ -36,16 +45,13 @@ class TestLanding:
         assert title_news.is_displayed(), "News title is missing"
         logger.info("Title News is displayed")
 
-        p_text1 = landing_page.find_p_text1()
-        ptext1_text = p_text1.get_attribute("textContent").strip()
-        # logger.info(f"Paragraph content: '{ptext1_text}'")
-        assert ptext1_text != "", "Paragraph text is empty!"
-
         para_text = landing_page.find_paragraph_text()
         assert len(para_text) == 6, f"Expected 6 text paragraphs, found {len(para_text)}"
+
         for idx, para in enumerate(para_text, start=1):
             text = para.text.strip()
-            assert text, f"Paragraph text {idx} is empty"
+            assert text, f"Paragraph text {idx} is empty!"
+            logger.info(f"Paragraph {idx}: '{text}'")
 
         big_img1 = landing_page.find_big_img1()
         assert big_img1.is_displayed(), "Section 1 big image is not found"

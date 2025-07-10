@@ -29,8 +29,8 @@ class CustomBasePage:
             loc = f"{file_path}:{line}" if file_path and line else ""
             raise AssertionError(f"❌ {description} not visible {f'@ {loc}' if loc else ''}")
         else:
-            # self.logger.info(f"✅ {description} is visible.")
-            print(f"✅ {description} is visible.")
+            # self.logger.info(f" {description} is visible.")
+            print(f"{description} is visible.")
 
     def find_element(self, by_locator, timeout=10):
         return WebDriverWait(self.browser, timeout).until(
