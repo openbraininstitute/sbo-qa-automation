@@ -73,7 +73,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: pytest-html-report
-            path: reports/report.html
+            path: latest_logs/report_${{ inputs.env }}_chrome.html
 
       - name: Run Tests Based on Environment
         env:
