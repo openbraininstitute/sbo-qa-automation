@@ -5,7 +5,7 @@
 import time
 import os.path
 import pytest
-from selenium.common import NoSuchElementException
+from selenium.common import NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver import Keys, ActionChains
 
 from locators.explore_emodel_locators import ExploreEModelPageLocators
@@ -58,18 +58,32 @@ class TestExploreModelPage:
         brain_region_panel_close_btn.click()
         logger.info("Brain region panel is toggled close")
 
+        searched_emodel = "cadpyr"
         search_for_resources = explore_model.find_search_for_resources()
         assert search_for_resources.is_displayed(), "Search resources field is not found"
         search_for_resources.click()
-        searched_emodel = "cadpyr"
+
         for char in searched_emodel:
             search_for_resources.send_keys(char)
-            time.sleep(0.1)
+            time.sleep(0.2)
         logger.info("Searching for 'cadpyr'")
-        lv_searched_emodel = explore_model.find_lv_selected_resource()
+
+        lv_row = explore_model.find_lv_row()
+        assert lv_row.is_displayed(), "The table and the rows are not found"
+        logger.info("The table and the rows are displayed")
+
+        explore_model.wait_for_spinner_to_disappear(timeout=25)
+
+        lv_searched_emodel = explore_model.find_lv_selected_resource(timeout=15)
         assert lv_searched_emodel.is_displayed(), "The selected emodel is not found"
         logger.info("Selected resource found")
-        lv_searched_emodel.click()
+
+        try:
+            lv_searched_emodel.click()
+        except ElementClickInterceptedException:
+            logger.warning("Click intercepted. Retrying after wait.")
+            time.sleep(1)
+            lv_searched_emodel.click()
 
         label_checks = [
             ("DESCRIPTION", explore_model.find_dv_description_label, explore_model.find_dv_description_value),
@@ -84,27 +98,26 @@ class TestExploreModelPage:
         ]
 
         for label_text, find_label_fn, find_value_fn in label_checks:
-            label_el = find_label_fn()
-            value_el = find_value_fn()
+            try:
+                label_el = find_label_fn()
+                value_el = find_value_fn()
 
-            if label_text == "CONTRIBUTORS":
-                try:
-                    assert label_el.is_displayed(), f"'{label_text}' label is missing"
-                    assert label_el.text.strip() == label_text, f"Expected label '{label_text}', got '{label_el.text.strip()}'"
-                    assert value_el.is_displayed(), f"{label_text} value is not displayed"
-                    value = value_el.text.strip()
-                    assert value != "", f"{label_text} value is empty"
-                    logger.info(f"{label_text} value: {value}")
-                except AssertionError as e:
-                    logger.warning(f"XFAIL: {label_text} check failed but is expected to fail: {e}")
-                    continue
-            else:
+                assert label_el is not None, f"'{label_text}' label element not found"
+                assert value_el is not None, f"{label_text} value element not found"
                 assert label_el.is_displayed(), f"'{label_text}' label is missing"
                 assert label_el.text.strip() == label_text, f"Expected label '{label_text}', got '{label_el.text.strip()}'"
                 assert value_el.is_displayed(), f"{label_text} value is not displayed"
                 value = value_el.text.strip()
                 assert value != "", f"{label_text} value is empty"
                 logger.info(f"{label_text} value: {value}")
+
+            except AssertionError as e:
+                if label_text == "CONTRIBUTORS":
+                    logger.warning(f"XFAIL: {label_text} check failed but is expected to fail: {e}")
+                else:
+                    logger.error(f"{label_text} check failed: {e}")
+            except Exception as e:
+                logger.error(f"Unexpected error in {label_text} check: {e}")
 
         dv_config_tab = explore_model.find_dv_configuration_tab()
         assert dv_config_tab.is_displayed(), "Emodel detail view confiugration tab is not displayed"

@@ -239,35 +239,11 @@ def pytest_runtest_logstart(nodeid, location):
     test_file = location[0].upper()
     print(f"\033[95m\n🚀 STARTING TEST FILE: {test_file}\033[0m\n")
 
+
 def pytest_runtest_logreport(report):
     """Capture failed tests during runtime"""
     if report.failed and report.when == "call":
-        try:
-            message = str(report.longrepr.reprcrash.message)
-        except Exception:
-            message = "Error message not available"
-        failed_tests.append((report.nodeid, message))
-
-
-def pytest_terminal_summary(terminalreporter, exitstatus, config):
-    summary = []
-
-    for report in terminalreporter.getreports("failed"):
-        if not hasattr(report, "longrepr") or not report.longrepr:
-            continue
-
-        nodeid = report.nodeid
-        if hasattr(report.longrepr, "reprcrash"):
-            error_msg = report.longrepr.reprcrash.message.strip()
-        else:
-            error_msg = str(report.longrepr).strip().splitlines()[-1]
-
-        summary.append(f"FAILED {nodeid} - {error_msg}")
-
-    if summary:
-        terminalreporter.write_sep("=", "FAILURE SUMMARY")
-        for line in summary:
-            terminalreporter.write_line(line)
+        failed_tests.append(report.nodeid)
 
 
 def pytest_sessionfinish(session, exitstatus):

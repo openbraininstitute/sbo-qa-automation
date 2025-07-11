@@ -7,22 +7,22 @@ from selenium.webdriver.common.by import By
 
 class ExploreEModelPageLocators:
     AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
-    AI_ASSISTANT_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[2]")
+    AI_ASSISTANT_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     BRAIN_REGION_PANEL = (By.XPATH, "(//div[@class='flex h-screen flex-col bg-primary-8'])[1]")
     BR_SEARCH_FIELD_TYPE = (By.XPATH, "//span[@class='ant-select-selection-search']")
     BR_SEARCH_REGION_SEARCH_FIELD = (By.XPATH, "//div[@class='ant-select-selector']")
     BR_CEREBRUM_TITLE = (By.XPATH, "//div[@title='Cerebrum']//button")
     CLOSE_BRAIN_REGION_PANEL_BTN = (By.XPATH, "(//button[starts-with(@class, 'ant-btn')]/span["
                                               "@class='ant-btn-icon'])[1]")
-    DV_ANALYSIS_TAB = (By.CSS_SELECTOR, "li[title='Analysis']")
-    DV_CONFIGURATION_TAB = (By.CSS_SELECTOR, "li[title='Configuration']")
-    DV_SIMULATION_TAB = (By.CSS_SELECTOR, "li[title='Simulation']")
+    DV_ANALYSIS_TAB = (By.CSS_SELECTOR, "#tab_analysis")
+    DV_CONFIGURATION_TAB = (By.CSS_SELECTOR, "#tab_configuration")
+    DV_SIMULATION_TAB = (By.CSS_SELECTOR, "#tab_simulation")
     DV_EXEMPLAR_MORPHOLOGY_TITLE = (By.XPATH, "//div[normalize-space()='Exemplar morphology']")
     DV_NAME_LABEL = (By.XPATH, "//div[@class='text font-thin' and text()='Name']")
     DV_NAME_VALUE = (By.XPATH, "(//div[contains(@class,'text-2xl') and contains(@class,'font-bold')])[1]")
-    DV_DESCRIPTION_LABEL = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Description']")
+    DV_DESCRIPTION_LABEL = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Description']")
     DV_DESCRIPTION_VALUE = (
-    By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Description']/following-sibling::div")
+    By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Description']/following-sibling::div")
 
     DV_CONTRIBUTORS_LABEL = (By.XPATH, "//div[text()='Contributors']")
     DV_CONTRIBUTORS_VALUE = (By.XPATH, "//div[text()='Contributors']/following-sibling::div")
@@ -54,4 +54,6 @@ class ExploreEModelPageLocators:
     SEARCH_REGION = (By.XPATH, "//input[@class='ant-select-selection-search-input']")
     SEARCH_RESOURCES = (By.CSS_SELECTOR, "input[placeholder='Search for resources...']")
     SELECTED_BRAIN_REGION = (By.XPATH, "//h1[@title='Isocortex']/span[text()='Isocortex']")
-    LV_EM_TD = (By.XPATH, "(//td[@title='cADpyr'][normalize-space()='cADpyr'])[1]")
+    SPINNER = (By.XPATH, "//div[@class='ant-spin ant-spin-spinning']")
+    LV_EM_TD = (By.XPATH, "(//tr[starts-with(@class,'ant-table-row')]//td[starts-with(@class,'ant-table-cell')])[6]")
+    LV_ROW = (By.CSS_SELECTOR, ".ant-table-body")
