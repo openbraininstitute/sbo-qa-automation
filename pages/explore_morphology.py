@@ -37,9 +37,26 @@ class ExploreMorphologyPage(ExplorePage):
 
     def find_column_headers(self, column_locators):
         column_headers = []
+        missing_locators = []
+
         for locator in column_locators:
-            column_headers.extend(self.find_all_elements(locator))
+            try:
+                elements = self.find_all_elements(locator)
+                if elements:
+                    self.logger.info(f"Found {len(elements)} elements for locator: {locator}")
+                    column_headers.extend(elements)
+                else:
+                    self.logger.warning(f"No elements found for locator: {locator}")
+                    missing_locators.append(locator)
+            except TimeoutException:
+                self.logger.error(f"Timeout while trying to find elements for locator: {locator}")
+                missing_locators.append(locator)
+
+        if missing_locators:
+            raise Exception(f"Missing or timed out locators: {missing_locators}")
+
         return column_headers
+
 
     def find_thumbnails(self):
         return self.find_all_elements(ExploreMorphologyPageLocators.LV_THUMBNAIL)
@@ -219,5 +236,7 @@ class ExploreMorphologyPage(ExplorePage):
     def lv_filter_search_field(self):
         return self.find_element(ExploreMorphologyPageLocators.LV_FILTER_SEARCH_FIELD)
 
-    def find_literature_panel_btn(self):
-        return self.find_element(ExploreMorphologyPageLocators.LITERATURE_PANEL_CLOSE_BTN)
+    def find_ai_panel_btn(self):
+        return self.find_element(ExploreMorphologyPageLocators.AI_ASSISTANT_PANEL_CLOSE_BTN)
+
+

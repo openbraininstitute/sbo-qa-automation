@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 
 class ExploreMorphologyPageLocators:
     AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
+    AI_ASSISTANT_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     BACK_IE_BTN = (By.XPATH, "//div[.='Back to list']")
     BRAIN_REGION_COLUMN_TITLE = (By.XPATH, "//div[text()='Brain Region']")
     BR_SORTED = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]/descendant::td[contains(text("
@@ -41,17 +42,14 @@ class ExploreMorphologyPageLocators:
                                 "cingulate area, dorsal part, layer 2/3']")
     DV_SOMA_TITLE = (By.XPATH, "//h2[text()='Soma']")
     DV_SPECIES_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Species']")
-    FILTERED_MTYPE = (By.XPATH, "//td[@class='ant-table-cell text-primary-7 cursor-pointer "
-                                "before:!content-none ant-table-cell-ellipsis' and "
-                                "@title='L5_TPC:A']")
+    FILTERED_MTYPE = (By.XPATH, "//td[@class='ant-table-cell text-primary-7 cursor-pointer before:!content-none "
+                                "ant-table-cell-ellipsis']/div[@title='L5_TPC:A']")
     FILTER_MTYPE_SEARCH = (By.XPATH, "//div[@class='ant-select-selection-overflow']")
     LV_FILTER_SEARCH_FIELD = (By.XPATH, "(//div[@class='ant-select-selector'])[2]")
     FILTER_MTYPE_TEXT_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input'])[2]")
     FILTER_PANEL = (By.XPATH, "//div[@data-testid='listing-view-filter-panel']")
     FIRST_ROW = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]")
-    LITERATURE_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[2]")
-    LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
-                                 "region']")
+    LV_BRAIN_REGION = (By.XPATH, "//div[@class='explore-module__frHowq__columnTitle' and text()='Brain region']")
     LV_CHECKBOX = (By.XPATH, "")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
     LV_FILTER_APPLY_BTN = (By.XPATH, "//button[contains(text(),'Apply') and @type='submit']")

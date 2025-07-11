@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 class ExploreEphysLocators:
     ALL_CHECKBOXES = (By.XPATH, "//span[@class='ant-checkbox ant-wave-target']")
     AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
+    AI_ASSISTANT_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")
     BRAIN_REGION_PANEL_CLOSE_BTN = (By.CSS_SELECTOR, ".ant-btn-icon")
     BRAIN_REGION_PANEL_OPEN_BTN = (By.CSS_SELECTOR, "span[class='anticon anticon-plus']")
