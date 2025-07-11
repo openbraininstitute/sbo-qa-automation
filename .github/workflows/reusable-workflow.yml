@@ -72,8 +72,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-            name: pytest-html-report
-            path: report.html
+           name: pytest-html-report
+           path: report.html
 
       - name: Run Tests Based on Environment
         env:
