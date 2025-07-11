@@ -8,7 +8,6 @@ from selenium.common import TimeoutException
 from locators.explore_ephys_locators import ExploreEphysLocators
 from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
-from util.util_links_checker import LinkChecker
 
 
 class ExploreElectrophysiologyPage(ExplorePage):
@@ -29,6 +28,12 @@ class ExploreElectrophysiologyPage(ExplorePage):
                 if attempt == retries - 1:
                     raise RuntimeError("The Explore Ephys page did not load within 60 seconds.")
             return self.browser.current_url
+
+    def brain_region_panel_close_btn(self):
+        return self.find_element(ExploreEphysLocators.BRAIN_REGION_PANEL_CLOSE_BTN)
+
+    def brain_region_panel_open_btn(self):
+        return self.find_element(ExploreEphysLocators.BRAIN_REGION_PANEL_OPEN_BTN)
 
     def download_resources(self):
         return self.find_element(ExploreEphysLocators.DOWNLOAD_RESOURCES)
@@ -59,6 +64,9 @@ class ExploreElectrophysiologyPage(ExplorePage):
 
     def dv_overview_btn(self):
         return self.find_element(ExploreEphysLocators.DV_OVERVIEW)
+
+    def dv_plots(self):
+        return self.find_all_elements(ExploreEphysLocators.DV_PLOTS)
 
     def dv_stimulus_btn(self):
         return self.find_element(ExploreEphysLocators.DV_STIMULUS_BTN)
@@ -107,8 +115,23 @@ class ExploreElectrophysiologyPage(ExplorePage):
 
     def find_dv_title_header(self, title_locators):
         title_headers = []
-        for title in title_locators:
-            title_headers.extend(self.find_all_elements(title))
+        missing_locators = []
+
+        for locator in title_locators:
+            try:
+                elements = self.find_all_elements(locator)
+                if elements:
+                    self.logger.info(f"Foound {len(elements)} elements for locator: {locator}")
+                    title_headers.extend(elements)
+                else:
+                    self.logger.error(f"No elements found for locator: {locator}")
+                    missing_locators.append(locator)
+            except TimeoutException:
+                self.logger.error(f"Timeout while trying to find elements for locator: {locator}")
+                missing_locators.append(locator)
+        if missing_locators:
+            raise Exception(f"Missing elements for locators: {missing_locators}")
+
         return title_headers
 
     def find_column_headers(self, column_locators):

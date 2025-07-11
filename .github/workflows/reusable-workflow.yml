@@ -67,8 +67,6 @@ jobs:
       - name: Create Logs Directory
         run: mkdir -p latest_logs/errors
 
-
-
       - name: Run Tests Based on Environment
         env:
           ENV_URL: ${{ vars.ENV_URL }}
