@@ -69,6 +69,7 @@ jobs:
 
       # Run tests and generate HTML Report
       - name: Upload Pytest HTML Report
+        if: always()
         uses: actions/upload-artifact@v3
         with:
             name: pytest-html-report
@@ -102,8 +103,6 @@ jobs:
             tests/test_outside_explore.py \
             tests/test_project_home.py \
             tests/test_project_notebooks.py \
-#            tests/test_build.py \
-#            tests/test_build_synaptome.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
             -sv \
