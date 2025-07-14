@@ -24,9 +24,9 @@ class TestNews:
         assert main_page_text.is_displayed(), "Main page text is not found."
         logger.info("Main page text is displayed.")
 
-        # main_hero_video = news_page.main_hero_video(timeout=15)
-        # assert main_hero_video.is_displayed(), "Main page video is not found."
-        # logger.info("Main page video is displayed.")
+        main_hero_video = news_page.main_hero_video(timeout=15)
+        assert main_hero_video.is_displayed(), "Main page video is not found."
+        logger.info("Main page video is displayed.")
 
         main_page_image = news_page.hero_img(timeout=10)
         assert main_page_image.is_displayed(), "Main page image is not found."

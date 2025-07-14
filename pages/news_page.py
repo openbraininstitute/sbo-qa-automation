@@ -35,21 +35,6 @@ class NewsPage(HomePage):
                 self.wait.sleep(delay)
         raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
 
-    def main_hero_video(self,timeout=15):
-        return self.element_visibility(NewsLocators.HERO_VIDEO, timeout=timeout)
-
-    def hero_img(self, timeout=10):
-        return self.element_visibility(NewsLocators.HERO_IMG, timeout=timeout)
-
-    def main_title(self):
-        return self.find_element(NewsLocators.HERO_MAIN_TITLE)
-
-    def main_page_text(self):
-        return self.find_element(NewsLocators.HERO_TEXT)
-
-    def page_cards(self):
-        return self.find_all_elements(NewsLocators.PAGE_CARDS)
-
     def cards_main_titles(self):
         return self.find_all_elements(NewsLocators.CARD_MAIN_TITLE)
 
@@ -62,5 +47,20 @@ class NewsPage(HomePage):
     def cards_read_more_btn(self):
         return self.find_all_elements(NewsLocators.CARD_READ_MORE_BTN)
 
+    def hero_img(self, timeout=10):
+        return self.element_visibility(NewsLocators.HERO_IMG, timeout=timeout)
+
     def load_more_btn(self):
         return self.find_element(NewsLocators.LOAD_MORE_BTN)
+
+    def main_hero_video(self,timeout=15):
+        return self.element_visibility(NewsLocators.HERO_VIDEO, timeout=timeout)
+
+    def main_title(self):
+        return self.find_element(NewsLocators.HERO_MAIN_TITLE)
+
+    def main_page_text(self):
+        return self.find_element(NewsLocators.HERO_TEXT)
+
+    def page_cards(self):
+        return self.find_all_elements(NewsLocators.PAGE_CARDS)
