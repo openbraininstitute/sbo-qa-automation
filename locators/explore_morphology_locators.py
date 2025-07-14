@@ -16,32 +16,32 @@ class ExploreMorphologyPageLocators:
                                "@class='ant-table-column-sorters']")
     CELLS = (By.XPATH, "//td[starts-with(@class,'ant-table-cell')]")
     CLEAR_FILTERS_BTN = (By.XPATH, "//button[@type='button']/div[text()='Clear filters']")
-    DV_AGE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Age']")
+    DV_AGE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Age']")
     DV_AP_TITLE = (By.XPATH, "//h2[text()='Apical Dendrite']")
     DV_AXON_TITLE = (By.XPATH, "//h2[text()='Axon']")
     DV_BACK_BTN = (By.XPATH, "//a[contains(@href,'/mmb-beta/explore/interactive/experimental"
                              "/morphology')]")
     DV_BD_TITLE = (By.XPATH, "//h2[text()='Basal Dendrite']")
-    DV_BRAIN_REGION_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Brain "
+    DV_BRAIN_REGION_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Brain "
                                        "Region']")
-    DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                                       ")='Contributors'] ")
-    DV_DESCRIPTION_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
+    DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text("
+                                       ")='Contributors']")
+    DV_DESCRIPTION_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text("
                                       ")='Description']")
     DV_DOWNLOAD_BTN = (By.XPATH, "//button[@type='button']/span[contains(text(),'Download')]")
-    DV_LICENSE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='License']")
+    DV_LICENSE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='License']")
     DV_MORPHOMETRICS_TITLE = (By.XPATH, "//h1[.='Morphometrics']")
-    DV_MTYPE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='M-Type']")
+    DV_MTYPE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='M-Type']")
     DV_NAME_TITLE = (By.XPATH, "//div[@class='text font-thin' and text()='Name']")
     DV_NM_TITLE = (By.XPATH, "//h2[text()='Neuron Morphology']")
-    DV_REGISTRATION_DATE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
+    DV_REGISTRATION_DATE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text("
                                             ")='Registration date']")
     DV_SELECTED_BR = (By.XPATH, "//div[@class='grid w-1/2 auto-rows-min grid-cols-3 gap-x-8 "
                                 "gap-y-6']//div[text()='Brain Region']/following-sibling::div["
                                 "text()='Anterior"
                                 "cingulate area, dorsal part, layer 2/3']")
     DV_SOMA_TITLE = (By.XPATH, "//h2[text()='Soma']")
-    DV_SPECIES_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Species']")
+    DV_SPECIES_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Species']")
     FILTERED_MTYPE = (By.XPATH, "//td[@class='ant-table-cell text-primary-7 cursor-pointer before:!content-none "
                                 "ant-table-cell-ellipsis']/div[@title='L5_TPC:A']")
     FILTER_MTYPE_SEARCH = (By.XPATH, "//div[@class='ant-select-selection-overflow']")

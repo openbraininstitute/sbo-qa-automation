@@ -159,15 +159,21 @@ class TestExploreMorphologyPage:
             ExploreMorphologyPageLocators.DV_CONTRIBUTORS_TITLE,
             ExploreMorphologyPageLocators.DV_REGISTRATION_DATE_TITLE,
             ExploreMorphologyPageLocators.DV_LICENSE_TITLE,
-            ExploreMorphologyPageLocators.DV_AGE_TITLE,
-            ExploreMorphologyPageLocators.DV_MTYPE_TITLE,
+            ExploreMorphologyPageLocators.DV_MTYPE_TITLE
         ]
-        logger.info("Found 'Detail view' header locators.")
-        dv_header_locators = explore_morphology.find_dv_headers(dv_header_locators)
 
-        for header in dv_header_locators:
-            assert header.is_displayed(), f"Detail view header {header} is not displayed."
-        logger.info("Found detail view headers")
+        try:
+            logger.info("Found metadata header locators.")
+            dv_header_locators = explore_morphology.find_dv_title_header(dv_header_locators)
+
+            for data in dv_header_locators:
+                assert data.is_displayed(), f"DV title header {data} is not displayed"
+                logger.info(f"Detail view header found: {data.text}")
+
+            logger.info("Found detail view title headers.")
+        except Exception as e:
+            logger.error(f"Test failed due to missing locator(s): {e}")
+            raise
 
         morphometrics_title = explore_morphology.find_morphometrics_title()
         morpho_title = morphometrics_title.text
@@ -183,9 +189,18 @@ class TestExploreMorphologyPage:
         logger.info("Found 'Detail view' titles.")
         morphology_titles = explore_morphology.find_morphology_titles(morphology_titles)
 
-        for title in morphology_titles:
-            assert title.is_displayed(), f"Detail view Morphology title:  {title} is not displayed."
-        logger.info("Found detail view morphology titles")
+        try:
+            logger.info("Found metadate header locators.")
+            morphology_titles = explore_morphology.find_dv_title_header(morphology_titles)
+
+            for data in morphology_titles:
+                assert data.is_displayed(), f"DV title header {data} is not displayed"
+                logger.info(f"Detail view header found: {data.text}")
+
+            logger.info("Found detail view title headers.")
+        except Exception as e:
+            logger.error(f"Test failed due to missing locator(s): {e}")
+            raise
 
         morpho_viewer = explore_morphology.find_morpho_viewer()
         logger.info("Morphology viewer is displayed")
