@@ -33,7 +33,7 @@ class Build(HomePage, LinkChecker):
         return self.find_all_elements(BuildLocators.CREATED_BY_NAME)
 
     def creation_date(self):
-        return self.find_element(BuildLocators.CREATION_DATE)
+        return self.find_element(BuildLocators.CREATION_DATE_TITLE)
 
     def date(self):
         return self.find_element(BuildLocators.DATE)
@@ -68,8 +68,14 @@ class Build(HomePage, LinkChecker):
     def select_e_model_btn(self):
         return self.find_element(BuildLocators.SELECT_E_MODEL_BTN)
 
+    def select_specific_e_model_btn(self):
+        return self.find_element(BuildLocators.SELECT_SPECIFIC_E_MODEL_BTN)
+
     def select_m_model_btn(self):
         return self.find_element(BuildLocators.SELECT_M_MODEL_BTN)
+
+    def select_specific_m_model_btn(self):
+        return self.find_element(BuildLocators.SELECT_SPECIFIC_M_MODEL_BTN)
 
     def single_neuron_build_btn(self):
         return self.find_element(BuildLocators.BUILD_SINGLE_NEURON_BTN)
