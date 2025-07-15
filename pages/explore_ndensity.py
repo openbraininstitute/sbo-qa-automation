@@ -140,3 +140,6 @@ class ExploreNeuronDensityPage(ExplorePage):
 
     def lv_br_row1(self):
         return self.find_element(ExploreNDensityPageLocators.LV_BR_ROW1)
+
+    def scroll_sideways(self):
+        return self.element_visibility(ExploreNDensityPageLocators.SCROLL_SIDEWAYS)

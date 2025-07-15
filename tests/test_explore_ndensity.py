@@ -32,6 +32,8 @@ class TestExploreNeuronDensity:
         brain_regions_panel_btn.click()
         logger.info("Brain regions panel is closed")
 
+        browser.maximize_window()
+
         column_locators = [
             ExploreNDensityPageLocators.LV_BRAIN_REGION,
             ExploreNDensityPageLocators.LV_MTYPE,
