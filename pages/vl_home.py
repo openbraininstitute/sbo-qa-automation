@@ -68,7 +68,7 @@ class VlabHome(HomePage, LinkChecker):
     def find_tutorials_carrousel(self):
         return self.find_element(VLHomeLocators.TUTORIALS_CARROUSEL)
 
-    def find_tutorials_carts(self):
+    def find_tutorials_cards(self):
         return self.find_all_elements(VLHomeLocators.TUTORIALS_CARDS)
 
     def find_tutorials_title(self):
@@ -130,5 +130,8 @@ class VlabHome(HomePage, LinkChecker):
 
         self.logger.info("Navigating to /contacts.")
         navigate_and_verify(VLHomeLocators.MENU_CONTACT_OBI_BTN, "/contact")
+
+        self.logger.info("Navigating to /terms.")
+        navigate_and_verify(VLHomeLocators.MENU_TERMS_BTN, "/terms")
 
         self.logger.info("All menu options validated successfully!")

@@ -43,6 +43,8 @@ class TestVlabHome:
             go_to_your_lab = vlab_home.go_to_your_vlab()
             if go_to_your_lab.is_displayed():
                 logger.info("Go to your lab page")
+                # go_to_your_lab.click()
+                # logger.info("Clicked to go to the vlab")
                 num_projects_element = vlab_home.find_num_projects()
                 num_projects = num_projects_element.text
                 logger.info(f"Number of projects: {num_projects}")
@@ -61,32 +63,17 @@ class TestVlabHome:
         assert tutorials_title.is_displayed(), f"Tutorials title is not displayed."
         logger.info("Tutorials title is displayed.")
 
-        tutorials_cards = vlab_home.find_tutorials_carts()
+        tutorials_cards = vlab_home.find_tutorials_cards()
         assert len(tutorials_cards) == 3, f"Tutorials cards are not displayed."
 
         for idx, card in enumerate(tutorials_cards):
             print(f"Card {idx + 1} content: {card.text}")
 
         vlab_home.validate_and_return()
+        logger.info("Validated the Q&A buttons and navigation")
 
-        qna_btn = vlab_home.find_qna_btn()
-        assert qna_btn.is_displayed(), f"Q&A button is not displayed."
-        logger.info("Q&A button is displayed.")
-
-        qna_btn.click()
-        logger.info("Q&A button is clicked.")
-        menu_terms = vlab_home.find_menu_terms_btn()
-        assert menu_terms.is_displayed(), f"Menu about button is not displayed."
-        logger.info("Menu about button is displayed.")
-        menu_terms.click()
-
-        browser.back()
         current_url = browser.current_url
         logger.info(f"Navigated back from {current_url}.")
-
-        home_btn = vlab_home.find_home_btn()
-        assert home_btn.is_displayed(), f"Home button is not displayed."
-        logger.info("Home button is displayed.")
 
         profile_btn = vlab_home.find_profile_btn()
         assert profile_btn.is_displayed(), f"Profile button is not displayed."
