@@ -14,7 +14,7 @@ class VLOverviewLocators:
     NAV_MEMBERS_BTN = (By.CSS_SELECTOR, "button[aria-label='Members']")
     NEXT = (By.XPATH, "//button[@type='button']/span[contains(text(), 'Next')]")
     MEMBERS_SECTION_TITLE = (By.XPATH, "(//div[@class='flex flex-col'])[4]/div[text()='Members']")
-    MEMBERS_SECTION_ADMIN_NAME = (By.XPATH, "//p[@class='capitalize text-gray-500 hidden' and text()='administrator']")
+    MEMBERS_SECTION_ADMIN_NAME = (By.XPATH, "(//div[text()='Admin']/following::div[@class='font-bold'])[2]")
     MENU_PROJECTS = (By.CSS_SELECTOR, "a[href='projects']")
     MENU_TEAM = (By.CSS_SELECTOR, "a[href='team']")
     MENU_ADMIN = (By.CSS_SELECTOR, "a[href='admin']")
