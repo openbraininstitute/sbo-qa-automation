@@ -10,7 +10,7 @@ from pages.home_page import HomePage
 from util.util_links_checker import LinkChecker
 
 
-class OutsideExplorePage(HomePage, LinkChecker):
+class OutsideExplorePage(HomePage):
     def __init__(self, browser, wait, base_url):
         super().__init__(browser, wait, base_url)
         self.home_page = HomePage(browser, wait, base_url)
@@ -69,13 +69,13 @@ class OutsideExplorePage(HomePage, LinkChecker):
     def check_explore_title_is_present(self):
         return self.find_element(ExplorePageLocators.EXPLORE_TITLE)
 
-    def cerebrum_title(self):
-        return self.find_element(ExplorePageLocators. CEREBRUM_TITLE_MAIN_PAGE)
+    def cerebrum_title(self, timeout=15):
+        return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
-    def find_explore_page_titles(self, page_locators):
+    def find_explore_page_titles(self, page_locators, timeout=15):
         elements_list = []
         for locator in page_locators:
-            elements_list.extend(self.find_all_elements(locator))
+            elements_list.extend(self.find_all_elements(locator, timeout=timeout))
         return elements_list
 
     def find_experimental_data_titles(self, exp_data_locators, timeout=10):
@@ -84,17 +84,18 @@ class OutsideExplorePage(HomePage, LinkChecker):
             result.extend(self.find_all_elements(locator, timeout))
         return result
 
-    def get_experiment_record_count(self, record_count_locators):
+    def get_experiment_record_count(self, record_count_locators, timeout=25):
         record_counts = []
         for locator in record_count_locators:
-            record = self.find_element(locator)
-            record_text = record.text.strip()
             try:
-                # record_number = int(''.join(filter(str.isdigit, record_text)))
-                record_number = int(''.join(filter(lambda c: c.isdigit(), record_text)))
+                record = self.wait_for_non_empty_text(locator, timeout)
+                record_text = record.text.strip()
+                record_number = int(''.join(filter(str.isdigit, record_text)))
+                record_counts.append(record_number)
+            except TimeoutException:
+                raise TimeoutException(f"Timeout: No text found for record at {locator} within {timeout} seconds.")
             except ValueError:
-                raise ValueError(f"Unable to parse record count from text: {record_text}")
-            record_counts.append(record_number)
+                raise ValueError(f"Could not parse record count from text: '{record_text}'")
         return record_counts
 
     def find_3d_atlas(self):

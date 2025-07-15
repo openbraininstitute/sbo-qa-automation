@@ -233,3 +233,10 @@ class CustomBasePage:
             EC.invisibility_of_element_located(by_locator),
             message=f"Element {by_locator} did not disappear within {timeout} seconds."
         )
+
+    def wait_for_non_empty_text(self, locator, timeout=25):
+        def check_text(d):
+            element = d.find_element(*locator)
+            return element if element.text.strip() else False
+
+        return WebDriverWait(self.browser, timeout).until(check_text)
