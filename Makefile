@@ -23,7 +23,7 @@ smoke:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_build_synaptome.py tests/test_about.py --html=report.html --self-contained-html"
 
 smoke-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_build_synaptome.py tests/test_about.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_homepage.py tests/test_about.py --html=report.html --self-contained-html"
 
 regression:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py --html=report.html --self-contained-html"
@@ -32,7 +32,7 @@ feature:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_explore_emodel.py tests/test_morphology.py --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_emodel.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_page.py --html=report.html --self-contained-html"
 
 # Main test runner
 run-tests:
