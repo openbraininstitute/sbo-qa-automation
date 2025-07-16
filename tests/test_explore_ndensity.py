@@ -33,6 +33,7 @@ class TestExploreNeuronDensity:
         logger.info("Brain regions panel is closed")
 
         browser.maximize_window()
+        explore_ndensity.wait_for_page_ready(timeout=30)
 
         column_locators = [
             ExploreNDensityPageLocators.LV_BRAIN_REGION,

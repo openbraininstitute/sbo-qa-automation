@@ -53,10 +53,16 @@ class ExploreNeuronDensityPage(ExplorePage):
             self.logger.info(f"Checking locator: {locator}")
             try:
                 self.element_visibility(locator, timeout=timeout)  # Debug visibility
+
                 elements = self.find_all_elements(locator)
+
                 if not elements:
                     self.logger.warning(f"No elements found with locator {locator}")
                     continue
+
+                self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", elements[0])
+                time.sleep(0.3)
+
                 if len(elements) > 1:
                     self.logger.info(f"Found multiple elements for {locator}")
                     column_headers.extend(elements)
