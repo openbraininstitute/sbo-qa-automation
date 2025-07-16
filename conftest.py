@@ -249,7 +249,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         terminalreporter.write_line("")  # just spacing
         terminalreporter.write_sep("=", "❌ FAILED TEST SUMMARY", red=True)
         for test in failed_tests:
-            terminalreporter.write_line(f"- {test}")
+            terminalreporter.write_line(f"- {test}", red=True)
     else:
         terminalreporter.write_line("")
         terminalreporter.write_sep("=", "✅ ALL TESTS PASSED", green=True)
