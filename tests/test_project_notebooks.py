@@ -65,7 +65,7 @@ class TestProjectNotebooks:
         filter_name_input.send_keys("Metabolism")
         logger.info("Filter name input is filled")
 
-        filter_scale_input = project_notebooks.filter_scale_input()
+        filter_scale_input = project_notebooks.filter_scale_input(timeout=10)
         assert filter_scale_input.is_displayed(), "Filter scale input is not displayed"
         logger.info("Filter scale input is found")
         filter_scale_input.click()
