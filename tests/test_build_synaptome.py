@@ -24,8 +24,14 @@ class TestBuildSynaptome:
         project_menu_build_synaptome = build_synaptome.find_menu_build()
         assert project_menu_build_synaptome.is_displayed(), f"Build menu is not displayed."
         logger.info("Build menu is displayed.")
+        # time.sleep(3)
+        synaptome_box = build_synaptome.find_synaptome_box(timeout=10)
+        assert synaptome_box.is_displayed(), "The synaptome box is not found."
+        logger.info("The synaptome box is found.")
 
-        synaptome_build_btn = build_synaptome.find_synaptome_build_btn()
+        synaptome_box.click()
+
+        synaptome_build_btn = build_synaptome.find_synaptome_build_btn(timeout=10)
         assert synaptome_build_btn.is_displayed(), f"Synaptome build button is not displayed."
         logger.info("Synaptome build button is displayed.")
         synaptome_build_btn.click()

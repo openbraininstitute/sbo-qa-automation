@@ -39,7 +39,7 @@ class BuildSynaptomeLocators:
     SPIN_CONTAINER = (By.XPATH, "//div[starts-with(@class,'ant-spin-container ant-spin-blur')]")
     START_BUILDING_BTN = (By.XPATH, "(//button[normalize-space()='Start building'])[1]")
     SYNAPTOME_FORM = (By.CSS_SELECTOR, "#synaptome-model-configuration-form")
-    SYNAPTOME_BOX = (By.XPATH, "//div[@class='mb-5 mt-8 grid grid-cols-3 gap-5']//div[contains(text(),'Synaptome')]")
+    SYNAPTOME_BOX = (By.XPATH, "//div[@id='synaptome']")
     SYNAPTOME_BUILD_BTN = (By.XPATH, "//div[@id='synaptome']//button[@type='button']/span[text()='Build']")
     SYNAPSE_GREATER_VALUE = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_exclusion_rules_0_distance_soma_gte")
     SYNAPSE_SMALLER_VALUE = (By.CSS_SELECTOR,
