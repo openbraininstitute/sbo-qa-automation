@@ -20,6 +20,9 @@ class CustomBasePage:
         self.browser.set_page_load_timeout(60)
 
     def go_to_page(self, page_url):
+        if self.lab_url is None:
+            raise ValueError("lab_url is not set. Cannot navigate to page.")
+
         url = self.lab_url + page_url
         print(f"INFO: CustomPage base_url + page_url = {url}" )
         self.browser.get(url)
@@ -237,6 +240,23 @@ class CustomBasePage:
     def wait_for_non_empty_text(self, locator, timeout=25):
         def check_text(d):
             element = d.find_element(*locator)
+            print(f"Checking text for {locator}: '{element.text.strip()}'")
             return element if element.text.strip() else False
 
         return WebDriverWait(self.browser, timeout).until(check_text)
+
+    def _get_counts_with_retry(self, record_count_locators, timeout):
+        record_counts = []
+        for locator in record_count_locators:
+            try:
+                print(f"Waiting for record count element: {locator}")
+                record = self.wait_for_non_empty_text(locator, timeout)
+                record_text = record.text.strip()
+                print(f"Found text for {locator}: '{record_text}'")
+                record_number = int(''.join(filter(str.isdigit, record_text)))
+                record_counts.append(record_number)
+            except TimeoutException:
+                raise TimeoutException(f"Timeout: No text found for record at {locator} within {timeout} seconds.")
+            except ValueError:
+                raise ValueError(f"Could not parse record count from text: '{record_text}'")
+        return record_counts

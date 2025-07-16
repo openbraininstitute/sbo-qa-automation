@@ -243,15 +243,26 @@ def pytest_runtest_logreport(report):
     if report.failed and report.when == "call":
         failed_tests.append(report.nodeid)
 
-
-def pytest_sessionfinish(session, exitstatus):
-    """Print failed test summary at the end of the session"""
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """Print failed test summary at the very end of the session output."""
     if failed_tests:
-        print("\n\033[91m❌ FAILED TEST SUMMARY:\033[0m")
+        terminalreporter.write_line("")  # just spacing
+        terminalreporter.write_sep("=", "❌ FAILED TEST SUMMARY", red=True)
         for test in failed_tests:
-            print(f"\033[91m- {test}\033[0m")
+            terminalreporter.write_line(f"- {test}")
     else:
-        print("\n\033[92m✅ ALL TESTS PASSED\033[0m")
+        terminalreporter.write_line("")
+        terminalreporter.write_sep("=", "✅ ALL TESTS PASSED", green=True)
+
+
+# def pytest_sessionfinish(session, exitstatus):
+#     """Print failed test summary at the end of the session"""
+#     if failed_tests:
+#         print("\n\033[91m❌ FAILED TEST SUMMARY:\033[0m")
+#         for test in failed_tests:
+#             print(f"\033[91m- {test}\033[0m")
+#     else:
+#         print("\n\033[92m✅ ALL TESTS PASSED\033[0m")
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):
