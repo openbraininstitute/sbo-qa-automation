@@ -70,7 +70,7 @@ class TestProjectNotebooks:
         logger.info("Filter scale input is found")
         filter_scale_input.click()
 
-        filter_scale_menu_metabolism = project_notebooks.filter_scale_menu_metabolism()
+        filter_scale_menu_metabolism = project_notebooks.filter_scale_menu_metabolism(timeout=10)
         assert filter_scale_menu_metabolism.is_displayed(), "Filter scale input is not displayed"
         filter_scale_menu_metabolism.click()
         logger.info("Filter scale input is selected")
