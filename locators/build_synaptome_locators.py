@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 class BuildSynaptomeLocators:
     ADD_RULE_BTN = (By.CSS_SELECTOR, "button[aria-label='Add new rule']")
     ADD_SYNAPSES_BTN = (By.CSS_SELECTOR, "button[aria-label='Add Synapse']")
-    APPLY_CHANGES = (By.XPATH, "//button[starts-with(@class,'ant-btn ant-btn-default ant-btn-lg h-14 cursor-pointer self-end bg-primary-8')]")
+    APPLY_CHANGES = (By.XPATH, "(//span[normalize-space()='Apply changes'])[1]")
     BRAIN_REGION_COLUMN_HEADER = (By.XPATH, "(//div[@class='ant-table-column-sorters'])[2]")
     BUILD_SYNAPTOME_TAB = (By.XPATH, "//a[normalize-space()='Build Synaptome']")
     CELLS = (By.XPATH, "//td[starts-with(@class,'ant-table-cell')]")
@@ -54,7 +54,8 @@ class BuildSynaptomeLocators:
     TARGET_SOMA = (By.XPATH, "//div[@class='ant-select-item-option-content' and text()='Soma']")
     TABLE_ROW = (By.XPATH, "//tr[starts-with(@class,'ant-table-row ant-table-row-level-0')]")
     TABLE = (By.CSS_SELECTOR, ".ant-table-tbody")
-    TYPE_FIELD = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_type")
+    # TYPE_FIELD = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_type")
+    TYPE_FIELD = (By.XPATH, "(//span[@class='ant-select-selection-wrap'])[2]")
     TYPE_EXCITATORY = (By.CSS_SELECTOR, "div[title='Excitatory Synapses']")
     USE_SN_MODEL_BTN = (By.XPATH, "//button[text()='Use single neuron model']")
 
