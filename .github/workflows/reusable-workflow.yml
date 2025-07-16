@@ -95,6 +95,7 @@ jobs:
             tests/test_outside_explore.py \
             tests/test_project_home.py \
             tests/test_project_notebooks.py \
+            tests/test_build.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
             -sv \
@@ -103,24 +104,12 @@ jobs:
             --self-contained-html \
            --browser-name=chrome
 
-      - name: Run tests and capture output
-        run: |
-          mkdir -p latest_logs/errors
-          pytest tests/ --tb=short -rF | tee > latest_logs/errors/result.log
-          
-          echo "======SUMMARY OF FAILURES======="
-          if grep -A 5 "FAILED" latest_logs/errors/result.log; then
-            echo "Found test failures."
-          else
-             echo "All tests passed."
-          fi
-
       # Upload test artifacts (screenshots) if failure
       - name: Upload test artifacts (screenshots)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.run_attempt }}
+          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.run_attempt }}-${{ github.sha }}
 
           path: latest_logs/errors
           if-no-files-found: warn
@@ -131,5 +120,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-html-report
+          name: pytest-html-report-${{ inputs.env }}-${{ matrix.browser }}
           path: latest_logs/report_${{ inputs.env }}_chrome.html

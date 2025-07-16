@@ -9,6 +9,7 @@ import time
 from io import BytesIO
 
 import pytest
+import base64
 from PIL import Image
 from selenium import webdriver
 from selenium.common import exceptions
@@ -291,9 +292,13 @@ def pytest_runtest_makereport(item):
                     _capture_screenshot(file_name, browser)
                     if os.path.exists(file_name):
                         print(f"Screenshot successfully saved at: {file_name}")
-                        html = ('<div><img src="%s" alt="screenshot" '
-                                'style="width:304px;height:228px;" onclick="window.open(this.src)" '
-                                'align="right"/></div>') % os.path.relpath(file_name)
+                        # html = ('<div><img src="%s" alt="screenshot" '
+                        #         'style="width:304px;height:228px;" onclick="window.open(this.src)" '
+                        #         'align="right"/></div>') % os.path.relpath(file_name)
+                        with open(file_name, "rb") as image_file:
+                            encoded = base64.b64encode(image_file.read()).decode("utf-8")
+                            html = f'<div><img src="data:image/png;base64,{encoded}" ' \
+                                   f'style="width:304px;height:228px;" onclick="window.open(this.src)" align="right"/></div>'
                         extra.append(pytest_html.extras.html(html))
                     else:
                         print(f"Screenshot not found at: {file_name}")
