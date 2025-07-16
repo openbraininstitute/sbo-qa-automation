@@ -98,12 +98,17 @@ class TestLanding:
 
         video_container = landing_page.browser.find_element(*LandingLocators.VIDEO_CONTAINER)
         landing_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", video_container)
-        time.sleep(1)  # Let layout settle
+        time.sleep(2)  # Let layout settle
 
-        logger.info("Looking for the video pointer")
-        video_pointer = landing_page.video_pointer()
-        video_pointer.click()
-        logger.info("Clicked on the video pointer")
+        video_play_btn = landing_page.digital_brains_play_btn(timeout=10)
+        logger.info("looking for play button")
+        video_play_btn.click()
+        logger.info("Clicked on play btn")
+
+        # logger.info("Looking for the video pointer")
+        # video_pointer = landing_page.video_pointer(timeout=10)
+        # video_pointer.click()
+        # logger.info("Clicked on the video pointer")
 
         logger.info("Video play button is clicked")
         landing_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", video_container)

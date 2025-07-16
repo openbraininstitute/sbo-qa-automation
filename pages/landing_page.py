@@ -49,8 +49,8 @@ class LandingPage(HomePage):
     def find_video_container(self, timeout=10):
         return self.find_element(LandingLocators.VIDEO_CONTAINER, timeout=timeout)
 
-    def video_pointer(self):
-        return self.find_element(LandingLocators.VIDEO_POINTER)
+    def video_pointer(self, timeout=10):
+        return self.find_element(LandingLocators.VIDEO_POINTER, timeout=timeout)
 
     def digital_brains_pause_btn(self, timeout=10):
         return self.find_element(LandingLocators.DIGITAL_BRAINS_PAUSE_BTN, timeout=timeout)
