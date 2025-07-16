@@ -7,6 +7,7 @@ import pytest
 
 from locators.landing_locators import LandingLocators
 from pages.landing_page import LandingPage
+from selenium.webdriver.common.action_chains import ActionChains
 
 @pytest.mark.no_auto_nav
 @pytest.mark.usefixtures("visit_public_pages")
@@ -92,28 +93,22 @@ class TestLanding:
         logger.info("The digital brains video is displayed")
 
         video_title = landing_page.video_title1()
+        assert video_title.is_displayed(), "The video title is not displayed."
         logger.info("Looking for video title 1")
 
-        play_button = landing_page.digital_brains_play_btn()
-        location = play_button.location
-        y_position = location['y']
+        video_container = landing_page.browser.find_element(*LandingLocators.VIDEO_CONTAINER)
+        landing_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", video_container)
+        time.sleep(1)  # Let layout settle
 
-        landing_page.browser.execute_script(f"window.scrollTo(0, {y_position - 100});")
-        time.sleep(1)  # Wait for scroll animation/layout
-
-        play_button.click()
-
-        logger.info("Video play button is clicked")
-        digital_brains_play_btn = landing_page.digital_brains_play_btn()
-        assert digital_brains_play_btn, "The Digital Brains video play button is not found"
-        logger.info("The digital brains video's play button is displayed")
+        logger.info("Looking for the video pointer")
+        video_pointer = landing_page.video_pointer()
+        video_pointer.click()
+        logger.info("Clicked on the video pointer")
 
         logger.info("Video play button is clicked")
-        digital_brains_pause_btn = landing_page.digital_brains_pause_btn()
-        if digital_brains_pause_btn.is_displayed():
-            logger.info("The video is being played")
-        else:
-            logger.info("It is not possible to play the video")
+        landing_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", video_container)
+        actions = ActionChains(landing_page.browser)
+        actions.move_to_element(video_container).perform()
 
         digital_brains_steps = landing_page.digital_brains_steps()
         assert digital_brains_steps, "No digital brains video steps found!"

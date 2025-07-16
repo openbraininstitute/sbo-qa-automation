@@ -12,11 +12,9 @@ class LandingLocators:
     BIG_IMG1 = (By.XPATH, "(//div[starts-with(@class,'SanityContentPreview-module__hsTF2G__vignette')])[1]")
     BIG_IMG2 = (By.XPATH, "(//div[starts-with(@class,'SanityContentPreview-module__hsTF2G__vignette')])[2]")
     BIG_IMG3 = (By.XPATH, "(//div[starts-with(@class,'SanityContentPreview-module__hsTF2G__vignette')])[3]")
-    # DIGITAL_BRAINS_VIDEO = (By.CSS_SELECTOR, ".Video-module__ZeAqaq__pointer")
     DIGITAL_BRAINS_VIDEO = (By.XPATH, "//div[@class='sanity-content-video-module__8kGZUG__sanityContentVideo "
                                   "styles-module__5IYxQa__blockMedium']")
-    # DIGITAL_BRAINS_PLAY_BTN = (By.CSS_SELECTOR, "button[aria-label='play video']")
-    DIGITAL_BRAINS_PLAY_BTN = (By.XPATH, "//div[contains(@class,'Video-module__ZeAqaq__video')]//button[contains(@class,'playButton')]")
+    DIGITAL_BRAINS_PLAY_BTN = (By.CSS_SELECTOR, "button[aria-label='play video']")
     DIGITAL_BRAINS_PAUSE_BTN = (By.CSS_SELECTOR, "button[aria-label='pause video']")
     DIGITAL_BRAINS_VIDEO_CURRENT_STEP = (By.CSS_SELECTOR, ".sanity-content-video-module__8kGZUG__currentStep")
     DIGITAL_BRAINS_VIDEO_STEP = (By.XPATH, "//button[@class='sanity-content-video-module__8kGZUG__step']")
@@ -70,5 +68,7 @@ class LandingLocators:
     TOP_CONTACT = (By.XPATH, "(//a[@href='/contact'])[1]")
     TOP_MENU_LOGO = (By.XPATH, "//a[starts-with(@class,'Menu_logo')]")
     VIDEO_TITLE1 = (By.XPATH, "//h3[normalize-space()='01. Fill with Neurons']")
+    VIDEO_CONTAINER = (By.XPATH, "(//div[starts-with(@class,'sanity-content-video-module')])[1]")
+    VIDEO_POINTER = (By.CSS_SELECTOR, ".Video-module__ZeAqaq__pointer")
 
 

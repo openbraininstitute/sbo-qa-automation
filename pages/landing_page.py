@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+import time
 
 from selenium.common import TimeoutException
 from locators.landing_locators import LandingLocators
@@ -42,11 +43,17 @@ class LandingPage(HomePage):
     def digital_brains_video(self):
         return self.is_visible(LandingLocators.DIGITAL_BRAINS_VIDEO)
 
-    def digital_brains_play_btn(self):
-        return self.is_visible(LandingLocators.DIGITAL_BRAINS_PLAY_BTN)
+    def digital_brains_play_btn(self, timeout=10):
+        return self.find_element(LandingLocators.DIGITAL_BRAINS_PLAY_BTN, timeout=timeout)
 
-    def digital_brains_pause_btn(self):
-        return self.find_element(LandingLocators.DIGITAL_BRAINS_PAUSE_BTN)
+    def find_video_container(self, timeout=10):
+        return self.find_element(LandingLocators.VIDEO_CONTAINER, timeout=timeout)
+
+    def video_pointer(self):
+        return self.find_element(LandingLocators.VIDEO_POINTER)
+
+    def digital_brains_pause_btn(self, timeout=10):
+        return self.find_element(LandingLocators.DIGITAL_BRAINS_PAUSE_BTN, timeout=timeout)
 
     def digital_brains_current_step(self):
         return self.find_element(LandingLocators.DIGITAL_BRAINS_VIDEO_CURRENT_STEP)
