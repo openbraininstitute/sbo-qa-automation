@@ -40,10 +40,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
-      # This is temporary for debugging
-      - name: Verify repository contents
-        run: ls -la
-
       - name: Set up virtual environment and install dependencies
         run: |
           uv venv -p 3.11 
@@ -98,7 +94,7 @@ jobs:
             tests/test_build_synaptome.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
-            -sv \
+            -s \
             --headless \
             --html="latest_logs/report_${ENV_NAME}_chrome.html" \
             --self-contained-html \
@@ -122,9 +118,17 @@ jobs:
           name: pytest-html-report-${{ inputs.env }}-${{ matrix.browser }}
           path: latest_logs/report_${{ inputs.env }}_chrome.html
 
-      - name: Annotation - Failed tests
+      - name: Annotation - Test Summary - Failures
         if: failure()
-        run: echo ::notice title=failed-tests::$(grep -E '^FAILED' test_output.log)
+        run: |
+          OLDIFS=$IFS
+          IFS=$'\n'
+          set -f
+          for line in $(sed -n '/FAILED TEST SUMMARY/,/short test summary info/p' test_output.log | grep -E '^-')
+          do
+            echo ::notice title=UI Test Failures::${line}
+          done
+          IFS=$OLDIFS
 
       - name: MS Teams Notification
         uses: jdcargile/ms-teams-notification@v1.4
