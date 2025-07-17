@@ -89,19 +89,18 @@ class ExplorePage(HomePage):
             result.extend(self.find_all_elements(locator))
         return result
 
-    def get_experiment_record_count(self, record_count_locators):
+    def get_experiment_record_count(self, record_count_locators, timeout=25):
         record_counts = []
         for locator in record_count_locators:
-            record_text = ""
-
             try:
-                record_element = self.find_element(locator, timeout=20)
-                record_text = record_element.text.strip()
-                self.logger.info(f"Record text retrieved for locator {locator}: '{record_text}'")
-                record_number = int(''.join(filter(lambda c: c.isdigit(), record_text)))
+                record = self.wait_for_non_empty_text(locator, timeout)
+                record_text = record.text.strip()
+                record_number = int(''.join(filter(str.isdigit, record_text)))
+                record_counts.append(record_number)
+            except TimeoutException:
+                raise TimeoutException(f"Timeout: No text found for record at {locator} within {timeout} seconds.")
             except ValueError:
-                raise ValueError(f"Unable to parse record count from text: {record_text}")
-            record_counts.append(record_number)
+                raise ValueError(f"Could not parse record count from text: '{record_text}'")
         return record_counts
 
     def find_3d_atlas(self):

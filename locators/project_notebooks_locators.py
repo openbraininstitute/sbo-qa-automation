@@ -30,6 +30,7 @@ class ProjectNotebooksLocators:
     FILTER_NAME_INPUT = (By.XPATH, "(//div[@class='mt-10 flex flex-col gap-5']//input[@type='text'])[1]")
     FILTER_NAME_LABEL = (By.XPATH, "//div[starts-with(@class, 'mb-3 flex cursor-pointer') and contains(text(),'Name')]")
     FILTER_AUTHOR_LABEL = (By.XPATH, "//div[starts-with(@class, 'mb-3 flex cursor-pointer') and contains(text(),'Author')]")
+    FILTER_SCALE_TITLE = (By.XPATH, "//div[normalize-space()='Scale']")
     FILTER_SELECT_SCALE_INPUT = (By.XPATH, "(//span[@class='ant-select-selection-search'])[1]")
     FILTER_SCALE_MENU_METABOLISM = (By.CSS_SELECTOR, "div[title='Metabolism']")
     MEMBER_NOTEBOOKS_TAB = (By.XPATH, "//a[normalize-space()='Member Notebooks']")

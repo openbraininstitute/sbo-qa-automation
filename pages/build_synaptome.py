@@ -55,11 +55,11 @@ class BuildSynaptomePage(HomePage):
     def find_menu_build(self):
         return self.find_element(BuildSynaptomeLocators.MENU_BUILD)
 
-    def find_synaptome_box(self):
-        return self.find_element(BuildSynaptomeLocators.SYNAPTOME_BOX)
+    def find_synaptome_box(self, timeout=10):
+        return self.find_element(BuildSynaptomeLocators.SYNAPTOME_BOX, timeout=timeout)
 
-    def find_synaptome_build_btn(self):
-        return self.find_element(BuildSynaptomeLocators.SYNAPTOME_BUILD_BTN)
+    def find_synaptome_build_btn(self, timeout=10):
+        return self.find_element(BuildSynaptomeLocators.SYNAPTOME_BUILD_BTN, timeout=timeout)
 
     def form_created_by(self):
         return self.find_element(BuildSynaptomeLocators.FORM_CREATED_BY)

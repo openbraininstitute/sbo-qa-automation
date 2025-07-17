@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 
 class ExploreMorphologyPageLocators:
     AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
+    AI_ASSISTANT_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     BACK_IE_BTN = (By.XPATH, "//div[.='Back to list']")
     BRAIN_REGION_COLUMN_TITLE = (By.XPATH, "//div[text()='Brain Region']")
     BR_SORTED = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]/descendant::td[contains(text("
@@ -15,43 +16,40 @@ class ExploreMorphologyPageLocators:
                                "@class='ant-table-column-sorters']")
     CELLS = (By.XPATH, "//td[starts-with(@class,'ant-table-cell')]")
     CLEAR_FILTERS_BTN = (By.XPATH, "//button[@type='button']/div[text()='Clear filters']")
-    DV_AGE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Age']")
+    DV_AGE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Age']")
     DV_AP_TITLE = (By.XPATH, "//h2[text()='Apical Dendrite']")
     DV_AXON_TITLE = (By.XPATH, "//h2[text()='Axon']")
     DV_BACK_BTN = (By.XPATH, "//a[contains(@href,'/mmb-beta/explore/interactive/experimental"
                              "/morphology')]")
     DV_BD_TITLE = (By.XPATH, "//h2[text()='Basal Dendrite']")
-    DV_BRAIN_REGION_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Brain "
+    DV_BRAIN_REGION_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Brain "
                                        "Region']")
-    DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
-                                       ")='Contributors'] ")
-    DV_DESCRIPTION_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
+    DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text("
+                                       ")='Contributors']")
+    DV_DESCRIPTION_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text("
                                       ")='Description']")
     DV_DOWNLOAD_BTN = (By.XPATH, "//button[@type='button']/span[contains(text(),'Download')]")
-    DV_LICENSE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='License']")
+    DV_LICENSE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='License']")
     DV_MORPHOMETRICS_TITLE = (By.XPATH, "//h1[.='Morphometrics']")
-    DV_MTYPE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='M-Type']")
+    DV_MTYPE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='M-Type']")
     DV_NAME_TITLE = (By.XPATH, "//div[@class='text font-thin' and text()='Name']")
     DV_NM_TITLE = (By.XPATH, "//h2[text()='Neuron Morphology']")
-    DV_REGISTRATION_DATE_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text("
+    DV_REGISTRATION_DATE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text("
                                             ")='Registration date']")
     DV_SELECTED_BR = (By.XPATH, "//div[@class='grid w-1/2 auto-rows-min grid-cols-3 gap-x-8 "
                                 "gap-y-6']//div[text()='Brain Region']/following-sibling::div["
                                 "text()='Anterior"
                                 "cingulate area, dorsal part, layer 2/3']")
     DV_SOMA_TITLE = (By.XPATH, "//h2[text()='Soma']")
-    DV_SPECIES_TITLE = (By.XPATH, "//div[@class='uppercase text-neutral-4' and text()='Species']")
-    FILTERED_MTYPE = (By.XPATH, "//td[@class='ant-table-cell text-primary-7 cursor-pointer "
-                                "before:!content-none ant-table-cell-ellipsis' and "
-                                "@title='L5_TPC:A']")
+    DV_SPECIES_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Species']")
+    FILTERED_MTYPE = (By.XPATH, "//td[@class='ant-table-cell text-primary-7 cursor-pointer before:!content-none "
+                                "ant-table-cell-ellipsis']/div[@title='L5_TPC:A']")
     FILTER_MTYPE_SEARCH = (By.XPATH, "//div[@class='ant-select-selection-overflow']")
     LV_FILTER_SEARCH_FIELD = (By.XPATH, "(//div[@class='ant-select-selector'])[2]")
     FILTER_MTYPE_TEXT_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input'])[2]")
     FILTER_PANEL = (By.XPATH, "//div[@data-testid='listing-view-filter-panel']")
     FIRST_ROW = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]")
-    LITERATURE_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[2]")
-    LV_BRAIN_REGION = (By.XPATH, "//span[@class='ant-table-column-title']//div[text()='Brain "
-                                 "region']")
+    LV_BRAIN_REGION = (By.XPATH, "//div[@class='explore-module__frHowq__columnTitle' and text()='Brain region']")
     LV_CHECKBOX = (By.XPATH, "")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
     LV_FILTER_APPLY_BTN = (By.XPATH, "//button[contains(text(),'Apply') and @type='submit']")

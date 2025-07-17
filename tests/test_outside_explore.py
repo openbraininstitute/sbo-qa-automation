@@ -30,7 +30,7 @@ class TestOutsideExplorePage:
         outside_explore.check_explore_title_is_present()
         logger.info("Explore page title is present")
 
-        cerebrum_title = outside_explore.cerebrum_title()
+        cerebrum_title = outside_explore.cerebrum_title(timeout=15)
         assert cerebrum_title, f"Cerebrum title is not found"
         logger.info("Cerebrum title is displayed")
 
@@ -67,7 +67,7 @@ class TestOutsideExplorePage:
             ExplorePageLocators.MODEL_DATA_BTN
         ]
         logger.info("Searching for Explore Page titles")
-        explore_page_titles = outside_explore.find_explore_page_titles(page_titles)
+        explore_page_titles = outside_explore.find_explore_page_titles(page_titles, timeout=15)
 
         for page_title in explore_page_titles:
             assert page_title.is_displayed(), f"Explore page titles {page_title} is not displayed"
@@ -81,8 +81,7 @@ class TestOutsideExplorePage:
             ExplorePageLocators.SYNAPSE_PER_CONNECTION_NRECORDS
         ]
 
-        time.sleep(3)
-        record_counts = outside_explore.get_experiment_record_count(record_count_locators)
+        record_counts = outside_explore.get_experiment_record_count(record_count_locators, timeout=30)
         for record_count in record_counts:
             assert record_count >= 1, f"Record count is less than 100: {record_count}"
         logger.info("Number of records for data types are displayed")
@@ -95,18 +94,15 @@ class TestOutsideExplorePage:
 
         cerebrum_arrow_btn = outside_explore.find_cerebrum_arrow_btn()
         logger.info("Cerebrum - parent arrow button is found")
-        # cerebrum_arrow_btn.click()
-        # browser.execute_script("arguments[0].click();", cerebrum_arrow_btn)
+        cerebrum_arrow_btn.click()
+        browser.execute_script("arguments[0].click();", cerebrum_arrow_btn)
 
         cerebral_cortex_title = outside_explore.find_cerebral_cortex_brp()
         logger.info("Found Cerebral cortex as a child of Cerebrum")
 
-        """ 
-        temporarily unavailable
         neurons_panel = outside_explore.find_neurons_panel()
         assert neurons_panel.is_displayed()
         logger.info("Neurons panel is displayed")
-        """
 
         density_count_switch = outside_explore.find_count_switch()
         assert density_count_switch.is_displayed()

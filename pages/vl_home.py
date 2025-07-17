@@ -59,7 +59,7 @@ class VlabHome(HomePage, LinkChecker):
     def find_profile_btn(self):
         return self.find_element(VLHomeLocators.PROFILE_BTN)
 
-    def find_public_projects(self, timeout=10):
+    def find_public_projects(self, timeout=15):
         return self.find_element(VLHomeLocators.PUBLIC_PROJECTS, timeout=timeout)
 
     def find_qna_btn(self):
@@ -68,7 +68,7 @@ class VlabHome(HomePage, LinkChecker):
     def find_tutorials_carrousel(self):
         return self.find_element(VLHomeLocators.TUTORIALS_CARROUSEL)
 
-    def find_tutorials_carts(self):
+    def find_tutorials_cards(self):
         return self.find_all_elements(VLHomeLocators.TUTORIALS_CARDS)
 
     def find_tutorials_title(self):
@@ -130,5 +130,8 @@ class VlabHome(HomePage, LinkChecker):
 
         self.logger.info("Navigating to /contacts.")
         navigate_and_verify(VLHomeLocators.MENU_CONTACT_OBI_BTN, "/contact")
+
+        self.logger.info("Navigating to /terms.")
+        navigate_and_verify(VLHomeLocators.MENU_TERMS_BTN, "/terms")
 
         self.logger.info("All menu options validated successfully!")

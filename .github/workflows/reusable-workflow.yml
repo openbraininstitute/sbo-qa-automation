@@ -1,4 +1,4 @@
-name: Deploy to Environment
+name: Test Based on Environment
 
 on:
   workflow_call:
@@ -52,9 +52,6 @@ jobs:
           uv pip install -r requirements.txt
           ls -la
 
-#      - name: Install Firefox
-#        uses: browser-actions/setup-firefox@v1
-
       - name: Verify Chrome installation
         run: google-chrome --version
 
@@ -103,14 +100,36 @@ jobs:
             --headless \
             --html="latest_logs/report_${ENV_NAME}_chrome.html" \
             --self-contained-html \
-           --browser-name=chrome
-
+            --browser-name=chrome | tee test_output.log
 
       # Upload test artifacts (screenshots) if failure
       - name: Upload test artifacts (screenshots)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.step }}
+          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.run_attempt }}-${{ github.sha }}
           path: latest_logs/errors
           if-no-files-found: warn
+          overwrite: true
+
+      # Run tests and generate HTML Report
+      - name: Upload Pytest HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-html-report-${{ inputs.env }}-${{ matrix.browser }}
+          path: latest_logs/report_${{ inputs.env }}_chrome.html
+
+      - name: Annotation - Failed tests
+        if: failure()
+        run: echo ::notice title=failed-tests::$(grep -E '^FAILED' test_output.log)
+
+      - name: MS Teams Notification
+        uses: jdcargile/ms-teams-notification@v1.4
+        if: failure()
+        with:
+            github-token: ${{ github.token }}
+            ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
+            notification-summary: UI Automated Test Execution
+              Check the workflow for details
+            notification-color: ffc107

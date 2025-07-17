@@ -46,27 +46,75 @@ class ExploreNeuronDensityPage(ExplorePage):
     def find_brain_regions_panel_btn(self):
         return self.find_element(ExploreNDensityPageLocators.BRAIN_REGIONS_PANEL_BTN)
 
-    def find_column_headers(self, column_locators, timeout=30):
+    # def find_column_headers(self, column_locators, timeout=30):
+    #
+    #     column_headers = []
+    #     for locator in column_locators:
+    #         self.logger.info(f"Checking locator: {locator}")
+    #         try:
+    #             self.element_visibility(locator, timeout=timeout)  # Debug visibility
+    #
+    #             elements = self.find_all_elements(locator)
+    #
+    #             if not elements:
+    #                 self.logger.warning(f"No elements found with locator {locator}")
+    #                 continue
+    #
+    #             self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", elements[0])
+    #             time.sleep(0.3)
+    #
+    #             if len(elements) > 1:
+    #                 self.logger.info(f"Found multiple elements for {locator}")
+    #                 column_headers.extend(elements)
+    #             else:
+    #                 column_headers.append(elements[0])
+    #         except TimeoutException:
+    #             self.logger.error(f"Timeout: Column header with locator {locator} is not visible after {timeout}s")
+    #             raise
+    #     self.logger.info(f"Found {len(column_headers)} column headers")
+    #     return column_headers
 
+    def find_column_headers(self, column_locators, timeout=30):
         column_headers = []
+
         for locator in column_locators:
             self.logger.info(f"Checking locator: {locator}")
+
             try:
-                self.element_visibility(locator, timeout=timeout)  # Debug visibility
                 elements = self.find_all_elements(locator)
+
                 if not elements:
                     self.logger.warning(f"No elements found with locator {locator}")
                     continue
+
+                element = elements[0]
+
+                # Scroll element into center of view (horizontal + vertical)
+                self.logger.debug(f"Scrolling element into view: {locator}")
+                self.browser.execute_script("""
+                    arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});
+                """, element)
+
+                time.sleep(0.3)  # Allow layout to settle
+
+                # Check visibility **after** scroll
+                self.element_visibility(locator, timeout=timeout)
+
+                # Add all matching elements (if >1), or just the one
                 if len(elements) > 1:
                     self.logger.info(f"Found multiple elements for {locator}")
                     column_headers.extend(elements)
                 else:
-                    column_headers.append(elements[0])
+                    column_headers.append(element)
+
             except TimeoutException:
                 self.logger.error(f"Timeout: Column header with locator {locator} is not visible after {timeout}s")
                 raise
+
         self.logger.info(f"Found {len(column_headers)} column headers")
         return column_headers
+
+
 
     def find_cerebrum_brp(self, timeout=30):
         return self.is_visible(ExploreNDensityPageLocators.BR_VERTICAL_PANEL_CEREBRUM, timeout=timeout)
@@ -140,3 +188,6 @@ class ExploreNeuronDensityPage(ExplorePage):
 
     def lv_br_row1(self):
         return self.find_element(ExploreNDensityPageLocators.LV_BR_ROW1)
+
+    def scroll_sideways(self):
+        return self.element_visibility(ExploreNDensityPageLocators.SCROLL_SIDEWAYS)

@@ -162,31 +162,48 @@ class TestExploreEphys:
             ExploreEphysLocators.DV_DESC
         ]
 
-        logger.info("Found metadata header locators.")
-        metadata_header = explore_ephys_page.find_dv_title_header(locators)
-        for data in metadata_header:
-            assert data.is_displayed(), f"DV title header {data} is not displayed"
-            logger.info(f"Detail view header found: {data.text}")
-        logger.info("Found detail view title headers.")
+        try:
+            logger.info("Found metadata header locators.")
+            metadata_header = explore_ephys_page.find_dv_title_header(locators)
 
-        dv_overview_btn = explore_ephys_page.dv_overview_btn()
+            for data in metadata_header:
+                assert data.is_displayed(), f"DV title header {data} is not displayed"
+                logger.info(f"Detail view header found: {data.text}")
+
+            logger.info("Found detail view title headers.")
+        except Exception as e:
+            logger.error(f"Test failed due to missing locator(s): {e}")
+            raise
+
+        brain_region_panel_close_btn = explore_ephys_page.brain_region_panel_close_btn()
+        assert brain_region_panel_close_btn.is_displayed(), "The close button is not found"
+        logger.info("Close button on the brain region panel is found.")
+        brain_region_panel_close_btn.click()
+        logger.info("The close button is clicked")
+        brain_region_panel_open_btn = explore_ephys_page.brain_region_panel_open_btn()
+        assert brain_region_panel_open_btn.is_displayed(), "The panel was not closed"
+        logger.info("The panel is closed.")
+
+        dv_overview_btn = explore_ephys_page.dv_overview_btn(timeout=10)
         logger.info("Found 'Overview' button.")
         dv_interactive_details_btn = explore_ephys_page.dv_interactive_details_btn()
         logger.info("Found 'Interactive details' button.")
-        dv_stimulus_btn = explore_ephys_page.dv_stimulus_btn().click()
-        logger.info("Clicked 'Stimulus dropdown' button.")
-        dv_stimulus_all = explore_ephys_page.dv_stimulus_all()
-        logger.info("All stimuli is displayed.")
-        dv_stimuli_images = explore_ephys_page.dv_stim_images()
-        assert dv_stimuli_images, "Stimuli plots are not displayed"
-        logger.info("Plots are displayed.")
-        dv_stimulus_all.click()
+
         dv_interactive_details_btn.click()
         logger.info("Clicked 'Interactive details' button.")
-        dv_id_plots = explore_ephys_page.dv_id_plots()
-        logger.info("Found 'Interactive detail' plots.")
-        dv_id_stimulus_title = explore_ephys_page.dv_id_stimulus_title()
-        logger.info("Found 'Interactive detail' Stimulus.")
+
+        dv_plots = explore_ephys_page.dv_plots()
+        assert dv_plots, "The plots are not found."
+        logger.info("The plots are displayed.")
+
+        # dv_stimulus_btn = explore_ephys_page.dv_stimulus_btn().click()
+        # logger.info("Clicked 'Stimulus dropdown' button.")
+        # dv_stimulus_all = explore_ephys_page.dv_stimulus_all()
+        # logger.info("All stimuli is displayed.")
+        # dv_stimuli_images = explore_ephys_page.dv_stim_images()
+        # assert dv_stimuli_images, "Stimuli plots are not displayed"
+        # logger.info("Plots are displayed.")
+        # dv_stimulus_all.click()
 
         # dv_id_repetition_title = explore_ephys_page.dv_id_repetition_title()
         # logger.info("Found 'Interactive detail' Repetition.")

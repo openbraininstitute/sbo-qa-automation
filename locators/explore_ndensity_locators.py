@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 
 class ExploreNDensityPageLocators:
     AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
-    AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[2]")
+    AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     BRAIN_REGIONS_PANEL_BTN = (By.XPATH, "(//span[@class='anticon anticon-minus'])[1]")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
     BR_VERTICAL_PANEL_CEREBRUM = (By.XPATH, "//div[@class='text-secondary-4 text-sm whitespace-nowrap' and text("
@@ -65,4 +65,5 @@ class ExploreNDensityPageLocators:
     DV_ETYPE_VALUE = (By.XPATH, "//div[div[normalize-space(text())='E-Type']]/div[2]")
     DV_DENSITY_VALUE = (By.XPATH, "//div[div[normalize-space(text())='Density']]/div[2]")
     DV_NUM_MEAS_VALUE = (By.XPATH, "//div[div[normalize-space(text())='N° of Measurements']]/div[2]")
+    SCROLL_SIDEWAYS = (By.XPATH, "(//button[starts-with(@class,'ant-btn ant-btn-circle ant-btn-default')])[2]")
 

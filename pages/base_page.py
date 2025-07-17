@@ -15,13 +15,25 @@ class CustomBasePage:
     def __init__(self, browser, wait, lab_url):
         self.browser = browser
         self.wait = wait
+        # self.logger = logger
         self.lab_url = lab_url
         self.browser.set_page_load_timeout(60)
 
     def go_to_page(self, page_url):
+        if self.lab_url is None:
+            raise ValueError("lab_url is not set. Cannot navigate to page.")
+
         url = self.lab_url + page_url
         print(f"INFO: CustomPage base_url + page_url = {url}" )
         self.browser.get(url)
+
+    def assert_visible(self, element, description, file_path=None, line=None):
+        if not element.is_displayed():
+            loc = f"{file_path}:{line}" if file_path and line else ""
+            raise AssertionError(f"❌ {description} not visible {f'@ {loc}' if loc else ''}")
+        else:
+            # self.logger.info(f" {description} is visible.")
+            print(f"{description} is visible.")
 
     def find_element(self, by_locator, timeout=10):
         return WebDriverWait(self.browser, timeout).until(
@@ -224,3 +236,27 @@ class CustomBasePage:
             EC.invisibility_of_element_located(by_locator),
             message=f"Element {by_locator} did not disappear within {timeout} seconds."
         )
+
+    def wait_for_non_empty_text(self, locator, timeout=25):
+        def check_text(d):
+            element = d.find_element(*locator)
+            print(f"Checking text for {locator}: '{element.text.strip()}'")
+            return element if element.text.strip() else False
+
+        return WebDriverWait(self.browser, timeout).until(check_text)
+
+    def _get_counts_with_retry(self, record_count_locators, timeout):
+        record_counts = []
+        for locator in record_count_locators:
+            try:
+                print(f"Waiting for record count element: {locator}")
+                record = self.wait_for_non_empty_text(locator, timeout)
+                record_text = record.text.strip()
+                print(f"Found text for {locator}: '{record_text}'")
+                record_number = int(''.join(filter(str.isdigit, record_text)))
+                record_counts.append(record_number)
+            except TimeoutException:
+                raise TimeoutException(f"Timeout: No text found for record at {locator} within {timeout} seconds.")
+            except ValueError:
+                raise ValueError(f"Could not parse record count from text: '{record_text}'")
+        return record_counts

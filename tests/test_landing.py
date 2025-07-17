@@ -4,7 +4,10 @@
 
 import time
 import pytest
+
+from locators.landing_locators import LandingLocators
 from pages.landing_page import LandingPage
+from selenium.webdriver.common.action_chains import ActionChains
 
 @pytest.mark.no_auto_nav
 @pytest.mark.usefixtures("visit_public_pages")
@@ -17,16 +20,25 @@ class TestLanding:
         browser, wait = _visit("")
         landing_page = LandingPage(browser, wait, logger, base_url)
 
-        # assert landing_page.is_landing_page_displayed(), "Landing Page did not load correctly."
-        # logger.info("✅ Landing Page loaded successfully.")
+        assert landing_page.is_landing_page_displayed(), "Landing Page did not load correctly."
+        logger.info("✅ Landing Page loaded successfully.")
+
+        background_page_image = landing_page.hero_background_img()
+        landing_page.assert_visible(background_page_image, "The page background image is not displayed")
+
+        background_page_video = landing_page.hero_background_video()
+        landing_page.assert_visible(background_page_video, "The page background video is not displayed")
+
+        banner_title = landing_page.find_banner_title()
+        landing_page.assert_visible(banner_title, "Page main banner title is not found")
 
         title_accelerate = landing_page.find_title_accelerate()
         assert title_accelerate.is_displayed(), "Accelerate title is missing"
         logger.info("Title Accelerate is displayed")
 
-        # title_reconstruct = landing_page.find_title_reconstruct()
-        # assert title_reconstruct.is_displayed(), "Reconstruct title is missing"
-        # logger.info("Title Reconstruct is displayed")
+        title_reconstruct = landing_page.find_title_dig_brain()
+        assert title_reconstruct.is_displayed(), "Reconstruct title is missing"
+        logger.info("Title Reconstruct is displayed")
 
         title_who = landing_page.find_title_who()
         assert title_who.is_displayed(), "Who we are title is missing"
@@ -36,23 +48,22 @@ class TestLanding:
         assert title_news.is_displayed(), "News title is missing"
         logger.info("Title News is displayed")
 
-        p_text1 = landing_page.find_p_text1()
-        ptext1_text = p_text1.get_attribute("textContent").strip()
-        # logger.info(f"Paragraph content: '{ptext1_text}'")
-        assert ptext1_text != "", "Paragraph text is empty!"
-
         para_text = landing_page.find_paragraph_text()
         assert len(para_text) == 6, f"Expected 6 text paragraphs, found {len(para_text)}"
+
         for idx, para in enumerate(para_text, start=1):
             text = para.text.strip()
-            assert text, f"Paragraph text {idx} is empty"
+            assert text, f"Paragraph text {idx} is empty!"
+            logger.info(f"Paragraph {idx}: '{text}'")
 
         big_img1 = landing_page.find_big_img1()
         assert big_img1.is_displayed(), "Section 1 big image is not found"
         logger.info("Accelerating neuroscience research section img is found")
+
         big_img2 = landing_page.find_big_img2()
         assert big_img2.is_displayed(), "Section 2 big image is not found"
         logger.info("Who is behind OBI img section is found")
+
         big_img3 = landing_page.find_big_img3()
         assert big_img3.is_displayed(), "Section 3 big image is not found"
         logger.info("How can we collaborate and help you achieve greatness img is found")
@@ -77,6 +88,42 @@ class TestLanding:
         assert section_btn5.is_displayed(), "Section 5 button is not displayed"
         logger.info("'Discover story in detail' button is found")
 
+        digital_brains_video = landing_page.digital_brains_video()
+        assert digital_brains_video, "The digital brains video is not found (line 107)"
+        logger.info("The digital brains video is displayed")
+
+        video_title = landing_page.video_title1()
+        assert video_title.is_displayed(), "The video title is not displayed."
+        logger.info("Looking for video title 1")
+
+        video_container = landing_page.browser.find_element(*LandingLocators.VIDEO_CONTAINER)
+        landing_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", video_container)
+        time.sleep(2)  # Let layout settle
+
+        video_play_btn = landing_page.digital_brains_play_btn(timeout=10)
+        logger.info("looking for play button")
+        video_play_btn.click()
+        logger.info("Clicked on play btn")
+
+        # logger.info("Looking for the video pointer")
+        # video_pointer = landing_page.video_pointer(timeout=10)
+        # video_pointer.click()
+        # logger.info("Clicked on the video pointer")
+
+        logger.info("Video play button is clicked")
+        landing_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", video_container)
+        actions = ActionChains(landing_page.browser)
+        actions.move_to_element(video_container).perform()
+
+        digital_brains_steps = landing_page.digital_brains_steps()
+        assert digital_brains_steps, "No digital brains video steps found!"
+        assert len(digital_brains_steps) == 5, f"Expected 5 steps, found {len(digital_brains_steps)}"
+
+        for idx, step in enumerate(digital_brains_steps, start=1):
+            text = step.text.strip()
+            logger.info(f"Step {idx} text: '{text}'")
+            assert text != "", f"Step {idx} text is empty!"
+
         gotolab = landing_page.go_to_lab()
         assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
         gotolab.click()
@@ -95,7 +142,5 @@ class TestLanding:
             logger.error(f"Failed during login redirection: {e}")
             raise
 
-        # landing_page.click_go_to_lab()
-        # wait.until(lambda d: "openid-connect" in d.current_url or "auth" in d.current_url)
-        # assert "openid-connect" in browser.current_url
+
 

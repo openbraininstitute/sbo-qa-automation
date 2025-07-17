@@ -8,7 +8,6 @@ from selenium.common import ElementNotVisibleException, TimeoutException, \
 
 from pages.explore_page import ExplorePage
 from locators.explore_emodel_locators import ExploreEModelPageLocators
-from util.util_links_checker import LinkChecker
 
 
 class ExploreEModelDataPage(ExplorePage):
@@ -118,17 +117,20 @@ class ExploreEModelDataPage(ExplorePage):
     def find_lv_em_td(self):
         return self.find_element(ExploreEModelPageLocators.LV_EM_TD)
 
-    def find_lv_selected_resource(self):
-        return self.find_element(ExploreEModelPageLocators.LV_EM_TD)
+    def find_lv_row(self, timeout=15):
+        return self.is_visible(ExploreEModelPageLocators.LV_ROW, timeout=timeout)
+
+    def find_lv_selected_resource(self, timeout=15):
+        return self.element_to_be_clickable(ExploreEModelPageLocators.LV_EM_TD, timeout=timeout)
 
     def find_selected_brain_region_title(self):
         return self.find_element(ExploreEModelPageLocators.SELECTED_BRAIN_REGION)
 
-    def find_search_for_resources(self):
-        return self.find_element(ExploreEModelPageLocators.SEARCH_RESOURCES)
+    def find_search_for_resources(self, timeout=15):
+        return self.element_to_be_clickable(ExploreEModelPageLocators.SEARCH_RESOURCES, timeout=timeout)
 
     def verify_exemplar_morphology_headers(self):
-        expected_headers = ["PREVIEW", "NAME", "DESCRIPTION", "BRAIN LOCATION", "M-TYPE", "CONTRIBUTOR"]
+        expected_headers = ["PREVIEW", "NAME", "DESCRIPTION", "BRAIN REGION", "M-TYPE", "CONTRIBUTORS"]
         actual_headers = self.dv_get_table_headers()
         assert actual_headers == expected_headers, (
             f"Expected morphology headers: {expected_headers}, but got: {actual_headers}"
@@ -136,9 +138,12 @@ class ExploreEModelDataPage(ExplorePage):
         self.logger.info("Exemplar Morphology headers match expected.")
 
     def verify_exemplar_traces_table_headers(self):
-        expected_headers = ["PREVIEW", "CELL NAME", "M-TYPE", "E-TYPE", "E-CODE", "SUBJECT SPECIES"]
+        expected_headers = ["PREVIEW", "NAME", "M-TYPE", "E-TYPE", "SPECIES"]
         actual_headers = self.dv_get_trace_table_headers()
         assert actual_headers == expected_headers, (
             f"Expected trace headers: {expected_headers}, but got: {actual_headers}"
         )
         self.logger.info("Exemplar Traces headers match expected.")
+
+    def wait_for_spinner_to_disappear(self, timeout=15):
+        return self.wait_for_element_to_disappear(ExploreEModelPageLocators.SPINNER, timeout=timeout)

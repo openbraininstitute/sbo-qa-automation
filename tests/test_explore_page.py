@@ -6,16 +6,11 @@ import time
 import os.path
 import pytest
 from selenium.webdriver import Keys
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 from locators.explore_page_locators import ExplorePageLocators
 from pages.explore_page import ExplorePage
 
-current_directory = os.getcwd()
-relative_file_path = 'scraped_links.txt'
-file_path = os.path.join(current_directory, relative_file_path)
 
 
 class TestExplorePage:
@@ -36,9 +31,10 @@ class TestExplorePage:
         logger.info("Cerebrum title is displayed")
 
         ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=10)
-
         logger.info("AI Assistant panel is open. Attempting to close it.")
+
         close_btn = explore_page.find_ai_assistant_panel_close(timeout=10)
+        explore_page.assert_visible(close_btn, "Close button on AI assistant panel", "pages/explore_page", 42)
         close_btn.click()
         ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
         assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
@@ -99,7 +95,7 @@ class TestExplorePage:
         assert cerebrum_arrow_btn, "The toggle arrow for Cerebrum is not found"
         logger.info("Cerebrum arrow button is found")
         # cerebrum_arrow_btn.click()
-        logger.info("Cerebrum - parent arrow button is clicked")
+        # logger.info("Cerebrum - parent arrow button is clicked")
         # browser.execute_script("arguments[0].click();", cerebrum_arrow_btn)
 
         cerebral_cortex_title = explore_page.find_cerebral_cortex_brp()
@@ -113,7 +109,7 @@ class TestExplorePage:
             ExplorePageLocators.SYNAPSE_PER_CONNECTION_NRECORDS
         ]
         time.sleep(2)
-        record_counts = explore_page.get_experiment_record_count(record_count_locators)
+        record_counts = explore_page.get_experiment_record_count(record_count_locators, timeout=25)
         for record_count in record_counts:
             if record_count == 0:
                 logger.warning(f"Record count is 0 for one of the data types.")

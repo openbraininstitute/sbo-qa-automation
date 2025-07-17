@@ -26,21 +26,23 @@ class ProjectNotebooks(HomePage):
             raise RuntimeError("The Project Notebooks page did not load within 60 seconds.")
         return self.browser.current_url
 
-
     def filter_clear_btn(self):
         return self.find_element(ProjectNotebooksLocators.FILTER_CLEAR_BTN)
 
     def filter_close_btn(self):
         return self.find_element(ProjectNotebooksLocators.FILTER_CLOSE_BTN)
 
-    def filter_name_input(self):
-        return self.find_element(ProjectNotebooksLocators.FILTER_NAME_INPUT)
+    def filter_name_input(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.FILTER_NAME_INPUT, timeout=timeout)
 
-    def filter_scale_input(self):
-        return self.find_element(ProjectNotebooksLocators.FILTER_SELECT_SCALE_INPUT)
+    def filter_scale_title(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.FILTER_SCALE_TITLE, timeout=timeout)
 
-    def filter_scale_menu_metabolism(self):
-        return self.find_element(ProjectNotebooksLocators.FILTER_SCALE_MENU_METABOLISM)
+    def filter_scale_input(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.FILTER_SELECT_SCALE_INPUT, timeout=timeout)
+
+    def filter_scale_menu_metabolism(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.FILTER_SCALE_MENU_METABOLISM, timeout=timeout)
 
     def page_filter(self):
         return self.find_element(ProjectNotebooksLocators.PAGE_FILTER)

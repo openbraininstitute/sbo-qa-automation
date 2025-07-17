@@ -9,15 +9,14 @@ import time
 from io import BytesIO
 
 import pytest
+import base64
 from PIL import Image
 from selenium import webdriver
-from selenium.common import exceptions, TimeoutException, NoSuchElementException
+from selenium.common import exceptions
 from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support.wait import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from pages.landing_page import LandingPage
@@ -34,14 +33,15 @@ def create_browser(pytestconfig):
         options = ChromeOptions()
         if headless:
             options.add_argument("--headless=new")
+            options.add_argument("--window-size=1920,1080")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--disable-gpu")
             options.add_argument("--window-size=1920,1080")
             options.add_argument("--ignore-certificate-errors")
             options.add_argument('--blink-settings=imagesEnabled=true')
-        # browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager(version="135.0.0.0").install()), options=options)
         browser = webdriver.Chrome(options=options)
+        browser.set_window_size(1920, 1080)
 
     elif browser_name == "firefox":
         options = FirefoxOptions()
@@ -56,6 +56,7 @@ def create_browser(pytestconfig):
         raise ValueError(f"Unsupported browser: {browser_name}")
 
     browser.set_page_load_timeout(60)
+    browser.set_window_size(1600, 900)
     wait = WebDriverWait(browser, 20)
 
     return browser, wait
@@ -93,7 +94,7 @@ def test_config(pytestconfig):
         raise ValueError("Username or password is missing in the configuration!")
 
     if env =="staging":
-        base_url = "https://next.staging.openbraininstitute.org"
+        base_url = "https://staging.openbraininstitute.org"
         lab_url = f"{base_url}/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_STAGING")
         project_id = os.getenv("PROJECT_ID_STAGING")
@@ -238,19 +239,32 @@ def pytest_runtest_logstart(nodeid, location):
     test_file = location[0].upper()
     print(f"\033[95m\n🚀 STARTING TEST FILE: {test_file}\033[0m\n")
 
+
 def pytest_runtest_logreport(report):
     """Capture failed tests during runtime"""
     if report.failed and report.when == "call":
         failed_tests.append(report.nodeid)
 
-def pytest_sessionfinish(session, exitstatus):
-    """Print failed test summary at the end of the session"""
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """Print failed test summary at the very end of the session output."""
     if failed_tests:
-        print("\n\033[91m❌ FAILED TEST SUMMARY:\033[0m")
+        terminalreporter.write_line("")  # just spacing
+        terminalreporter.write_sep("=", "❌ FAILED TEST SUMMARY", red=True)
         for test in failed_tests:
-            print(f"\033[91m- {test}\033[0m")
+            terminalreporter.write_line(f"- {test}", red=True)
     else:
-        print("\n\033[92m✅ ALL TESTS PASSED\033[0m")
+        terminalreporter.write_line("")
+        terminalreporter.write_sep("=", "✅ ALL TESTS PASSED", green=True)
+
+
+# def pytest_sessionfinish(session, exitstatus):
+#     """Print failed test summary at the end of the session"""
+#     if failed_tests:
+#         print("\n\033[91m❌ FAILED TEST SUMMARY:\033[0m")
+#         for test in failed_tests:
+#             print(f"\033[91m- {test}\033[0m")
+#     else:
+#         print("\n\033[92m✅ ALL TESTS PASSED\033[0m")
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):
@@ -291,9 +305,13 @@ def pytest_runtest_makereport(item):
                     _capture_screenshot(file_name, browser)
                     if os.path.exists(file_name):
                         print(f"Screenshot successfully saved at: {file_name}")
-                        html = ('<div><img src="%s" alt="screenshot" '
-                                'style="width:304px;height:228px;" onclick="window.open(this.src)" '
-                                'align="right"/></div>') % os.path.relpath(file_name)
+                        # html = ('<div><img src="%s" alt="screenshot" '
+                        #         'style="width:304px;height:228px;" onclick="window.open(this.src)" '
+                        #         'align="right"/></div>') % os.path.relpath(file_name)
+                        with open(file_name, "rb") as image_file:
+                            encoded = base64.b64encode(image_file.read()).decode("utf-8")
+                            html = f'<div><img src="data:image/png;base64,{encoded}" ' \
+                                   f'style="width:304px;height:228px;" onclick="window.open(this.src)" align="right"/></div>'
                         extra.append(pytest_html.extras.html(html))
                     else:
                         print(f"Screenshot not found at: {file_name}")

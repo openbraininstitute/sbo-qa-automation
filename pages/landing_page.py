@@ -1,11 +1,11 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+import time
 
 from selenium.common import TimeoutException
 from locators.landing_locators import LandingLocators
 from pages.home_page import HomePage
-from util.util_links_checker import LinkChecker
 
 
 class LandingPage(HomePage):
@@ -40,14 +40,35 @@ class LandingPage(HomePage):
             self.logger.error(f"❌ Failed to click 'Go to Lab' button: {e}")
             raise
 
+    def digital_brains_video(self):
+        return self.is_visible(LandingLocators.DIGITAL_BRAINS_VIDEO)
+
+    def digital_brains_play_btn(self, timeout=10):
+        return self.find_element(LandingLocators.DIGITAL_BRAINS_PLAY_BTN, timeout=timeout)
+
+    def find_video_container(self, timeout=10):
+        return self.find_element(LandingLocators.VIDEO_CONTAINER, timeout=timeout)
+
+    def video_pointer(self, timeout=10):
+        return self.find_element(LandingLocators.VIDEO_POINTER, timeout=timeout)
+
+    def digital_brains_pause_btn(self, timeout=10):
+        return self.find_element(LandingLocators.DIGITAL_BRAINS_PAUSE_BTN, timeout=timeout)
+
+    def digital_brains_current_step(self):
+        return self.find_element(LandingLocators.DIGITAL_BRAINS_VIDEO_CURRENT_STEP)
+
+    def digital_brains_steps(self):
+        return self.find_all_elements(LandingLocators.DIGITAL_BRAINS_VIDEO_STEP)
+
     def find_banner_title(self):
         return self.find_element(LandingLocators.BANNER_TITLE)
 
     def find_title_accelerate(self):
         return self.find_element(LandingLocators.TITLE_ACCELERATE)
 
-    def find_title_reconstruct(self):
-        return self.find_element(LandingLocators.TITLE_RECONSTRUCT)
+    def find_title_dig_brain(self):
+        return self.find_element(LandingLocators.TITLE_DIG_BRAIN)
 
     def find_title_who(self):
         return self.find_element(LandingLocators.TITLE_WHO)
@@ -66,6 +87,9 @@ class LandingPage(HomePage):
 
     def find_p_text4(self):
         return self.find_element(LandingLocators.P_TEXT4)
+
+    def find_p_text5(self):
+        return self.find_element(LandingLocators.P_TEXT5)
 
     def find_paragraph_text(self):
         return self.find_all_elements(LandingLocators.PARA_TEXT)
@@ -150,3 +174,12 @@ class LandingPage(HomePage):
 
     def find_menu_logo(self):
         return self.find_element(LandingLocators.TOP_MENU_LOGO)
+
+    def hero_background_img(self):
+        return self.find_element(LandingLocators.HERO_BACKGROUND_IMG)
+
+    def hero_background_video(self):
+        return self.find_element(LandingLocators.HERO_BACKGROUND_VIDEO)
+
+    def video_title1(self):
+        return self.find_element(LandingLocators.VIDEO_TITLE1)
