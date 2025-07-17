@@ -56,7 +56,7 @@ def create_browser(pytestconfig):
         raise ValueError(f"Unsupported browser: {browser_name}")
 
     browser.set_page_load_timeout(60)
-    browser.set_window_size(1920, 1080)
+    browser.set_window_size(1600, 900)
     wait = WebDriverWait(browser, 20)
 
     return browser, wait

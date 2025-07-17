@@ -50,6 +50,7 @@ jobs:
           python -m pip install --upgrade pip 
           source .venv/bin/activate
           uv pip install -r requirements.txt
+          pip install pytest-ctrf
           ls -la
 
 #      - name: Install Firefox
@@ -84,6 +85,7 @@ jobs:
           echo "ENV_URL: $ENV_URL"
           echo "ENV_NAME: $ENV_NAME"
           uv run pytest \
+            --ctrf-json=ctrf/report.json \
             tests/test_about.py \
             tests/test_mission.py \
             tests/test_news.py \
@@ -96,6 +98,7 @@ jobs:
             tests/test_project_home.py \
             tests/test_project_notebooks.py \
             tests/test_build.py \
+            tests/test_build_synaptome.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
             -sv \
@@ -122,3 +125,18 @@ jobs:
         with:
           name: pytest-html-report-${{ inputs.env }}-${{ matrix.browser }}
           path: latest_logs/report_${{ inputs.env }}_chrome.html
+
+      - name: Publish Test Report
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+            report-path: './ctrf/*.json'
+            summary-report: true
+            failed-report: true
+            flaky-report: true
+            insights-report: true
+            test-report: true
+            report-order: 'summary-report,failed-report,flaky-report,insights-report,test-report'
+            github-report: true
+            annotate: true
+            upload-artifact: true
+        if: always()
