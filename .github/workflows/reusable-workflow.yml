@@ -121,21 +121,26 @@ jobs:
       - name: Annotation - Test Summary - Failures
         if: failure()
         run: |
+          echo "## UI Test Failures for ${{ inputs.env }}" >> failures_${{ inputs.env }}.md
+          echo "" >> failures_${{ inputs.env }}.md
+
+          sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log \
+            | grep -E '^- ' \
+            | sort | uniq >> failures_${{ inputs.env }}.md
+
+          cat failures_${{ inputs.env }}.md
           OLDIFS=$IFS
           IFS=$'\n'
           set -f
-          for line in $(sed -n '/FAILED TEST SUMMARY/,/short test summary info/p' test_output.log | grep -E '^-')
+          for line in $(sed -n '/FAILED TEST SUMMARY/,/short test summary info/p' test_output.log | grep -E '^-' | sort | uniq)
           do
-            echo ::notice title=UI Test Failures::${line}
+            echo ::fail title=UI Test Failures::${line}
           done
           IFS=$OLDIFS
 
-      - name: MS Teams Notification
-        uses: jdcargile/ms-teams-notification@v1.4
-        if: failure()
+      - name: Upload Combined Failure Summary
+        uses: actions/upload-artifact@v4
         with:
-            github-token: ${{ github.token }}
-            ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
-            notification-summary: UI Automated Test Execution
-              Check the workflow for details
-            notification-color: ffc107
+          name: all-ui-test-failures
+          path: all_failures.md
+
