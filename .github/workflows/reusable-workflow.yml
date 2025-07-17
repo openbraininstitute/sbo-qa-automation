@@ -50,7 +50,7 @@ jobs:
           python -m pip install --upgrade pip 
           source .venv/bin/activate
           uv pip install -r requirements.txt
-          pip install pytest-ctrf
+          pip install pytest-json-report
           ls -la
 
 #      - name: Install Firefox
@@ -85,7 +85,6 @@ jobs:
           echo "ENV_URL: $ENV_URL"
           echo "ENV_NAME: $ENV_NAME"
           uv run pytest \
-            --ctrf-json=ctrf/report.json \
             tests/test_about.py \
             tests/test_mission.py \
             tests/test_news.py \
@@ -105,7 +104,8 @@ jobs:
             --headless \
             --html="latest_logs/report_${ENV_NAME}_chrome.html" \
             --self-contained-html \
-           --browser-name=chrome
+           --browser-name=chrome \
+          --json-report --json-report-file=ctrf/report.json
 
       # Upload test artifacts (screenshots) if failure
       - name: Upload test artifacts (screenshots)
