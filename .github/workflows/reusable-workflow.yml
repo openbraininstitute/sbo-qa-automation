@@ -47,10 +47,9 @@ jobs:
       - name: Set up virtual environment and install dependencies
         run: |
           uv venv -p 3.11 
-          python -m pip install --upgrade pip 
           source .venv/bin/activate
+          python -m pip install --upgrade pip 
           uv pip install -r requirements.txt
-          pip install pytest-json-report
           ls -la
 
 #      - name: Install Firefox
@@ -104,8 +103,7 @@ jobs:
             --headless \
             --html="latest_logs/report_${ENV_NAME}_chrome.html" \
             --self-contained-html \
-           --browser-name=chrome \
-          --json-report --json-report-file=ctrf/report.json
+            --browser-name=chrome | tee test_output.log
 
       # Upload test artifacts (screenshots) if failure
       - name: Upload test artifacts (screenshots)
@@ -113,7 +111,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.run_attempt }}-${{ github.sha }}
-
           path: latest_logs/errors
           if-no-files-found: warn
           overwrite: true
@@ -126,17 +123,16 @@ jobs:
           name: pytest-html-report-${{ inputs.env }}-${{ matrix.browser }}
           path: latest_logs/report_${{ inputs.env }}_chrome.html
 
-      - name: Publish Test Report
-        uses: ctrf-io/github-test-reporter@v1
+      - name: Annotation - Failed tests
+        if: failure()
+        run: echo ::notice title=failed-tests::$(grep -E '^FAILED' test_output.log)
+
+      - name: MS Teams Notification
+        uses: jdcargile/ms-teams-notification@v1.4
+        if: failure()
         with:
-            report-path: './ctrf/*.json'
-            summary-report: true
-            failed-report: true
-            flaky-report: true
-            insights-report: true
-            test-report: true
-            report-order: 'summary-report,failed-report,flaky-report,insights-report,test-report'
-            github-report: true
-            annotate: true
-            upload-artifact: true
-        if: always()
+            github-token: ${{ github.token }}
+            ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
+            notification-summary: UI Automated Test Execution
+              Check the workflow for details
+            notification-color: ffc107
