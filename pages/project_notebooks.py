@@ -35,8 +35,11 @@ class ProjectNotebooks(HomePage):
     def filter_name_input(self, timeout=10):
         return self.find_element(ProjectNotebooksLocators.FILTER_NAME_INPUT, timeout=timeout)
 
+    def filter_scale_title(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.FILTER_SCALE_TITLE, timeout=timeout)
+
     def filter_scale_input(self, timeout=10):
-        return self.element_to_be_clickable(ProjectNotebooksLocators.FILTER_SELECT_SCALE_INPUT, timeout=timeout)
+        return self.find_element(ProjectNotebooksLocators.FILTER_SELECT_SCALE_INPUT, timeout=timeout)
 
     def filter_scale_menu_metabolism(self, timeout=10):
         return self.find_element(ProjectNotebooksLocators.FILTER_SCALE_MENU_METABOLISM, timeout=timeout)
