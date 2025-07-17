@@ -80,6 +80,8 @@ jobs:
           echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
           echo "ENV_URL: $ENV_URL"
           echo "ENV_NAME: $ENV_NAME"
+          
+          set -o pipefail 
           uv run pytest \
             tests/test_about.py \
             tests/test_mission.py \
