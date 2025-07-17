@@ -151,7 +151,7 @@ class TestBuildSynaptome:
         logger.info("Provided 'soma' as name for the set.")
 
         time.sleep(3)
-        target_select = build_synaptome.target_select()
+        target_select = build_synaptome.target_select(timeout=15)
         logger.info("'Target select' is displayed.")
 
         print("attempting to click on target select")

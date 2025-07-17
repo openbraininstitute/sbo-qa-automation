@@ -87,7 +87,7 @@ class TestProjectNotebooks:
         filter_close_btn.click()
         logger.info("Filter is closed")
 
-        data_search_result = project_notebooks.table_search_result()
+        data_search_result = project_notebooks.table_search_result(timeout=10)
         assert data_search_result.is_displayed(), "Table search result is not displayed"
         logger.info("Table search result is found")
 

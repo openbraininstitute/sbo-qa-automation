@@ -53,8 +53,8 @@ class ProjectNotebooks(HomePage):
     def rows(self):
         return self.find_all_elements(ProjectNotebooksLocators.ROWS)
 
-    def table_search_result(self):
-        return self.find_element(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT)
+    def table_search_result(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=timeout)
 
     def search_input(self):
         return self.find_element(ProjectNotebooksLocators.SEARCH_NOTEBOOK)

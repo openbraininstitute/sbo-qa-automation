@@ -199,9 +199,8 @@ class BuildSynaptomePage(HomePage):
     def target_soma(self):
         return self.find_element(BuildSynaptomeLocators.TARGET_SOMA)
 
-    def target_select(self):
-        return WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located(BuildSynaptomeLocators.TARGET_SELECT))
+    def target_select(self, timeout=10):
+        return self.find_element(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
 
     def type_field(self):
         return self.find_element(BuildSynaptomeLocators.TYPE_FIELD)
