@@ -32,8 +32,8 @@ class ProjectNotebooks(HomePage):
     def filter_close_btn(self):
         return self.find_element(ProjectNotebooksLocators.FILTER_CLOSE_BTN)
 
-    def filter_name_input(self):
-        return self.find_element(ProjectNotebooksLocators.FILTER_NAME_INPUT)
+    def filter_name_input(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.FILTER_NAME_INPUT, timeout=timeout)
 
     def filter_scale_input(self, timeout=10):
         return self.find_element(ProjectNotebooksLocators.FILTER_SELECT_SCALE_INPUT, timeout=timeout)

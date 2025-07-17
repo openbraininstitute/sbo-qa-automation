@@ -184,7 +184,7 @@ class TestExploreEphys:
         assert brain_region_panel_open_btn.is_displayed(), "The panel was not closed"
         logger.info("The panel is closed.")
 
-        dv_overview_btn = explore_ephys_page.dv_overview_btn()
+        dv_overview_btn = explore_ephys_page.dv_overview_btn(timeout=10)
         logger.info("Found 'Overview' button.")
         dv_interactive_details_btn = explore_ephys_page.dv_interactive_details_btn()
         logger.info("Found 'Interactive details' button.")

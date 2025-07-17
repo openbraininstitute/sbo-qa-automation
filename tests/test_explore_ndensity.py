@@ -32,15 +32,14 @@ class TestExploreNeuronDensity:
         brain_regions_panel_btn.click()
         logger.info("Brain regions panel is closed")
 
-        browser.maximize_window()
-        explore_ndensity.wait_for_page_ready(timeout=30)
+        # browser.set_window_size(1920, 1080)
+        explore_ndensity.wait_for_page_ready(timeout=40)
 
         column_locators = [
             ExploreNDensityPageLocators.LV_BRAIN_REGION,
             ExploreNDensityPageLocators.LV_MTYPE,
             ExploreNDensityPageLocators.LV_ETYPE,
-            # Skip the 'Density' column for now
-            # ExploreNDensityPageLocators.LV_DENSITY,
+            ExploreNDensityPageLocators.LV_DENSITY,
             ExploreNDensityPageLocators.LV_NMEASUREMENTS,
             ExploreNDensityPageLocators.LV_NAME,
             ExploreNDensityPageLocators.LV_SPECIES,
@@ -48,7 +47,7 @@ class TestExploreNeuronDensity:
             ExploreNDensityPageLocators.LV_CONTRIBUTORS,
             ExploreNDensityPageLocators.LV_REGISTRATION_DATE
         ]
-        column_headers = explore_ndensity.find_column_headers(column_locators, timeout=30)
+        column_headers = explore_ndensity.find_column_headers(column_locators, timeout=40)
 
         found_column_headers = [element.text for element in column_headers]
         logger.info(f"Found n.density list view column headers: {found_column_headers}")

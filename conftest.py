@@ -33,14 +33,15 @@ def create_browser(pytestconfig):
         options = ChromeOptions()
         if headless:
             options.add_argument("--headless=new")
+            options.add_argument("--window-size=1920,1080")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--disable-gpu")
             options.add_argument("--window-size=1920,1080")
             options.add_argument("--ignore-certificate-errors")
             options.add_argument('--blink-settings=imagesEnabled=true')
-        # browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager(version="135.0.0.0").install()), options=options)
         browser = webdriver.Chrome(options=options)
+        browser.set_window_size(1920, 1080)
 
     elif browser_name == "firefox":
         options = FirefoxOptions()
@@ -55,6 +56,7 @@ def create_browser(pytestconfig):
         raise ValueError(f"Unsupported browser: {browser_name}")
 
     browser.set_page_load_timeout(60)
+    browser.set_window_size(1920, 1080)
     wait = WebDriverWait(browser, 20)
 
     return browser, wait

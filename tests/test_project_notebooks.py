@@ -58,7 +58,7 @@ class TestProjectNotebooks:
         page_filter.click()
         logger.info("Page filter is clicked")
 
-        filter_name_input = project_notebooks.filter_name_input()
+        filter_name_input = project_notebooks.filter_name_input(timeout=10)
         assert filter_name_input.is_displayed(), "Filter name input is not displayed"
         logger.info("Filter name input is found")
 

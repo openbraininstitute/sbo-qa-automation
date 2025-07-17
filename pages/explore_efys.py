@@ -62,8 +62,8 @@ class ExploreElectrophysiologyPage(ExplorePage):
     def dv_interactive_details_btn(self):
         return self.find_element(ExploreEphysLocators.DV_INTER_DETAILS)
 
-    def dv_overview_btn(self):
-        return self.find_element(ExploreEphysLocators.DV_OVERVIEW)
+    def dv_overview_btn(self, timeout=10):
+        return self.find_element(ExploreEphysLocators.DV_OVERVIEW, timeout=timeout)
 
     def dv_plots(self):
         return self.find_all_elements(ExploreEphysLocators.DV_PLOTS)
