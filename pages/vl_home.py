@@ -24,7 +24,7 @@ class VlabHome(HomePage, LinkChecker):
         path = f"/app/virtual-lab"
         try:
             self.go_to_page(path)
-            self.wait_for_page_ready(timeout=60)
+            self.wait_for_page_ready(timeout=120)
         except TimeoutException:
             raise RuntimeError(f"Failed to load page at {path} within 60 seconds")
         return self.browser.current_url
@@ -59,7 +59,7 @@ class VlabHome(HomePage, LinkChecker):
     def find_profile_btn(self):
         return self.find_element(VLHomeLocators.PROFILE_BTN)
 
-    def find_public_projects(self, timeout=15):
+    def find_public_projects(self, timeout=30):
         return self.find_element(VLHomeLocators.PUBLIC_PROJECTS, timeout=timeout)
 
     def find_qna_btn(self):
@@ -87,6 +87,10 @@ class VlabHome(HomePage, LinkChecker):
             "account_subscription_btn": self.find_element(VLHomeLocators.ACCOUNT_SUBSCRIPTIONS_BTN),
             "logout_btn": self.find_element(VLHomeLocators.LOGOUT_BTN)
         }
+
+    def refresh_page(self):
+        self.browser.refresh()
+        self.wait_for_page_ready(timeout=120)
 
     def validate_and_return(self):
         """

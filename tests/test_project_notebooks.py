@@ -35,13 +35,14 @@ class TestProjectNotebooks:
         logger.info("Search input is found")
 
         search_notebook.send_keys("Single cell")
+        logger.info("Searching for Single Cell using the free text search")
 
         result1 = project_notebooks.row1()
         result_text = result1.text
-        assert "single cell" in result_text, "Expected 'Single cell' in the result"
+        assert "single cell" in result_text, "Expected 'single cell' in the result"
         logger.info("Expected 'Single cell' in the result")
 
-        search_notebook.clear()
+        clear_search_input = project_notebooks.clear_search_notebook_input()
         logger.info("Search input is cleared")
 
         assert search_notebook.get_attribute("value") == "", "Search input is not empty after clearing"
@@ -89,7 +90,7 @@ class TestProjectNotebooks:
 
         table_container = project_notebooks.table_container(timeout=10)
         logger.info("Looking for table container")
-
+        time.sleep(5)
         data_search_result = project_notebooks.table_search_result(timeout=20)
         assert data_search_result.is_displayed(), "Table search result is not displayed"
         logger.info("Table search result is found")
@@ -114,8 +115,3 @@ class TestProjectNotebooks:
         assert total_rows_after_filter == total_rows_before_filter, ("Total rows before filtering and after clearing "
                                                                      "filter are not equal")
         logger.info("Total rows before and after filtering are equal")
-
-
-
-
-        time.sleep(2)

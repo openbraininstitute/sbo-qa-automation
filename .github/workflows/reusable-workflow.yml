@@ -121,21 +121,15 @@ jobs:
       - name: Annotation - Test Summary - Failures
         if: failure()
         run: |
-          echo "## UI Test Failures for ${{ inputs.env }}" >> failures_${{ inputs.env }}.md
+          echo "## UI Test Failures for ${{ inputs.env }}" > failures_${{ inputs.env }}.md
           echo "" >> failures_${{ inputs.env }}.md
 
           sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log \
-            | grep -E '^- ' \
+            | grep -E '^- tests/' \
             | sort | uniq >> failures_${{ inputs.env }}.md
 
           cat failures_${{ inputs.env }}.md
-
-          OLDIFS=$IFS
-          IFS=$'\n'
-          set -f
-          for line in $(sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log | grep -E '^-' | sort | uniq); do
-            echo "::error title=UI Test Failure in ${{ inputs.env }}::${line}"
-          done
+          echo "::error title=UI Test Failure in ${{ inputs.env }}::$(sed ':a;N;$!ba;s/\n/\\n/g' failures_${{ inputs.env }}.md)"
 
       - name: Upload Combined Failure Summary
         uses: actions/upload-artifact@v4
