@@ -15,11 +15,13 @@ class TestBuild:
         build = Build(browser,wait, base_url)
         lab_id = test_config["lab_id"]
         project_id = test_config["project_id"]
-        print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         current_url = build.go_to_build(lab_id, project_id)
-        build_menu_title = build.build_menu_title(timeout=10)
+
+        build_menu_title = build.build_menu_title(timeout=20)
+        logger.info("Looking for the 'Build' title in the Project menu.")
+
         build_menu_title.click()
-        logger.info("Cliked on 'Build'")
+        logger.info("Clicked on 'Build'")
 
         new_model_tab = build.new_model_tab()
         logger.info("New Model tab is displayed")

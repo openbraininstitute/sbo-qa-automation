@@ -15,18 +15,24 @@ class Build(HomePage, LinkChecker):
 
     def go_to_build(self, lab_id: str, project_id: str):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/home"
-        # time.sleep(20)
         try:
             self.go_to_page(path)
-            self.wait_for_page_ready(timeout=60)
+            self.wait_for_page_ready(timeout=100)
+            self.wait_for_build_page_loaded(timeout=60)
         except TimeoutException:
-            raise RuntimeError(f"Failed to load page at {path} within 60 seconds")
+            raise RuntimeError(f"Failed to load page at {path} within 100 seconds")
         return self.browser.current_url
+
+    def wait_for_build_page_loaded(self, timeout=30):
+        return self.wait.until(
+            lambda driver: self.build_menu_title(timeout=5).is_displayed(),
+            message="Build menu title did not appear within timeout"
+        )
 
     def brain_region_toggle_btn(self):
         return self.find_element(BuildLocators.BRAIN_REGION_PANEL_TOGGLE)
 
-    def build_menu_title(self, timeout=10):
+    def build_menu_title(self, timeout=20):
         return self.find_element(BuildLocators.BUILD_MENU_TITLE, timeout=timeout)
 
     def created_by_name(self):

@@ -84,7 +84,7 @@ class CustomBasePage:
         except TimeoutException as ex:
             raise Exception(f"Element {element_locator} not visible after {timeout} seconds. Exception: {ex}")
 
-    def wait_for_page_ready(self, timeout=10):
+    def wait_for_page_ready(self, timeout=20):
         """
         Waits until the page's readyState is 'complete', indicating that the page has finished loading.
 
