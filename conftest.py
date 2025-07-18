@@ -181,7 +181,7 @@ def login(setup, navigate_to_login, test_config, logger):
     login_page = navigate_to_login
 
     username = test_config.get("username")
-    password = os.getenv("password")
+    password = os.getenv("OBI_PASSWORD")
 
     if not username or not password:
         raise ValueError("Username or password is missing in the configuration!")
