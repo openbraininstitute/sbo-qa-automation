@@ -161,8 +161,6 @@ def navigate_to_landing_page(public_browsing, logger, test_config):
 def navigate_to_login(setup, logger, request, test_config):
     """Fixture that navigates to the login page"""
     browser, wait, lab_url, lab_id, project_id = setup
-    print(f"DEBUG NAVIGATE TO LOGIN function: {browser.current_url}")
-
     landing_page = LandingPage(browser, wait, test_config["base_url"], logger)
     landing_page.go_to_landing_page()
     landing_page.click_go_to_lab()

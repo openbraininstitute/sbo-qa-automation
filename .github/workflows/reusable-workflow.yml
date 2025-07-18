@@ -129,7 +129,7 @@ jobs:
             | sort | uniq >> failures_${{ inputs.env }}.md
 
           cat failures_${{ inputs.env }}.md
-          echo "::error title=UI Test Failure in ${{ inputs.env }}::$(sed ':a;N;$!ba;s/\n/\\n/g' failures_${{ inputs.env }}.md)"
+          echo "::error title=UI Test Failure in ${{ inputs.env }}::$(sed ':a;N;$!ba;s/\n/%0A/g' failures_${{ inputs.env }}.md)"
 
       - name: Upload Combined Failure Summary
         uses: actions/upload-artifact@v4

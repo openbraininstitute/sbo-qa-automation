@@ -50,8 +50,8 @@ class ExplorePage(HomePage):
     def find_atlas_fullscreen_bt(self, timeout=20):
         return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN, timeout=timeout)
 
-    def find_brain_region_panel(self):
-        return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL)
+    def find_brain_region_panel(self, timeout=20):
+        return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL, timeout=timeout)
 
     def find_brain_region_search_field(self, timeout=20):
         return self.find_element(ExplorePageLocators.SEARCH_REGION, timeout=timeout)
@@ -65,7 +65,7 @@ class ExplorePage(HomePage):
     def find_cerebrum_arrow_btn(self, timeout=20):
         return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB, timeout=timeout)
 
-    def find_cerebrum_title_main_page(self, timeout=15):
+    def find_cerebrum_title_main_page(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
     def find_count_switch(self):
@@ -77,10 +77,10 @@ class ExplorePage(HomePage):
     def check_explore_title_is_present(self):
         return self.find_element(ExplorePageLocators.EXPLORE_TITLE_VLAB)
 
-    def find_explore_page_titles(self, page_locators):
+    def find_explore_page_titles(self, page_locators, timeout=30):
         elements_list = []
         for locator in page_locators:
-            elements_list.extend(self.find_all_elements(locator))
+            elements_list.extend(self.find_all_elements(locator, timeout=timeout))
         return elements_list
 
     def find_experimental_data_titles(self, exp_data_locators):

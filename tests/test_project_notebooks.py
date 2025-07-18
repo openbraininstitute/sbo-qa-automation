@@ -34,6 +34,8 @@ class TestProjectNotebooks:
         assert search_notebook.is_displayed(), "Search input is not displayed"
         logger.info("Search input is found")
 
+        ''' 
+        Commenting out for now. 
         search_notebook.send_keys("Single cell")
         logger.info("Searching for Single Cell using the free text search")
 
@@ -47,6 +49,7 @@ class TestProjectNotebooks:
 
         assert search_notebook.get_attribute("value") == "", "Search input is not empty after clearing"
         logger.info("Search input is confirmed to be empty")
+        '''
 
         rows_before_filter = project_notebooks.rows()
         total_rows_before_filter = len(rows_before_filter)

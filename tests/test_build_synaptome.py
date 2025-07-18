@@ -238,7 +238,7 @@ class TestBuildSynaptome:
         synapse_set_num = build_synaptome.synapse_set_num()
         logger.info("'Synapse set' is equal to 1 again.")
 
-        save_synaptome = build_synaptome.save_btn()
+        save_synaptome = build_synaptome.save_btn(timeout=15)
         assert save_synaptome.is_displayed(), "'Save' button is not displayed."
         logger.info("'Save' button is displayed.")
 

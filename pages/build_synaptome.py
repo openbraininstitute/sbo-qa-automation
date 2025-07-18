@@ -163,8 +163,9 @@ class BuildSynaptomePage(HomePage):
 
     def results_label(self):
         return self.find_element(BuildSynaptomeLocators.RESULTS)
-    def save_btn(self):
-        return self.find_element(BuildSynaptomeLocators.SAVE_SYNAPTOME_MODEL)
+
+    def save_btn(self, timeout=15):
+        return self.find_element(BuildSynaptomeLocators.SAVE_SYNAPTOME_MODEL, timeout=timeout)
 
     def start_building_button(self):
         return self.element_to_be_clickable(BuildSynaptomeLocators.START_BUILDING_BTN)

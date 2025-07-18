@@ -67,7 +67,7 @@ class TestOutsideExplorePage:
             ExplorePageLocators.MODEL_DATA_BTN
         ]
         logger.info("Searching for Explore Page titles")
-        explore_page_titles = outside_explore.find_explore_page_titles(page_titles, timeout=15)
+        explore_page_titles = outside_explore.find_explore_page_titles(page_titles, timeout=30)
 
         for page_title in explore_page_titles:
             assert page_title.is_displayed(), f"Explore page titles {page_title} is not displayed"

@@ -18,7 +18,8 @@ class LandingPage(HomePage):
 
     def go_to_landing_page(self):
         self.browser.get(self.base_url)
-        self.wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+        self.wait_for_page_to_load(timeout=30)
+        banner_title = self.find_banner_title()
 
     def is_landing_page_displayed(self):
         try:

@@ -24,13 +24,16 @@ class TestLanding:
         logger.info("✅ Landing Page loaded successfully.")
 
         background_page_image = landing_page.hero_background_img()
-        landing_page.assert_visible(background_page_image, "The page background image is not displayed")
+        assert background_page_image.is_displayed(), "The main page image is not found."
+        logger.info("The main page image is found.")
 
         background_page_video = landing_page.hero_background_video()
-        landing_page.assert_visible(background_page_video, "The page background video is not displayed")
+        assert background_page_video.is_displayed(), "The page background video is not displayed"
+        logger.info("The main background video is displayed.")
 
         banner_title = landing_page.find_banner_title()
-        landing_page.assert_visible(banner_title, "Page main banner title is not found")
+        assert banner_title.is_displayed(), "Page main banner title is not found"
+        logger.info("Landing Page main banner title is found.")
 
         title_accelerate = landing_page.find_title_accelerate()
         assert title_accelerate.is_displayed(), "Accelerate title is missing"
@@ -104,11 +107,6 @@ class TestLanding:
         logger.info("looking for play button")
         video_play_btn.click()
         logger.info("Clicked on play btn")
-
-        # logger.info("Looking for the video pointer")
-        # video_pointer = landing_page.video_pointer(timeout=10)
-        # video_pointer.click()
-        # logger.info("Clicked on the video pointer")
 
         logger.info("Video play button is clicked")
         landing_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", video_container)

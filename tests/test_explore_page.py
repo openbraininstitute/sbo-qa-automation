@@ -40,7 +40,7 @@ class TestExplorePage:
         assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
         logger.info("AI Assistant open button is displayed, means the panel is closed.")
 
-        cerebrum_title_main_page = explore_page.find_cerebrum_title_main_page(timeout=15)
+        cerebrum_title_main_page = explore_page.find_cerebrum_title_main_page(timeout=30)
         assert cerebrum_title_main_page.is_displayed(), "Cerebrum title on the main page is not displayed."
 
         exp_data_titles = [
@@ -79,13 +79,13 @@ class TestExplorePage:
             ExplorePageLocators.MODEL_DATA_BTN
         ]
         logger.info("Searching for Explore Page titles")
-        explore_page_titles = explore_page.find_explore_page_titles(page_titles)
+        explore_page_titles = explore_page.find_explore_page_titles(page_titles, timeout=30)
 
         for page_title in explore_page_titles:
             assert page_title.is_displayed(), f"Explore page titles {page_title} is not displayed"
         logger.info("Found Explore page titles")
 
-        brain_region_panel = explore_page.find_brain_region_panel()
+        brain_region_panel = explore_page.find_brain_region_panel(timeout=20)
         logger.info("Found Brain Region Panel")
 
         cerebrum_in_brpanel = explore_page.find_cerebrum_brp()
