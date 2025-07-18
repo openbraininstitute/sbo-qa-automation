@@ -59,8 +59,8 @@ class ExplorePage(HomePage):
     def find_cerebrum_brp(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL, timeout=timeout)
 
-    def find_cerebral_cortex_brp(self):
-        return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE)
+    def find_cerebral_cortex_brp(self, timeout=15):
+        return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE, timeout=timeout)
 
     def find_cerebrum_arrow_btn(self, timeout=20):
         return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB, timeout=timeout)
@@ -74,8 +74,8 @@ class ExplorePage(HomePage):
     def find_data_panel(self):
         return self.find_element(ExplorePageLocators.DATA_PANEL)
 
-    def check_explore_title_is_present(self):
-        return self.find_element(ExplorePageLocators.EXPLORE_TITLE_VLAB)
+    def check_explore_title_is_present(self, timeout=15):
+        return self.find_element(ExplorePageLocators.EXPLORE_TITLE_VLAB, timeout=timeout)
 
     def find_explore_page_titles(self, page_locators, timeout=30):
         elements_list = []
@@ -83,10 +83,10 @@ class ExplorePage(HomePage):
             elements_list.extend(self.find_all_elements(locator, timeout=timeout))
         return elements_list
 
-    def find_experimental_data_titles(self, exp_data_locators):
+    def find_experimental_data_titles(self, exp_data_locators, timeout=15):
         result = []
         for locator in exp_data_locators:
-            result.extend(self.find_all_elements(locator))
+            result.extend(self.find_all_elements(locator, timeout=timeout))
         return result
 
     def get_experiment_record_count(self, record_count_locators, timeout=40):

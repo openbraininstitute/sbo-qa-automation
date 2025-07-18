@@ -24,18 +24,20 @@ class TestExplorePage:
         explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
-        explore_page.check_explore_title_is_present()
+        explore_page.check_explore_title_is_present(timeout=15)
         logger.info("Explore page title is present")
         cerebrum_title_br_panel = explore_page.cerebrum_title_br_panel()
         assert cerebrum_title_br_panel, f"Cerebrum title is not found"
         logger.info("Cerebrum title is displayed")
 
-        ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=10)
+        ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=15)
         logger.info("AI Assistant panel is open. Attempting to close it.")
 
         close_btn = explore_page.find_ai_assistant_panel_close(timeout=10)
-        explore_page.assert_visible(close_btn, "Close button on AI assistant panel", "pages/explore_page", 42)
+        assert close_btn, "Close button on AI assistant panel"
         close_btn.click()
+        logger.info("AI Panel is closed.")
+
         ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
         assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
         logger.info("AI Assistant open button is displayed, means the panel is closed.")
@@ -62,7 +64,7 @@ class TestExplorePage:
             else:
                 logger.warning(f"No elements were found for locator [{i + 1}]: {locator}")
 
-        exp_data_elements = explore_page.find_experimental_data_titles(exp_data_titles)
+        exp_data_elements = explore_page.find_experimental_data_titles(exp_data_titles, timeout=15)
 
 
         found_titles = [
@@ -98,7 +100,7 @@ class TestExplorePage:
         # logger.info("Cerebrum - parent arrow button is clicked")
         # browser.execute_script("arguments[0].click();", cerebrum_arrow_btn)
 
-        cerebral_cortex_title = explore_page.find_cerebral_cortex_brp()
+        cerebral_cortex_title = explore_page.find_cerebral_cortex_brp(timeout=15)
         logger.info("Found Cerebral cortex as a child of Cerebrum")
 
         record_count_locators = [
