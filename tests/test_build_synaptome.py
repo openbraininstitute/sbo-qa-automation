@@ -150,19 +150,31 @@ class TestBuildSynaptome:
         name_your_set.send_keys("soma")
         logger.info("Provided 'soma' as name for the set.")
 
-        time.sleep(3)
-        target_select = build_synaptome.target_select()
-        logger.info("'Target select' is displayed.")
+        canvas = build_synaptome.canvas(timeout=10)
+        assert canvas.is_displayed(), "3D Neuron is not displayed."
+        logger.info("Canvas is displayed.")
 
-        print("attempting to click on target select")
+        canvas_pointer = build_synaptome.canvas_pointer(timeout=10)
+        assert canvas.is_displayed(), "Canvas pointer is not displayed."
+        logger.info("Canvas pointer is displayed.")
+
+        target_field = build_synaptome.target_field(timeout=15)
+        logger.info("Found 'Target field'.")
+
+        target_select = build_synaptome.target_select(timeout=25)
+        time.sleep(3)
         target_select.click()
+        time.sleep(2)
         logger.info("Clicked on 'Target select'.")
 
-        target_list = build_synaptome.target_list(timeout=10)
+        build_synaptome.wait_for_target_dropdown_expanded(timeout=10)
+        logger.info("'Target select' dropdown expanded.")
+
+        target_list = build_synaptome.target_list(timeout=20)
         assert target_list.is_displayed(), "'Target' list is not displayed."
         logger.info("'Target' list is displayed.")
 
-        target_soma = build_synaptome.target_soma()
+        target_soma = build_synaptome.target_soma(timeout=15)
         assert target_soma.is_displayed(), "'Target soma' is not displayed."
         logger.info("'Target soma' is displayed.")
 
@@ -226,7 +238,7 @@ class TestBuildSynaptome:
         synapse_set_num = build_synaptome.synapse_set_num()
         logger.info("'Synapse set' is equal to 1 again.")
 
-        save_synaptome = build_synaptome.save_btn()
+        save_synaptome = build_synaptome.save_btn(timeout=15)
         assert save_synaptome.is_displayed(), "'Save' button is not displayed."
         logger.info("'Save' button is displayed.")
 

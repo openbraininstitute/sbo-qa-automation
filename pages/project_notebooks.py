@@ -5,6 +5,7 @@
 
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.project_notebooks_locators import ProjectNotebooksLocators
 from pages.home_page import HomePage
@@ -26,8 +27,19 @@ class ProjectNotebooks(HomePage):
             raise RuntimeError("The Project Notebooks page did not load within 60 seconds.")
         return self.browser.current_url
 
-    def filter_clear_btn(self):
-        return self.find_element(ProjectNotebooksLocators.FILTER_CLEAR_BTN)
+    def clear_search_notebook_input(self, timeout=15):
+        input_field = self.search_input(timeout=timeout)
+
+        # Clear the field
+        input_field.clear()
+
+        # Wait until the input is empty, or timeout after `timeout` seconds
+        WebDriverWait(self.browser, timeout).until(
+            lambda d: input_field.get_attribute("value") == ""
+        )
+
+    def filter_clear_btn(self, timeout=15):
+        return self.find_element(ProjectNotebooksLocators.FILTER_CLEAR_BTN, timeout=timeout)
 
     def filter_close_btn(self):
         return self.find_element(ProjectNotebooksLocators.FILTER_CLOSE_BTN)
@@ -53,11 +65,14 @@ class ProjectNotebooks(HomePage):
     def rows(self):
         return self.find_all_elements(ProjectNotebooksLocators.ROWS)
 
-    def table_search_result(self):
-        return self.find_element(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT)
+    def table_container(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.TABLE_CONTAINER, timeout=timeout)
 
-    def search_input(self):
-        return self.find_element(ProjectNotebooksLocators.SEARCH_NOTEBOOK)
+    def table_search_result(self, timeout=20):
+        return self.is_visible(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=timeout)
+
+    def search_input(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.SEARCH_NOTEBOOK, timeout=timeout)
 
     def validate_table_headers(self, expected_headers):
         """

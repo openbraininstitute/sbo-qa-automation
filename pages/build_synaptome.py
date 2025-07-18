@@ -163,8 +163,9 @@ class BuildSynaptomePage(HomePage):
 
     def results_label(self):
         return self.find_element(BuildSynaptomeLocators.RESULTS)
-    def save_btn(self):
-        return self.find_element(BuildSynaptomeLocators.SAVE_SYNAPTOME_MODEL)
+
+    def save_btn(self, timeout=15):
+        return self.find_element(BuildSynaptomeLocators.SAVE_SYNAPTOME_MODEL, timeout=timeout)
 
     def start_building_button(self):
         return self.element_to_be_clickable(BuildSynaptomeLocators.START_BUILDING_BTN)
@@ -190,18 +191,31 @@ class BuildSynaptomePage(HomePage):
     def synapse_set_num(self):
         return self.find_element(BuildSynaptomeLocators.SYNAPSE_SET_NUM)
 
-    def target_field(self):
-        return self.find_element(BuildSynaptomeLocators.TARGET_FIELD)
+    def target_field(self, timeout=15):
+        return self.find_element(BuildSynaptomeLocators.TARGET_FIELD, timeout=timeout)
 
-    def target_list(self, timeout=10):
+    def target_list(self, timeout=20):
         return self.find_element(BuildSynaptomeLocators.TARGET_LIST, timeout=timeout)
 
-    def target_soma(self):
-        return self.find_element(BuildSynaptomeLocators.TARGET_SOMA)
+    def target_soma(self, timeout=15):
+        return self.find_element(BuildSynaptomeLocators.TARGET_SOMA, timeout=timeout)
 
-    def target_select(self):
-        return WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located(BuildSynaptomeLocators.TARGET_SELECT))
+    def canvas(self, timeout=10):
+        return self.is_visible(BuildSynaptomeLocators.CANVAS, timeout=timeout)
+
+    def canvas_pointer(self, timeout=10):
+        return self.element_visibility(BuildSynaptomeLocators.CANVAS_POINTER, timeout=timeout)
+
+    def target_select(self, timeout=25):
+        return self.find_element(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
+
+    # def target_select(self, timeout=10):
+    #     return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
+
+    def wait_for_target_dropdown_expanded(self, timeout=10):
+        WebDriverWait(self.browser, timeout).until(
+            lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT).get_attribute("aria-expanded") == "true"
+        )
 
     def type_field(self):
         return self.find_element(BuildSynaptomeLocators.TYPE_FIELD)

@@ -99,6 +99,15 @@ class CustomBasePage:
             f"Page did not reach ready state within {timeout} seconds"
         )
 
+    def wait_for_page_to_load(self, timeout=10, element_locator=None):
+        local_wait = WebDriverWait(self.browser, timeout)
+        local_wait.until(
+            lambda driver: self.browser.execute_script("return document.readyState") == "complete",
+            f"Page did not reach ready state within {timeout} seconds"
+        )
+        if element_locator:
+            local_wait.until(EC.visibility_of_element_located(element_locator))
+
     def wait_for_condition(self, condition, timeout=60, retries=3, delay=5, message=None):
         """
         General-purpose wait function to wait for a specific condition with retries.

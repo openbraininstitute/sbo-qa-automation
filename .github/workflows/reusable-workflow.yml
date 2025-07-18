@@ -40,10 +40,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
-      # This is temporary for debugging
-      - name: Verify repository contents
-        run: ls -la
-
       - name: Set up virtual environment and install dependencies
         run: |
           uv venv -p 3.11 
@@ -80,6 +76,8 @@ jobs:
           echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
           echo "ENV_URL: $ENV_URL"
           echo "ENV_NAME: $ENV_NAME"
+          
+          set -o pipefail 
           uv run pytest \
             tests/test_about.py \
             tests/test_mission.py \
@@ -96,7 +94,7 @@ jobs:
             tests/test_build_synaptome.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
-            -sv \
+            -s \
             --headless \
             --html="latest_logs/report_${ENV_NAME}_chrome.html" \
             --self-contained-html \
@@ -120,16 +118,22 @@ jobs:
           name: pytest-html-report-${{ inputs.env }}-${{ matrix.browser }}
           path: latest_logs/report_${{ inputs.env }}_chrome.html
 
-      - name: Annotation - Failed tests
+      - name: Annotation - Test Summary - Failures
         if: failure()
-        run: echo ::notice title=failed-tests::$(grep -E '^FAILED' test_output.log)
+        run: |
+          echo "## UI Test Failures for ${{ inputs.env }}" > failures_${{ inputs.env }}.md
+          echo "" >> failures_${{ inputs.env }}.md
 
-      - name: MS Teams Notification
-        uses: jdcargile/ms-teams-notification@v1.4
-        if: failure()
+          sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log \
+            | grep -E '^- tests/' \
+            | sort | uniq >> failures_${{ inputs.env }}.md
+
+          cat failures_${{ inputs.env }}.md
+          echo "::error title=UI Test Failure in ${{ inputs.env }}::$(sed ':a;N;$!ba;s/\n/%0A/g' failures_${{ inputs.env }}.md)"
+
+      - name: Upload Combined Failure Summary
+        uses: actions/upload-artifact@v4
         with:
-            github-token: ${{ github.token }}
-            ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
-            notification-summary: UI Automated Test Execution
-              Check the workflow for details
-            notification-color: ffc107
+          name: all-ui-test-failures
+          path: all_failures.md
+

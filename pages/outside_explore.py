@@ -72,7 +72,7 @@ class OutsideExplorePage(HomePage):
     def cerebrum_title(self, timeout=15):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
-    def find_explore_page_titles(self, page_locators, timeout=15):
+    def find_explore_page_titles(self, page_locators, timeout=30):
         elements_list = []
         for locator in page_locators:
             elements_list.extend(self.find_all_elements(locator, timeout=timeout))

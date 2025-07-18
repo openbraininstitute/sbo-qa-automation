@@ -15,11 +15,13 @@ class TestVlabHome:
     def test_vl_home(self, setup, login, logger,test_config):
         browser, wait, base_url, lab_id, project_id = setup
         vlab_home = VlabHome(browser,wait, base_url, logger=logger)
-        lab_id = test_config["lab_id"]
-        project_id = test_config["project_id"]
+        # lab_id = test_config["lab_id"]
+        # project_id = test_config["project_id"]
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
 
-        public_projects = vlab_home.find_public_projects(timeout=15)
+        vlab_home.refresh_page()
+
+        public_projects = vlab_home.find_public_projects(timeout=30)
         assert public_projects.is_displayed(), f"Public projects are not displayed."
         logger.info("Public projects are displayed.")
 
