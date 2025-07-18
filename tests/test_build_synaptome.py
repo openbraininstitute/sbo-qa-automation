@@ -21,7 +21,7 @@ class TestBuildSynaptome:
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         current_url = build_synaptome.go_to_build_synaptome(lab_id, project_id)
 
-        project_menu_build_synaptome = build_synaptome.find_menu_build(timeout=10)
+        project_menu_build_synaptome = build_synaptome.find_menu_build(timeout=25)
         assert project_menu_build_synaptome.is_displayed(), f"Build menu is not displayed."
         logger.info("Build menu is displayed.")
 

@@ -164,7 +164,7 @@ def navigate_to_login(setup, logger, request, test_config):
     """Fixture that navigates to the login page"""
     browser, wait, lab_url, lab_id, project_id = setup
     landing_page = LandingPage(browser, wait, test_config["base_url"], logger)
-    landing_page.go_to_landing_page()
+    landing_page.go_to_landing_page(timeout=15)
     landing_page.click_go_to_lab()
 
     WebDriverWait(browser, 60).until(

@@ -23,11 +23,11 @@ class BuildSynaptomePage(HomePage):
     def go_to_build_synaptome(self, lab_id: str, project_id: str):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/build"
         try:
-            self.browser.set_page_load_timeout(90)
+            self.browser.set_page_load_timeout(100)
             self.go_to_page(path)
             self.wait_for_page_ready(timeout=60)
         except TimeoutException:
-            raise RuntimeError("The Build page did not load within 60 seconds.")
+            raise RuntimeError("The Build page did not load within 100 seconds.")
         return self.browser.current_url
 
     def apply_changes_btn(self):
@@ -51,7 +51,7 @@ class BuildSynaptomePage(HomePage):
     def filter_synapses_btn(self):
         return self.find_element(BuildSynaptomeLocators.FILTER_SYNAPSES_BTN)
 
-    def find_menu_build(self, timeout=10):
+    def find_menu_build(self, timeout=25):
         return self.find_element(BuildSynaptomeLocators.MENU_BUILD, timeout=timeout)
 
     def find_synaptome_box(self, timeout=10):

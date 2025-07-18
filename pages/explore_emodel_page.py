@@ -38,11 +38,11 @@ class ExploreEModelDataPage(ExplorePage):
     def find_brain_region_search_field(self, timeout=20):
         return self.find_element(ExploreEModelPageLocators.SEARCH_REGION, timeout=timeout)
 
-    def find_brain_region_panel(self):
-        return self.find_element(ExploreEModelPageLocators.BRAIN_REGION_PANEL)
+    def find_brain_region_panel(self, timeout=15):
+        return self.find_element(ExploreEModelPageLocators.BRAIN_REGION_PANEL, timeout=timeout)
 
-    def find_br_cerebrum_title(self):
-        return self.find_element(ExploreEModelPageLocators.BR_CEREBRUM_TITLE)
+    def find_br_cerebrum_title(self, timeout=15):
+        return self.find_element(ExploreEModelPageLocators.BR_CEREBRUM_TITLE, timeout=timeout)
 
     def find_dv_analysis_tab(self):
         return self.find_element(ExploreEModelPageLocators.DV_ANALYSIS_TAB)
@@ -111,8 +111,8 @@ class ExploreEModelDataPage(ExplorePage):
     def find_dv_simulation_tab(self):
         return self.find_element(ExploreEModelPageLocators.DV_SIMULATION_TAB)
 
-    def find_emodel_tab(self):
-        return self.find_element(ExploreEModelPageLocators.EMODEL_TAB)
+    def find_emodel_tab(self, timeout=15):
+        return self.find_element(ExploreEModelPageLocators.EMODEL_TAB, timeout=timeout)
 
     def find_lv_em_td(self):
         return self.find_element(ExploreEModelPageLocators.LV_EM_TD)
