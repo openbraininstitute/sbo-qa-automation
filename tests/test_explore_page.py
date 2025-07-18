@@ -24,6 +24,9 @@ class TestExplorePage:
         explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
+        brain_region_panel = explore_page.find_brain_region_panel(timeout=20)
+        logger.info("Found Brain Region Panel")
+
         explore_page.check_explore_title_is_present(timeout=15)
         logger.info("Explore page title is present")
         cerebrum_title_br_panel = explore_page.cerebrum_title_br_panel()

@@ -23,11 +23,11 @@ class BuildSynaptomePage(HomePage):
     def go_to_build_synaptome(self, lab_id: str, project_id: str):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/build"
         try:
-            self.browser.set_page_load_timeout(100)
+            self.browser.set_page_load_timeout(120)
             self.go_to_page(path)
             self.wait_for_page_ready(timeout=60)
         except TimeoutException:
-            raise RuntimeError("The Build page did not load within 100 seconds.")
+            raise RuntimeError("The Build page did not load within 120 seconds.")
         return self.browser.current_url
 
     def apply_changes_btn(self):

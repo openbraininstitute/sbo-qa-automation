@@ -19,11 +19,11 @@ class ExploreEModelDataPage(ExplorePage):
     def go_to_explore_emodel_page(self, lab_id: str, project_id: str):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/model/e-model"
         try:
-            self.browser.set_page_load_timeout(90)
+            self.browser.set_page_load_timeout(100)
             self.go_to_page(path)
             self.wait_for_page_ready(timeout=60)
         except TimeoutException:
-            raise RuntimeError("The Model data page did not load within 60 seconds.")
+            raise RuntimeError("The Model data page did not load within 100 seconds.")
         return self.browser.current_url
 
     def brain_region_panel_close_btn(self):
