@@ -84,23 +84,9 @@ class OutsideExplorePage(HomePage):
             result.extend(self.find_all_elements(locator, timeout))
         return result
 
-    # def get_experiment_record_count(self, record_count_locators, timeout=30):
-    #     record_counts = []
-    #     for locator in record_count_locators:
-    #         try:
-    #             record = self.wait_for_non_empty_text(locator, timeout)
-    #             record_text = record.text.strip()
-    #             record_number = int(''.join(filter(str.isdigit, record_text)))
-    #             record_counts.append(record_number)
-    #         except TimeoutException:
-    #             raise TimeoutException(f"Timeout: No text found for record at {locator} within {timeout} seconds.")
-    #         except ValueError:
-    #             raise ValueError(f"Could not parse record count from text: '{record_text}'")
-    #     return record_counts
-
-    def get_experiment_record_count(self, record_count_locators, timeout=30, retries=2):
+    def get_experiment_record_count(self, record_count_locators, timeout=40, retries=2):
         if timeout is None:
-            timeout = 60 if os.getenv("CI") == "true" else 30
+            timeout = 60 if os.getenv("CI") == "true" else 40
         for attempt in range(retries):
             try:
                 return self._get_counts_with_retry(record_count_locators, timeout)

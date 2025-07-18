@@ -52,8 +52,8 @@ class BuildSynaptomePage(HomePage):
     def filter_synapses_btn(self):
         return self.find_element(BuildSynaptomeLocators.FILTER_SYNAPSES_BTN)
 
-    def find_menu_build(self):
-        return self.find_element(BuildSynaptomeLocators.MENU_BUILD)
+    def find_menu_build(self, timeout=10):
+        return self.find_element(BuildSynaptomeLocators.MENU_BUILD, timeout=timeout)
 
     def find_synaptome_box(self, timeout=10):
         return self.find_element(BuildSynaptomeLocators.SYNAPTOME_BOX, timeout=timeout)

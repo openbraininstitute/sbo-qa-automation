@@ -26,8 +26,8 @@ class Build(HomePage, LinkChecker):
     def brain_region_toggle_btn(self):
         return self.find_element(BuildLocators.BRAIN_REGION_PANEL_TOGGLE)
 
-    def build_menu_title(self):
-        return self.find_element(BuildLocators.BUILD_MENU_TITLE)
+    def build_menu_title(self, timeout=10):
+        return self.find_element(BuildLocators.BUILD_MENU_TITLE, timeout=timeout)
 
     def created_by_name(self):
         return self.find_all_elements(BuildLocators.CREATED_BY_NAME)

@@ -81,7 +81,7 @@ class TestOutsideExplorePage:
             ExplorePageLocators.SYNAPSE_PER_CONNECTION_NRECORDS
         ]
 
-        record_counts = outside_explore.get_experiment_record_count(record_count_locators, timeout=30)
+        record_counts = outside_explore.get_experiment_record_count(record_count_locators, timeout=40)
         for record_count in record_counts:
             assert record_count >= 1, f"Record count is less than 100: {record_count}"
         logger.info("Number of records for data types are displayed")

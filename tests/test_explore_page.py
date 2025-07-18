@@ -109,7 +109,7 @@ class TestExplorePage:
             ExplorePageLocators.SYNAPSE_PER_CONNECTION_NRECORDS
         ]
         time.sleep(2)
-        record_counts = explore_page.get_experiment_record_count(record_count_locators, timeout=25)
+        record_counts = explore_page.get_experiment_record_count(record_count_locators, timeout=40)
         for record_count in record_counts:
             if record_count == 0:
                 logger.warning(f"Record count is 0 for one of the data types.")

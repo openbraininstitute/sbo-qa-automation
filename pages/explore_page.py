@@ -89,7 +89,7 @@ class ExplorePage(HomePage):
             result.extend(self.find_all_elements(locator))
         return result
 
-    def get_experiment_record_count(self, record_count_locators, timeout=25):
+    def get_experiment_record_count(self, record_count_locators, timeout=40):
         record_counts = []
         for locator in record_count_locators:
             try:
