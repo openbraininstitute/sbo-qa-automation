@@ -129,14 +129,13 @@ jobs:
             | sort | uniq >> failures_${{ inputs.env }}.md
 
           cat failures_${{ inputs.env }}.md
+
           OLDIFS=$IFS
           IFS=$'\n'
           set -f
-          for line in $(sed -n '/FAILED TEST SUMMARY/,/short test summary info/p' test_output.log | grep -E '^-' | sort | uniq)
-          do
-            echo ::fail title=UI Test Failures::${line}
+          for line in $(sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log | grep -E '^-' | sort | uniq); do
+            echo "::error title=UI Test Failure in ${{ inputs.env }}::${line}"
           done
-          IFS=$OLDIFS
 
       - name: Upload Combined Failure Summary
         uses: actions/upload-artifact@v4

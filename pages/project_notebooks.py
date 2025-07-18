@@ -57,7 +57,7 @@ class ProjectNotebooks(HomePage):
         return self.find_element(ProjectNotebooksLocators.TABLE_CONTAINER, timeout=timeout)
 
     def table_search_result(self, timeout=20):
-        return self.find_element(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=timeout)
+        return self.is_visible(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=timeout)
 
     def search_input(self):
         return self.find_element(ProjectNotebooksLocators.SEARCH_NOTEBOOK)

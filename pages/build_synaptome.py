@@ -193,7 +193,7 @@ class BuildSynaptomePage(HomePage):
     def target_field(self, timeout=15):
         return self.find_element(BuildSynaptomeLocators.TARGET_FIELD, timeout=timeout)
 
-    def target_list(self, timeout=15):
+    def target_list(self, timeout=20):
         return self.find_element(BuildSynaptomeLocators.TARGET_LIST, timeout=timeout)
 
     def target_soma(self, timeout=15):
@@ -205,7 +205,7 @@ class BuildSynaptomePage(HomePage):
     def canvas_pointer(self, timeout=10):
         return self.element_visibility(BuildSynaptomeLocators.CANVAS_POINTER, timeout=timeout)
 
-    def target_select(self, timeout=10):
+    def target_select(self, timeout=25):
         return self.find_element(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
 
     # def target_select(self, timeout=10):
