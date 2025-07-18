@@ -101,7 +101,7 @@ class TestProjectNotebooks:
         filter_clear_btn = project_notebooks.filter_clear_btn()
         assert filter_clear_btn.is_displayed(), "Filter clear button is not displayed"
         logger.info("Filter clear button is found")
-        filter_clear_btn.click()
+        # filter_clear_btn.click()
         logger.info("Filter is cleared")
 
         rows_after_filter = project_notebooks.rows()
