@@ -128,7 +128,7 @@ jobs:
             | grep -E '^- tests/' \
             | sort | uniq >> failures_${{ inputs.env }}.md
 
-          cat failures_${{ inputs.env }}.md
+#          cat failures_${{ inputs.env }}.md
           echo "::error title=UI Test Failure in ${{ inputs.env }}::$(sed ':a;N;$!ba;s/\n/%0A/g' failures_${{ inputs.env }}.md)"
 
       - name: Upload Combined Failure Summary
