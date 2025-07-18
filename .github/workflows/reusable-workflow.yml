@@ -129,7 +129,6 @@ jobs:
             | grep -E '^- tests/' \
             | sort | uniq >> failures_${{ inputs.env }}.md
 
-#          cat failures_${{ inputs.env }}.md
           echo "::error title=UI Test Failure in ${{ inputs.env }}::$(sed ':a;N;$!ba;s/\n/%0A/g' failures_${{ inputs.env }}.md)"
 
       - name: Upload Combined Failure Summary
@@ -142,10 +141,10 @@ jobs:
         uses: skitionek/notify-microsoft-teams@v1.0.9
         if: failure()
         with:
-            webhook_url: ${{ secrets.MS_TEAMS_NEW_WEBHOOK_URI }}
-            job: ${{ toJson(job) }}
-            steps: ${{ toJson(steps) }}
-            raw: >-
+          webhook_url: ${{ secrets.MS_TEAMS_NEW_WEBHOOK_URI }}
+          job: ${{ toJson(job) }}
+          steps: ${{ toJson(steps) }}
+          raw: >-
               {
                 "type": "message",
                 "attachments": [
