@@ -18,16 +18,17 @@ class LandingPage(HomePage):
 
     def go_to_landing_page(self):
         self.browser.get(self.base_url)
-        self.wait_for_page_to_load(timeout=30)
+        self.wait_for_page_loaded(timeout=30)
         banner_title = self.find_banner_title()
 
-    def is_landing_page_displayed(self):
-        try:
-            expected_title = "Open Brain Platform"
-            return expected_title in self.browser.title
-        except TimeoutException as e:
-            self.logger.warning(f"Error loading OBI Landing Page")
-            return False
+    def wait_for_page_loaded(self, timeout=30):
+        return self.wait.until(
+            lambda driver: self.obi_logo(timeout=timeout).is_displayed(),
+            message=f"Build menu title did not appear within {timeout} seconds"
+        )
+
+    def obi_logo(self, timeout=10):
+        return self.is_visible(LandingLocators.OBI_LOGO, timeout=timeout)
 
     def go_to_lab(self, timeout=10):
         return self.find_element(LandingLocators.GOTO_LAB, timeout=timeout)
