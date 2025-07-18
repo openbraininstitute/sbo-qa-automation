@@ -87,6 +87,9 @@ class TestProjectNotebooks:
         filter_close_btn.click()
         logger.info("Filter is closed")
 
+        table_container = project_notebooks.table_container(timeout=10)
+        logger.info("Looking for table container")
+
         data_search_result = project_notebooks.table_search_result(timeout=10)
         assert data_search_result.is_displayed(), "Table search result is not displayed"
         logger.info("Table search result is found")
@@ -98,10 +101,10 @@ class TestProjectNotebooks:
         page_filter.click()
         logger.info("Page filter is clicked")
 
-        filter_clear_btn = project_notebooks.filter_clear_btn()
+        filter_clear_btn = project_notebooks.filter_clear_btn(timeout=15)
         assert filter_clear_btn.is_displayed(), "Filter clear button is not displayed"
         logger.info("Filter clear button is found")
-        # filter_clear_btn.click()
+        filter_clear_btn.click()
         logger.info("Filter is cleared")
 
         rows_after_filter = project_notebooks.rows()
