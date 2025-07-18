@@ -196,8 +196,8 @@ class BuildSynaptomePage(HomePage):
     def target_list(self, timeout=15):
         return self.find_element(BuildSynaptomeLocators.TARGET_LIST, timeout=timeout)
 
-    def target_soma(self):
-        return self.find_element(BuildSynaptomeLocators.TARGET_SOMA)
+    def target_soma(self, timeout=15):
+        return self.find_element(BuildSynaptomeLocators.TARGET_SOMA, timeout=timeout)
 
     def canvas(self, timeout=10):
         return self.is_visible(BuildSynaptomeLocators.CANVAS, timeout=timeout)

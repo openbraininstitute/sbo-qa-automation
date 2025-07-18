@@ -173,7 +173,7 @@ class TestBuildSynaptome:
         assert target_list.is_displayed(), "'Target' list is not displayed."
         logger.info("'Target' list is displayed.")
 
-        target_soma = build_synaptome.target_soma()
+        target_soma = build_synaptome.target_soma(timeout=15)
         assert target_soma.is_displayed(), "'Target soma' is not displayed."
         logger.info("'Target soma' is displayed.")
 

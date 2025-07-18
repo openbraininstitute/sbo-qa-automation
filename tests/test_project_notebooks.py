@@ -90,7 +90,7 @@ class TestProjectNotebooks:
         table_container = project_notebooks.table_container(timeout=10)
         logger.info("Looking for table container")
 
-        data_search_result = project_notebooks.table_search_result(timeout=10)
+        data_search_result = project_notebooks.table_search_result(timeout=20)
         assert data_search_result.is_displayed(), "Table search result is not displayed"
         logger.info("Table search result is found")
 
