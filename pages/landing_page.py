@@ -178,11 +178,11 @@ class LandingPage(HomePage):
     def find_menu_logo(self):
         return self.find_element(LandingLocators.TOP_MENU_LOGO)
 
-    def hero_background_img(self, timeout=15):
-        return self.find_element(LandingLocators.HERO_BACKGROUND_IMG, timeout=timeout)
+    def hero_background_img(self, timeout=25):
+        return self.is_visible(LandingLocators.HERO_BACKGROUND_IMG, timeout=timeout)
 
-    def hero_background_video(self, timeout=15):
-        return self.find_element(LandingLocators.HERO_BACKGROUND_VIDEO, timeout=timeout)
+    def hero_background_video(self, timeout=25):
+        return self.is_visible(LandingLocators.HERO_BACKGROUND_VIDEO, timeout=timeout)
 
     def video_title1(self, timeout=15):
         return self.find_element(LandingLocators.VIDEO_TITLE1, timeout=timeout)

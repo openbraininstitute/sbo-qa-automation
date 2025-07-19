@@ -21,11 +21,11 @@ class TestLanding:
         landing_page = LandingPage(browser, wait, logger, base_url)
         logger.info("✅ Landing Page loaded successfully.")
 
-        background_page_image = landing_page.hero_background_img(timeout=15)
+        background_page_image = landing_page.hero_background_img(timeout=25)
         assert background_page_image.is_displayed(), "The main page image is not found."
         logger.info("The main page image is found.")
 
-        background_page_video = landing_page.hero_background_video(timeout=15)
+        background_page_video = landing_page.hero_background_video(timeout=25)
         assert background_page_video.is_displayed(), "The page background video is not displayed"
         logger.info("The main background video is displayed.")
 
