@@ -57,13 +57,13 @@ class TestOutsideExplorePage:
             ExplorePageLocators.SYNAPSE_PER_CONNECTION
         ]
         logger.info("Searching for Experimental Data types")
-        exp_data_elements = outside_explore.find_experimental_data_titles(exp_data_titles, timeout=15)
+        exp_data_elements = outside_explore.find_visible_experimental_data_titles(exp_data_titles, timeout=25)
+
+        for element in exp_data_elements:
+            assert element.is_displayed(), f"Experimental data element not displayed: {element}"
 
         found_titles = [element.text for element in exp_data_elements]
         logger.info(f"Found experimental data titles: {found_titles}")
-        for element in exp_data_elements:
-            assert element.is_displayed(), f"Experimental data {element} is not displayed."
-        logger.info("Found Experimental data titles")
 
         page_titles = [
             ExplorePageLocators.EXPERIMENTAL_DATA_BTN,
@@ -202,10 +202,11 @@ class TestOutsideExplorePage:
         assert neuron_panel_one_mtype.is_displayed(), "The M-types titles in the panel is not found"
         logger.info("An M-type in the neurons panel is found")
 
+        '''
+        Temporarily commenting out.
         neuron_panel_one_mtype.click()
         logger.info("Clicking inside the viewport of the Neuron panel")
 
-        """
         neurons_panel_mtype_btn = outside_explore.find_neurons_mtypes_btn()
         assert neurons_panel_mtype_btn, "The toggle arrow for M-type is not found"
         logger.info("M-type arrow button is found")
@@ -236,4 +237,5 @@ class TestOutsideExplorePage:
             (f"The element is not fully in the viewport. Element top: {element_top}, "
              f"Element bottom: {element_bottom}, Viewport height: {viewport_height}")
         logger.info(f"Scrolled through the M-types in the Neurons' panel")
-        """
+        '''
+

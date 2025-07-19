@@ -78,7 +78,7 @@ class OutsideExplorePage(HomePage):
             elements_list.extend(self.find_all_elements(locator, timeout=timeout))
         return elements_list
 
-    def find_experimental_data_titles(self, exp_data_locators, timeout=10):
+    def find_experimental_data_titles(self, exp_data_locators, timeout=25):
         result = []
         for locator in exp_data_locators:
             result.extend(self.find_all_elements(locator, timeout))
@@ -113,7 +113,7 @@ class OutsideExplorePage(HomePage):
         return self.find_element(ExplorePageLocators.MODEL_DATA_BTN)
 
     def find_neurons_panel(self):
-        return self.find_element(ExplorePageLocators.NEURONS_PANEL)
+        return self.is_visible(ExplorePageLocators.NEURONS_PANEL)
 
     def find_neurons_mtypes_btn(self):
         return self.find_element(ExplorePageLocators.NEURONS_PANEL_MTYPE_BTN)
@@ -147,3 +147,11 @@ class OutsideExplorePage(HomePage):
 
     def find_panel_mtype(self):
         return self.find_element(ExplorePageLocators.NEURONS_PANEL_MTYPE)
+
+    def find_visible_experimental_data_titles(self, locators, timeout=30):
+        """Return all visible experimental data elements from a list of locators."""
+        result = []
+        for locator in locators:
+            elements = self.visibility_of_all_elements(locator, timeout=timeout)
+            result.extend(elements)
+        return result

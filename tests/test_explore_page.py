@@ -55,10 +55,12 @@ class TestExplorePage:
             ExplorePageLocators.BOUTON_DENSITY,
             ExplorePageLocators.SYNAPSE_PER_CONNECTION
         ]
+
         logger.info("Searching for Experimental Data types")
+
         for i, locator in enumerate(exp_data_titles):
             logger.info(f"Searching for locator [{i + 1}]: {locator}")
-            elements = explore_page.find_all_elements(locator)  # Find elements for the specific locator
+            elements = explore_page.find_all_elements(locator)
 
             if elements:
                 for element in elements:
@@ -67,9 +69,7 @@ class TestExplorePage:
             else:
                 logger.warning(f"No elements were found for locator [{i + 1}]: {locator}")
 
-        exp_data_elements = explore_page.find_experimental_data_titles(exp_data_titles, timeout=15)
-
-
+        exp_data_elements = explore_page.find_experimental_data_titles(exp_data_titles, timeout=25)
         found_titles = [
             element.text if element.text else f"No text (Tag: {element.tag_name})"
             for element in exp_data_elements

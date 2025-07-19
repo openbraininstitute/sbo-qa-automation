@@ -52,7 +52,7 @@ class BuildSynaptomePage(HomePage):
         return self.find_element(BuildSynaptomeLocators.FILTER_SYNAPSES_BTN)
 
     def find_menu_build(self, timeout=25):
-        return self.find_element(BuildSynaptomeLocators.MENU_BUILD, timeout=timeout)
+        return self.is_visible(BuildSynaptomeLocators.MENU_BUILD, timeout=timeout)
 
     def find_synaptome_box(self, timeout=10):
         return self.find_element(BuildSynaptomeLocators.SYNAPTOME_BOX, timeout=timeout)
@@ -208,10 +208,7 @@ class BuildSynaptomePage(HomePage):
     def target_select(self, timeout=25):
         return self.find_element(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
 
-    # def target_select(self, timeout=10):
-    #     return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
-
-    def wait_for_target_dropdown_expanded(self, timeout=10):
+    def wait_for_target_dropdown_expanded(self, timeout=25):
         WebDriverWait(self.browser, timeout).until(
             lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT).get_attribute("aria-expanded") == "true"
         )
