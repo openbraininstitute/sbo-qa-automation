@@ -73,6 +73,7 @@ jobs:
           LAB_ID_PRODUCTION: ${{ secrets.LAB_ID_PRODUCTION }}
           PROJECT_ID_PRODUCTION: ${{ secrets.PROJECT_ID_PRODUCTION }}
         run: |
+          echo "RUN_URL=https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> ${GITHUB_ENV}
           echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
           echo "ENV_URL: $ENV_URL"
           echo "ENV_NAME: $ENV_NAME"
@@ -128,12 +129,21 @@ jobs:
             | grep -E '^- tests/' \
             | sort | uniq >> failures_${{ inputs.env }}.md
 
-          cat failures_${{ inputs.env }}.md
           echo "::error title=UI Test Failure in ${{ inputs.env }}::$(sed ':a;N;$!ba;s/\n/%0A/g' failures_${{ inputs.env }}.md)"
 
       - name: Upload Combined Failure Summary
+        if: failure() && hashFiles('all_failures.md') != ''
         uses: actions/upload-artifact@v4
         with:
           name: all-ui-test-failures
           path: all_failures.md
 
+      - name: MS Teams Notification
+        uses: jdcargile/ms-teams-notification@v1.4
+        if: failure()
+        with:
+          github-token: ${{ github.token }}
+          ms-teams-webhook-uri: ${{ secrets.MS_TEAMS_WEBHOOK_URI }}
+          notification-summary: 🔺 UI Automated Test Execution Failures
+            Check the workflow for details
+          notification-color: ff0000

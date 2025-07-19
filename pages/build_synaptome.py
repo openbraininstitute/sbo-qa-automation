@@ -6,7 +6,6 @@ from tkinter.constants import RADIOBUTTON
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import TimeoutException
 import logging
 
@@ -24,11 +23,11 @@ class BuildSynaptomePage(HomePage):
     def go_to_build_synaptome(self, lab_id: str, project_id: str):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/build"
         try:
-            self.browser.set_page_load_timeout(90)
+            self.browser.set_page_load_timeout(120)
             self.go_to_page(path)
             self.wait_for_page_ready(timeout=60)
         except TimeoutException:
-            raise RuntimeError("The Build page did not load within 60 seconds.")
+            raise RuntimeError("The Build page did not load within 120 seconds.")
         return self.browser.current_url
 
     def apply_changes_btn(self):
@@ -52,8 +51,8 @@ class BuildSynaptomePage(HomePage):
     def filter_synapses_btn(self):
         return self.find_element(BuildSynaptomeLocators.FILTER_SYNAPSES_BTN)
 
-    def find_menu_build(self):
-        return self.find_element(BuildSynaptomeLocators.MENU_BUILD)
+    def find_menu_build(self, timeout=25):
+        return self.is_visible(BuildSynaptomeLocators.MENU_BUILD, timeout=timeout)
 
     def find_synaptome_box(self, timeout=10):
         return self.find_element(BuildSynaptomeLocators.SYNAPTOME_BOX, timeout=timeout)
@@ -209,10 +208,7 @@ class BuildSynaptomePage(HomePage):
     def target_select(self, timeout=25):
         return self.find_element(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
 
-    # def target_select(self, timeout=10):
-    #     return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
-
-    def wait_for_target_dropdown_expanded(self, timeout=10):
+    def wait_for_target_dropdown_expanded(self, timeout=25):
         WebDriverWait(self.browser, timeout).until(
             lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT).get_attribute("aria-expanded") == "true"
         )

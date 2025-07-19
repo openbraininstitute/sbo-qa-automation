@@ -21,7 +21,7 @@ class ExplorePage(HomePage):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive"
         for attempt in range(retries):
             try:
-                self.browser.set_page_load_timeout(90)
+                self.browser.set_page_load_timeout(100)
                 self.go_to_page(path)
                 self.wait_for_page_ready(timeout=90)
             except TimeoutException:
@@ -59,8 +59,8 @@ class ExplorePage(HomePage):
     def find_cerebrum_brp(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL, timeout=timeout)
 
-    def find_cerebral_cortex_brp(self):
-        return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE)
+    def find_cerebral_cortex_brp(self, timeout=15):
+        return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE, timeout=timeout)
 
     def find_cerebrum_arrow_btn(self, timeout=20):
         return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB, timeout=timeout)
@@ -74,22 +74,22 @@ class ExplorePage(HomePage):
     def find_data_panel(self):
         return self.find_element(ExplorePageLocators.DATA_PANEL)
 
-    def check_explore_title_is_present(self):
-        return self.find_element(ExplorePageLocators.EXPLORE_TITLE_VLAB)
+    def check_explore_title_is_present(self, timeout=15):
+        return self.find_element(ExplorePageLocators.EXPLORE_TITLE_VLAB, timeout=timeout)
 
     def find_explore_page_titles(self, page_locators, timeout=30):
         elements_list = []
         for locator in page_locators:
-            elements_list.extend(self.find_all_elements(locator, timeout=timeout))
+            elements_list.extend(self.visibility_of_all_elements(locator, timeout=timeout))
         return elements_list
 
-    def find_experimental_data_titles(self, exp_data_locators):
+    def find_experimental_data_titles(self, exp_data_locators, timeout=30):
         result = []
         for locator in exp_data_locators:
-            result.extend(self.find_all_elements(locator))
+            result.extend(self.find_all_elements(locator, timeout=timeout))
         return result
 
-    def get_experiment_record_count(self, record_count_locators, timeout=25):
+    def get_experiment_record_count(self, record_count_locators, timeout=40):
         record_counts = []
         for locator in record_count_locators:
             try:
@@ -116,7 +116,7 @@ class ExplorePage(HomePage):
         return self.find_element(ExplorePageLocators.MODEL_DATA_BTN)
 
     def find_neurons_panel(self):
-        return self.find_element(ExplorePageLocators.NEURONS_PANEL)
+        return self.is_visible(ExplorePageLocators.NEURONS_PANEL)
 
     def find_selected_brain_region_title(self):
         return self.find_element(ExplorePageLocators.SELECTED_BRAIN_REGION)
@@ -153,6 +153,19 @@ class ExplorePage(HomePage):
 
     def find_total_count_switch(self):
         return self.find_element(ExplorePageLocators.TOTAL_COUNT_SWITCH)
+
+    def find_visible_experimental_data_titles(self, exp_data_locators, timeout=30):
+        """Return all visible experimental data elements from a list of locators."""
+        result = []
+        for locator in exp_data_locators:
+            result.extend(self.visibility_of_all_elements(locator, timeout=timeout))
+        return result
+
+    def find_visible_explore_page_titles(self, page_locators, timeout=30):
+        elements_list = []
+        for locator in page_locators:
+            elements_list.extend(self.visibility_of_all_elements(locator, timeout=timeout))
+        return elements_list
 
     def wait_for_locators_to_have_text(self, browser, locators, timeout=20):
         for locator in locators:

@@ -28,6 +28,7 @@ class LandingLocators:
     NAV_TEAM = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/team']")
     NAV_RESOURCES = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/resources']")
     NAV_CONTACT = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/contact']")
+    OBI_LOGO = (By.XPATH, "(//h2[contains(text(),'Open Brain Institute')])[1]")
     PARA_TEXT = (By.XPATH, "//div[contains(@class, 'Text-module__KTJYiG__text')]")
     P_TEXT1 = (By.XPATH, "(//div[@class='SanityContentPreview-module__hsTF2G__text'])[1]")
     P_TEXT2 = (By.XPATH, "(//div[@class='SanityContentPreview-module__hsTF2G__text'])[2]")

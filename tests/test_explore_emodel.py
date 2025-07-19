@@ -24,17 +24,18 @@ class TestExploreModelPage:
         explore_model.go_to_explore_emodel_page(lab_id, project_id)
         logger.info("Explore page is loaded")
 
-        emodel_tab = explore_model.find_emodel_tab()
+        emodel_tab = explore_model.find_emodel_tab(timeout=15)
         assert emodel_tab.is_displayed(), "E-model tab is not displayed"
         logger.info("E-model data tab is found")
 
-        cerebrum_title = explore_model.find_br_cerebrum_title()
+        cerebrum_title = explore_model.find_br_cerebrum_title(timeout=15)
         cerebrum_text = cerebrum_title.text
         logger.info(f"Found text: {cerebrum_text}")
 
         ai_assistant_panel = explore_model.find_ai_assistant_panel(timeout=10)
         assert ai_assistant_panel.is_displayed()
         logger.info("Found AI assistant panel")
+
         ai_assistant_panel_close_btn = explore_model.find_ai_assistant_panel_close_btn()
         logger.info("Panel is open. Clicking to close it.")
         ai_assistant_panel_close_btn.click()

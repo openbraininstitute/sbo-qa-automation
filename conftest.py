@@ -23,6 +23,10 @@ from pages.landing_page import LandingPage
 from pages.login_page import LoginPage
 
 
+def get_safe_config(config):
+    safe = config.copy()
+    safe["password"] = "****"
+    return safe
 
 def create_browser(pytestconfig):
     browser_name = pytestconfig.getoption("--browser-name")
@@ -108,13 +112,11 @@ def test_config(pytestconfig):
 
     return {
         "username": username,
-        "password": password,
         "base_url": base_url,
         "lab_url": lab_url,
         "lab_id": lab_id,
         "project_id": project_id,
     }
-
 
 
 @pytest.fixture(scope="class", autouse=True)
@@ -162,7 +164,7 @@ def navigate_to_login(setup, logger, request, test_config):
     """Fixture that navigates to the login page"""
     browser, wait, lab_url, lab_id, project_id = setup
     landing_page = LandingPage(browser, wait, test_config["base_url"], logger)
-    landing_page.go_to_landing_page()
+    landing_page.go_to_landing_page(timeout=15)
     landing_page.click_go_to_lab()
 
     WebDriverWait(browser, 60).until(
@@ -179,12 +181,12 @@ def login(setup, navigate_to_login, test_config, logger):
     login_page = navigate_to_login
 
     username = test_config.get("username")
-    password = test_config.get("password")
+    password = os.getenv("OBI_PASSWORD")
 
     if not username or not password:
         raise ValueError("Username or password is missing in the configuration!")
 
-    login_page.perform_login(username, password)
+    login_page.perform_login(test_config["username"], password)
     login_page.wait_for_login_complete()
     print("Login successful. Current URL:", browser.current_url)
     login_page = LoginPage(browser, wait, lab_url, logger)

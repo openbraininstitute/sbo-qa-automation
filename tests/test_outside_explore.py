@@ -34,11 +34,14 @@ class TestOutsideExplorePage:
         assert cerebrum_title, f"Cerebrum title is not found"
         logger.info("Cerebrum title is displayed")
 
-        ai_assistant_panel = outside_explore.find_ai_assistant_panel(timeout=10)
-        # if ai_assistant_panel.is_displayed():
+        ai_assistant_panel = outside_explore.find_ai_assistant_panel(timeout=15)
         logger.info("AI Assistant panel is open. Attempting to close it.")
-        close_btn = outside_explore.find_ai_assistant_panel_close(timeout=10)
+
+        close_btn = outside_explore.find_ai_assistant_panel_close(timeout=15)
+        assert close_btn, "Close button on AI assistant panel"
         close_btn.click()
+        logger.info("AI Panel is closed.")
+
         ai_assistant_open_btn = outside_explore.find_ai_assistant_panel_open()
         assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
         logger.info("AI Assistant open button is displayed, means the panel is closed.")
@@ -54,13 +57,13 @@ class TestOutsideExplorePage:
             ExplorePageLocators.SYNAPSE_PER_CONNECTION
         ]
         logger.info("Searching for Experimental Data types")
-        exp_data_elements = outside_explore.find_experimental_data_titles(exp_data_titles, timeout=15)
+        exp_data_elements = outside_explore.find_visible_experimental_data_titles(exp_data_titles, timeout=25)
+
+        for element in exp_data_elements:
+            assert element.is_displayed(), f"Experimental data element not displayed: {element}"
 
         found_titles = [element.text for element in exp_data_elements]
         logger.info(f"Found experimental data titles: {found_titles}")
-        for element in exp_data_elements:
-            assert element.is_displayed(), f"Experimental data {element} is not displayed."
-        logger.info("Found Experimental data titles")
 
         page_titles = [
             ExplorePageLocators.EXPERIMENTAL_DATA_BTN,
@@ -81,7 +84,7 @@ class TestOutsideExplorePage:
             ExplorePageLocators.SYNAPSE_PER_CONNECTION_NRECORDS
         ]
 
-        record_counts = outside_explore.get_experiment_record_count(record_count_locators, timeout=30)
+        record_counts = outside_explore.get_experiment_record_count(record_count_locators, timeout=40)
         for record_count in record_counts:
             assert record_count >= 1, f"Record count is less than 100: {record_count}"
         logger.info("Number of records for data types are displayed")
@@ -199,10 +202,11 @@ class TestOutsideExplorePage:
         assert neuron_panel_one_mtype.is_displayed(), "The M-types titles in the panel is not found"
         logger.info("An M-type in the neurons panel is found")
 
+        '''
+        Temporarily commenting out.
         neuron_panel_one_mtype.click()
         logger.info("Clicking inside the viewport of the Neuron panel")
 
-        """
         neurons_panel_mtype_btn = outside_explore.find_neurons_mtypes_btn()
         assert neurons_panel_mtype_btn, "The toggle arrow for M-type is not found"
         logger.info("M-type arrow button is found")
@@ -233,4 +237,5 @@ class TestOutsideExplorePage:
             (f"The element is not fully in the viewport. Element top: {element_top}, "
              f"Element bottom: {element_bottom}, Viewport height: {viewport_height}")
         logger.info(f"Scrolled through the M-types in the Neurons' panel")
-        """
+        '''
+

@@ -43,36 +43,8 @@ class ExploreNeuronDensityPage(ExplorePage):
     def find_ai_assistant_panel_close(self, timeout=10):
         return self.find_element(ExploreNDensityPageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=timeout)
 
-    def find_brain_regions_panel_btn(self):
-        return self.find_element(ExploreNDensityPageLocators.BRAIN_REGIONS_PANEL_BTN)
-
-    # def find_column_headers(self, column_locators, timeout=30):
-    #
-    #     column_headers = []
-    #     for locator in column_locators:
-    #         self.logger.info(f"Checking locator: {locator}")
-    #         try:
-    #             self.element_visibility(locator, timeout=timeout)  # Debug visibility
-    #
-    #             elements = self.find_all_elements(locator)
-    #
-    #             if not elements:
-    #                 self.logger.warning(f"No elements found with locator {locator}")
-    #                 continue
-    #
-    #             self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", elements[0])
-    #             time.sleep(0.3)
-    #
-    #             if len(elements) > 1:
-    #                 self.logger.info(f"Found multiple elements for {locator}")
-    #                 column_headers.extend(elements)
-    #             else:
-    #                 column_headers.append(elements[0])
-    #         except TimeoutException:
-    #             self.logger.error(f"Timeout: Column header with locator {locator} is not visible after {timeout}s")
-    #             raise
-    #     self.logger.info(f"Found {len(column_headers)} column headers")
-    #     return column_headers
+    def find_brain_regions_panel_btn(self, timeout=10):
+        return self.find_element(ExploreNDensityPageLocators.BRAIN_REGIONS_PANEL_BTN, timeout=timeout)
 
     def find_column_headers(self, column_locators, timeout=30):
         column_headers = []

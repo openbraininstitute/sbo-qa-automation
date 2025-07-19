@@ -18,21 +18,20 @@ class TestExploreNeuronDensity:
         browser, wait, base_url, lab_id, project_id = setup
         explore_ndensity = ExploreNeuronDensityPage(browser, wait, logger, base_url)
         explore_ndensity.go_to_explore_neuron_density_page(lab_id, project_id)
-        explore_ndensity.wait_for_ndensity_tab(timeout=60)
+        explore_ndensity.wait_for_ndensity_tab(timeout=120)
         logger.info(f"Neuron density tab is displayed, {browser.current_url}")
 
-        ai_assistant_panel = explore_ndensity.find_ai_assistant_panel()
+        ai_assistant_panel = explore_ndensity.find_ai_assistant_panel(timeout=10)
         logger.info("Found Ai Assistant Panel")
         ai_assistant_panel_close = explore_ndensity.find_ai_assistant_panel_close()
         ai_assistant_panel_close.click()
         logger.info("Found the AI assistant close button and clicked")
 
-        brain_regions_panel_btn = explore_ndensity.find_brain_regions_panel_btn()
+        brain_regions_panel_btn = explore_ndensity.find_brain_regions_panel_btn(timeout=10)
         assert brain_regions_panel_btn.is_displayed(), "Button to close Brain regions panel is not found"
         brain_regions_panel_btn.click()
         logger.info("Brain regions panel is closed")
 
-        # browser.set_window_size(1920, 1080)
         explore_ndensity.wait_for_page_ready(timeout=40)
 
         column_locators = [

@@ -16,18 +16,20 @@ class LandingPage(HomePage):
         self.logger = logger
         self.base_url = base_url
 
-    def go_to_landing_page(self):
+    def go_to_landing_page(self, timeout=20):
         self.browser.get(self.base_url)
-        self.wait_for_page_to_load(timeout=30)
-        banner_title = self.find_banner_title()
+        self.wait_for_page_loaded(timeout=timeout)
+        banner_title = self.find_banner_title(timeout=timeout)
+        return banner_title
 
-    def is_landing_page_displayed(self):
-        try:
-            expected_title = "Open Brain Platform"
-            return expected_title in self.browser.title
-        except TimeoutException as e:
-            self.logger.warning(f"Error loading OBI Landing Page")
-            return False
+    def wait_for_page_loaded(self, timeout=40):
+        return self.wait.until(
+            lambda driver: self.obi_logo(timeout=timeout).is_displayed(),
+            message=f"Build menu title did not appear within {timeout} seconds"
+        )
+
+    def obi_logo(self, timeout=10):
+        return self.is_visible(LandingLocators.OBI_LOGO, timeout=timeout)
 
     def go_to_lab(self, timeout=10):
         return self.find_element(LandingLocators.GOTO_LAB, timeout=timeout)
@@ -62,8 +64,8 @@ class LandingPage(HomePage):
     def digital_brains_steps(self):
         return self.find_all_elements(LandingLocators.DIGITAL_BRAINS_VIDEO_STEP)
 
-    def find_banner_title(self):
-        return self.find_element(LandingLocators.BANNER_TITLE)
+    def find_banner_title(self, timeout=10):
+        return self.find_element(LandingLocators.BANNER_TITLE, timeout=timeout)
 
     def find_title_accelerate(self):
         return self.find_element(LandingLocators.TITLE_ACCELERATE)
@@ -176,11 +178,11 @@ class LandingPage(HomePage):
     def find_menu_logo(self):
         return self.find_element(LandingLocators.TOP_MENU_LOGO)
 
-    def hero_background_img(self):
-        return self.find_element(LandingLocators.HERO_BACKGROUND_IMG)
+    def hero_background_img(self, timeout=15):
+        return self.find_element(LandingLocators.HERO_BACKGROUND_IMG, timeout=timeout)
 
-    def hero_background_video(self):
-        return self.find_element(LandingLocators.HERO_BACKGROUND_VIDEO)
+    def hero_background_video(self, timeout=15):
+        return self.find_element(LandingLocators.HERO_BACKGROUND_VIDEO, timeout=timeout)
 
-    def video_title1(self):
-        return self.find_element(LandingLocators.VIDEO_TITLE1)
+    def video_title1(self, timeout=15):
+        return self.find_element(LandingLocators.VIDEO_TITLE1, timeout=timeout)

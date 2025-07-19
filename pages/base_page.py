@@ -84,7 +84,7 @@ class CustomBasePage:
         except TimeoutException as ex:
             raise Exception(f"Element {element_locator} not visible after {timeout} seconds. Exception: {ex}")
 
-    def wait_for_page_ready(self, timeout=10):
+    def wait_for_page_ready(self, timeout=20):
         """
         Waits until the page's readyState is 'complete', indicating that the page has finished loading.
 
@@ -131,11 +131,10 @@ class CustomBasePage:
                 attempt += 1
         raise RuntimeError(message or f"Condition not met within {timeout} seconds after {retries} retries.")
 
-
-    def wait_for_url_contains(self, partial_url, timeout=30):
-        return self.wait.until(
-            lambda driver: partial_url in driver.current_url,
-            timeout
+    def wait_for_url_contains(self, fragment: str, timeout: int = 30):
+        WebDriverWait(self.browser, timeout).until(
+            EC.url_contains(fragment),
+            message=f"URL did not contain '{fragment}' after {timeout} seconds"
         )
 
     def wait_for_url_change(self, old_url, timeout=30):

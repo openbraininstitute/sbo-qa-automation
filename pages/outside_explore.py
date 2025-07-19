@@ -78,29 +78,15 @@ class OutsideExplorePage(HomePage):
             elements_list.extend(self.find_all_elements(locator, timeout=timeout))
         return elements_list
 
-    def find_experimental_data_titles(self, exp_data_locators, timeout=10):
+    def find_experimental_data_titles(self, exp_data_locators, timeout=25):
         result = []
         for locator in exp_data_locators:
             result.extend(self.find_all_elements(locator, timeout))
         return result
 
-    # def get_experiment_record_count(self, record_count_locators, timeout=30):
-    #     record_counts = []
-    #     for locator in record_count_locators:
-    #         try:
-    #             record = self.wait_for_non_empty_text(locator, timeout)
-    #             record_text = record.text.strip()
-    #             record_number = int(''.join(filter(str.isdigit, record_text)))
-    #             record_counts.append(record_number)
-    #         except TimeoutException:
-    #             raise TimeoutException(f"Timeout: No text found for record at {locator} within {timeout} seconds.")
-    #         except ValueError:
-    #             raise ValueError(f"Could not parse record count from text: '{record_text}'")
-    #     return record_counts
-
-    def get_experiment_record_count(self, record_count_locators, timeout=30, retries=2):
+    def get_experiment_record_count(self, record_count_locators, timeout=40, retries=2):
         if timeout is None:
-            timeout = 60 if os.getenv("CI") == "true" else 30
+            timeout = 60 if os.getenv("CI") == "true" else 40
         for attempt in range(retries):
             try:
                 return self._get_counts_with_retry(record_count_locators, timeout)
@@ -127,7 +113,7 @@ class OutsideExplorePage(HomePage):
         return self.find_element(ExplorePageLocators.MODEL_DATA_BTN)
 
     def find_neurons_panel(self):
-        return self.find_element(ExplorePageLocators.NEURONS_PANEL)
+        return self.is_visible(ExplorePageLocators.NEURONS_PANEL)
 
     def find_neurons_mtypes_btn(self):
         return self.find_element(ExplorePageLocators.NEURONS_PANEL_MTYPE_BTN)
@@ -161,3 +147,11 @@ class OutsideExplorePage(HomePage):
 
     def find_panel_mtype(self):
         return self.find_element(ExplorePageLocators.NEURONS_PANEL_MTYPE)
+
+    def find_visible_experimental_data_titles(self, locators, timeout=30):
+        """Return all visible experimental data elements from a list of locators."""
+        result = []
+        for locator in locators:
+            elements = self.visibility_of_all_elements(locator, timeout=timeout)
+            result.extend(elements)
+        return result

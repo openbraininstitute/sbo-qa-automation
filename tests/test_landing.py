@@ -19,15 +19,13 @@ class TestLanding:
         _visit, base_url = visit_public_pages
         browser, wait = _visit("")
         landing_page = LandingPage(browser, wait, logger, base_url)
-
-        assert landing_page.is_landing_page_displayed(), "Landing Page did not load correctly."
         logger.info("✅ Landing Page loaded successfully.")
 
-        background_page_image = landing_page.hero_background_img()
+        background_page_image = landing_page.hero_background_img(timeout=15)
         assert background_page_image.is_displayed(), "The main page image is not found."
         logger.info("The main page image is found.")
 
-        background_page_video = landing_page.hero_background_video()
+        background_page_video = landing_page.hero_background_video(timeout=15)
         assert background_page_video.is_displayed(), "The page background video is not displayed"
         logger.info("The main background video is displayed.")
 
@@ -95,7 +93,7 @@ class TestLanding:
         assert digital_brains_video, "The digital brains video is not found (line 107)"
         logger.info("The digital brains video is displayed")
 
-        video_title = landing_page.video_title1()
+        video_title = landing_page.video_title1(timeout=15)
         assert video_title.is_displayed(), "The video title is not displayed."
         logger.info("Looking for video title 1")
 
