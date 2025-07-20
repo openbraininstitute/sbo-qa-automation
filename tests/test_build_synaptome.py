@@ -245,7 +245,7 @@ class TestBuildSynaptome:
 
         save_synaptome.click()
         logger.info("Clicked on 'Save' button.")
-
+        time.sleep(1)
         build_synaptome.wait_for_url_contains("/explore/interactive/model/synaptome")
         logger.info("URL contains '/explore/interactive/model/synaptome', the model is built and detail view is "
                     "displayed.")

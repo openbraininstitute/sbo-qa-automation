@@ -131,10 +131,10 @@ class CustomBasePage:
                 attempt += 1
         raise RuntimeError(message or f"Condition not met within {timeout} seconds after {retries} retries.")
 
-    def wait_for_url_contains(self, fragment: str, timeout: int = 30):
+    def wait_for_url_contains(self, url_fragment: str, timeout: int = 30):
         WebDriverWait(self.browser, timeout).until(
-            EC.url_contains(fragment),
-            message=f"URL did not contain '{fragment}' after {timeout} seconds"
+            EC.url_contains(url_fragment),
+            message=f"Timed out waiting for URL to contain: '{url_fragment}'"
         )
 
     def wait_for_url_change(self, old_url, timeout=30):

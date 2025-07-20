@@ -79,7 +79,7 @@ class TestBuild:
             print("Button is disabled, cannot click.")
         logger.info("'Start building' button is clicked.")
 
-        sn_name = build.sn_name()
+        sn_name = build.sn_name(timeout=10)
         assert sn_name.text.strip(), "Name is missing or empty."
         print(f"Name: {sn_name.text.strip()}")
         logger.info("Single neuron name is displayed.")

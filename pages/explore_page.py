@@ -68,8 +68,8 @@ class ExplorePage(HomePage):
     def find_cerebrum_title_main_page(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
-    def find_count_switch(self):
-        return self.find_element(ExplorePageLocators.COUNT_SWITCH)
+    def find_count_switch(self,  timeout=10):
+        return self.is_visible(ExplorePageLocators.COUNT_SWITCH, timeout=timeout)
 
     def find_data_panel(self):
         return self.find_element(ExplorePageLocators.DATA_PANEL)
@@ -77,7 +77,7 @@ class ExplorePage(HomePage):
     def check_explore_title_is_present(self, timeout=15):
         return self.find_element(ExplorePageLocators.EXPLORE_TITLE_VLAB, timeout=timeout)
 
-    def find_explore_page_titles(self, page_locators, timeout=30):
+    def find_explore_page_titles(self, page_locators, timeout=25):
         elements_list = []
         for locator in page_locators:
             elements_list.extend(self.visibility_of_all_elements(locator, timeout=timeout))
@@ -86,7 +86,7 @@ class ExplorePage(HomePage):
     def find_experimental_data_titles(self, exp_data_locators, timeout=30):
         result = []
         for locator in exp_data_locators:
-            result.extend(self.find_all_elements(locator, timeout=timeout))
+            result.extend(self.visibility_of_all_elements(locator, timeout=timeout))
         return result
 
     def get_experiment_record_count(self, record_count_locators, timeout=40):
@@ -172,4 +172,5 @@ class ExplorePage(HomePage):
             WebDriverWait(self.browser, timeout).until(
                 EC.text_to_be_present_in_element(locator, '')
             )
+
 

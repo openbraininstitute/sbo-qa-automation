@@ -107,8 +107,8 @@ class Build(HomePage, LinkChecker):
     def sn_mtype(self):
         return self.find_element(BuildLocators.SN_MTYPE)
 
-    def sn_name(self):
-        return self.find_element(BuildLocators.SN_NAME)
+    def sn_name(self, timeout=10):
+        return self.find_element(BuildLocators.SN_NAME, timeout=timeout)
 
     def start_building_btn(self):
         return self.element_to_be_clickable(BuildLocators.START_BUILDING_BTN)

@@ -111,7 +111,7 @@ class ExploreEModelDataPage(ExplorePage):
     def find_dv_simulation_tab(self):
         return self.find_element(ExploreEModelPageLocators.DV_SIMULATION_TAB)
 
-    def find_emodel_tab(self, timeout=15):
+    def find_emodel_tab(self, timeout=10):
         return self.find_element(ExploreEModelPageLocators.EMODEL_TAB, timeout=timeout)
 
     def find_lv_em_td(self):

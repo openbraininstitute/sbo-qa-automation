@@ -37,8 +37,8 @@ class VLOverview(HomePage):
     def free_plan_create_project_btn(self):
         return self.find_element(VLOverviewLocators.FREE_PLAN_CREATE_PROJECT_BTN)
 
-    def vl_overview_title(self):
-        return self.find_element(VLOverviewLocators.VLOVERVIEW_TITLE)
+    def vl_overview_title(self, timeout=10):
+        return self.is_visible(VLOverviewLocators.VLOVERVIEW_TITLE, timeout=timeout)
 
     def create_project(self):
         return self.find_element(VLOverviewLocators.CREATE_PROJECT_BTN_BANNER)
