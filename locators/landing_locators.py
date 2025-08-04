@@ -35,7 +35,7 @@ class LandingLocators:
     P_TEXT3 = (By.XPATH, "(//div[@class='SanityContentPreview-module__hsTF2G__text'])[3]")
     P_TEXT4 = (By.XPATH, "(//div[@class='SanityContentPreview-module__hsTF2G__text'])[4]")
     P_TEXT5 = (By.XPATH, "//div[@class='Text-module__KTJYiG__text']/p[contains(text(), 'Digital brains are advanced')]")
-    OBI_LOGO = (By.CSS_SELECTOR, ".Menu-module__CnaVha__logo")
+    # OBI_LOGO = (By.CSS_SELECTOR, ".Menu-module__CnaVha__logo")
     SECTION_BTN1 = (By.XPATH, "(//button[starts-with(@class,'SanityContentPreview-module__hsTF2G__button')])[1]")
     SECTION_BTN2 = (By.XPATH, "(//button[starts-with(@class,'SanityContentPreview-module__hsTF2G__button')])[2]")
     SECTION_BTN3 = (By.XPATH, "(//button[starts-with(@class,'SanityContentPreview-module__hsTF2G__button')])[3]")

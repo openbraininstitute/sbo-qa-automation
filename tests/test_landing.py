@@ -50,7 +50,7 @@ class TestLanding:
         logger.info("Title News is displayed")
 
         para_text = landing_page.find_paragraph_text()
-        assert len(para_text) == 6, f"Expected 6 text paragraphs, found {len(para_text)}"
+        assert len(para_text) == 7, f"Expected 6 text paragraphs, found {len(para_text)}"
 
         for idx, para in enumerate(para_text, start=1):
             text = para.text.strip()
