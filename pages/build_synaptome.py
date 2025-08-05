@@ -226,8 +226,13 @@ class BuildSynaptomePage(HomePage):
     def target_select2(self, timeout=25):
         return self.find_element(BuildSynaptomeLocators.TARGET_SELECT2, timeout=timeout)
 
+    # def wait_for_target_dropdown_expanded(self, timeout=25):
+    #     return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+
     def wait_for_target_dropdown_expanded(self, timeout=25):
-        return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+        WebDriverWait(self.browser, timeout).until(
+            lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT).get_attribute("aria-expanded") == "true"
+        )
 
     def wait_for_target_dropdown_expanded2(self, timeout=25):
         WebDriverWait(self.browser, timeout).until(

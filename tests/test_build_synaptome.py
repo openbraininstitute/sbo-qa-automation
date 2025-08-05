@@ -89,7 +89,7 @@ class TestBuildSynaptome:
         start_building_btn = build_synaptome.start_building_button()
         if start_building_btn.get_attribute('disabled') is None:
             start_building_btn.click()
-            logger.info("Button clicked!")
+            logger.info("'Start Building' button is clicked")
         else:
            logger.info("Button is disabled, cannot click.")
         logger.info("'Start building' button is clicked.")
@@ -168,8 +168,8 @@ class TestBuildSynaptome:
         time.sleep(2)
         logger.info("Clicked on 'Target select'.")
 
-        build_synaptome.wait_for_target_dropdown_expanded(timeout=25)
-        logger.info("'Target select' dropdown expanded.")
+        # build_synaptome.wait_for_target_dropdown_expanded(timeout=25)
+        # logger.info("'Target select' dropdown expanded.")
 
         target_list = build_synaptome.target_dropdown_list(timeout=25)
         assert target_list.is_displayed(), "'Target' list is not displayed."

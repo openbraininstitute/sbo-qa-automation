@@ -53,7 +53,9 @@ class BuildSynaptomeLocators:
     TARGET_DROPDOWN_LIST = (By.CSS_SELECTOR, "div.rc-virtual-list-holder-inner")
     TARGET_FIELD = (By.XPATH, "(//span[@class='ant-select-selection-search'])[1]")
     TARGET_FIELD2 = (By.XPATH, "(//span[@class='ant-select-selection-search'])[3]")
-    TARGET_INPUT = (By.ID, "synaptome-model-configuration-form_synapses_0_target")
+    # TARGET_INPUT = (By.ID, "synaptome-model-configuration-form_synapses_0_target")
+    TARGET_INPUT = (By.CSS_SELECTOR, "input[aria-label='Target select']")
+
     TARGET_INPUT2 = (By.ID, "synaptome-model-configuration-form_synapses_1_target")
     TARGET_SELECTOR = (
         By.XPATH,
