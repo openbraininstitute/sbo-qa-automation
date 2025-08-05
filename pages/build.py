@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 
+from selenium.webdriver.common.by import By
+
 from pages.home_page import HomePage
 from util.util_links_checker import LinkChecker
 from locators.build_locators import BuildLocators
@@ -47,8 +49,8 @@ class Build(HomePage, LinkChecker):
     def find_search_input_search_item(self):
         return self.find_element(BuildLocators.SEARCH_INPUT_FIELD)
 
-    def form_brain_region(self):
-        return self.element_to_be_clickable(BuildLocators.FORM_BRAIN_REGION)
+    def form_brain_region(self, timeout=10):
+        return self.element_to_be_clickable(BuildLocators.FORM_BRAIN_REGION, timeout=timeout)
 
     def form_build_single_neuron_title(self):
         return self.find_element(BuildLocators.FORM_BUILD_NEURON_TITLE)
@@ -118,3 +120,11 @@ class Build(HomePage, LinkChecker):
 
     def tick_search_m_record(self):
         return self.find_element(BuildLocators.TICK_SEARCHED_M_RECORD)
+
+    def wait_for_dropdown_visible(self, timeout=10):
+        return self.element_visibility(BuildLocators.BRAIN_REGION_DROPDOWN_CONTAINER, timeout=timeout)
+
+    def wait_for_brain_region_option(self, region_name, timeout=10):
+        xpath = f"//div[@class='ant-select-item-option-content' and text()='{region_name}']"
+        return self.is_visible((By.XPATH, xpath), timeout=timeout)
+

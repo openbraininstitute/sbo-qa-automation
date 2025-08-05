@@ -65,12 +65,20 @@ class TestBuild:
         logger.info("' Creation date' is not empty.")
         print(f"Creation date found: {date_text}")
 
-        form_brain_region = build.form_brain_region()
+        form_brain_region = build.form_brain_region(timeout=10)
         logger.info("Brain region title is found.")
         form_brain_region.click()
+
+        build.wait_for_dropdown_visible()
+        logger.info("Brain region dropdown is visible.")
+
         form_brain_region.send_keys("Cerebrum")
+        build.wait_for_brain_region_option("Cerebrum")
+        logger.info("'Cerebrum' option is now visible.")
+
         form_brain_region.send_keys(Keys.RETURN)
         logger.info("Selected 'Cerebrum' as brain region")
+
         start_building_btn = build.start_building_btn()
         if start_building_btn.get_attribute('disabled') is None:  # Button is not disabled
             start_building_btn.click()
