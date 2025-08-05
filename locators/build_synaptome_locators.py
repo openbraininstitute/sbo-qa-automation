@@ -50,11 +50,15 @@ class BuildSynaptomeLocators:
     SYNAPSE_SETS = (By.CSS_SELECTOR, "#synaptic-input-1")
     SYNAPSE_SET_NUM = (By.XPATH, "//span[text()='Synapses sets']/span")
     SYNAPSE_FORMULA = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_formula")
+    TARGET_DROPDOWN_LIST = (By.CSS_SELECTOR, "div.rc-virtual-list-holder-inner")
     TARGET_FIELD = (By.XPATH, "(//span[@class='ant-select-selection-search'])[1]")
     TARGET_FIELD2 = (By.XPATH, "(//span[@class='ant-select-selection-search'])[3]")
     TARGET_INPUT = (By.ID, "synaptome-model-configuration-form_synapses_0_target")
-    TARGET_INPUT2 = (By.ID, "#synaptome-model-configuration-form_synapses_1_target")
-    TARGET_SELECT = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_target")
+    TARGET_INPUT2 = (By.ID, "synaptome-model-configuration-form_synapses_1_target")
+    TARGET_SELECTOR = (
+        By.XPATH,
+        "//input[@id='synaptome-model-configuration-form_synapses_0_target']/ancestor::div[contains(@class, 'ant-select')]/div[contains(@class, 'ant-select-selector')]"
+    )
     TARGET_SELECT2 = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_1_target")
     TARGET_LIST = (By.XPATH, "//div[@class='rc-virtual-list']")
     TARGET_LIST2 = (By.CSS_SELECTOR, "div.ant-select-dropdown:not(.ant-select-dropdown-hidden)")

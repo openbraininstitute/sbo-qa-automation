@@ -217,16 +217,17 @@ class BuildSynaptomePage(HomePage):
     def canvas_pointer(self, timeout=10):
         return self.element_visibility(BuildSynaptomeLocators.CANVAS_POINTER, timeout=timeout)
 
+    def target_dropdown_list(self, timeout=10):
+        return self.find_element(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+
     def target_select(self, timeout=25):
-        return self.find_element(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
+        return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECTOR, timeout=timeout)
 
     def target_select2(self, timeout=25):
         return self.find_element(BuildSynaptomeLocators.TARGET_SELECT2, timeout=timeout)
 
     def wait_for_target_dropdown_expanded(self, timeout=25):
-        WebDriverWait(self.browser, timeout).until(
-            lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT).get_attribute("aria-expanded") == "true"
-        )
+        return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
 
     def wait_for_target_dropdown_expanded2(self, timeout=25):
         WebDriverWait(self.browser, timeout).until(

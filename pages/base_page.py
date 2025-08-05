@@ -56,9 +56,11 @@ class CustomBasePage:
         )
 
     def element_to_be_clickable(self, by_locator, timeout=10):
-        return WebDriverWait(self.browser, timeout).until(
+        element = WebDriverWait(self.browser, timeout).until(
             EC.element_to_be_clickable(by_locator)
         )
+        time.sleep(0.5)  # short buffer for UI animation
+        return element
 
     def assert_element_text(self, by_locator, expected_text):
         element = self.wait.until(EC.visibility_of_element_located(by_locator))
