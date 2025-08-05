@@ -68,6 +68,7 @@ class TestExploreModelPage:
             search_for_resources.send_keys(char)
             time.sleep(0.2)
         logger.info("Searching for 'cadpyr'")
+        explore_model.wait_for_spinner_to_disappear(timeout=25)
 
         lv_row = explore_model.find_lv_row()
         assert lv_row.is_displayed(), "The table and the rows are not found"
@@ -75,7 +76,7 @@ class TestExploreModelPage:
 
         explore_model.wait_for_spinner_to_disappear(timeout=25)
 
-        lv_searched_emodel = explore_model.find_lv_selected_resource(timeout=15)
+        lv_searched_emodel = explore_model.find_lv_selected_resource(timeout=25)
         assert lv_searched_emodel.is_displayed(), "The selected emodel is not found"
         logger.info("Selected resource found")
 

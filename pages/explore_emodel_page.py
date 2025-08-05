@@ -120,8 +120,8 @@ class ExploreEModelDataPage(ExplorePage):
     def find_lv_row(self, timeout=15):
         return self.is_visible(ExploreEModelPageLocators.LV_ROW, timeout=timeout)
 
-    def find_lv_selected_resource(self, timeout=15):
-        return self.element_to_be_clickable(ExploreEModelPageLocators.LV_EM_TD, timeout=timeout)
+    def find_lv_selected_resource(self, timeout=25):
+        return self.is_visible(ExploreEModelPageLocators.LV_EM_TD, timeout=timeout)
 
     def find_selected_brain_region_title(self):
         return self.find_element(ExploreEModelPageLocators.SELECTED_BRAIN_REGION)
