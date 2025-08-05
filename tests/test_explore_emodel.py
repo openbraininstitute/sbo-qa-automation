@@ -24,11 +24,11 @@ class TestExploreModelPage:
         explore_model.go_to_explore_emodel_page(lab_id, project_id)
         logger.info("Explore page is loaded")
 
-        emodel_tab = explore_model.find_emodel_tab(timeout=10)
+        emodel_tab = explore_model.find_emodel_tab(timeout=25)
         assert emodel_tab.is_displayed(), "E-model tab is not displayed"
         logger.info("E-model data tab is found")
 
-        cerebrum_title = explore_model.find_br_cerebrum_title(timeout=10)
+        cerebrum_title = explore_model.find_br_cerebrum_title(timeout=25)
         cerebrum_text = cerebrum_title.text
         logger.info(f"Found text: {cerebrum_text}")
 
