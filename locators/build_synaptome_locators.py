@@ -79,5 +79,7 @@ class BuildSynaptomeLocators:
     SELECT_INHIBITORY = (By.XPATH, "(//div[@class='ant-select-item-option-content'][normalize-space()='Inhibitory "
                               "Synapses'])[2]")
     USE_SN_MODEL_BTN = (By.XPATH, "//button[text()='Use single neuron model']")
+    ZOOM_UI_CONTAINER = (By.CSS_SELECTOR, "div.absolute.bottom-4.right-6")
+
 
 

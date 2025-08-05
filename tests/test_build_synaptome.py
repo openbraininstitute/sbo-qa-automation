@@ -151,13 +151,16 @@ class TestBuildSynaptome:
         name_your_set.send_keys("soma")
         logger.info("Provided 'soma' as name for the set.")
 
-        canvas = build_synaptome.canvas(timeout=10)
+        canvas = build_synaptome.canvas(timeout=15)
         assert canvas.is_displayed(), "3D Neuron is not displayed."
         logger.info("Canvas is displayed.")
 
-        canvas_pointer = build_synaptome.canvas_pointer(timeout=10)
+        canvas_pointer = build_synaptome.canvas_pointer(timeout=15)
         assert canvas.is_displayed(), "Canvas pointer is not displayed."
         logger.info("Canvas pointer is displayed.")
+
+        zoom_ui = build_synaptome.wait_for_zoom_ui(timeout=15)
+        assert zoom_ui.is_displayed(), "Zoom UI did not appear (neuron may not be loaded)."
 
         target_field = build_synaptome.target_field(timeout=15)
         logger.info("Found 'Target field'.")

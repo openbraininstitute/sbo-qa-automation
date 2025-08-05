@@ -290,3 +290,5 @@ class BuildSynaptomePage(HomePage):
             "Table data is not loaded within the timeout."
         )
 
+    def wait_for_zoom_ui(self, timeout=15):
+        return self.is_visible(BuildSynaptomeLocators.ZOOM_UI_CONTAINER, timeout)

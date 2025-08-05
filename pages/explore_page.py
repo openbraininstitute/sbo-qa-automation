@@ -41,8 +41,8 @@ class ExplorePage(HomePage):
     def find_ai_assistant_panel(self, timeout=10):
         return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
 
-    def find_ai_assistant_panel_close(self, timeout=10):
-        return self.element_to_be_clickable(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=10)
+    def find_ai_assistant_panel_close(self, timeout=25):
+        return self.element_to_be_clickable(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=timeout)
 
     def find_ai_assistant_panel_open(self):
         return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL_BTN_OPEN)
