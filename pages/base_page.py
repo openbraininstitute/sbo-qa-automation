@@ -75,6 +75,11 @@ class CustomBasePage:
         return WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located(by_locator)
         )
 
+    def text_is_visible(self, by_locator, text, timeout=10):
+        return WebDriverWait(self.browser, timeout).until(
+        EC.text_to_be_present_in_element(by_locator, text)
+        )
+
     def wait_for_long_load(self, element_locator, timeout=60):
         try:
             print(f"Waiting for element: {element_locator}")

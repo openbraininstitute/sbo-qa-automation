@@ -28,6 +28,7 @@ class BuildSynaptomeLocators:
     MENU_BUILD = (By.XPATH, "//div[@class='mx-4' and text()='Build']")
     NAME_TITLE = (By.CSS_SELECTOR, "//h1[normalize-space()='Build new synaptome model']")
     NAME_YOUR_SET_FIELD = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_name")
+    NAME_YOUR_SET_FIELD2 = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_1_name")
     NEW_SYNAPTOME_TITLE = (By.XPATH, "//h1[normalize-space()='Build new synaptome model']")
     RADIO_BTN_ME_MODEL = (By.XPATH, "(//span[@class='ant-radio ant-wave-target'])[2]")
     RESULTS = (By.XPATH, "//div[@aria-label='listing-view-title']/span[contains(text(),'Results')]")
@@ -47,18 +48,30 @@ class BuildSynaptomeLocators:
     SYNAPSE_SMALLER_VALUE = (By.CSS_SELECTOR,
                          "#synaptome-model-configuration-form_synapses_0_exclusion_rules_0_distance_soma_lte")
     SYNAPSE_SETS = (By.CSS_SELECTOR, "#synaptic-input-1")
-    SYNAPSE_SET_NUM = (By.XPATH, "//span[text()='Synapses sets']/span[text()='(1)']")
+    SYNAPSE_SET_NUM = (By.XPATH, "//span[text()='Synapses sets']/span")
     SYNAPSE_FORMULA = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_formula")
     TARGET_FIELD = (By.XPATH, "(//span[@class='ant-select-selection-search'])[1]")
+    TARGET_FIELD2 = (By.XPATH, "(//span[@class='ant-select-selection-search'])[3]")
     TARGET_INPUT = (By.ID, "synaptome-model-configuration-form_synapses_0_target")
+    TARGET_INPUT2 = (By.ID, "#synaptome-model-configuration-form_synapses_1_target")
     TARGET_SELECT = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_0_target")
+    TARGET_SELECT2 = (By.CSS_SELECTOR, "#synaptome-model-configuration-form_synapses_1_target")
     TARGET_LIST = (By.XPATH, "//div[@class='rc-virtual-list']")
+    TARGET_LIST2 = (By.CSS_SELECTOR, "div.ant-select-dropdown:not(.ant-select-dropdown-hidden)")
+
+
     TARGET_SOMA = (By.XPATH, "//div[@class='ant-select-item-option-content' and text()='Soma']")
+    TARGET_SOMA2 = (
+    By.XPATH, "//div[contains(@class, 'ant-select-dropdown') and not(contains(@class,'hidden'))]//div[text()='Soma']")
+
     TABLE_ROW = (By.XPATH, "//tr[starts-with(@class,'ant-table-row ant-table-row-level-0')]")
     TABLE = (By.CSS_SELECTOR, ".ant-table-tbody")
     TYPE_FIELD = (By.XPATH, "(//span[@class='ant-select-selection-wrap'])[2]")
+    TYPE_FIELD2 = (By.CSS_SELECTOR, "span[title='Inhibitory Synapses']")
     TYPE_EXCITATORY = (By.CSS_SELECTOR, "div[title='Excitatory Synapses']")
+    TYPE_INHIBITORY = (By.XPATH, "(//span[@title='Excitatory Synapses'][normalize-space()='Excitatory Synapses'])[2]")
+    SELECT_INHIBITORY = (By.XPATH, "(//div[@class='ant-select-item-option-content'][normalize-space()='Inhibitory "
+                              "Synapses'])[2]")
     USE_SN_MODEL_BTN = (By.XPATH, "//button[text()='Use single neuron model']")
-
 
 
