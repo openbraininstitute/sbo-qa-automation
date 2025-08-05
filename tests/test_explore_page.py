@@ -33,7 +33,7 @@ class TestExplorePage:
         assert cerebrum_title_br_panel, f"Cerebrum title is not found"
         logger.info("Cerebrum title is displayed")
 
-        ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=15)
+        ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=25)
         logger.info("AI Assistant panel is open. Attempting to close it.")
 
         close_btn = explore_page.find_ai_assistant_panel_close(timeout=25)

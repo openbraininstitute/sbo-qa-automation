@@ -4,6 +4,8 @@
 
 
 import time
+
+from locators.build_synaptome_locators import BuildSynaptomeLocators
 from pages.build_synaptome import BuildSynaptomePage
 import random
 from datetime import datetime
@@ -165,14 +167,15 @@ class TestBuildSynaptome:
         target_field = build_synaptome.target_field(timeout=15)
         logger.info("Found 'Target field'.")
 
-        target_select = build_synaptome.target_select(timeout=25)
-        time.sleep(2)
-        target_select.click()
-        time.sleep(2)
+        # target_select = build_synaptome.target_select(timeout=25)
+        # time.sleep(2)
+        # target_select.click()
+        # time.sleep(2)
+        build_synaptome.click_target_select(timeout=25)
         logger.info("Clicked on 'Target select'.")
 
-        # build_synaptome.wait_for_target_dropdown_expanded(timeout=25)
-        # logger.info("'Target select' dropdown expanded.")
+        build_synaptome.wait_for_target_dropdown_expanded(timeout=25)
+        logger.info("'Target select' dropdown expanded.")
 
         target_list = build_synaptome.target_dropdown_list(timeout=25)
         assert target_list.is_displayed(), "'Target' list is not displayed."

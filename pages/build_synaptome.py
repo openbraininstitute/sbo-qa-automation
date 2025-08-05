@@ -39,6 +39,9 @@ class BuildSynaptomePage(HomePage):
     def brain_region_column_header(self, timeout=10):
         return self.find_element(BuildSynaptomeLocators.BRAIN_REGION_COLUMN_HEADER, timeout=timeout)
 
+    def click_target_select(self, timeout=25):
+        self.wait_and_click(BuildSynaptomeLocators.TARGET_SELECTOR, timeout=timeout)
+
     def configure_model(self):
         return self.find_element(BuildSynaptomeLocators.CONFIGURE_MODEL)
 
@@ -226,13 +229,13 @@ class BuildSynaptomePage(HomePage):
     def target_select2(self, timeout=25):
         return self.find_element(BuildSynaptomeLocators.TARGET_SELECT2, timeout=timeout)
 
-    # def wait_for_target_dropdown_expanded(self, timeout=25):
-    #     return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
-
     def wait_for_target_dropdown_expanded(self, timeout=25):
-        WebDriverWait(self.browser, timeout).until(
-            lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT).get_attribute("aria-expanded") == "true"
-        )
+        return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+
+    # def wait_for_target_dropdown_expanded(self, timeout=25):
+    #     WebDriverWait(self.browser, timeout).until(
+    #         lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT).get_attribute("aria-expanded") == "true"
+    #     )
 
     def wait_for_target_dropdown_expanded2(self, timeout=25):
         WebDriverWait(self.browser, timeout).until(
