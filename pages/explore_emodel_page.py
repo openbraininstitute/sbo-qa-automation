@@ -5,6 +5,7 @@ import time
 
 from selenium.common import ElementNotVisibleException, TimeoutException, \
     StaleElementReferenceException
+from selenium.webdriver.support.wait import WebDriverWait
 
 from pages.explore_page import ExplorePage
 from locators.explore_emodel_locators import ExploreEModelPageLocators
@@ -160,5 +161,11 @@ class ExploreEModelDataPage(ExplorePage):
         return self.wait_for_element_to_disappear(ExploreEModelPageLocators.SPINNER, timeout=timeout)
 
     def wait_for_emodel_tab_ready(self, timeout=30):
-       self.is_visible(ExploreEModelPageLocators.EMODEL_TAB)
-       return self.browser.find_element(*ExploreEModelPageLocators.EMODEL_TAB)
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: driver.execute_script(
+                "return document.readyState === 'complete';"
+            ),
+            "Page did not reach readyState=complete"
+        )
+        self.is_visible(ExploreEModelPageLocators.EMODEL_TAB, timeout=timeout)
+        return self.browser.find_element(*ExploreEModelPageLocators.EMODEL_TAB)

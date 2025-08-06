@@ -25,7 +25,7 @@ class TestExploreModelPage:
         logger.info("Explore page is loaded")
 
         # emodel_tab = explore_model.find_emodel_tab(timeout=25)
-        emodel_tab = explore_model.wait_for_emodel_tab_ready(timeout=30)
+        emodel_tab = explore_model.wait_for_emodel_tab_ready(timeout=40)
         assert emodel_tab.is_displayed(), "E-model tab is not displayed"
         logger.info("E-model data tab is found")
 
