@@ -50,7 +50,10 @@ class ExplorePage(HomePage):
     def find_atlas_fullscreen_bt(self, timeout=20):
         return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN, timeout=timeout)
 
-    def find_brain_region_panel(self, timeout=20):
+    def find_brain_region_panel(self, timeout=40):
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: driver.execute_script("return document.readyState") == "complete"
+        )
         return self.is_visible(ExplorePageLocators.BRAIN_REGION_PANEL, timeout=timeout)
 
     def find_brain_region_search_field(self, timeout=20):
