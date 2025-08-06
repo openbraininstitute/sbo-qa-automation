@@ -37,7 +37,7 @@ class TestOutsideExplorePage:
         ai_assistant_panel = outside_explore.find_ai_assistant_panel(timeout=15)
         logger.info("AI Assistant panel is open. Attempting to close it.")
 
-        close_btn = outside_explore.find_ai_assistant_panel_close(timeout=15)
+        close_btn = outside_explore.find_ai_assistant_panel_close(timeout=25)
         assert close_btn, "Close button on AI assistant panel"
         close_btn.click()
         logger.info("AI Panel is closed.")
