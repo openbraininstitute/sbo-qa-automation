@@ -167,10 +167,9 @@ class TestBuildSynaptome:
         target_field = build_synaptome.target_field(timeout=15)
         logger.info("Found 'Target field'.")
 
-        # target_select = build_synaptome.target_select(timeout=25)
-        # time.sleep(2)
-        # target_select.click()
-        # time.sleep(2)
+        build_synaptome.wait_for_target_dropdown_enabled(timeout=60)
+        logger.info("'Target select' is now enabled.")
+
         build_synaptome.click_target_select(timeout=25)
         logger.info("Clicked on 'Target select'.")
 
@@ -191,7 +190,7 @@ class TestBuildSynaptome:
         type_field = build_synaptome.type_field()
         logger.info("'Type' field is displayed.")
 
-        time.sleep(3)
+        time.sleep(2)
         type_field.click()
         logger.info("Clicked on 'Type' field.")
 
