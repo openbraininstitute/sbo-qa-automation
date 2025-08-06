@@ -16,12 +16,23 @@ class ExploreEModelDataPage(ExplorePage):
         self.home_page = ExplorePage(browser, wait, logger, base_url)
         self.logger = logger
 
+    # def go_to_explore_emodel_page(self, lab_id: str, project_id: str):
+    #     path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/model/e-model"
+    #     try:
+    #         self.browser.set_page_load_timeout(100)
+    #         self.go_to_page(path)
+    #         self.wait_for_page_ready(timeout=60)
+    #     except TimeoutException:
+    #         raise RuntimeError("The Model data page did not load within 100 seconds.")
+    #     return self.browser.current_url
+
     def go_to_explore_emodel_page(self, lab_id: str, project_id: str):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/model/e-model"
         try:
             self.browser.set_page_load_timeout(100)
             self.go_to_page(path)
-            self.wait_for_page_ready(timeout=60)
+            self.wait_for_page_to_load(timeout=60, element_locator=ExploreEModelPageLocators.EMODEL_TAB)
+
         except TimeoutException:
             raise RuntimeError("The Model data page did not load within 100 seconds.")
         return self.browser.current_url
