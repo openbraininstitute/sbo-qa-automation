@@ -242,7 +242,8 @@ def pytest_runtest_logstart(nodeid, location):
 
 def pytest_runtest_logreport(report):
     """Capture failed tests during runtime"""
-    if report.failed and report.when == "call":
+    # if report.failed and report.when == "call":
+    if report.failed and report.when in ("setup", "call", "teardown"):
         failed_tests.append(report.nodeid)
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
@@ -275,6 +276,8 @@ def pytest_runtest_makereport(item):
     - Embeds the screenshot into the HTML report.
     """
     pytest_html = item.config.pluginmanager.getplugin('html')
+    if not pytest_html:
+        print("pytest-html plugin not available.")
     outcome = yield
     report = outcome.get_result()
     extra = getattr(report, 'extra', [])
@@ -297,7 +300,7 @@ def pytest_runtest_makereport(item):
                 browser = getattr(item.cls, "browser", None)
             if not browser:
                 browser = getattr(item, "_browser", None)
-                print(f"Browser found in item attribute")
+                print(f"Browser found in item attribute", report.nodeid)
 
             if browser:
                 try:
