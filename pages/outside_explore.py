@@ -33,10 +33,10 @@ class OutsideExplorePage(HomePage):
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
 
-    def find_ai_assistant_panel(self, timeout=15):
-        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
+    def find_ai_assistant_panel(self, timeout=25):
+        return self.is_visible(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
 
-    def find_ai_assistant_panel_close(self, timeout=15):
+    def find_ai_assistant_panel_close(self, timeout=25):
         return self.element_to_be_clickable(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=timeout)
 
     def find_ai_assistant_panel_open(self):

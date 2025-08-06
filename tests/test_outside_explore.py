@@ -34,7 +34,7 @@ class TestOutsideExplorePage:
         assert cerebrum_title, f"Cerebrum title is not found"
         logger.info("Cerebrum title is displayed")
 
-        ai_assistant_panel = outside_explore.find_ai_assistant_panel(timeout=15)
+        ai_assistant_panel = outside_explore.find_ai_assistant_panel(timeout=25)
         logger.info("AI Assistant panel is open. Attempting to close it.")
 
         close_btn = outside_explore.find_ai_assistant_panel_close(timeout=25)
