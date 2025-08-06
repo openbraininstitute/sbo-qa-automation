@@ -158,3 +158,7 @@ class ExploreEModelDataPage(ExplorePage):
 
     def wait_for_spinner_to_disappear(self, timeout=15):
         return self.wait_for_element_to_disappear(ExploreEModelPageLocators.SPINNER, timeout=timeout)
+
+    def wait_for_emodel_tab_ready(self, timeout=30):
+       self.is_visible(ExploreEModelPageLocators.EMODEL_TAB)
+       return self.browser.find_element(*ExploreEModelPageLocators.EMODEL_TAB)
