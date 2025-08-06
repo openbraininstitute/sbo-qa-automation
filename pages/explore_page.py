@@ -39,7 +39,7 @@ class ExplorePage(HomePage):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
 
     def find_ai_assistant_panel(self, timeout=10):
-        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
+        return self.is_visible(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
 
     def find_ai_assistant_panel_close(self, timeout=25):
         return self.element_to_be_clickable(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=timeout)
@@ -51,7 +51,7 @@ class ExplorePage(HomePage):
         return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN, timeout=timeout)
 
     def find_brain_region_panel(self, timeout=20):
-        return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL, timeout=timeout)
+        return self.is_visible(ExplorePageLocators.BRAIN_REGION_PANEL, timeout=timeout)
 
     def find_brain_region_search_field(self, timeout=20):
         return self.find_element(ExplorePageLocators.SEARCH_REGION, timeout=timeout)
