@@ -233,7 +233,10 @@ class BuildSynaptomePage(HomePage):
         """
         Wait until the 'Target select' dropdown is clickable (enabled).
         """
-        return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECTOR)
+        # return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECTOR)
+        element = self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECTOR, timeout=timeout)
+        print(element.get_attribute("aria-expanded"))
+        return element
 
     def wait_for_target_dropdown_expanded(self, timeout=25):
         return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)

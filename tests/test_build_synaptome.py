@@ -171,6 +171,7 @@ class TestBuildSynaptome:
         logger.info("'Target select' is now enabled.")
 
         build_synaptome.click_target_select(timeout=25)
+        time.sleep(0.5)
         logger.info("Clicked on 'Target select'.")
 
         build_synaptome.wait_for_target_dropdown_expanded(timeout=25)
