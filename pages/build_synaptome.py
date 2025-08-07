@@ -6,7 +6,7 @@ from tkinter.constants import RADIOBUTTON
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException, NoSuchElementException, StaleElementReferenceException
 import logging
 
 from locators.build_synaptome_locators import BuildSynaptomeLocators
@@ -238,8 +238,18 @@ class BuildSynaptomePage(HomePage):
         print(element.get_attribute("aria-expanded"))
         return element
 
-    def wait_for_target_dropdown_expanded(self, timeout=25):
-        return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+    # def wait_for_target_dropdown_expanded(self, timeout=25):
+    #     return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+
+    def wait_for_target_dropdown_expanded(self, timeout=25, retries=2):
+        last_exception = None
+        for i in range(retries):
+            try:
+                return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST)
+            except TimeoutException as e:
+                last_exception = e
+                time.sleep(1)  # small delay before retry
+        raise last_exception
 
     def wait_for_target_dropdown_expanded2(self, timeout=25):
         WebDriverWait(self.browser, timeout).until(

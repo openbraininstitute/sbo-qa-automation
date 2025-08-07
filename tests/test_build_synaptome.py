@@ -290,7 +290,7 @@ class TestBuildSynaptome:
         save_synaptome = build_synaptome.save_btn(timeout=15)
         assert save_synaptome.is_displayed(), "'Save' button is not displayed."
         logger.info("'Save' button is displayed.")
-
+        time.sleep(300)
         save_synaptome.click()
         logger.info("Clicked on 'Save' button.")
         time.sleep(1)
