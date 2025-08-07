@@ -56,9 +56,11 @@ class CustomBasePage:
         )
 
     def element_to_be_clickable(self, by_locator, timeout=10):
-        return WebDriverWait(self.browser, timeout).until(
+        element = WebDriverWait(self.browser, timeout).until(
             EC.element_to_be_clickable(by_locator)
         )
+        time.sleep(0.5)  # short buffer for UI animation
+        return element
 
     def assert_element_text(self, by_locator, expected_text):
         element = self.wait.until(EC.visibility_of_element_located(by_locator))
@@ -73,6 +75,11 @@ class CustomBasePage:
 
     def is_visible(self, by_locator, timeout=10):
         return WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located(by_locator)
+        )
+
+    def text_is_visible(self, by_locator, text, timeout=10):
+        return WebDriverWait(self.browser, timeout).until(
+        EC.text_to_be_present_in_element(by_locator, text)
         )
 
     def wait_for_long_load(self, element_locator, timeout=60):
@@ -131,10 +138,10 @@ class CustomBasePage:
                 attempt += 1
         raise RuntimeError(message or f"Condition not met within {timeout} seconds after {retries} retries.")
 
-    def wait_for_url_contains(self, fragment: str, timeout: int = 30):
+    def wait_for_url_contains(self, url_fragment: str, timeout: int = 30):
         WebDriverWait(self.browser, timeout).until(
-            EC.url_contains(fragment),
-            message=f"URL did not contain '{fragment}' after {timeout} seconds"
+            EC.url_contains(url_fragment),
+            message=f"Timed out waiting for URL to contain: '{url_fragment}'"
         )
 
     def wait_for_url_change(self, old_url, timeout=30):

@@ -4,6 +4,8 @@
 
 
 import time
+
+from locators.build_synaptome_locators import BuildSynaptomeLocators
 from pages.build_synaptome import BuildSynaptomePage
 import random
 from datetime import datetime
@@ -89,7 +91,7 @@ class TestBuildSynaptome:
         start_building_btn = build_synaptome.start_building_button()
         if start_building_btn.get_attribute('disabled') is None:
             start_building_btn.click()
-            logger.info("Button clicked!")
+            logger.info("'Start Building' button is clicked")
         else:
            logger.info("Button is disabled, cannot click.")
         logger.info("'Start building' button is clicked.")
@@ -151,27 +153,30 @@ class TestBuildSynaptome:
         name_your_set.send_keys("soma")
         logger.info("Provided 'soma' as name for the set.")
 
-        canvas = build_synaptome.canvas(timeout=10)
+        canvas = build_synaptome.canvas(timeout=15)
         assert canvas.is_displayed(), "3D Neuron is not displayed."
         logger.info("Canvas is displayed.")
 
-        canvas_pointer = build_synaptome.canvas_pointer(timeout=10)
+        canvas_pointer = build_synaptome.canvas_pointer(timeout=15)
         assert canvas.is_displayed(), "Canvas pointer is not displayed."
         logger.info("Canvas pointer is displayed.")
+
+        zoom_ui = build_synaptome.wait_for_zoom_ui(timeout=15)
+        assert zoom_ui.is_displayed(), "Zoom UI did not appear (neuron may not be loaded)."
 
         target_field = build_synaptome.target_field(timeout=15)
         logger.info("Found 'Target field'.")
 
-        target_select = build_synaptome.target_select(timeout=25)
-        time.sleep(3)
-        target_select.click()
-        time.sleep(2)
+        build_synaptome.wait_for_target_dropdown_enabled(timeout=60)
+        logger.info("'Target select' is now enabled.")
+
+        build_synaptome.click_target_select(timeout=25)
         logger.info("Clicked on 'Target select'.")
 
         build_synaptome.wait_for_target_dropdown_expanded(timeout=25)
         logger.info("'Target select' dropdown expanded.")
 
-        target_list = build_synaptome.target_list(timeout=20)
+        target_list = build_synaptome.target_dropdown_list(timeout=25)
         assert target_list.is_displayed(), "'Target' list is not displayed."
         logger.info("'Target' list is displayed.")
 
@@ -185,7 +190,7 @@ class TestBuildSynaptome:
         type_field = build_synaptome.type_field()
         logger.info("'Type' field is displayed.")
 
-        time.sleep(3)
+        time.sleep(2)
         type_field.click()
         logger.info("Clicked on 'Type' field.")
 
@@ -230,13 +235,55 @@ class TestBuildSynaptome:
         assert synapse_set2.is_displayed(), "'Synapse set' is not displayed."
         logger.info("'Synapse set' is displayed.")
 
+        name_your_set2 = build_synaptome.name_your_set2()
+        assert name_your_set2.is_displayed(), "'Name your set' label is not displayed."
+        logger.info("'Name your set' label is displayed.")
+
+        name_your_set2.click()
+        logger.info("Clicked on 'Name your set' label.")
+
+        name_your_set2.send_keys("soma")
+        logger.info("Provided 'soma' as name for the set.")
+
+        target_field2 = build_synaptome.target_field2(timeout=15)
+        logger.info("Found 'Target field'.")
+
+        target_select2 = build_synaptome.target_select2(timeout=25)
+        target_select2.click()
+        time.sleep(1)
+        logger.info("Clicked on 'Target select'.")
+
+        target_list2 = build_synaptome.target_list2(timeout=20)
+        assert target_list2.is_displayed(), "'Target' list is not displayed."
+        logger.info("'Target' list is displayed.")
+
+        target_soma2 = build_synaptome.target_soma2(timeout=15)
+        assert target_soma2.is_displayed(), "'Target soma' is not displayed."
+        logger.info("'Target soma' is displayed.")
+
+        target_soma2.click()
+        logger.info("Clicked on 'Target soma' option.")
+
+        type2 = build_synaptome.type_inhibitory()
+        time.sleep(5)
+        assert type2.is_displayed(), "'type_inhibitory' is not displayed."
+        logger.info("'type_inhibitory' is displayed.")
+        time.sleep(2)
+        type2.click()
+        logger.info("Clicked on 'type_inhibitory' option.")
+
+        select_inhibitory = build_synaptome.select_inhibitory()
+        select_inhibitory.click()
+        logger.info("CLICKED ON THE INHIBITORY DROPDOWN")
+
         delete_synapse_set2= build_synaptome.delete_synapse_set(timeout=20)
         assert delete_synapse_set2.is_displayed(), "'Delete synapse set' is not displayed."
         logger.info("'Delete synapse set' is displayed.")
         delete_synapse_set2.click()
+        time.sleep(2)
         logger.info("Clicked on 'Delete synapse set' button.")
 
-        synapse_set_num = build_synaptome.synapse_set_num()
+        synapse_set_num = build_synaptome.synapse_set_num("(1)", timeout=25)
         logger.info("'Synapse set' is equal to 1 again.")
 
         save_synaptome = build_synaptome.save_btn(timeout=15)
@@ -245,7 +292,7 @@ class TestBuildSynaptome:
 
         save_synaptome.click()
         logger.info("Clicked on 'Save' button.")
-
+        time.sleep(1)
         build_synaptome.wait_for_url_contains("/explore/interactive/model/synaptome")
         logger.info("URL contains '/explore/interactive/model/synaptome', the model is built and detail view is "
                     "displayed.")

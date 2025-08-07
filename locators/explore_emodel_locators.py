@@ -11,7 +11,8 @@ class ExploreEModelPageLocators:
     BRAIN_REGION_PANEL = (By.XPATH, "(//div[@class='flex h-screen flex-col bg-primary-8'])[1]")
     BR_SEARCH_FIELD_TYPE = (By.XPATH, "//span[@class='ant-select-selection-search']")
     BR_SEARCH_REGION_SEARCH_FIELD = (By.XPATH, "//div[@class='ant-select-selector']")
-    BR_CEREBRUM_TITLE = (By.XPATH, "//div[@title='Cerebrum']//button")
+    BR_CEREBRUM_TITLE = (By.XPATH, "//span[normalize-space(text())='Cerebrum']")
+
     CLOSE_BRAIN_REGION_PANEL_BTN = (By.XPATH, "(//button[starts-with(@class, 'ant-btn')]/span["
                                               "@class='ant-btn-icon'])[1]")
     DV_ANALYSIS_TAB = (By.CSS_SELECTOR, "#tab_analysis")
@@ -49,7 +50,7 @@ class ExploreEModelPageLocators:
 
     DV_MORPH_TABLE_HEADER_COLUMNS = (By.XPATH, "(//thead[@class='ant-table-thead'])[1]//th")
     DV_EXEMPLAR_TABLE_HEADER_COLUMNS = (By.XPATH, "(//thead[@class='ant-table-thead'])[2]//th")
-    EMODEL_TAB = (By.XPATH, "//li[@title='E-model']")
+    EMODEL_TAB = (By.XPATH, "//li[.//span[contains(text(), 'E-model')]]")
     ME_MODEL_TAB = (By.XPATH, "//li[@title='ME-model']")
     SEARCH_REGION = (By.XPATH, "//input[@class='ant-select-selection-search-input']")
     SEARCH_RESOURCES = (By.CSS_SELECTOR, "input[placeholder='Search for resources...']")

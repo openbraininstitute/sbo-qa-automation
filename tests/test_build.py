@@ -65,12 +65,20 @@ class TestBuild:
         logger.info("' Creation date' is not empty.")
         print(f"Creation date found: {date_text}")
 
-        form_brain_region = build.form_brain_region()
+        form_brain_region = build.form_brain_region(timeout=10)
         logger.info("Brain region title is found.")
         form_brain_region.click()
+
+        build.wait_for_dropdown_visible()
+        logger.info("Brain region dropdown is visible.")
+
         form_brain_region.send_keys("Cerebrum")
+        build.wait_for_brain_region_option("Cerebrum")
+        logger.info("'Cerebrum' option is now visible.")
+
         form_brain_region.send_keys(Keys.RETURN)
         logger.info("Selected 'Cerebrum' as brain region")
+
         start_building_btn = build.start_building_btn()
         if start_building_btn.get_attribute('disabled') is None:  # Button is not disabled
             start_building_btn.click()
@@ -79,7 +87,7 @@ class TestBuild:
             print("Button is disabled, cannot click.")
         logger.info("'Start building' button is clicked.")
 
-        sn_name = build.sn_name()
+        sn_name = build.sn_name(timeout=10)
         assert sn_name.text.strip(), "Name is missing or empty."
         print(f"Name: {sn_name.text.strip()}")
         logger.info("Single neuron name is displayed.")

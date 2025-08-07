@@ -6,6 +6,8 @@ from selenium.webdriver.common.by import By
 
 class BuildLocators:
     BRAIN_REGION_PANEL_TOGGLE = (By.XPATH, "(//span[@aria-label='minus'])[1]")
+    BRAIN_REGION_DROPDOWN_CONTAINER = (By.CSS_SELECTOR, "div.rc-virtual-list-holder-inner")
+    BRAIN_REGION_OPTIONS = (By.CSS_SELECTOR, "div.ant-select-item.ant-select-item-option")
     BUILD_MENU_TITLE = (By.XPATH, "//div[@class='mx-4' and text()='Build']")
     BUILD_SINGLE_NEURON_BTN = (By.XPATH, "//div[@id='single-neuron']//span[contains(text(), 'Build')]")
     CREATED_BY_NAME = (By.XPATH, "//div[@class='font-bold']")

@@ -21,7 +21,7 @@ class TestVLOverview:
         vl_overview.go_to_vloverview(lab_id, project_id)
         logger.info("Virtual Lab Overview page is loaded")
 
-        vl_overview_title = vl_overview.vl_overview_title()
+        vl_overview_title = vl_overview.vl_overview_title(timeout=10)
         logger.info("'Your Virtual Labs and Projects' title is found")
 
         vl_banner_name_label = vl_overview.vl_banner_name_label()

@@ -24,11 +24,12 @@ class TestExploreModelPage:
         explore_model.go_to_explore_emodel_page(lab_id, project_id)
         logger.info("Explore page is loaded")
 
-        emodel_tab = explore_model.find_emodel_tab(timeout=15)
+        # emodel_tab = explore_model.find_emodel_tab(timeout=25)
+        emodel_tab = explore_model.wait_for_emodel_tab_ready(timeout=40)
         assert emodel_tab.is_displayed(), "E-model tab is not displayed"
         logger.info("E-model data tab is found")
 
-        cerebrum_title = explore_model.find_br_cerebrum_title(timeout=15)
+        cerebrum_title = explore_model.find_br_cerebrum_title(timeout=25)
         cerebrum_text = cerebrum_title.text
         logger.info(f"Found text: {cerebrum_text}")
 
@@ -40,7 +41,7 @@ class TestExploreModelPage:
         logger.info("Panel is open. Clicking to close it.")
         ai_assistant_panel_close_btn.click()
 
-        brain_region_search_field = explore_model.find_brain_region_search_field(timeout=25)
+        brain_region_search_field = explore_model.find_brain_region_search_field(timeout=15)
         assert brain_region_search_field.is_displayed()
         logger.info("Bran region panel search field is found")
         brain_region_search_field.send_keys(Keys.ENTER)
@@ -68,6 +69,7 @@ class TestExploreModelPage:
             search_for_resources.send_keys(char)
             time.sleep(0.2)
         logger.info("Searching for 'cadpyr'")
+        explore_model.wait_for_spinner_to_disappear(timeout=25)
 
         lv_row = explore_model.find_lv_row()
         assert lv_row.is_displayed(), "The table and the rows are not found"
@@ -75,7 +77,7 @@ class TestExploreModelPage:
 
         explore_model.wait_for_spinner_to_disappear(timeout=25)
 
-        lv_searched_emodel = explore_model.find_lv_selected_resource(timeout=15)
+        lv_searched_emodel = explore_model.find_lv_selected_resource(timeout=25)
         assert lv_searched_emodel.is_displayed(), "The selected emodel is not found"
         logger.info("Selected resource found")
 

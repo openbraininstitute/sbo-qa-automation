@@ -4,7 +4,9 @@
 import os
 import time
 
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException, StaleElementReferenceException
+from selenium.webdriver.support.wait import WebDriverWait
+
 from locators.explore_page_locators import ExplorePageLocators
 from selenium.webdriver.support import expected_conditions as EC
 from pages.home_page import HomePage
@@ -33,10 +35,10 @@ class OutsideExplorePage(HomePage):
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
 
-    def find_ai_assistant_panel(self, timeout=15):
-        return self.find_element(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
+    def find_ai_assistant_panel(self, timeout=25):
+        return self.is_visible(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
 
-    def find_ai_assistant_panel_close(self, timeout=15):
+    def find_ai_assistant_panel_close(self, timeout=25):
         return self.element_to_be_clickable(ExplorePageLocators.AI_ASSISTANT_PANEL_CLOSE, timeout=timeout)
 
     def find_ai_assistant_panel_open(self):
@@ -45,8 +47,11 @@ class OutsideExplorePage(HomePage):
     def find_atlas_fullscreen_bt(self, timeout=20):
         return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN, timeout=timeout)
 
-    def find_brain_region_panel(self):
-        return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL)
+    def find_brain_region_panel(self, timeout=40):
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: driver.execute_script("return document.readyState") == "complete"
+        )
+        return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL, timeout=timeout)
 
     def find_brain_region_search_field(self, timeout=20):
         return self.find_element(ExplorePageLocators.SEARCH_REGION, timeout=timeout)
@@ -57,8 +62,8 @@ class OutsideExplorePage(HomePage):
     def find_cerebrum_brp(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL, timeout=timeout)
 
-    def find_cerebral_cortex_brp(self):
-        return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE)
+    def find_cerebral_cortex_brp(self, timeout=15):
+        return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE, timeout=timeout)
 
     def find_cerebrum_arrow_btn(self):
         return self.find_element(ExplorePageLocators.CEREBRUM_BTN)
@@ -66,8 +71,8 @@ class OutsideExplorePage(HomePage):
     def find_data_panel(self):
         return self.find_element(ExplorePageLocators.DATA_PANEL)
 
-    def check_explore_title_is_present(self):
-        return self.find_element(ExplorePageLocators.EXPLORE_TITLE)
+    def check_explore_title_is_present(self, timeout=15):
+        return self.is_visible(ExplorePageLocators.EXPLORE_TITLE, timeout=timeout)
 
     def cerebrum_title(self, timeout=15):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
@@ -84,18 +89,29 @@ class OutsideExplorePage(HomePage):
             result.extend(self.find_all_elements(locator, timeout))
         return result
 
-    def get_experiment_record_count(self, record_count_locators, timeout=40, retries=2):
-        if timeout is None:
-            timeout = 60 if os.getenv("CI") == "true" else 40
-        for attempt in range(retries):
-            try:
-                return self._get_counts_with_retry(record_count_locators, timeout)
-            except TimeoutException as e:
-                if attempt == retries - 1:
-                    raise e
-                time.sleep(5)
-                self.logger.warning(
-                    f"Retrying get_experiment_record_count due to timeout... Attempt {attempt + 2}/{retries}")
+    # def get_experiment_record_count(self, record_count_locators, timeout=40, retries=2):
+    #     if timeout is None:
+    #         timeout = 60 if os.getenv("CI") == "true" else 40
+    #     for attempt in range(retries):
+    #         try:
+    #             return self._get_counts_with_retry(record_count_locators, timeout)
+    #         except TimeoutException as e:
+    #             if attempt == retries - 1:
+    #                 raise e
+    #             time.sleep(5)
+    #             self.logger.warning(
+    #                 f"Retrying get_experiment_record_count due to timeout... Attempt {attempt + 2}/{retries}")
+
+    # def _get_counts_with_retry(self, record_count_locators, timeout):
+    #     record_counts = {}
+    #     for locator in record_count_locators:
+    #         try:
+    #             element = self.find_element(locator)
+    #             record_counts[locator] = element.text
+    #         except StaleElementReferenceException:
+    #             element = self.find_element(locator)
+    #             record_counts[locator] = element.text
+    #     return record_counts
 
     def find_3d_atlas(self):
         return self.find_element(ExplorePageLocators.ATLAS)

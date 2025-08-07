@@ -39,6 +39,9 @@ class BuildSynaptomePage(HomePage):
     def brain_region_column_header(self, timeout=10):
         return self.find_element(BuildSynaptomeLocators.BRAIN_REGION_COLUMN_HEADER, timeout=timeout)
 
+    def click_target_select(self, timeout=25):
+        self.wait_and_click(BuildSynaptomeLocators.TARGET_SELECTOR, timeout=timeout)
+
     def configure_model(self):
         return self.find_element(BuildSynaptomeLocators.CONFIGURE_MODEL)
 
@@ -154,6 +157,9 @@ class BuildSynaptomePage(HomePage):
     def name_your_set(self):
         return self.find_element(BuildSynaptomeLocators.NAME_YOUR_SET_FIELD)
 
+    def name_your_set2(self):
+        return self.find_element(BuildSynaptomeLocators.NAME_YOUR_SET_FIELD2)
+
     def new_synaptome_title(self):
         return self.find_element(BuildSynaptomeLocators.NEW_SYNAPTOME_TITLE)
 
@@ -187,17 +193,26 @@ class BuildSynaptomePage(HomePage):
     def synapse_set(self, timeout=15):
         return self.find_element(BuildSynaptomeLocators.SYNAPSE_SETS, timeout=timeout)
 
-    def synapse_set_num(self):
-        return self.find_element(BuildSynaptomeLocators.SYNAPSE_SET_NUM)
+    def synapse_set_num(self, text, timeout=15):
+        return self.text_is_visible(BuildSynaptomeLocators.SYNAPSE_SET_NUM, text, timeout=timeout)
 
     def target_field(self, timeout=15):
         return self.find_element(BuildSynaptomeLocators.TARGET_FIELD, timeout=timeout)
 
+    def target_field2(self, timeout=15):
+        return self.find_element(BuildSynaptomeLocators.TARGET_FIELD2, timeout=timeout)
+
     def target_list(self, timeout=20):
         return self.find_element(BuildSynaptomeLocators.TARGET_LIST, timeout=timeout)
 
+    def target_list2(self, timeout=20):
+        return self.find_element(BuildSynaptomeLocators.TARGET_LIST2, timeout=timeout)
+
     def target_soma(self, timeout=15):
         return self.find_element(BuildSynaptomeLocators.TARGET_SOMA, timeout=timeout)
+
+    def target_soma2(self, timeout=15):
+        return self.find_element(BuildSynaptomeLocators.TARGET_SOMA2, timeout=timeout)
 
     def canvas(self, timeout=10):
         return self.is_visible(BuildSynaptomeLocators.CANVAS, timeout=timeout)
@@ -205,19 +220,43 @@ class BuildSynaptomePage(HomePage):
     def canvas_pointer(self, timeout=10):
         return self.element_visibility(BuildSynaptomeLocators.CANVAS_POINTER, timeout=timeout)
 
+    def target_dropdown_list(self, timeout=10):
+        return self.find_element(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+
     def target_select(self, timeout=25):
-        return self.find_element(BuildSynaptomeLocators.TARGET_SELECT, timeout=timeout)
+        return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECTOR, timeout=timeout)
+
+    def target_select2(self, timeout=25):
+        return self.find_element(BuildSynaptomeLocators.TARGET_SELECT2, timeout=timeout)
+
+    def wait_for_target_dropdown_enabled(self, timeout=60):
+        """
+        Wait until the 'Target select' dropdown is clickable (enabled).
+        """
+        return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECTOR)
 
     def wait_for_target_dropdown_expanded(self, timeout=25):
+        return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+
+    def wait_for_target_dropdown_expanded2(self, timeout=25):
         WebDriverWait(self.browser, timeout).until(
-            lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT).get_attribute("aria-expanded") == "true"
+            lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT2).get_attribute("aria-expanded") == "true"
         )
 
     def type_field(self):
         return self.find_element(BuildSynaptomeLocators.TYPE_FIELD)
 
+    def type_field2(self):
+        return self.find_element(BuildSynaptomeLocators.TYPE_FIELD2)
+
     def type_excitatory(self):
         return self.element_to_be_clickable(BuildSynaptomeLocators.TYPE_EXCITATORY)
+
+    def type_inhibitory(self):
+        return self.element_to_be_clickable(BuildSynaptomeLocators.TYPE_INHIBITORY)
+
+    def select_inhibitory(self):
+        return self.element_to_be_clickable(BuildSynaptomeLocators.SELECT_INHIBITORY)
 
     def use_sn_model_btn(self):
         return self.element_to_be_clickable(BuildSynaptomeLocators.USE_SN_MODEL_BTN)
@@ -255,3 +294,5 @@ class BuildSynaptomePage(HomePage):
             "Table data is not loaded within the timeout."
         )
 
+    def wait_for_zoom_ui(self, timeout=15):
+        return self.is_visible(BuildSynaptomeLocators.ZOOM_UI_CONTAINER, timeout)

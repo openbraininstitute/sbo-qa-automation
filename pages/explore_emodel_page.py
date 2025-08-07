@@ -5,6 +5,7 @@ import time
 
 from selenium.common import ElementNotVisibleException, TimeoutException, \
     StaleElementReferenceException
+from selenium.webdriver.support.wait import WebDriverWait
 
 from pages.explore_page import ExplorePage
 from locators.explore_emodel_locators import ExploreEModelPageLocators
@@ -16,12 +17,23 @@ class ExploreEModelDataPage(ExplorePage):
         self.home_page = ExplorePage(browser, wait, logger, base_url)
         self.logger = logger
 
+    # def go_to_explore_emodel_page(self, lab_id: str, project_id: str):
+    #     path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/model/e-model"
+    #     try:
+    #         self.browser.set_page_load_timeout(100)
+    #         self.go_to_page(path)
+    #         self.wait_for_page_ready(timeout=60)
+    #     except TimeoutException:
+    #         raise RuntimeError("The Model data page did not load within 100 seconds.")
+    #     return self.browser.current_url
+
     def go_to_explore_emodel_page(self, lab_id: str, project_id: str):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/model/e-model"
         try:
             self.browser.set_page_load_timeout(100)
             self.go_to_page(path)
-            self.wait_for_page_ready(timeout=60)
+            self.wait_for_page_to_load(timeout=60, element_locator=ExploreEModelPageLocators.EMODEL_TAB)
+
         except TimeoutException:
             raise RuntimeError("The Model data page did not load within 100 seconds.")
         return self.browser.current_url
@@ -111,8 +123,8 @@ class ExploreEModelDataPage(ExplorePage):
     def find_dv_simulation_tab(self):
         return self.find_element(ExploreEModelPageLocators.DV_SIMULATION_TAB)
 
-    def find_emodel_tab(self, timeout=15):
-        return self.find_element(ExploreEModelPageLocators.EMODEL_TAB, timeout=timeout)
+    def find_emodel_tab(self, timeout=25):
+        return self.is_visible(ExploreEModelPageLocators.EMODEL_TAB, timeout=timeout)
 
     def find_lv_em_td(self):
         return self.find_element(ExploreEModelPageLocators.LV_EM_TD)
@@ -120,8 +132,8 @@ class ExploreEModelDataPage(ExplorePage):
     def find_lv_row(self, timeout=15):
         return self.is_visible(ExploreEModelPageLocators.LV_ROW, timeout=timeout)
 
-    def find_lv_selected_resource(self, timeout=15):
-        return self.element_to_be_clickable(ExploreEModelPageLocators.LV_EM_TD, timeout=timeout)
+    def find_lv_selected_resource(self, timeout=25):
+        return self.is_visible(ExploreEModelPageLocators.LV_EM_TD, timeout=timeout)
 
     def find_selected_brain_region_title(self):
         return self.find_element(ExploreEModelPageLocators.SELECTED_BRAIN_REGION)
@@ -147,3 +159,13 @@ class ExploreEModelDataPage(ExplorePage):
 
     def wait_for_spinner_to_disappear(self, timeout=15):
         return self.wait_for_element_to_disappear(ExploreEModelPageLocators.SPINNER, timeout=timeout)
+
+    def wait_for_emodel_tab_ready(self, timeout=30):
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: driver.execute_script(
+                "return document.readyState === 'complete';"
+            ),
+            "Page did not reach readyState=complete"
+        )
+        self.is_visible(ExploreEModelPageLocators.EMODEL_TAB, timeout=timeout)
+        return self.browser.find_element(*ExploreEModelPageLocators.EMODEL_TAB)
