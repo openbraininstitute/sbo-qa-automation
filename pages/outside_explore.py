@@ -5,6 +5,8 @@ import os
 import time
 
 from selenium.common import TimeoutException, StaleElementReferenceException
+from selenium.webdriver.support.wait import WebDriverWait
+
 from locators.explore_page_locators import ExplorePageLocators
 from selenium.webdriver.support import expected_conditions as EC
 from pages.home_page import HomePage
@@ -45,8 +47,11 @@ class OutsideExplorePage(HomePage):
     def find_atlas_fullscreen_bt(self, timeout=20):
         return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN, timeout=timeout)
 
-    def find_brain_region_panel(self):
-        return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL)
+    def find_brain_region_panel(self, timeout=40):
+        WebDriverWait(self.browser, timeout).until(
+            lambda driver: driver.execute_script("return document.readyState") == "complete"
+        )
+        return self.find_element(ExplorePageLocators.BRAIN_REGION_PANEL, timeout=timeout)
 
     def find_brain_region_search_field(self, timeout=20):
         return self.find_element(ExplorePageLocators.SEARCH_REGION, timeout=timeout)

@@ -27,6 +27,9 @@ class TestOutsideExplorePage:
         outside_explore.go_to_outside_explore_page()
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
+        brain_region_panel = outside_explore.find_brain_region_panel(timeout=40)
+        logger.info("Found Brain Region Panel")
+
         outside_explore.check_explore_title_is_present(timeout=15)
         logger.info("Explore page title is present")
 
@@ -46,7 +49,7 @@ class TestOutsideExplorePage:
         assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
         logger.info("AI Assistant open button is displayed, means the panel is closed.")
 
-        cerebrum_title_main_page = outside_explore.find_cerebrum_title_main_page(timeout=15)
+        cerebrum_title_main_page = outside_explore.find_cerebrum_title_main_page(timeout=20)
         assert cerebrum_title_main_page.is_displayed(), "Cerebrum title on the main page is not displayed."
 
         exp_data_titles = [
