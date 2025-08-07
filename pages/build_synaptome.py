@@ -42,8 +42,8 @@ class BuildSynaptomePage(HomePage):
     def click_target_select(self, timeout=25):
         self.wait_and_click(BuildSynaptomeLocators.TARGET_SELECTOR, timeout=timeout)
 
-    def configure_model(self):
-        return self.find_element(BuildSynaptomeLocators.CONFIGURE_MODEL)
+    def configure_model(self, timeout=10):
+        return self.find_element(BuildSynaptomeLocators.CONFIGURE_MODEL, timeout=timeout)
 
     def delete_synapse_set(self, timeout=20):
         return self.find_element(BuildSynaptomeLocators.DELETE_SYNAPSE_SET2, timeout=timeout)
@@ -219,6 +219,12 @@ class BuildSynaptomePage(HomePage):
 
     def canvas_pointer(self, timeout=10):
         return self.element_visibility(BuildSynaptomeLocators.CANVAS_POINTER, timeout=timeout)
+
+    def seed_synaptome(self, timeout=10):
+        return self.element_visibility(BuildSynaptomeLocators.SEED_TITLE, timeout=timeout)
+
+    def select_single_neuron_title(self, timeout=10):
+        return self.element_visibility(BuildSynaptomeLocators.SELECT_SINGLE_NEURON_TITLE, timeout=timeout)
 
     def target_dropdown_list(self, timeout=10):
         return self.find_element(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
