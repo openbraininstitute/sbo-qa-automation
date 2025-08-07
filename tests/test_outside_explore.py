@@ -121,17 +121,21 @@ class TestOutsideExplorePage:
         brain_region_search_field = outside_explore.find_brain_region_search_field(timeout=25)
         assert brain_region_search_field.is_displayed()
         logger.info("Bran region panel search field is found")
+
         brain_region_search_field.send_keys(Keys.ENTER)
         find_input_file_and_wait = ExplorePageLocators.SEARCH_REGION
         outside_explore.wait_for_long_load(find_input_file_and_wait)
         logger.info("Waiting for page to load")
 
+        brain_region_search_field = outside_explore.find_brain_region_search_field(timeout=15)
         brain_region_search_field.send_keys("Isocortex")
         logger.info("Searching for 'Isocortex'")
+
         brain_region_search_field.send_keys(Keys.ENTER)
         selected_brain_region_title = outside_explore.find_selected_brain_region_title()
         assert selected_brain_region_title.text == 'Isocortex'
         logger.info("Found 'Isocortex' in the brain region panel and the title is displayed ")
+
         outside_explore.wait_for_page_ready(timeout=20)
         logger.info("Wait for the sorting action to complete.")
         model_data_tab = outside_explore.find_model_data_title()

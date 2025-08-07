@@ -149,8 +149,8 @@ class OutsideExplorePage(HomePage):
     def find_panel_synaptome(self):
         return self.find_element(ExplorePageLocators.PANEL_SYNAPTOME)
 
-    def find_selected_brain_region_title(self):
-        return self.find_element(ExplorePageLocators.SELECTED_BRAIN_REGION)
+    def find_selected_brain_region_title(self, timeout=10):
+        return self.is_visible(ExplorePageLocators.SELECTED_BRAIN_REGION, timeout=timeout)
 
     def find_total_count_density(self):
         return self.find_element(ExplorePageLocators.TOTAL_COUNT_DENSITY)
