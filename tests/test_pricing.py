@@ -44,3 +44,21 @@ class TestPricing:
         assert pricing_hero_video, "The main hero/background video is not found."
         logger.info("The main hero/background video is found.")
 
+        page_title = pricing_page.page_title()
+        assert page_title.is_displayed(), "'Discover our plans' title is not found."
+        logger.info("'Discover our plans' title is found.")
+
+        create_your_vlab_btn = pricing_page.temp_goto_vlab_btn()
+        assert create_your_vlab_btn.is_displayed(), "'Create your virtual lab' button is not found."
+        logger.info("'Create your virtual lab' button is found.")
+
+        price_list_container = pricing_page.price_list_container()
+        assert price_list_container.is_displayed(), "Price list container is not found."
+        logger.info("Price list container is found.")
+
+        price_list_plans = pricing_page.price_list_plans()
+        assert price_list_plans, "Price list plans are not found."
+        logger.info( "Price list plans are found.")
+
+
+

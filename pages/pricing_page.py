@@ -31,6 +31,9 @@ class PricingPage(HomePage):
                 self.wait.sleep(delay)
         raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
 
+    def page_title(self):
+        return self.find_element(PricingLocators.DISCOVER_PLANS)
+
     def obi_homepage_logo(self):
         return self.is_visible(PricingLocators.OBI_HOMEPAGE_LOGO_BTN)
 
@@ -48,3 +51,12 @@ class PricingPage(HomePage):
 
     def hero_video(self, timeout=20):
         return self.element_visibility(PricingLocators.HERO_VIDEO, timeout=timeout)
+
+    def price_list_container(self):
+        return self.find_element(PricingLocators.PRICE_LIST_CONTAINER)
+
+    def price_list_plans(self):
+        return self.find_all_elements(PricingLocators.PRICE_LIST_PLANS)
+
+    def temp_goto_vlab_btn(self):
+        return self.find_element(PricingLocators.TEMP_GOTO_VLAB_BTN)
