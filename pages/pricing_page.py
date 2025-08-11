@@ -34,7 +34,6 @@ class PricingPage(HomePage):
     def obi_homepage_logo(self):
         return self.is_visible(PricingLocators.OBI_HOMEPAGE_LOGO_BTN)
 
-
     def obi_menu(self):
         return self.element_visibility(PricingLocators.OBI_MENU)
 
