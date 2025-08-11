@@ -7,9 +7,13 @@ from selenium.webdriver.common.by import By
 
 
 class PricingLocators:
+    CONTACT_US = (By.CSS_SELECTOR, ".contact-us-module__uvpJja__contactUs")
+    DETAIL_PLANS = (By.CSS_SELECTOR, ".large-screen-module__desitq__priceList")
     DISCOVER_PLANS = (By.XPATH, "//h1[normalize-space()='Discover our plans']")
+    FOOTER = (By.CSS_SELECTOR, ".FooterPanel-module__YUozGG__footerPanel")
     PRICING_TITLE = (By.XPATH, "//h1[normalize-space()='Pricing']")
     PRICING_SUBTEXT = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__content")
+    NOTES_EXPLANATION = (By.CSS_SELECTOR, ".large-screen-module__desitq__notesExplanation")
     OBI_HOMEPAGE_MAIN_NAV = (By.CSS_SELECTOR, "div[id='LandingPage/menu']")
     OBI_HOMEPAGE_LOGO_BTN = (By.CSS_SELECTOR, ".Menu-module__CnaVha__logo")
     OBI_MENU = (By.CSS_SELECTOR, ".Menu-module__CnaVha__items")

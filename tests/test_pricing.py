@@ -60,5 +60,18 @@ class TestPricing:
         assert price_list_plans, "Price list plans are not found."
         logger.info( "Price list plans are found.")
 
+        contact_us_btn_premium_plan = pricing_page.contact_us()
+        assert contact_us_btn_premium_plan.is_displayed(), "Button 'Contact us' is not found."
+        logger.info("Button 'Contact us' is found.")
+
+        container_detail_plan = pricing_page.detail_plans()
+        assert container_detail_plan.is_displayed(), "Container with details of plans is not found."
+        logger.info("Container with details of plans is not found.")
+
+        page_footer = pricing_page.footer()
+        assert page_footer.is_displayed(), "Page footer is not found."
+        logger.info("Page footer is found.")
+
+
 
 

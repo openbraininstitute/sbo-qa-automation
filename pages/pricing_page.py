@@ -31,6 +31,18 @@ class PricingPage(HomePage):
                 self.wait.sleep(delay)
         raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
 
+    def contact_us(self):
+        return self.find_element(PricingLocators.CONTACT_US)
+
+    def detail_plans(self):
+        return self.find_element(PricingLocators.DETAIL_PLANS)
+
+    def footer(self):
+        return self.find_element(PricingLocators.FOOTER)
+
+    def notes_explanation(self):
+        return self.find_element(PricingLocators.NOTES_EXPLANATION)
+
     def page_title(self):
         return self.find_element(PricingLocators.DISCOVER_PLANS)
 
