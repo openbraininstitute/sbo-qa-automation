@@ -41,6 +41,8 @@ class BuildSynaptomeLocators:
     By.XPATH, "//h1[contains(text(),'Select a single neuron model to build a synaptome ')]")
     SPIN_CONTAINER = (By.XPATH, "//div[starts-with(@class,'ant-spin-container ant-spin-blur')]")
     START_BUILDING_BTN = (By.XPATH, "(//button[normalize-space()='Start building'])[1]")
+    SEED_TITLE = (By.ID, "synaptome-model-configuration-form_seed")
+    SELECT_SINGLE_NEURON_TITLE = (By.XPATH, "//div[contains(text(),'select single neuron')]")
     SYNAPTOME_FORM = (By.CSS_SELECTOR, "#synaptome-model-configuration-form")
     SYNAPTOME_BOX = (By.XPATH, "//div[@id='synaptome']")
     SYNAPTOME_BUILD_BTN = (By.XPATH, "//div[@id='synaptome']//button[@type='button']/span[text()='Build']")

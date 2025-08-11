@@ -111,7 +111,6 @@ class TestBuildSynaptome:
         assert brain_region_column_header.is_displayed(), "'Brain region' column header is not displayed."
         logger.info("'Brain region' column header is displayed.")
 
-        # Wait for table to load
         build_synaptome.wait_for_table_data_to_load(timeout=10)
         logger.info("Table data is fully loaded.")
 
@@ -139,9 +138,17 @@ class TestBuildSynaptome:
         use_sn_model_btn.click()
         logger.info("Clicked on 'Use synaptome model' button.")
 
-        configure_model_label = build_synaptome.configure_model()
+        select_single_neuron_title = build_synaptome.select_single_neuron_title(timeout=10)
+        assert select_single_neuron_title.is_displayed(), "'Select single neuron' breadcrumb is displayed."
+        logger.info("Select single neuron breadcrumb title is displayed.")
+
+        configure_model_label = build_synaptome.configure_model(timeout=10)
         assert configure_model_label.is_displayed(), "'Configure model' label is not displayed."
         logger.info("'Configure model' label is displayed.")
+
+        seed_title = build_synaptome.seed_synaptome(timeout=10)
+        assert seed_title.is_displayed(), "Synaptome seed title is displayed."
+        logger.info("Seed seed title is displayed.")
 
         name_your_set = build_synaptome.name_your_set()
         assert name_your_set.is_displayed(), "'Name your set' label is not displayed."
@@ -171,6 +178,7 @@ class TestBuildSynaptome:
         logger.info("'Target select' is now enabled.")
 
         build_synaptome.click_target_select(timeout=25)
+        time.sleep(0.5)
         logger.info("Clicked on 'Target select'.")
 
         build_synaptome.wait_for_target_dropdown_expanded(timeout=25)
@@ -289,7 +297,7 @@ class TestBuildSynaptome:
         save_synaptome = build_synaptome.save_btn(timeout=15)
         assert save_synaptome.is_displayed(), "'Save' button is not displayed."
         logger.info("'Save' button is displayed.")
-
+        time.sleep(300)
         save_synaptome.click()
         logger.info("Clicked on 'Save' button.")
         time.sleep(1)

@@ -6,7 +6,7 @@ from tkinter.constants import RADIOBUTTON
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException, NoSuchElementException, StaleElementReferenceException
 import logging
 
 from locators.build_synaptome_locators import BuildSynaptomeLocators
@@ -42,8 +42,8 @@ class BuildSynaptomePage(HomePage):
     def click_target_select(self, timeout=25):
         self.wait_and_click(BuildSynaptomeLocators.TARGET_SELECTOR, timeout=timeout)
 
-    def configure_model(self):
-        return self.find_element(BuildSynaptomeLocators.CONFIGURE_MODEL)
+    def configure_model(self, timeout=10):
+        return self.find_element(BuildSynaptomeLocators.CONFIGURE_MODEL, timeout=timeout)
 
     def delete_synapse_set(self, timeout=20):
         return self.find_element(BuildSynaptomeLocators.DELETE_SYNAPSE_SET2, timeout=timeout)
@@ -220,6 +220,12 @@ class BuildSynaptomePage(HomePage):
     def canvas_pointer(self, timeout=10):
         return self.element_visibility(BuildSynaptomeLocators.CANVAS_POINTER, timeout=timeout)
 
+    def seed_synaptome(self, timeout=10):
+        return self.element_visibility(BuildSynaptomeLocators.SEED_TITLE, timeout=timeout)
+
+    def select_single_neuron_title(self, timeout=10):
+        return self.element_visibility(BuildSynaptomeLocators.SELECT_SINGLE_NEURON_TITLE, timeout=timeout)
+
     def target_dropdown_list(self, timeout=10):
         return self.find_element(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
 
@@ -233,10 +239,23 @@ class BuildSynaptomePage(HomePage):
         """
         Wait until the 'Target select' dropdown is clickable (enabled).
         """
-        return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECTOR)
+        # return self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECTOR)
+        element = self.element_to_be_clickable(BuildSynaptomeLocators.TARGET_SELECTOR, timeout=timeout)
+        print(element.get_attribute("aria-expanded"))
+        return element
 
-    def wait_for_target_dropdown_expanded(self, timeout=25):
-        return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+    # def wait_for_target_dropdown_expanded(self, timeout=25):
+    #     return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST, timeout=timeout)
+
+    def wait_for_target_dropdown_expanded(self, timeout=25, retries=2):
+        last_exception = None
+        for i in range(retries):
+            try:
+                return self.is_visible(BuildSynaptomeLocators.TARGET_DROPDOWN_LIST)
+            except TimeoutException as e:
+                last_exception = e
+                time.sleep(1)  # small delay before retry
+        raise last_exception
 
     def wait_for_target_dropdown_expanded2(self, timeout=25):
         WebDriverWait(self.browser, timeout).until(

@@ -74,8 +74,12 @@ class CustomBasePage:
         return self.wait.until(EC.visibility_of_element_located(by_locator)).send_keys(text)
 
     def is_visible(self, by_locator, timeout=10):
-        return WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located(by_locator)
-        )
+        try:
+            return WebDriverWait(self.browser, timeout).until(
+                EC.visibility_of_element_located(by_locator)
+            )
+        except TimeoutException:
+            raise TimeoutException(f"Element not visible: {by_locator}")
 
     def text_is_visible(self, by_locator, text, timeout=10):
         return WebDriverWait(self.browser, timeout).until(
