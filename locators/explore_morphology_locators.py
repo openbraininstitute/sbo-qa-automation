@@ -28,7 +28,7 @@ class ExploreMorphologyPageLocators:
                                        ")='Contributors']")
     DV_DESCRIPTION_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text("
                                       ")='Description']")
-    DV_DOWNLOAD_BTN = (By.XPATH, "//button[@type='button']/span[contains(text(),'Download')]")
+    DV_DOWNLOAD_BTN = (By.CSS_SELECTOR, "button[title='Download'] div[class='flex items-center px-2 group-hover:py-2']")
     DV_LICENSE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='License']")
     DV_MORPHOMETRICS_TITLE = (By.XPATH, "//h1[.='Morphometrics']")
     DV_MTYPE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='M-Type']")
@@ -49,7 +49,7 @@ class ExploreMorphologyPageLocators:
     FILTER_MTYPE_TEXT_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input'])[2]")
     FILTER_PANEL = (By.XPATH, "//div[@data-testid='listing-view-filter-panel']")
     FIRST_ROW = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]")
-    LV_BRAIN_REGION = (By.XPATH, "//div[@class='explore-module__frHowq__columnTitle' and text()='Brain region']")
+    LV_BRAIN_REGION = (By.XPATH, "//div[@class='explore-module__frHowq__columnTitle break-words'][normalize-space()='Brain region']")
     LV_CHECKBOX = (By.XPATH, "")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
     LV_FILTER_APPLY_BTN = (By.XPATH, "//button[contains(text(),'Apply') and @type='submit']")

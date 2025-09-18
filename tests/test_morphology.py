@@ -213,6 +213,7 @@ class TestExploreMorphologyPage:
         logger.info("Morphology viewer settings button clicked")
         morpho_fullscreen_btn.click()
         logger.info("Close full screen")
+        # time.sleep(10)
         download_btn = explore_morphology.find_download_btn()
         logger.info("Morphology 'Download' button is displayed")
 
