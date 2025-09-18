@@ -11,7 +11,7 @@ class ExplorePageLocators:
     AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     AI_ASSISTANT_PANEL_BTN_OPEN = (By.CSS_SELECTOR, "span[aria-label='plus']")
     ATLAS = (By.CSS_SELECTOR, "div[id='3d-area']")
-    ATLAS_FULLSCREEN = (By.CSS_SELECTOR, "span[class='anticon anticon-fullscreen h-5 w-5 text-xl']")
+    ATLAS_FULLSCREEN = (By.CSS_SELECTOR, "span[aria-label='fullscreen']")
     BOUTON_DENSITY_NRECORDS = (By.CSS_SELECTOR, "a[data-testid='dataset-experimental_bouton_density'] span[class='mr-2 font-light']")
     BRAIN_REGION_PANEL = (By.XPATH, "//span[text()='Brain region']")
     CEREBRAL_CORTEX_TITLE = (By.XPATH, "//div[@title='Cerebral cortex']/button")
