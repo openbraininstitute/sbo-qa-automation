@@ -242,7 +242,6 @@ def pytest_runtest_logstart(nodeid, location):
 
 def pytest_runtest_logreport(report):
     """Capture failed tests during runtime"""
-    # if report.failed and report.when == "call":
     if report.failed and report.when in ("setup", "call", "teardown"):
         failed_tests.append(report.nodeid)
 
@@ -282,7 +281,8 @@ def pytest_runtest_makereport(item):
     report = outcome.get_result()
     extra = getattr(report, 'extra', [])
 
-    if report.when == 'call' or report.when == "setup":
+    # if report.when == 'call' or report.when == "setup":
+    if report.when in ("setup", "call", "teardown"):
         xfail = hasattr(report, 'wasxfail')
         if (report.skipped and xfail) or (report.failed and not xfail):
             print("Test failed - handling it")
