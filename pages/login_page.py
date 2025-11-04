@@ -10,6 +10,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from locators.login_locators import LoginPageLocators
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import CustomBasePage
+from selenium.webdriver.common.by import By
 
 
 class LoginPage(CustomBasePage):
@@ -34,9 +35,6 @@ class LoginPage(CustomBasePage):
         self.logger.info(f"INFO: Starting URL from pages/login_page.py:, {self.browser.current_url}")
         return target_url
 
-    def find_login_button(self):
-        return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.LOGIN_BUTTON))
-
     def wait_for_login_complete(self, timeout=30):
         """Wait for login completion by checking a URL or element."""
         try:
@@ -52,19 +50,13 @@ class LoginPage(CustomBasePage):
         return self.find_element(LoginPageLocators.FORM_CONTAINER, timeout=timeout)
 
     def find_username_field(self):
-        return self.find_element(LoginPageLocators.USERNAME_FIELD)
+        return self.element_visibility(LoginPageLocators.USERNAME_FIELD)
 
     def find_password_field(self):
-        return self.wait.until(EC.presence_of_element_located(LoginPageLocators.PASSWORD_FIELD))
-
-    def find_signin_button(self):
-        return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.SIGN_IN))
+        return self.element_visibility(LoginPageLocators.PASSWORD_FIELD)
 
     def find_logout_button(self):
         return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.LOGOUT))
-
-    def find_submit(self):
-        return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.SUBMIT))
 
     def submit_button(self):
         return self.element_to_be_clickable(LoginPageLocators.SUBMIT_BUTTON)
@@ -72,30 +64,38 @@ class LoginPage(CustomBasePage):
     def perform_login(self, username, password):
         self.logger.info("Performing login with the provided credentials.")
 
-        self.make_form_visible()
-        username_field = self.find_username_field()
-        print(f"DEBUG: Username field visible? {username_field.is_displayed()}")
-        password_field = self.find_password_field()
-        # print(f"DEBUG: Username field visible? {password_field.is_displayed()}")
+        self.wait.until(EC.url_contains("/auth/realms/"))
+        print(f"DEBUG: Current URL: {self.browser.current_url}")
 
+        self.wait.until(EC.presence_of_element_located((By.ID, "kc-form-wrapper")))
+
+        self.make_form_visible()
+        self.wait.until(EC.visibility_of_element_located((By.ID, "username")))
+        self.wait.until(EC.visibility_of_element_located((By.ID, "password")))
+
+        username_field = self.browser.find_element(By.ID, "username")
+        password_field = self.browser.find_element(By.ID, "password")
         username_field.send_keys(username)
         password_field.send_keys(password)
         password_field.send_keys(Keys.ENTER)
-        # print("DEBUG: Submitted login credentials")
 
-        try:
-            self.wait_for_login_complete()
-            self.wait.until(EC.url_contains("app/virtual-lab"))
-            print("DEBUG: Login should be complete now.")
-        except Exception as e:
-            print(f"ERROR: Login process did not complete as expected: {e}")
         self.wait.until(EC.url_contains("app/virtual-lab"))
+        print("DEBUG: Login completed successfully.")
 
     def make_form_visible(self):
         """Use JavaScript to make the hidden form visible by removing 'display:none'."""
         form_container = self.find_form_container()
-        self.browser.execute_script("arguments[0].style.display = 'block';", form_container)
-        print("Form container made visible via JavaScript.")
+        if not form_container:
+            raise RuntimeError("Login form container not found in DOM")
+
+        self.browser.execute_script("""
+                arguments[0].classList.remove('display-none', 'hidden');
+                arguments[0].style.display = 'block';
+                arguments[0].style.visibility = 'visible';
+            """, form_container)
+
+        print("DEBUG: Form container made visible via JavaScript.")
+
 
     def ensure_element_interactable(self, element):
         """Ensure the element is visible and interactable, even if hidden."""
