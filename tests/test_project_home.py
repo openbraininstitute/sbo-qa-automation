@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+import os
 
 import pytest
 
@@ -10,8 +11,8 @@ from pages.project_home import ProjectHome
 
 class TestProjectHomePage:
     @pytest.mark.project_page
-    def test_project_home(self, setup, login, logger, test_config):
-        browser, wait, base_url, lab_id, project_id = setup
+    def test_project_home(self, setup, logger, login_direct_complete, test_config):
+        browser, wait, base_url, lab_id, project_id = login_direct_complete
         project_home = ProjectHome(browser, wait, logger, base_url)
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
 

@@ -102,11 +102,33 @@ def test_config(pytestconfig):
         lab_url = f"{base_url}/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_STAGING")
         project_id = os.getenv("PROJECT_ID_STAGING")
+        oidc_login_url = (
+            "https://staging.openbraininstitute.org/auth/realms/SBO/protocol/"
+            "openid-connect/auth?"
+            "client_id=core-webapp-main&"
+            "scope=profile%20openid%20groups&"
+            "response_type=code&"
+            "redirect_uri=https%3A%2F%2Fstaging.openbraininstitute.org%2Fapi%2Fauth%2Fcallback%2Fkeycloak&"
+            "state=123&"  
+            "code_challenge=abc&"
+            "code_challenge_method=S256"
+        )
     elif env == "production":
         base_url = "https://www.openbraininstitute.org"
         lab_url = f"{base_url}/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_PRODUCTION")
         project_id = os.getenv("PROJECT_ID_PRODUCTION")
+        oidc_login_url = (
+            "https://www.openbraininstitute.org/auth/realms/SBO/protocol/"
+            "openid-connect/auth?"
+            "client_id=core-webapp-main&"
+            "scope=profile%20openid%20groups&"
+            "response_type=code&"
+            "redirect_uri=https%3A%2F%2Fwww.openbraininstitute.org%2Fapi%2Fauth%2Fcallback%2Fkeycloak&"
+            "state=dummy&"
+            "code_challenge=dummy&"
+            "code_challenge_method=S256"
+        )
     else:
         raise ValueError(f"Invalid environment: {env}")
 
@@ -116,6 +138,7 @@ def test_config(pytestconfig):
         "lab_url": lab_url,
         "lab_id": lab_id,
         "project_id": project_id,
+        "oidc_login_url": oidc_login_url,
     }
 
 
@@ -173,6 +196,38 @@ def navigate_to_login(setup, logger, request, test_config):
     )
     print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
     return LoginPage(browser=browser, wait=wait, lab_url=test_config["lab_url"], logger=logger)
+
+@pytest.fixture(scope="function")
+def navigate_to_login_direct(setup, logger, test_config):
+    """Navigate directly to the OIDC login page instead of the landing page."""
+    browser, wait, base_url, lab_id, project_id = setup
+
+    oidc_url = test_config["oidc_login_url"]
+    logger.info(f"Navigating directly to OIDC login URL: {oidc_url}")
+
+    browser.get(oidc_url)
+
+    WebDriverWait(browser, 30).until(
+        EC.url_contains("openid-connect/auth"),
+        "OIDC login page did not load"
+    )
+
+    return LoginPage(browser=browser, wait=wait, lab_url=test_config["lab_url"], logger=logger)
+
+
+@pytest.fixture(scope="function")
+def login_direct_complete(setup, navigate_to_login_direct, test_config, logger):
+    """Perform direct login and return browser + wait ready for use."""
+    login_page = navigate_to_login_direct
+    username = test_config["username"]
+    password = os.getenv("OBI_PASSWORD")
+
+    login_page.perform_login(username, password)
+    login_page.wait_for_login_complete()
+
+    # reuse the browser and wait from setup
+    browser, wait, base_url, lab_id, project_id = setup
+    yield browser, wait, base_url, lab_id, project_id
 
 @pytest.fixture(scope="function")
 def login(setup, navigate_to_login, test_config, logger):
