@@ -18,7 +18,7 @@ class ExplorePage(HomePage):
         self.logger = logger
 
     def go_to_explore_page(self, lab_id: str, project_id: str, retries=3, delay=5):
-        path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive"
+        path = f"/app/virtual-lab/{lab_id}/{project_id}/data"
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(100)
@@ -32,8 +32,17 @@ class ExplorePage(HomePage):
                     raise RuntimeError("The Explore page failed to load after multiple attempts.")
             return self.browser.current_url
 
+    def skip_onboardin_btn(self, timeout=10):
+        return self.element_to_be_clickable(ExplorePageLocators.SKIP_ONBOARDING_BTN, timeout=timeout)
+
+    def data_skip_onboardin_btn(self, timeout=10):
+        return self.find_element(ExplorePageLocators.DATA_SKIP_BTN, timeout=timeout)
+
     def cerebrum_title_br_panel(self):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL)
+
+    def experimental_data_tab(self):
+        return self.find_element(ExplorePageLocators.EXPERIMENTAL_DATA_BTN)
 
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))

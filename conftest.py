@@ -225,7 +225,6 @@ def login_direct_complete(setup, navigate_to_login_direct, test_config, logger):
     login_page.perform_login(username, password)
     login_page.wait_for_login_complete()
 
-    # reuse the browser and wait from setup
     browser, wait, base_url, lab_id, project_id = setup
     yield browser, wait, base_url, lab_id, project_id
 

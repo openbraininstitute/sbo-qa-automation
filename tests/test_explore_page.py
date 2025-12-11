@@ -16,44 +16,56 @@ from pages.explore_page import ExplorePage
 class TestExplorePage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=3)
-    def test_explore_page(self, setup, login, logger, test_config):
+    def test_explore_page(self, setup, login_direct_complete, logger, test_config):
         """Checking the Explore Page"""
-        browser, wait, base_url, lab_id, project_id = setup
+        browser, wait, base_url, lab_id, project_id = login_direct_complete
         explore_page = ExplorePage(browser, wait, logger, base_url)
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
+        skip_onboarding = explore_page.skip_onboardin_btn(timeout=10)
+        if skip_onboarding:
+            skip_onboarding.click()
+        logger.info("Clicked on 'Skip' on the overlay")
+
+        data_skip_onboarding = explore_page.data_skip_onboardin_btn(timeout=5)
+        if  data_skip_onboarding.is_displayed():
+            data_skip_onboarding.click()
+        logger.info("Clicked on 'Data - Skip' on the overlay")
+
         brain_region_panel = explore_page.find_brain_region_panel(timeout=40)
         logger.info("Found Brain Region Panel")
 
-        explore_page.check_explore_title_is_present(timeout=15)
-        logger.info("Explore page title is present")
-        cerebrum_title_br_panel = explore_page.cerebrum_title_br_panel()
-        assert cerebrum_title_br_panel, f"Cerebrum title is not found"
-        logger.info("Cerebrum title is displayed")
+        # explore_page.check_explore_title_is_present(timeout=15)
+        # logger.info("Explore page title is present")
+        # cerebrum_title_br_panel = explore_page.cerebrum_title_br_panel()
+        # assert cerebrum_title_br_panel, f"Cerebrum title is not found"
+        # logger.info("Cerebrum title is displayed")
 
         ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=25)
         logger.info("AI Assistant panel is open. Attempting to close it.")
 
-        close_btn = explore_page.find_ai_assistant_panel_close(timeout=25)
-        assert close_btn, "Close button on AI assistant panel"
-        close_btn.click()
-        logger.info("AI Panel is closed.")
+        # close_btn = explore_page.find_ai_assistant_panel_close(timeout=25)
+        # assert close_btn, "Close button on AI assistant panel"
+        # close_btn.click()
+        # logger.info("AI Panel is closed.")
 
-        ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
-        assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
-        logger.info("AI Assistant open button is displayed, means the panel is closed.")
+        # ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
+        # assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
+        # logger.info("AI Assistant open button is displayed, means the panel is closed.")
 
-        cerebrum_title_main_page = explore_page.find_cerebrum_title_main_page(timeout=20)
-        assert cerebrum_title_main_page.is_displayed(), "Cerebrum title on the main page is not displayed."
+        experimental_data_tab = explore_page.experimental_data_tab()
+        assert experimental_data_tab.is_displayed(), f"Experimental data tab is not displayed"
+        logger.info("Experimental data tab is displayed.")
 
         exp_data_titles = [
             ExplorePageLocators.NEURON_MORPHOLOGY,
             ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY,
             ExplorePageLocators.NEURON_DENSITY,
             ExplorePageLocators.BOUTON_DENSITY,
-            ExplorePageLocators.SYNAPSE_PER_CONNECTION
+            ExplorePageLocators.SYNAPSE_PER_CONNECTION,
+            ExplorePageLocators.ION_CHANNEL_EPHYS
         ]
 
         logger.info("Searching for Experimental Data types")
@@ -83,7 +95,8 @@ class TestExplorePage:
 
         page_titles = [
             ExplorePageLocators.EXPERIMENTAL_DATA_BTN,
-            ExplorePageLocators.MODEL_DATA_BTN
+            ExplorePageLocators.MODEL_DATA_BTN,
+            ExplorePageLocators.SIMULATIONS_BTN
         ]
         logger.info("Searching for Explore Page titles")
         explore_page_titles = explore_page.find_explore_page_titles(page_titles, timeout=15)

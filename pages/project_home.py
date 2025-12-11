@@ -11,7 +11,7 @@ class ProjectHome(HomePage):
         self.logger = logger
 
     def go_to_project_page(self, lab_id: str, project_id: str):
-        path = f"/app/virtual-lab/{lab_id}/{project_id}/"
+        path = f"/app/virtual-lab/{lab_id}/{project_id}"
         try:
             self.browser.set_page_load_timeout(90)
             self.go_to_page(path)
