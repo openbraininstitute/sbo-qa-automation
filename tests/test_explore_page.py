@@ -60,6 +60,52 @@ class TestExplorePage:
         assert experimental_data_tab.is_displayed(), f"Experimental data tab is not displayed"
         logger.info("Experimental data tab is displayed.")
 
+        atlas = explore_page.find_3d_atlas()
+        assert atlas.is_displayed()
+        logger.info("3D Atlas is displayed")
+
+        atlas_fullscreen = explore_page.find_atlas_fullscreen_bt(timeout=15)
+        logger.info("Found atlas fullscreen button")
+        atlas_fullscreen.click()
+
+        fulscreen_exit = explore_page.find_fullscreen_exit(timeout=15)
+        logger.info("Fullscreen exit button is found")
+        fulscreen_exit.click()
+        logger.info("Fullscreen exit button is clicked, atlas is minimized")
+        total_count_density_title = explore_page.find_total_count_density()
+        assert total_count_density_title, "The total neurons count title is not found"
+        logger.info("Title for the total count of neurons is found")
+
+        total_count_number = explore_page.find_total_count_n()
+        neuron_count = total_count_number.text
+        assert neuron_count.strip(), "Total neuron count is empty"
+        logger.info(f"Total number of neurons is: {neuron_count}")
+
+        count_switch_button = explore_page.find_total_count_switch()
+        assert count_switch_button.is_displayed()
+        logger.info(f"Found the switch count/density button")
+        current_state = count_switch_button.get_attribute('aria-checked')
+        logger.info(f"Current state of the total count switch: {current_state}")
+
+        # Temporarily adding time.sleep()
+        time.sleep(2)
+        if current_state == "false":
+            count_switch_button.click()
+            logger.info("Switch toggled to 'true'.")
+        elif current_state == "true":
+            count_switch_button.click()
+            logger.info(f"Switch toggled to 'on'.")
+        else:
+            logger.error(f"Unexpected switch state: {current_state}")
+
+        new_state = count_switch_button.get_attribute("aria-checked")
+        logger.info(f"New state of the switch: {new_state}")
+
+        total_count_number = explore_page.find_total_count_n()
+        neuron_count = total_count_number.text
+        assert neuron_count.strip(), "Total neuron DENSITY is empty"
+        logger.info(f"Total DENSITY is: {neuron_count}")
+
         exp_data_titles = [
             ExplorePageLocators.NEURON_MORPHOLOGY,
             ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY,
@@ -70,27 +116,45 @@ class TestExplorePage:
         ]
 
         logger.info("Searching for Experimental Data types")
+        missing_locators = []
+        not_displayed = []
 
-        for i, locator in enumerate(exp_data_titles):
-            logger.info(f"Searching for locator [{i + 1}]: {locator}")
-            elements = explore_page.find_all_elements(locator)
+        def get_element_label(element):
+            return (
+                    element.text.strip()
+                    or element.get_attribute("aria-label")
+                    or element.get_attribute("title")
+                    or f"<no text> tag={element.tag_name}"
+            )
 
-            if elements:
+        for locator in exp_data_titles:
+            try:
+                elements = explore_page.find_all_elements(locator, timeout=5)
+
+                if not elements:
+                    missing_locators.append(locator)
+                    continue
+
                 for element in elements:
+                    label = get_element_label(element)
+
                     logger.info(
-                        f"  -> Found element for locator {locator}: Text='{element.text}'")
-            else:
-                logger.warning(f"No elements were found for locator [{i + 1}]: {locator}")
+                        f"✓ Found Experimental Data section: locator={locator}, label='{label}'"
+                    )
 
-        exp_data_elements = explore_page.find_experimental_data_titles(exp_data_titles, timeout=15)
+                    if not element.is_displayed():
+                        not_displayed.append(f"{locator} (label='{label}')")
 
-        found_titles = [
-            element.text if element.text else f"No text (Tag: {element.tag_name})"
-            for element in exp_data_elements
-        ]
-        for element in exp_data_elements:
-            assert element.is_displayed(), f"Experimental data {element.text} is not displayed."
-        logger.info("Verification: All experimental data titles are displayed.")
+            except TimeoutException:
+                missing_locators.append(locator)
+
+        assert not missing_locators and not not_displayed, (
+                "Experimental Data validation failed:\n"
+                + (f"Missing locators: {missing_locators}\n" if missing_locators else "")
+                + (f"Not displayed: {not_displayed}\n" if not_displayed else "")
+        )
+
+        logger.info("✓ All experimental data sections are present and displayed")
 
         page_titles = [
             ExplorePageLocators.EXPERIMENTAL_DATA_BTN,
@@ -179,72 +243,67 @@ class TestExplorePage:
 
         model_data_tab.click()
         logger.info("Model data tab is clicked")
+
+        model_data_titles = [
+            ExplorePageLocators.PANEL_EMODEL,
+            ExplorePageLocators.PANEL_CIRCUIT,
+            ExplorePageLocators.PANEL_MEMODEL,
+            ExplorePageLocators.PANEL_SYNAPTOME,
+            ExplorePageLocators.PANEL_SYNAPTOME_BETA,
+            ExplorePageLocators.PANEL_ION_CHANNEL_MODEL_BETA
+        ]
+        logger.info("Searching for Model data artifact titles")
+
+        missing_locators = []
+        not_displayed = []
+
+        for locator in model_data_titles:
+            try:
+                elements = explore_page.find_all_elements(locator, timeout=5)
+
+                if not elements:
+                    missing_locators.append(locator)
+                    continue
+
+                for element in elements:
+                    text = element.text.strip()
+                    logger.info(
+                        f"✓ Found Model Data artifact: locator={locator}, text='{text}'"
+                    )
+
+                    if not element.is_displayed():
+                        not_displayed.append(f"{locator} (text='{text}')")
+
+            except TimeoutException:
+                missing_locators.append(locator)
+
+            assert not missing_locators and not not_displayed, (
+                    "Model Data validation failed:\n"
+                    + (f"Missing locators: {missing_locators}\n" if missing_locators else "")
+                    + (f"Not displayed: {not_displayed}\n" if not_displayed else "")
+            )
+            logger.info("Found Model data artifact titles")
+
+        # data_model_data_titles = explore_page.find_visible_explore_page_titles(model_data_titles, timeout=15)
+
+
+        # panel_emodel = explore_page.find_panel_emodel()
+        # logger.info("E-model is found in the types panel")
+        #
+        # panel_memodel = explore_page.find_panel_memodel()
+        # logger.info("ME-model is found in the types panel")
+        #
+        # panel_synaptome = explore_page.find_panel_synaptome()
+        # logger.info("Synaptome is found in the types panel")
+        #
+        # panel_circuit = explore_page.find_panel_circuit()
+        # logger.info("Circuit is found in the types panel")
+
         # expected_panel = explore_page.find_data_panel()
-        # assert expected_panel.is_displayed(), \
-        #     "Model data panel did not appear after clicking the tab."
+        # assert expected_panel.is_displayed()
         # logger.info("Model data panel is displayed after clicking the tab.")
 
-        panel_emodel = explore_page.find_panel_emodel()
-        logger.info("E-model is found in the types panel")
 
-        panel_memodel = explore_page.find_panel_memodel()
-        logger.info("ME-model is found in the types panel")
-
-        panel_synaptome = explore_page.find_panel_synaptome()
-        logger.info("Synaptome is found in the types panel")
-
-        panel_circuit = explore_page.find_panel_circuit()
-        logger.info("Circuit is found in the types panel")
-
-        expected_panel = explore_page.find_data_panel()
-        assert expected_panel.is_displayed()
-        logger.info("Model data panel is displayed after clicking the tab.")
-
-        atlas = explore_page.find_3d_atlas()
-        assert atlas.is_displayed()
-        logger.info("3D Atlas is displayed")
-
-        atlas_fullscreen = explore_page.find_atlas_fullscreen_bt(timeout=15)
-        logger.info("Found atlas fullscreen button")
-        atlas_fullscreen.click()
-
-        fulscreen_exit = explore_page.find_fullscreen_exit(timeout=15)
-        logger.info("Fullscreen exit button is found")
-        fulscreen_exit.click()
-        logger.info("Fullscreen exit button is clicked, atlas is minimized")
-        total_count_density_title = explore_page.find_total_count_density()
-        assert total_count_density_title, "The total neurons count title is not found"
-        logger.info("Title for the total count of neurons is found")
-
-        total_count_number = explore_page.find_total_count_n()
-        neuron_count = total_count_number.text
-        assert neuron_count.strip(), "Total neuron count is empty"
-        logger.info(f"Total number of neurons is: {neuron_count}")
-
-        count_switch_button = explore_page.find_total_count_switch()
-        assert count_switch_button.is_displayed()
-        logger.info(f"Found the switch count/density button")
-        current_state = count_switch_button.get_attribute('aria-checked')
-        logger.info(f"Current state of the total count switch: {current_state}")
-
-        # Temporarily adding time.sleep()
-        time.sleep(2)
-        if current_state == "false":
-            count_switch_button.click()
-            logger.info("Switch toggled to 'true'.")
-        elif current_state == "true":
-            count_switch_button.click()
-            logger.info(f"Switch toggled to 'on'.")
-        else:
-            logger.error(f"Unexpected switch state: {current_state}")
-
-        new_state = count_switch_button.get_attribute("aria-checked")
-        logger.info(f"New state of the switch: {new_state}")
-
-        total_count_number = explore_page.find_total_count_n()
-        neuron_count = total_count_number.text
-        assert neuron_count.strip(), "Total neuron DENSITY is empty"
-        logger.info(f"Total DENSITY is: {neuron_count}")
 
         '''
         pending implementation of config file
