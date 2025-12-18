@@ -33,10 +33,16 @@ class ExplorePage(HomePage):
             return self.browser.current_url
 
     def skip_onboardin_btn(self, timeout=10):
-        return self.element_to_be_clickable(ExplorePageLocators.SKIP_ONBOARDING_BTN, timeout=timeout)
+        try:
+            return self.element_to_be_clickable(ExplorePageLocators.SKIP_ONBOARDING_BTN, timeout=timeout)
+        except TimeoutException:
+            return None
 
     def data_skip_onboardin_btn(self, timeout=10):
-        return self.find_element(ExplorePageLocators.DATA_SKIP_BTN, timeout=timeout)
+        try:
+            return self.find_element(ExplorePageLocators.DATA_SKIP_BTN, timeout=timeout)
+        except TimeoutException:
+            return None
 
     def cerebrum_title_br_panel(self):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL)
@@ -80,11 +86,11 @@ class ExplorePage(HomePage):
     def find_cerebrum_title_main_page(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
-    def find_count_switch(self,  timeout=10):
+    def find_count_switch(self, timeout=10):
         return self.is_visible(ExplorePageLocators.COUNT_SWITCH, timeout=timeout)
 
-    def find_data_panel(self):
-        return self.find_element(ExplorePageLocators.DATA_PANEL)
+    def find_data_panel(self, timeout=10):
+        return self.find_element(ExplorePageLocators.DATA_PANEL, timeout=timeout)
 
     def check_explore_title_is_present(self, timeout=15):
         return self.find_element(ExplorePageLocators.EXPLORE_TITLE_VLAB, timeout=timeout)
@@ -179,10 +185,11 @@ class ExplorePage(HomePage):
             elements_list.extend(self.visibility_of_all_elements(locator, timeout=timeout))
         return elements_list
 
+    def search_region_input_field(self, timeout=10):
+        return self.find_element(ExplorePageLocators.SEARCH_REGION_INPUT, timeout=timeout)
+
     def wait_for_locators_to_have_text(self, browser, locators, timeout=20):
         for locator in locators:
             WebDriverWait(self.browser, timeout).until(
                 EC.text_to_be_present_in_element(locator, '')
             )
-
-

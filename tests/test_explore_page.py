@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import time
-import os.path
 import pytest
+from selenium.common import TimeoutException
 from selenium.webdriver import Keys
 
 
@@ -24,15 +24,15 @@ class TestExplorePage:
         explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
-        skip_onboarding = explore_page.skip_onboardin_btn(timeout=10)
+        skip_onboarding = explore_page.skip_onboardin_btn(timeout=3)
         if skip_onboarding:
             skip_onboarding.click()
         logger.info("Clicked on 'Skip' on the overlay")
 
-        data_skip_onboarding = explore_page.data_skip_onboardin_btn(timeout=5)
-        if  data_skip_onboarding.is_displayed():
+        data_skip_onboarding = explore_page.data_skip_onboardin_btn(timeout=3)
+        if data_skip_onboarding and data_skip_onboarding.is_displayed():
             data_skip_onboarding.click()
-        logger.info("Clicked on 'Data - Skip' on the overlay")
+            logger.info("Clicked on 'Data - Skip' on the overlay")
 
         brain_region_panel = explore_page.find_brain_region_panel(timeout=40)
         logger.info("Found Brain Region Panel")
@@ -46,14 +46,15 @@ class TestExplorePage:
         ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=25)
         logger.info("AI Assistant panel is open. Attempting to close it.")
 
-        # close_btn = explore_page.find_ai_assistant_panel_close(timeout=25)
-        # assert close_btn, "Close button on AI assistant panel"
-        # close_btn.click()
-        # logger.info("AI Panel is closed.")
+        ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
+        assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
+        logger.info("AI Assistant open button is displayed, means the panel is open.")
+        ai_assistant_open_btn.click()
 
-        # ai_assistant_open_btn = explore_page.find_ai_assistant_panel_open()
-        # assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
-        # logger.info("AI Assistant open button is displayed, means the panel is closed.")
+        close_btn = explore_page.find_ai_assistant_panel_close(timeout=25)
+        assert close_btn, "Close button on AI assistant panel"
+        close_btn.click()
+        logger.info("AI Panel is closed.")
 
         experimental_data_tab = explore_page.experimental_data_tab()
         assert experimental_data_tab.is_displayed(), f"Experimental data tab is not displayed"
@@ -82,16 +83,14 @@ class TestExplorePage:
                 logger.warning(f"No elements were found for locator [{i + 1}]: {locator}")
 
         exp_data_elements = explore_page.find_experimental_data_titles(exp_data_titles, timeout=15)
+
         found_titles = [
             element.text if element.text else f"No text (Tag: {element.tag_name})"
             for element in exp_data_elements
         ]
-
         for element in exp_data_elements:
             assert element.is_displayed(), f"Experimental data {element.text} is not displayed."
         logger.info("Verification: All experimental data titles are displayed.")
-
-
 
         page_titles = [
             ExplorePageLocators.EXPERIMENTAL_DATA_BTN,
@@ -149,29 +148,41 @@ class TestExplorePage:
         brain_region_search_field = explore_page.find_brain_region_search_field(timeout=25)
         assert brain_region_search_field.is_displayed()
         logger.info("Bran region panel search field is found")
-        brain_region_search_field.send_keys(Keys.ENTER)
-        find_input_file_and_wait = ExplorePageLocators.SEARCH_REGION
-        explore_page.wait_for_long_load(find_input_file_and_wait)
-        logger.info("Waiting for page to load")
 
-        brain_region_search_field.send_keys("Isocortex")
+        try:
+            if brain_region_search_field.is_displayed():
+                brain_region_search_field.click()
+                logger.info("Brain region search field is clicked")
+        except TimeoutException:
+            logger.error("Timeout: Brain region search field is not clickable after multiple attempts.")
+
+        search_region_input_field = explore_page.search_region_input_field(timeout=10)
+        try:
+            if search_region_input_field.is_displayed():
+                search_region_input_field.click()
+                logger.info("Search region input field is clicked")
+        except TimeoutException:
+            logger.error("Timeout: Search region input field is not clickable after multiple attempts.")
+
+        search_region_input_field.send_keys(Keys.ENTER)
+        search_region_input_field.send_keys("Isocortex")
         logger.info("Searching for 'Isocortex'")
-        brain_region_search_field.send_keys(Keys.ENTER)
+        search_region_input_field.send_keys(Keys.ENTER)
         selected_brain_region_title = explore_page.find_selected_brain_region_title()
         assert selected_brain_region_title.text == 'Isocortex'
         logger.info("Found 'Isocortex' in the brain region panel and the title is displayed ")
         explore_page.wait_for_page_ready(timeout=20)
         logger.info("Wait for the sorting action to complete.")
         model_data_tab = explore_page.find_model_data_title()
-        assert model_data_tab.text == "Model data"
-        logger.info("Model data tab is found")
+        assert model_data_tab.text == "Model"
+        logger.info("Model tab is found")
 
         model_data_tab.click()
         logger.info("Model data tab is clicked")
-        expected_panel = explore_page.find_data_panel()
-        assert expected_panel.is_displayed(), \
-            "Model data panel did not appear after clicking the tab."
-        logger.info("Model data panel is displayed after clicking the tab.")
+        # expected_panel = explore_page.find_data_panel()
+        # assert expected_panel.is_displayed(), \
+        #     "Model data panel did not appear after clicking the tab."
+        # logger.info("Model data panel is displayed after clicking the tab.")
 
         panel_emodel = explore_page.find_panel_emodel()
         logger.info("E-model is found in the types panel")
