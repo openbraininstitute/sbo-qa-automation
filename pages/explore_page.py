@@ -26,11 +26,11 @@ class ExplorePage(HomePage):
                 self.wait_for_page_ready(timeout=90)
             except TimeoutException:
                 print(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                time.sleep(delay)  # Wait before retrying
-                delay *= 2  # Exponentially increase delay (e.g., 5, 10, 20 seconds)
+                time.sleep(delay)
                 if attempt == retries - 1:
                     raise RuntimeError("The Explore page failed to load after multiple attempts.")
             return self.browser.current_url
+        return None
 
     def skip_onboardin_btn(self, timeout=10):
         try:

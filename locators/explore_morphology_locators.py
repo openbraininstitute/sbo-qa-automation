@@ -16,6 +16,7 @@ class ExploreMorphologyPageLocators:
                                "@class='ant-table-column-sorters']")
     CELLS = (By.XPATH, "//td[starts-with(@class,'ant-table-cell')]")
     CLEAR_FILTERS_BTN = (By.XPATH, "//button[@type='button']/div[text()='Clear filters']")
+    CONTRIBUTORS_COLUMN_TITLE = (By.XPATH, "//div[contains(text(),'Contributors')]")
     DV_AGE_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Age']")
     DV_AP_TITLE = (By.XPATH, "//h2[text()='Apical Dendrite']")
     DV_AXON_TITLE = (By.XPATH, "//h2[text()='Axon']")
@@ -49,7 +50,7 @@ class ExploreMorphologyPageLocators:
     FILTER_MTYPE_TEXT_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input'])[2]")
     FILTER_PANEL = (By.XPATH, "//div[@data-testid='listing-view-filter-panel']")
     FIRST_ROW = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]")
-    LV_BRAIN_REGION = (By.XPATH, "//div[@class='explore-module__frHowq__columnTitle break-words'][normalize-space()='Brain region']")
+    LV_BRAIN_REGION = (By.XPATH, "(//div[normalize-space()='Brain region'])[2]")
     LV_CHECKBOX = (By.XPATH, "")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
     LV_FILTER_APPLY_BTN = (By.XPATH, "//button[contains(text(),'Apply') and @type='submit']")
@@ -58,10 +59,9 @@ class ExploreMorphologyPageLocators:
     LV_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='M-type']")
     LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
     LV_PREVIEW = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Preview']")
-    LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
-                                      ")='Registration date']")
+    LV_REGISTRATION_DATE = (By.XPATH, "//div[contains(text(),'Registration date')]")
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
-    LV_THUMBNAIL = (By.XPATH, "//img[@alt='img preview']")
+    LV_THUMBNAIL = (By.XPATH, "//div/img")
     MORPHOLOGY_FILTER = (By.XPATH, "//button[@aria-label='listing-view-filter-button']")
     MORPHOLOGY_FILTER_CLOSE_BTN = (By.XPATH, "//div[@data-testid='listing-view-filter-panel"
                                              "']//button[@type='button' and @aria-label='Close']")
@@ -81,11 +81,11 @@ class ExploreMorphologyPageLocators:
                                               "fullscreen']")
     MORPHO_VIEWER_SETTINGS_BTN = (By.XPATH, "//button[@type='button']/div[contains(text(), "
                                             "'Settings')]")
-    RESULTS = (By.XPATH, "//span[text()='Results ']")
+    RECORDS = (By.XPATH, "//a[.//div[normalize-space()='Morphology']]//span[not(text()='of')]")
     ROW = (By.XPATH, "//tr[starts-with(@class,'ant-table-row')]")
     SEARCH_INPUT_FIELD = (By.XPATH, "//input[@placeholder='Search for resources...']")
     SEARCH_NAME = (By.XPATH, "//td[@title='mtC070301B_idC']")
     SPECIES_SORTED = (By.XPATH, "//tbody[@class='ant-table-tbody']/tr[2]/descendant::td[contains("
                                 "text(),'Rattus norvegicus')]")
-    TABLE = (By.XPATH, "//tbody[@class='ant-table-tbody']")
+    TABLE = (By.CSS_SELECTOR, "#data-table-container")
     TEXT_CONTAINER = (By.XPATH, "//div[@id='text-field-container']")

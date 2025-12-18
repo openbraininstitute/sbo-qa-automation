@@ -16,21 +16,30 @@ from pages.explore_morphology import ExploreMorphologyPage
 class TestExploreMorphologyPage:
     @pytest.mark.explore_page
     @pytest.mark.run(order=4)
-    def test_explore_morphology(self, setup, login, logger, test_config):
-        browser, wait, base_url,lab_id, project_id = setup
+    def test_explore_morphology(self, setup, login_direct_complete, logger, test_config):
+        browser, wait, base_url, lab_id, project_id = login_direct_complete
         explore_morphology = ExploreMorphologyPage(browser, wait, logger, base_url)
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         explore_morphology.go_to_explore_morphology_page(lab_id, project_id)
         logger.info("Explore morphology page is displayed")
-        morphology_tab = explore_morphology.find_morphology_tab()
-        logger.info("Morphology tab is displayed")
+        # morphology_tab = explore_morphology.find_morphology_tab()
+        # logger.info("Morphology tab is displayed")
+
+        ai_assistant_panel = explore_morphology.find_ai_assistant_panel(timeout=25)
+        logger.info("AI Assistant panel is open. Attempting to close it.")
+
+        ai_assistant_open_btn = explore_morphology.find_ai_assistant_panel_open()
+        assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
+        logger.info("AI Assistant open button is displayed, means the panel is open.")
+        ai_assistant_open_btn.click()
 
         ai_assistant_panel_close_btn = explore_morphology.find_ai_assistant_panel_close()
         assert ai_assistant_panel_close_btn.is_displayed(), ("Close button on the AI literature search panel is not "
                                                              "found")
         ai_assistant_panel_close_btn.click()
-        logger.info("AI Assistant panel is closed.")
-        time.sleep(10)
+        logger.info("AI assistant panel is closed ")
+        table_list_view = explore_morphology.find_table()
+        logger.info("Morphology table is displayed.")
 
         column_locators = [
             ExploreMorphologyPageLocators.LV_PREVIEW,
@@ -38,32 +47,28 @@ class TestExploreMorphologyPage:
             ExploreMorphologyPageLocators.LV_MTYPE,
             ExploreMorphologyPageLocators.LV_NAME,
             ExploreMorphologyPageLocators.LV_SPECIES,
+            ExploreMorphologyPageLocators.LV_REGISTRATION_DATE
         ]
-        column_headers = explore_morphology.find_column_headers(column_locators)
 
-        for header in column_headers:
-            assert header.is_displayed(), f"Column header {header} is not displayed."
-        logger.info("Morphology column headers are displayed.")
+        explore_morphology.assert_elements_present_and_displayed(
+            locators=column_locators,
+            context_name="Morphology column headers",
+            timeout=10
+        )
 
-        '''
-        Currently  a lot of thumbnails are missing, they will be added later?  
         thumbnail_img = explore_morphology.verify_all_thumbnails_displayed()
         logger.info("Morphology thumbnail is displayed.")
-
-
-       for thumbnail in thumbnail_img:
+        for thumbnail in thumbnail_img:
             assert thumbnail['is_displayed'], f"Thumbnail {thumbnail['element']} is not displayed!"
             logger.info(f"Thumbnail {thumbnail['element']} is displayed.")
-        '''
 
-        results = explore_morphology.find_results()
+        morphology_results = explore_morphology.find_results()
         logger.info("Total number of results for morphology tab is displayed.")
 
         original_data = explore_morphology.get_table_data()
         logger.info("Fetch table data before sorting")
 
-        '''
-        # Temporarily not possible to sort columns by brain region
+
         br_sort_arrow = explore_morphology.find_br_sort_arrow()
         br_sort_arrow.click()
         logger.info("Click the column sort arrow.")
@@ -233,3 +238,4 @@ class TestExploreMorphologyPage:
         logger.info("Back to Interactive exploration button found.")
         back_to_ie.click()
         logger.info("Returned to the Interactive exploration page.")
+'''

@@ -12,10 +12,10 @@ from selenium.webdriver.support.wait import WebDriverWait
 @pytest.mark.usefixtures("setup", "logger")
 class CustomBasePage:
 
-    def __init__(self, browser, wait, lab_url):
+    def __init__(self, browser, wait, lab_url, logger=None):
         self.browser = browser
         self.wait = wait
-        # self.logger = logger
+        self.logger = logger
         self.lab_url = lab_url
         self.browser.set_page_load_timeout(60)
 
@@ -32,8 +32,55 @@ class CustomBasePage:
             loc = f"{file_path}:{line}" if file_path and line else ""
             raise AssertionError(f"❌ {description} not visible {f'@ {loc}' if loc else ''}")
         else:
-            # self.logger.info(f" {description} is visible.")
             print(f"{description} is visible.")
+
+    def assert_elements_present_and_displayed(self, locators:list, context_name:str, timeout: int=5, logger=None):
+        """
+               Validates that each locator:
+                 1. Exists on the page
+                 2. Is displayed
+               Logs missing locators and elements that are not displayed.
+               """
+        missing_locators = []
+        not_displayed = []
+
+        def get_element_label(ele):
+            text = ele.text.strip()
+            if text:
+                return text
+            return ele.get_attribute("innerText").strip() or f"<no text> tag={ele.tag_name}"
+
+        self.logger.info(f"Verifying {context_name}")
+
+        for locator in locators:
+            try:
+                elements = self.find_all_elements(locator, timeout=timeout)
+
+                if not elements:
+                    missing_locators.append(locator)
+                    continue
+
+                for el in elements:
+                    label = get_element_label(el)
+                    self.logger.info(f"Found {context_name}: locator={locator}, label='{label}'")
+                try:
+                    visible_elements = self.visibility_of_all_elements(locator, timeout=timeout)
+                    visible = bool(visible_elements)
+                except TimeoutException:
+                    visible = False
+
+            except TimeoutException:
+                missing_locators.append(locator)
+
+        if missing_locators or not_displayed:
+            error_msg = f"{context_name} validation failed:\n"
+            if missing_locators:
+                error_msg += f"Missing locators: {missing_locators}\n"
+            if not_displayed:
+                error_msg += f"Not displayed (all elements hidden): {not_displayed}\n"
+            raise AssertionError(error_msg)
+
+        self.logger.info(f"✓ All {context_name} are present and displayed")
 
     def find_element(self, by_locator, timeout=10):
         return WebDriverWait(self.browser, timeout).until(

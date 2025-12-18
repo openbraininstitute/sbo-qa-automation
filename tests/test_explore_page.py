@@ -37,12 +37,6 @@ class TestExplorePage:
         brain_region_panel = explore_page.find_brain_region_panel(timeout=40)
         logger.info("Found Brain Region Panel")
 
-        # explore_page.check_explore_title_is_present(timeout=15)
-        # logger.info("Explore page title is present")
-        # cerebrum_title_br_panel = explore_page.cerebrum_title_br_panel()
-        # assert cerebrum_title_br_panel, f"Cerebrum title is not found"
-        # logger.info("Cerebrum title is displayed")
-
         ai_assistant_panel = explore_page.find_ai_assistant_panel(timeout=25)
         logger.info("AI Assistant panel is open. Attempting to close it.")
 
@@ -119,12 +113,12 @@ class TestExplorePage:
         missing_locators = []
         not_displayed = []
 
-        def get_element_label(element):
+        def get_element_label(el):
             return (
                     element.text.strip()
                     or element.get_attribute("aria-label")
                     or element.get_attribute("title")
-                    or f"<no text> tag={element.tag_name}"
+                    or f"<no text> tag={el.tag_name}"
             )
 
         for locator in exp_data_titles:
@@ -177,9 +171,6 @@ class TestExplorePage:
         cerebrum_arrow_btn = explore_page.find_cerebrum_arrow_btn(timeout=15)
         assert cerebrum_arrow_btn, "The toggle arrow for Cerebrum is not found"
         logger.info("Cerebrum arrow button is found")
-        # cerebrum_arrow_btn.click()
-        # logger.info("Cerebrum - parent arrow button is clicked")
-        # browser.execute_script("arguments[0].click();", cerebrum_arrow_btn)
 
         cerebral_cortex_title = explore_page.find_cerebral_cortex_brp(timeout=15)
         logger.info("Found Cerebral cortex as a child of Cerebrum")
@@ -283,27 +274,6 @@ class TestExplorePage:
                     + (f"Not displayed: {not_displayed}\n" if not_displayed else "")
             )
             logger.info("Found Model data artifact titles")
-
-        # data_model_data_titles = explore_page.find_visible_explore_page_titles(model_data_titles, timeout=15)
-
-
-        # panel_emodel = explore_page.find_panel_emodel()
-        # logger.info("E-model is found in the types panel")
-        #
-        # panel_memodel = explore_page.find_panel_memodel()
-        # logger.info("ME-model is found in the types panel")
-        #
-        # panel_synaptome = explore_page.find_panel_synaptome()
-        # logger.info("Synaptome is found in the types panel")
-        #
-        # panel_circuit = explore_page.find_panel_circuit()
-        # logger.info("Circuit is found in the types panel")
-
-        # expected_panel = explore_page.find_data_panel()
-        # assert expected_panel.is_displayed()
-        # logger.info("Model data panel is displayed after clicking the tab.")
-
-
 
         '''
         pending implementation of config file
