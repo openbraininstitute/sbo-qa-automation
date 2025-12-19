@@ -5,13 +5,12 @@
 from selenium.webdriver.common.by import By
 
 class ProjectNotebooksLocators:
-
-    COLUMN_NAME_HEADER = (By.XPATH, "//th[@aria-label='Name']")
-    COLUMN_DESCRIPTION_HEADER = (By.XPATH, "//th[@aria-label='Description']")
-    COLUMN_OBJECT_OF_INTEREST_HEADER = (By.XPATH, "//th[@aria-label='Object of interest']")
-    COLUMN_SCALE_HEADER = (By.XPATH, "//th[@aria-label='Scale']")
-    COLUMN_AUTHORS_HEADER = (By.XPATH, "//th[@aria-label='Authors']")
-    COLUMN_CREATION_DATE_HEADER = (By.XPATH, "//th[@aria-label='Creation date']")
+    COLUMN_HEADER = (By.XPATH, "//thead/tr/th")
+    COLUMN_NAME_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Name']")
+    COLUMN_DESCRIPTION_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Description']")
+    COLUMN_SCALE_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Scale']")
+    COLUMN_CONTRIBUTORS_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Contributors']")
+    COLUMN_CREATION_DATE_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Creation date']")
     DATA_ROW_KEY_SEARCH_RESULT = (By.XPATH, "//tr[@class='ant-table-row ant-table-row-level-0' and "
                                "@data-row-key='Metabolism/analysis_notebook.ipynb']")
     DATA_ROW_NAME = (By.XPATH, "//td[@aria-label='Name']")
@@ -36,10 +35,13 @@ class ProjectNotebooksLocators:
     MEMBER_NOTEBOOKS_TAB = (By.XPATH, "//a[normalize-space()='Member Notebooks']")
     OBI_NOTEBOOKS_TAB = (By.XPATH, "//a[normalize-space()='OBI Notebooks']")
     PAGE_FILTER = (By.CSS_SELECTOR, "button[aria-label='listing-view-filter-button']")
+    PUBLIC_TAB = (By.XPATH, "//a[normalize-space()='Public']")
+    PROJECT_TAB = (By.XPATH, "//a[normalize-space()='Project']")
     ROW1 = (By.XPATH, "//tr[contains(@class, 'ant-table-row')]")
-    ROWS = (By.XPATH, "//tr[@class='ant-table-row ant-table-row-level-0']")
-    SEARCH_NOTEBOOK = (By.CSS_SELECTOR, "input[placeholder='Search for notebooks']")
+    ROWS = (By.XPATH, "//tbody/tr/td")
+    SEARCH_NOTEBOOK = (By.XPATH, "//button[@aria-label='Open search']")
+    SEARCH_INPUT = (By.CSS_SELECTOR, "input[placeholder='Search for entities...']")
     TABLE_ELEMENT = (By.XPATH, "//table//thead")
-    TABLE_CONTAINER = (By.CSS_SELECTOR, "#table-container")
+    TABLE_CONTAINER = (By.XPATH, "//table[@aria-label='listing-view-table']")
     TH = (By.XPATH, "//th")
 

@@ -22,8 +22,6 @@ class TestExploreMorphologyPage:
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         explore_morphology.go_to_explore_morphology_page(lab_id, project_id)
         logger.info("Explore morphology page is displayed")
-        # morphology_tab = explore_morphology.find_morphology_tab()
-        # logger.info("Morphology tab is displayed")
 
         ai_assistant_panel = explore_morphology.find_ai_assistant_panel(timeout=25)
         logger.info("AI Assistant panel is open. Attempting to close it.")
