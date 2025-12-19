@@ -47,14 +47,13 @@ class TestProjectNotebooks:
         search_input.send_keys("circuit")
         logger.info("Searching for 'circuit' using the free text search")
 
-        result1 = project_notebooks.row1()
-        result_text = result1.text
-        assert "circuit" in result_text, "Expected 'circuit' in the result"
-        logger.info("Expected 'circuit' in the result")
-
+        project_notebooks.wait_for_scale_to_be("circuit")
         scale_cells = project_notebooks.get_column_cells("Scale")
-        for cell in scale_cells:
-            assert cell.text.strip().lower() == "circuit"
+
+        for i, cell in enumerate(scale_cells, start=1):
+            assert cell.text.strip().lower() == "circuit", f"Row {i}: expected 'circuit', got '{cell.text.strip()}'"
+
+        logger.info("All Scale values are 'circuit'")
 
         clear_search_input = project_notebooks.clear_search_notebook_input()
         logger.info("Search input is cleared")
@@ -74,28 +73,45 @@ class TestProjectNotebooks:
         page_filter.click()
         logger.info("Page filter is clicked")
 
+        filter_name_label = project_notebooks.filter_name_label(timeout=10)
+        assert filter_name_label.is_displayed(), "Filter name label is not displayed"
+        logger.info("Filter name label is found")
+        filter_name_label.click()
+        logger.info("Filter name label is clicked")
+
         filter_name_input = project_notebooks.filter_name_input(timeout=10)
         assert filter_name_input.is_displayed(), "Filter name input is not displayed"
         logger.info("Filter name input is found")
+        filter_name_input.click()
+        logger.info("Filter name input is clicked")
 
-        filter_name_input.send_keys("Metabolism")
+        filter_name_input.send_keys("Visualize skeletonized neuronal")
         logger.info("Filter name input is filled")
+
+        filter_name_label.click()
+        logger.info("Filter name label is clicked again")
 
         filter_scale_title = project_notebooks.filter_scale_title(timeout=10)
         assert filter_scale_title, "'Scale' title inside the filter is not found."
         logger.info("'Scale' title inside Filter is found.")
 
-        filter_scale_input = project_notebooks.filter_scale_input(timeout=10)
-        assert filter_scale_input.is_displayed(), "Filter scale input is not displayed"
-        logger.info("Filter scale input is found")
-        filter_scale_input.click()
-        time.sleep(0.5)
+        filter_contributor_label = project_notebooks.filter_contributor_label(timeout=10)
+        assert filter_contributor_label.is_displayed(), "Filter scale input is not displayed"
+        logger.info("Filter contributor input is found")
+        filter_contributor_label.click()
+        logger.info("Filter contributor input is clicked")
 
-        filter_scale_menu_metabolism = project_notebooks.filter_scale_menu_metabolism(timeout=10)
-        assert filter_scale_menu_metabolism.is_displayed(), "Filter scale input is not displayed"
-        time.sleep(0.3)
-        filter_scale_menu_metabolism.click()
-        logger.info("Filter scale input is selected")
+        filter_contributor_checkbox = project_notebooks.filter_contributor_checkbox()
+        assert filter_contributor_checkbox.is_displayed(), "Filter contributor checkbox is not displayed"
+        logger.info("Filter contributor checkbox is found")
+        filter_contributor_checkbox.click()
+        logger.info("Filter contributor checkbox is clicked")
+
+        filter_apply_btn = project_notebooks.filter_apply_btn()
+        assert filter_apply_btn.is_displayed(), "Filter apply button is not displayed"
+        logger.info("Filter apply button is found")
+        filter_apply_btn.click()
+        logger.info("Filter is applied")
 
         filter_close_btn = project_notebooks.filter_close_btn()
         assert filter_close_btn.is_displayed(), "Filter close button is not displayed"

@@ -43,23 +43,29 @@ class ProjectNotebooks(HomePage):
     def column_headers(self):
         return self.find_all_elements(ProjectNotebooksLocators.COLUMN_HEADER)
 
+    def filter_apply_btn(self):
+        return self.find_element(ProjectNotebooksLocators.FILTER_APPLY_BTN)
+
     def filter_clear_btn(self, timeout=15):
         return self.find_element(ProjectNotebooksLocators.FILTER_CLEAR_BTN, timeout=timeout)
 
     def filter_close_btn(self):
         return self.find_element(ProjectNotebooksLocators.FILTER_CLOSE_BTN)
 
+    def filter_contributor_label(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.FILTER_CONTRIBUTOR_LABEL, timeout=timeout)
+
+    def filter_contributor_checkbox(self):
+        return self.element_visibility(ProjectNotebooksLocators.FILTER_CONTRIBUTOR_CHECKBOX)
+
+    def filter_name_label(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.Filter_NAME_LABEL, timeout=timeout)
+
     def filter_name_input(self, timeout=10):
         return self.find_element(ProjectNotebooksLocators.FILTER_NAME_INPUT, timeout=timeout)
 
     def filter_scale_title(self, timeout=10):
         return self.find_element(ProjectNotebooksLocators.FILTER_SCALE_TITLE, timeout=timeout)
-
-    def filter_scale_input(self, timeout=10):
-        return self.find_element(ProjectNotebooksLocators.FILTER_SELECT_SCALE_INPUT, timeout=timeout)
-
-    def filter_scale_menu_metabolism(self, timeout=10):
-        return self.find_element(ProjectNotebooksLocators.FILTER_SCALE_MENU_METABOLISM, timeout=timeout)
 
     def get_column_cells(self, column_name: str) -> List[WebElement]:
         headers = self.column_headers()
@@ -73,9 +79,8 @@ class ProjectNotebooks(HomePage):
         if column_index is None:
             raise ValueError(f"Column '{column_name}' not found")
 
-        cells = self.find_all_elements(
-            (By.XPATH, f"//tbody/tr/td[{column_index}]")
-        )
+        xpath = f"//tbody/tr[not(contains(@style,'display: none'))]/td[{column_index}]"
+        cells = self.find_all_elements((By.XPATH, xpath))
 
         return [cell for cell in cells if cell.text.strip()]
 
@@ -134,4 +139,14 @@ class ProjectNotebooks(HomePage):
         except TimeoutException:
             self.logger.error("The table element was not found on the Project Notebooks page.")
             raise RuntimeError("The table element was not loaded within the timeout.")
+
+    def wait_for_scale_to_be(self, value: str, timeout: int = 10):
+        value = value.lower()
+
+        WebDriverWait(self.browser, timeout).until(
+            lambda d: all(
+                cell.text.strip().lower() == value
+                for cell in self.get_column_cells("Scale")
+            )
+        )
 
