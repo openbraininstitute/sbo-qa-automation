@@ -102,6 +102,9 @@ class ProjectNotebooks(HomePage):
     def table_container(self, timeout=10):
         return self.find_element(ProjectNotebooksLocators.TABLE_CONTAINER, timeout=timeout)
 
+    def table_body_container(self, timeout=10):
+        return self.find_element(ProjectNotebooksLocators.TABLE_BODY_CONTAINER, timeout=timeout)
+
     def table_search_result(self, timeout=20):
         return self.is_visible(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=timeout)
 

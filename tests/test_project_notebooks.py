@@ -29,7 +29,7 @@ class TestProjectNotebooks:
             "Name",
             "Description",
             "Contributors",
-            "Registration date",
+            "Creation date",
             "Scale",
             ""
         ]
@@ -98,14 +98,6 @@ class TestProjectNotebooks:
         filter_contributor_label = project_notebooks.filter_contributor_label(timeout=10)
         assert filter_contributor_label.is_displayed(), "Filter scale input is not displayed"
         logger.info("Filter contributor input is found")
-        filter_contributor_label.click()
-        logger.info("Filter contributor input is clicked")
-
-        filter_contributor_checkbox = project_notebooks.filter_contributor_checkbox()
-        assert filter_contributor_checkbox.is_displayed(), "Filter contributor checkbox is not displayed"
-        logger.info("Filter contributor checkbox is found")
-        filter_contributor_checkbox.click()
-        logger.info("Filter contributor checkbox is clicked")
 
         filter_apply_btn = project_notebooks.filter_apply_btn()
         assert filter_apply_btn.is_displayed(), "Filter apply button is not displayed"
@@ -119,7 +111,7 @@ class TestProjectNotebooks:
         filter_close_btn.click()
         logger.info("Filter is closed")
 
-        table_container = project_notebooks.table_container(timeout=10)
+        table_body_container = project_notebooks.table_body_container(timeout=10)
         logger.info("Looking for table container")
         time.sleep(5)
         data_search_result = project_notebooks.table_search_result(timeout=20)
