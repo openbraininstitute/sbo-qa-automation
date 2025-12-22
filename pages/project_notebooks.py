@@ -29,7 +29,7 @@ class ProjectNotebooks(HomePage):
                 print(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
                 time.sleep(delay)
                 if attempt == retries - 1:
-                    raise RuntimeError("The Explore Morphology page did not load within 60 seconds")
+                    raise RuntimeError("The Project > Notebooks page did not load within 60 seconds")
         return self.browser.current_url
 
     def clear_search_notebook_input(self, timeout=15):

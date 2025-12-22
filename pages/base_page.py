@@ -195,10 +195,10 @@ class CustomBasePage:
             message=f"Timed out waiting for URL to contain: '{url_fragment}'"
         )
 
-    def wait_for_url_change(self, old_url, timeout=30):
-        return self.wait.until(
+    def wait_for_url_change(self, old_url, timeout: int=30):
+        WebDriverWait(self.browser, timeout).until(
             lambda driver: driver.current_url != old_url,
-            timeout
+            message="Timed out waiting for URL to change"
         )
 
     def is_clickable_via_js(self, element):
