@@ -28,6 +28,7 @@ class LandingLocators:
     GOTO_LAB = (By.XPATH, "//a[@href='/app/virtual-lab/sync']")
     HERO_BACKGROUND_IMG = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__background")
     HERO_BACKGROUND_VIDEO = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__show")
+    LOGIN_BUTTON = (By.XPATH, "//a[@href='/app/virtual-lab']")
     NAV_ABOUT = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/about']")
     NAV_MISSION = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/mission']")
     NAV_NEWS = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/news']")

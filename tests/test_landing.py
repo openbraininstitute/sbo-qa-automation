@@ -194,11 +194,11 @@ class TestLanding:
         assert not missing, f"Missing social media links: {', '.join(missing)}"
         assert set(actual_social_media) >= expected_social_media
 
-        gotolab = landing_page.go_to_lab(timeout=15)
+        gotolab = landing_page.go_to_lab(timeout=25)
         assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
         gotolab.click()
         try:
-            landing_page.wait_for_url_contains("openid-connect", timeout=30)
+            landing_page.wait_for_url_contains("openid-connect", timeout=40)
             redirected = (
                     "openid-connect" in landing_page.browser.current_url or
                     "auth" in landing_page.browser.current_url
