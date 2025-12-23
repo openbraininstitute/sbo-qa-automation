@@ -201,20 +201,33 @@ def navigate_to_login(setup, logger, request, test_config):
 def navigate_to_login_direct(setup, logger, test_config):
     """Navigate directly to the OIDC login page instead of the landing page."""
     browser, wait, base_url, lab_id, project_id = setup
-
     oidc_url = test_config["oidc_login_url"]
     logger.info(f"Navigating directly to OIDC login URL: {oidc_url}")
-
     browser.get(oidc_url)
-    browser.save_screenshot("/tmp/debug_login_page.png")
-    print("DEBUG: Current URL after get():", browser.current_url)
 
+    # Wait until either we land on login OR we are redirected
     WebDriverWait(browser, 60).until(
-        EC.url_contains("openid-connect/auth"),
-        "OIDC login page did not load"
+        lambda d: "openid-connect/auth" in d.current_url
     )
 
-    return LoginPage(browser=browser, wait=wait, lab_url=test_config["lab_url"], logger=logger)
+    logger.info(f"Reached OIDC login URL: {browser.current_url}")
+    browser.save_screenshot("/tmp/debug_login_page.png")
+
+    return LoginPage(browser, wait, lab_url=test_config["lab_url"], logger=logger)
+
+    # oidc_url = test_config["oidc_login_url"]
+    # logger.info(f"Navigating directly to OIDC login URL: {oidc_url}")
+    #
+    # browser.get(oidc_url)
+    # browser.save_screenshot("/tmp/debug_login_page.png")
+    # print("DEBUG: Current URL after get():", browser.current_url)
+    #
+    # WebDriverWait(browser, 60).until(
+    #     EC.url_contains("openid-connect/auth"),
+    #     "OIDC login page did not load"
+    # )
+    #
+    # return LoginPage(browser=browser, wait=wait, lab_url=test_config["lab_url"], logger=logger)
 
 
 @pytest.fixture(scope="function")
