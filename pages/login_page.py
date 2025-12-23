@@ -78,7 +78,6 @@ class LoginPage(CustomBasePage):
         username_field.send_keys(username)
         password_field.send_keys(password)
         password_field.send_keys(Keys.ENTER)
-
         self.wait.until(EC.url_contains("app/virtual-lab"))
         print("DEBUG: Login completed successfully.")
 

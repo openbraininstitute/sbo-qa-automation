@@ -12,8 +12,9 @@ import pytest
 import base64
 from PIL import Image
 from selenium import webdriver
-from selenium.common import exceptions
+from selenium.common import exceptions, TimeoutException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support.wait import WebDriverWait
@@ -205,13 +206,27 @@ def navigate_to_login_direct(setup, logger, test_config):
     logger.info(f"Navigating directly to OIDC login URL: {oidc_url}")
     browser.get(oidc_url)
 
-    # Wait until either we land on login OR we are redirected
-    WebDriverWait(browser, 60).until(
-        lambda d: "openid-connect/auth" in d.current_url
-    )
-
-    logger.info(f"Reached OIDC login URL: {browser.current_url}")
-    browser.save_screenshot("/tmp/debug_login_page.png")
+    # Wait for login page or landing page
+    try:
+        WebDriverWait(browser, 30).until(
+            EC.presence_of_element_located((By.ID, "kc-form-wrapper"))
+        )
+        logger.info("Reached OIDC login page")
+    except TimeoutException:
+        # fallback: check if we are on the landing page
+        logger.warning("Login form not found, landing page detected. Trying to click login button.")
+        try:
+            login_btn = WebDriverWait(browser, 15).until(
+                EC.element_to_be_clickable((By.XPATH, "//a[@href='/app/virtual-lab']"))
+            )
+            login_btn.click()
+            WebDriverWait(browser, 30).until(
+                EC.presence_of_element_located((By.ID, "kc-form-wrapper"))
+            )
+            logger.info("Clicked login button and reached OIDC login page")
+        except TimeoutException:
+            browser.save_screenshot("/tmp/failed_login.png")
+            raise RuntimeError("Cannot reach OIDC login page from CI/CD")
 
     return LoginPage(browser, wait, lab_url=test_config["lab_url"], logger=logger)
 

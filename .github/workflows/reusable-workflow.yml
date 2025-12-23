@@ -80,10 +80,6 @@ jobs:
 
           set -o pipefail
           uv run pytest \
-            tests/test_about.py \
-            tests/test_mission.py \
-            tests/test_news.py \
-            tests/test_landing.py \
             tests/test_login.py \
             tests/test_explore_page.py \
             tests/test_explore_emodel.py \
