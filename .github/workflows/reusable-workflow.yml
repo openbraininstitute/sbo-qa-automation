@@ -1,188 +1,184 @@
-#name: Test Based on Environment
-#
-#on:
-#  workflow_call:
-#    inputs:
-#      env:
-#        description: "The name of environment (eg. STAGING, PRODUCTION, SAUCE-LABS)"
-#        required: true
-#        type: string
-#      artifact-name:
-#        description: "The name of the artifact to download"
-#        required: true
-#        type: string
-#
-#jobs:
-#  test:
-#    strategy:
-#      matrix:
-#        browser: [ chrome ]
-#    runs-on: ubuntu-latest
-#    environment: ${{ inputs.env }}
-#
-#    steps:
-#      - name: Checkout repo
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 1
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.11'
-#
-#      - name: Install required dependencies
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y unzip wget
-#
-#      # Installation of 'uv' is required
-#      - name: Install uv
-#        uses: astral-sh/setup-uv@v5
-#
-#      - name: Set up virtual environment and install dependencies
-#        run: |
-#          uv venv -p 3.11
-#          python -m pip install --upgrade pip
-#          source .venv/bin/activate
-#          uv pip install -r requirements.txt
-#          ls -la
-#
-#      - name: Verify Chrome installation
-#        run: google-chrome --version
-#
-#      # This is temporary for debugging
-#      - name: Verify browser installation
-#        run: |
-#          firefox --version
-#
-#      # Create a directory for logs
-#      - name: Create Logs Directory
-#        run: mkdir -p latest_logs/errors
-#
-#      - name: Run Tests Based on Environment
-#        env:
-#          ENV_URL: ${{ vars.ENV_URL }}
-#          ENV_NAME: ${{ inputs.env }}
-#          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-#          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-#          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-#          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-#          LAB_ID_STAGING: ${{ secrets.LAB_ID_STAGING }}
-#          PROJECT_ID_STAGING: ${{ secrets.PROJECT_ID_STAGING }}
-#          LAB_ID_PRODUCTION: ${{ secrets.LAB_ID_PRODUCTION }}
-#          PROJECT_ID_PRODUCTION: ${{ secrets.PROJECT_ID_PRODUCTION }}
-#        run: |
-#          echo "RUN_URL=https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> ${GITHUB_ENV}
-#          echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
-#          echo "ENV_URL: $ENV_URL"
-#          echo "ENV_NAME: $ENV_NAME"
-#
-#          set -o pipefail
-#          uv run pytest \
-#            tests/test_about.py \
-#            tests/test_mission.py \
-#            tests/test_news.py \
-#            tests/test_landing.py \
-#            tests/test_login.py \
-#            tests/test_explore_page.py \
-#            tests/test_explore_ndensity.py \
-#            tests/test_explore_emodel.py \
-#            tests/test_outside_explore.py \
-#            tests/test_project_home.py \
-#            tests/test_project_notebooks.py \
-#            tests/test_build.py \
-#            tests/test_build_synaptome.py \
-#            --env="$ENV_NAME" \
-#            --env_url="$ENV_URL" \
-#            -s \
-#            --headless \
-#            --html="latest_logs/report_${ENV_NAME}_chrome.html" \
-#            --self-contained-html \
-#            --browser-name=chrome | tee test_output.log
-#
-#      # Upload test artifacts (screenshots) if failure
-#      - name: Upload test artifacts (screenshots)
-#        if: failure()
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.run_attempt }}-${{ github.sha }}
-#          path: latest_logs/errors
-#          if-no-files-found: warn
-#          overwrite: true
-#
-#      # Run tests and generate HTML Report
-#      - name: Upload Pytest HTML Report
-#        if: always()
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: pytest-html-report-${{ inputs.env }}-${{ matrix.browser }}
-#          path: latest_logs/report_${{ inputs.env }}_chrome.html
-#
-#      - name: Annotation - Test Summary - Failures
-#        if: failure()
-#        run: |
-#          echo "## UI Test Failures for ${{ inputs.env }}" > failures_${{ inputs.env }}.md
-#          echo "" >> failures_${{ inputs.env }}.md
-#
-#          sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log \
-#            | grep -E '^- tests/' \
-#            | sort | uniq >> failures_${{ inputs.env }}.md
-#
-#          echo "::error title=UI Test Failure in ${{ inputs.env }}::$(sed ':a;N;$!ba;s/\n/%0A/g' failures_${{ inputs.env }}.md)"
-#
-#      - name: Upload Combined Failure Summary
-#        if: failure() && hashFiles('all_failures.md') != ''
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: all-ui-test-failures
-#          path: all_failures.md
-#
-#      - name: MS Teams Notification
-#        uses: skitionek/notify-microsoft-teams@v1.0.9
-#        if: failure()
-#        with:
-#          webhook_url: ${{ secrets.MS_TEAMS_NEW_WEBHOOK_URI }}
-#          job: ${{ toJson(job) }}
-#          steps: ${{ toJson(steps) }}
-#          raw: >-
-#            {
-#              "type": "message",
-#              "attachments": [
-#                {
-#                  "contentType": "application/vnd.microsoft.card.adaptive",
-#                  "content": {
-#                    "type": "AdaptiveCard",
-#                    "msteams": {
-#                      "width": "Full"
-#                    },
-#                    "body": [
-#                      {
-#                        "type": "Container",
-#                        "items": [
-#                          {
-#                            "type": "RichTextBlock",
-#                            "inlines": [
-#                              {
-#                                "type": "TextRun",
-#                                "text": "Attention! Some UI tests failed, check the workflow for details.",
-#                                "color": "attention",
-#                                "size": "medium",
-#                                "weight": "bolder"
-#                              }
-#                            ]
-#                          }
-#                        ]
-#                      }
-#                    ],
-#                    "actions": [
-#                      {
-#                        "type": "Action.OpenUrl",
-#                        "title": "View Workflow Run",
-#                        "url": "${{ env.RUN_URL }}"
-#                      }
-#                    ]
-#                  }
-#                }
-#              ]
-#            }
+name: Test Based on Environment
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        description: "The name of environment (eg. STAGING, PRODUCTION, SAUCE-LABS)"
+        required: true
+        type: string
+      artifact-name:
+        description: "The name of the artifact to download"
+        required: true
+        type: string
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        browser: [ chrome ]
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install required dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip wget
+
+      # Installation of 'uv' is required
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up virtual environment and install dependencies
+        run: |
+          uv venv -p 3.11
+          python -m pip install --upgrade pip
+          source .venv/bin/activate
+          uv pip install -r requirements.txt
+          ls -la
+
+      - name: Verify Chrome installation
+        run: google-chrome --version
+
+      # This is temporary for debugging
+      - name: Verify browser installation
+        run: |
+          firefox --version
+
+      # Create a directory for logs
+      - name: Create Logs Directory
+        run: mkdir -p latest_logs/errors
+
+      - name: Run Tests Based on Environment
+        env:
+          ENV_URL: ${{ vars.ENV_URL }}
+          ENV_NAME: ${{ inputs.env }}
+          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          LAB_ID_STAGING: ${{ secrets.LAB_ID_STAGING }}
+          PROJECT_ID_STAGING: ${{ secrets.PROJECT_ID_STAGING }}
+          LAB_ID_PRODUCTION: ${{ secrets.LAB_ID_PRODUCTION }}
+          PROJECT_ID_PRODUCTION: ${{ secrets.PROJECT_ID_PRODUCTION }}
+        run: |
+          echo "RUN_URL=https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> ${GITHUB_ENV}
+          echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
+          echo "ENV_URL: $ENV_URL"
+          echo "ENV_NAME: $ENV_NAME"
+
+          set -o pipefail
+          uv run pytest \
+            tests/test_about.py \
+            tests/test_mission.py \
+            tests/test_news.py \
+            tests/test_landing.py \
+            tests/test_login.py \
+            tests/test_explore_page.py \
+            tests/test_explore_emodel.py \
+            tests/test_project_home.py \
+            tests/test_project_notebooks.py \
+            --env="$ENV_NAME" \
+            --env_url="$ENV_URL" \
+            -s \
+            --headless \
+            --html="latest_logs/report_${ENV_NAME}_chrome.html" \
+            --self-contained-html \
+            --browser-name=chrome | tee test_output.log
+
+      # Upload test artifacts (screenshots) if failure
+      - name: Upload test artifacts (screenshots)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-screenshots-${{ matrix.browser }}-${{ github.run_id }}-${{ github.job }}-${{ github.run_attempt }}-${{ github.sha }}
+          path: latest_logs/errors
+          if-no-files-found: warn
+          overwrite: true
+
+      # Run tests and generate HTML Report
+      - name: Upload Pytest HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-html-report-${{ inputs.env }}-${{ matrix.browser }}
+          path: latest_logs/report_${{ inputs.env }}_chrome.html
+
+      - name: Annotation - Test Summary - Failures
+        if: failure()
+        run: |
+          echo "## UI Test Failures for ${{ inputs.env }}" > failures_${{ inputs.env }}.md
+          echo "" >> failures_${{ inputs.env }}.md
+
+          sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log \
+            | grep -E '^- tests/' \
+            | sort | uniq >> failures_${{ inputs.env }}.md
+
+          echo "::error title=UI Test Failure in ${{ inputs.env }}::$(sed ':a;N;$!ba;s/\n/%0A/g' failures_${{ inputs.env }}.md)"
+
+      - name: Upload Combined Failure Summary
+        if: failure() && hashFiles('all_failures.md') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-ui-test-failures
+          path: all_failures.md
+
+      - name: MS Teams Notification
+        uses: skitionek/notify-microsoft-teams@v1.0.9
+        if: failure()
+        with:
+          webhook_url: ${{ secrets.MS_TEAMS_NEW_WEBHOOK_URI }}
+          job: ${{ toJson(job) }}
+          steps: ${{ toJson(steps) }}
+          raw: >-
+            {
+              "type": "message",
+              "attachments": [
+                {
+                  "contentType": "application/vnd.microsoft.card.adaptive",
+                  "content": {
+                    "type": "AdaptiveCard",
+                    "msteams": {
+                      "width": "Full"
+                    },
+                    "body": [
+                      {
+                        "type": "Container",
+                        "items": [
+                          {
+                            "type": "RichTextBlock",
+                            "inlines": [
+                              {
+                                "type": "TextRun",
+                                "text": "Attention! Some UI tests failed, check the workflow for details.",
+                                "color": "attention",
+                                "size": "medium",
+                                "weight": "bolder"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "actions": [
+                      {
+                        "type": "Action.OpenUrl",
+                        "title": "View Workflow Run",
+                        "url": "${{ env.RUN_URL }}"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
