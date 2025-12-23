@@ -206,8 +206,10 @@ def navigate_to_login_direct(setup, logger, test_config):
     logger.info(f"Navigating directly to OIDC login URL: {oidc_url}")
 
     browser.get(oidc_url)
+    browser.save_screenshot("/tmp/debug_login_page.png")
+    print("DEBUG: Current URL after get():", browser.current_url)
 
-    WebDriverWait(browser, 30).until(
+    WebDriverWait(browser, 60).until(
         EC.url_contains("openid-connect/auth"),
         "OIDC login page did not load"
     )

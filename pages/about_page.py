@@ -54,8 +54,8 @@ class AboutPage(HomePage):
     def find_contributors_list(self):
         return self.find_element(AboutLocators.CONTRIBUTORS_LIST)
 
-    def find_contributors_name(self):
-        return self.find_all_elements(AboutLocators.CONTRIBUTORS_NAME)
+    def find_contributors_name(self, timeout=15):
+        return self.find_all_elements(AboutLocators.CONTRIBUTORS_NAME, timeout=timeout)
 
     def get_element(self, locator):
         return self.find_element(locator)

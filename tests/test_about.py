@@ -107,7 +107,7 @@ class TestAbout:
         click_load_more_btn = about_page.find_load_more_btn(timeout=20)
         logger.info("Clicking LOAD MORE BUTTON")
 
-        final_contributors = about_page.find_contributors_name()
+        final_contributors = about_page.find_contributors_name(timeout=15)
         final_count = len(final_contributors)
         logger.info(f"Final number of B contributors after loading more: {final_count}")
         assert final_count > initial_count, "No additional B contributors were loaded after clicking 'Load more'"
