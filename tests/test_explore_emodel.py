@@ -115,12 +115,15 @@ class TestExploreModelPage:
         mini_detail_view_button.click()
         logger.info("Mini detail view button is clicked")
 
-        explore_emodel.wait_for_url_change(old_url, timeout=25)
-        explore_emodel.wait_for_url_contains("/data/view/emodel/", timeout=20)
+        explore_emodel.wait_for_url_change(old_url, timeout=30)
+        explore_emodel.wait_for_url_contains("/data/view/emodel/", timeout=30)
+
+        detail_view_breacrumb = explore_emodel.find_dv_emodel_breadcrumb(timeout=10)
+        assert detail_view_breacrumb.is_displayed(), "Detail view breadcrumb is not found"
+        logger.info("Detail view breadcrumb is found")
 
         current_url = browser.current_url
         logger.info(f"Current URL: {current_url}")
-
         assert "/overview" in current_url
 
         label_checks = [

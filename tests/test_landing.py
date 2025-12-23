@@ -9,6 +9,9 @@ from locators.landing_locators import LandingLocators
 from pages.landing_page import LandingPage
 from selenium.webdriver.common.action_chains import ActionChains
 
+from pages.login_page import LoginPage
+
+
 @pytest.mark.no_auto_nav
 @pytest.mark.usefixtures("visit_public_pages")
 class TestLanding:
@@ -195,8 +198,12 @@ class TestLanding:
         assert set(actual_social_media) >= expected_social_media
 
         gotolab = landing_page.go_to_lab(timeout=25)
+
+        logger.info("TEST/LANDING PAGE LOOKING FOR 'Go to Lab' button")
         assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
         gotolab.click()
+        logger.info("TEST/LANDING PAGE Clicked on 'Go to Lab' button")
+
         try:
             landing_page.wait_for_url_contains("openid-connect", timeout=40)
             redirected = (
@@ -211,6 +218,8 @@ class TestLanding:
         except Exception as e:
             logger.error(f"Failed during login redirection: {e}")
             raise
+        browser.refresh()
+        logger.info("Had to refresh the page otherwise there is CDN related error")
 
 
 

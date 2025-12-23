@@ -17,7 +17,7 @@ class ExploreEModelDataPage(ExplorePage):
         self.home_page = ExplorePage(browser, wait, logger, base_url)
         self.logger = logger
 
-    def go_to_explore_emodel_page(self, lab_id: str, project_id: str, retries=3, delay=5):
+    def go_to_explore_emodel_page(self, lab_id: str, project_id: str, retries=2, delay=5):
         path = f"/app/virtual-lab/{lab_id}/{project_id}/data/browse/entity/emodel"
         for attempt in range(retries):
             try:
@@ -66,6 +66,9 @@ class ExploreEModelDataPage(ExplorePage):
 
     def find_dv_created_by_value(self):
         return self.find_element(ExploreEModelPageLocators.DV_CREATED_BY_VALUE)
+
+    def find_dv_emodel_breadcrumb(self, timeout=10):
+        return self.find_element(ExploreEModelPageLocators.DV_EMODEL_BREADCRUMB, timeout=timeout)
 
     def find_dv_species_label(self):
         return self.find_element(ExploreEModelPageLocators.DV_SPECIES_LABEL)

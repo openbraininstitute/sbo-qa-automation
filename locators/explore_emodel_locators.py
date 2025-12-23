@@ -27,6 +27,7 @@ class ExploreEModelPageLocators:
     DV_DESCRIPTION_VALUE = (
         By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Description']/following-sibling::div")
     DV_EXEMPLAR_TRACE_LABEL = (By.XPATH, "//div[normalize-space()='Exemplar Traces']")
+    DV_EMODEL_BREADCRUMB = (By.XPATH, "//a[contains(text(),'Data')]")
     DV_ETYPE_LABEL = (By.XPATH, "//div[text()='E-Type']")
     DV_ETYPE_VALUE = (By.XPATH, "//div[text()='E-Type']/following-sibling::div")
     DV_EXEMPLAR_TABLE_HEADER_COLUMNS = (By.XPATH, "(//thead[@class='ant-table-thead'])[2]//th")

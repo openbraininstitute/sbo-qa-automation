@@ -21,7 +21,10 @@ class ProjectHome(HomePage):
         return self.browser.current_url
 
     def skip_onboardin_btn(self):
-        return self.find_element(ProjectHomeLocators.SKIP_ONBOARDING_BTN)
+        try:
+            return self.element_to_be_clickable(ProjectHomeLocators.SKIP_ONBOARDING_BTN)
+        except TimeoutException:
+            return None
 
     def project_menu_titles(self, titles, timeout=10):
         """

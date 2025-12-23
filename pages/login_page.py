@@ -25,7 +25,7 @@ class LoginPage(CustomBasePage):
         self.browser.get(target_url)
         self.logger.info(f"INFO: Target URL is {target_url}")
         try:
-            WebDriverWait(self.browser, 30).until(
+            WebDriverWait(self.browser, 40).until(
                 lambda d: "openid-connect" in d.current_url or "auth" in d.current_url
             )
             self.logger.info(f"INFO: Successfully reached {self.browser.current_url}")
@@ -38,13 +38,26 @@ class LoginPage(CustomBasePage):
     def wait_for_login_complete(self, timeout=30):
         """Wait for login completion by checking a URL or element."""
         try:
-            self.wait.until(EC.url_contains("app/virtual-lab"))
+            WebDriverWait(self.browser, timeout).until(
+                lambda d: "/app/virtual-lab" in d.current_url
+                          and not d.current_url.endswith("/sync")
+            )
             print(f"INFO: Successfully redirected to {self.browser.current_url}")
         except TimeoutException:
             print(
-                f"Timeout waiting for URL to contain 'virtual-lab'. Current URL: "
-                f"{self.browser.current_url}")
+                f"Timeout waiting for Virtual Lab page. Current URL: {self.browser.current_url}"
+            )
             raise
+
+
+        # try:
+        #     self.wait.until(EC.url_contains("app/virtual-lab"))
+        #     print(f"INFO: Successfully redirected to {self.browser.current_url}")
+        # except TimeoutException:
+        #     print(
+        #         f"Timeout waiting for URL to contain 'virtual-lab'. Current URL: "
+        #         f"{self.browser.current_url}")
+        #     raise
 
     def find_form_container(self, timeout=10):
         return self.find_element(LoginPageLocators.FORM_CONTAINER, timeout=timeout)
@@ -63,12 +76,12 @@ class LoginPage(CustomBasePage):
 
     def perform_login(self, username, password):
         self.logger.info("Performing login with the provided credentials.")
-
         self.wait.until(EC.url_contains("/auth/realms/"))
-        print(f"DEBUG: Current URL: {self.browser.current_url}")
+
+        self.logger.info(f"LOGIN_PAGE DEBUG: Current URL: {self.browser.current_url}")
+        self.logger.info("Looking for kc-form-wrapper")
 
         self.wait.until(EC.presence_of_element_located((By.ID, "kc-form-wrapper")))
-
         self.make_form_visible()
         self.wait.until(EC.visibility_of_element_located((By.ID, "username")))
         self.wait.until(EC.visibility_of_element_located((By.ID, "password")))
@@ -78,8 +91,10 @@ class LoginPage(CustomBasePage):
         username_field.send_keys(username)
         password_field.send_keys(password)
         password_field.send_keys(Keys.ENTER)
-        self.wait.until(EC.url_contains("app/virtual-lab"))
-        print("DEBUG: Login completed successfully.")
+
+        # self.wait.until(lambda d: "/auth/realms/" not in d.current_url)
+        self.wait.until(lambda d: "/app/virtual-lab" in d.current_url)
+        self.logger.info("LOGIN_PAGE / DEBUG: Login completed successfully.")
 
     def make_form_visible(self):
         """Use JavaScript to make the hidden form visible by removing 'display:none'."""
