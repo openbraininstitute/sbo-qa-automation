@@ -127,6 +127,9 @@ class LandingPage(HomePage):
     def find_horizontal_cards_section2(self):
         return self.find_element(LandingLocators.HORIZONTAL_CARDS_SECTION2)
 
+    def find_horizontal_cards_section3(self):
+        return self.find_element(LandingLocators.HORIZONTAL_CARDS_SECTION3)
+
     def find_news_content1(self):
         return self.find_element(LandingLocators.NEWS_CARD_CONTENT1)
 
@@ -178,11 +181,42 @@ class LandingPage(HomePage):
     def find_menu_logo(self):
         return self.find_element(LandingLocators.TOP_MENU_LOGO)
 
+    def footer_obi_logo(self):
+        return self.find_element(LandingLocators.FOOTER_OBI_LOGO)
+
+    def footer_obi_copyright(self):
+        return  self.find_element(LandingLocators.FOOTER_OBI_COPYRIGHT)
+
+    def footer_link_titles(self):
+        """
+        Returns a list of footer link titles (text of <a> elements).
+        """
+        links = self.find_all_elements(LandingLocators.FOOTER_LINK_TITLES)
+        return [link.text.strip() for link in links if link.text.strip()]
+
+    def footer_social_media_links(self):
+        """
+        Returns a list of social media links (href attributes of <a> elements).
+        """
+        elements = self.find_all_elements(LandingLocators.FOOTER_SOCIAL_MEDIA_LINKS)
+        return [el.get_attribute("href") for el in elements]
+
+
+    def footer_subscribe_block(self):
+        return self.find_element(LandingLocators.FOOTER_SUBSCRIBE_BLOCK)
+
     def hero_background_img(self, timeout=25):
         return self.is_visible(LandingLocators.HERO_BACKGROUND_IMG, timeout=timeout)
 
     def hero_background_video(self, timeout=25):
         return self.is_visible(LandingLocators.HERO_BACKGROUND_VIDEO, timeout=timeout)
+
+    def horizontal_card_sections(self):
+        return {
+            "Section 1": self.find_horizontal_cards_section1(),
+            "Section 2": self.find_horizontal_cards_section2(),
+            "Section 3": self.find_horizontal_cards_section3(),
+        }
 
     def video_title1(self, timeout=15):
         return self.find_element(LandingLocators.VIDEO_TITLE1, timeout=timeout)
