@@ -54,8 +54,8 @@ class AboutPage(HomePage):
     def find_contributors_list(self):
         return self.find_element(AboutLocators.CONTRIBUTORS_LIST)
 
-    def find_contributors_name(self):
-        return self.find_all_elements(AboutLocators.CONTRIBUTORS_NAME)
+    def find_contributors_name(self, timeout=15):
+        return self.find_all_elements(AboutLocators.CONTRIBUTORS_NAME, timeout=timeout)
 
     def get_element(self, locator):
         return self.find_element(locator)
@@ -123,7 +123,7 @@ class AboutPage(HomePage):
 
         self.browser.execute_script("window.scrollTo(0, 0);")
 
-    def wait_for_card_image_to_load(self, img_element, timeout=10):
+    def wait_for_card_image_to_load(self, img_element, timeout=20):
         WebDriverWait(self.browser, timeout).until(
             lambda d: d.execute_script(
                 "return arguments[0].complete && arguments[0].naturalWidth > 0;", img_element

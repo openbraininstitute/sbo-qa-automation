@@ -18,7 +18,7 @@ class ExplorePage(HomePage):
         self.logger = logger
 
     def go_to_explore_page(self, lab_id: str, project_id: str, retries=3, delay=5):
-        path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive"
+        path = f"/app/virtual-lab/{lab_id}/{project_id}/data"
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(100)
@@ -26,14 +26,29 @@ class ExplorePage(HomePage):
                 self.wait_for_page_ready(timeout=90)
             except TimeoutException:
                 print(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                time.sleep(delay)  # Wait before retrying
-                delay *= 2  # Exponentially increase delay (e.g., 5, 10, 20 seconds)
+                time.sleep(delay)
                 if attempt == retries - 1:
                     raise RuntimeError("The Explore page failed to load after multiple attempts.")
             return self.browser.current_url
+        return None
+
+    def skip_onboardin_btn(self, timeout=10):
+        try:
+            return self.element_to_be_clickable(ExplorePageLocators.SKIP_ONBOARDING_BTN, timeout=timeout)
+        except TimeoutException:
+            return None
+
+    def data_skip_onboardin_btn(self, timeout=10):
+        try:
+            return self.find_element(ExplorePageLocators.DATA_SKIP_BTN, timeout=timeout)
+        except TimeoutException:
+            return None
 
     def cerebrum_title_br_panel(self):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL)
+
+    def experimental_data_tab(self):
+        return self.find_element(ExplorePageLocators.EXPERIMENTAL_DATA_BTN)
 
     def wait_for_dynamically_loaded_links(self):
         self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
@@ -71,11 +86,11 @@ class ExplorePage(HomePage):
     def find_cerebrum_title_main_page(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
 
-    def find_count_switch(self,  timeout=10):
+    def find_count_switch(self, timeout=10):
         return self.is_visible(ExplorePageLocators.COUNT_SWITCH, timeout=timeout)
 
-    def find_data_panel(self):
-        return self.find_element(ExplorePageLocators.DATA_PANEL)
+    def find_data_panel(self, timeout=10):
+        return self.find_element(ExplorePageLocators.DATA_PANEL, timeout=timeout)
 
     def check_explore_title_is_present(self, timeout=15):
         return self.find_element(ExplorePageLocators.EXPLORE_TITLE_VLAB, timeout=timeout)
@@ -170,10 +185,11 @@ class ExplorePage(HomePage):
             elements_list.extend(self.visibility_of_all_elements(locator, timeout=timeout))
         return elements_list
 
+    def search_region_input_field(self, timeout=10):
+        return self.find_element(ExplorePageLocators.SEARCH_REGION_INPUT, timeout=timeout)
+
     def wait_for_locators_to_have_text(self, browser, locators, timeout=20):
         for locator in locators:
             WebDriverWait(self.browser, timeout).until(
                 EC.text_to_be_present_in_element(locator, '')
             )
-
-

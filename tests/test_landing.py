@@ -120,11 +120,85 @@ class TestLanding:
             logger.info(f"Step {idx} text: '{text}'")
             assert text != "", f"Step {idx} text is empty!"
 
-        gotolab = landing_page.go_to_lab()
+        sections = landing_page.horizontal_card_sections()
+        missing_sections = []
+
+        for name, section in sections.items():
+            if section.is_displayed():
+                logger.info(f"{name} is displayed")
+            else:
+                logger.info(f"{name} is NOT displayed")
+                missing_sections.append(name)
+
+        assert not missing_sections, f"Missing sections: {', '.join(missing_sections)}"
+
+        footer_obi_logo = landing_page.footer_obi_logo()
+        assert footer_obi_logo.is_displayed(), "Footer OBI logo is not displayed."
+        logger.info("OBI logo is found in page footer")
+
+        footer_obi_copyright = landing_page.footer_obi_copyright()
+        assert footer_obi_copyright.is_displayed(), "Footer OBI copyright is not displayed."
+        logger.info("OBI Copyright is found in footer.")
+
+        expected_titles = {
+            "About OBI",
+            "Our story",
+            "Mission",
+            "Team",
+            "Notebooks",
+            "Gallery",
+            "Pricing",
+            "News",
+            "Contact",
+            "Login",
+            "Terms and conditions",
+            "Financing policy",
+            "Privacy policy",
+        }
+
+        actual_titles = landing_page.footer_link_titles()
+        missing_titles = []
+
+        for title in expected_titles:
+            if title in actual_titles:
+                logger.info(f"Footer title found: {title}")
+            else:
+                logger.info(f"Footer title NOT found: {title}")
+                missing_titles.append(title)
+
+        assert not missing_titles, f"Missing footer titles: {', '.join(missing_titles)}"
+        assert set(actual_titles) >= expected_titles
+
+        subscribe_to_newsletter_section = landing_page.footer_subscribe_block()
+        assert subscribe_to_newsletter_section.is_displayed(), "Subscribe to newsletter section is not displayed"
+        logger.info("Subscribe to newsletter section is displayed")
+
+        expected_social_media = {
+            "https://www.linkedin.com/company/openbraininstitute/",
+            "https://x.com/OpenBrainInst",
+            "https://www.youtube.com/@openbraininstitute",
+            "https://bsky.app/profile/openbraininst.bsky.social",
+        }
+
+        actual_social_media = set(landing_page.footer_social_media_links())
+
+        missing = []
+
+        for title in expected_social_media:
+            if title in actual_social_media:
+                logger.info(f"Social media link found: {title}")
+            else:
+                logger.info(f"Social media link NOT found: {title}")
+                missing.append(title)
+
+        assert not missing, f"Missing social media links: {', '.join(missing)}"
+        assert set(actual_social_media) >= expected_social_media
+
+        gotolab = landing_page.go_to_lab(timeout=25)
         assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
         gotolab.click()
         try:
-            landing_page.wait_for_url_contains("openid-connect", timeout=30)
+            landing_page.wait_for_url_contains("openid-connect", timeout=40)
             redirected = (
                     "openid-connect" in landing_page.browser.current_url or
                     "auth" in landing_page.browser.current_url
@@ -137,6 +211,7 @@ class TestLanding:
         except Exception as e:
             logger.error(f"Failed during login redirection: {e}")
             raise
+
 
 
 

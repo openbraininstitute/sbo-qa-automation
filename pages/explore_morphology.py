@@ -15,15 +15,20 @@ class ExploreMorphologyPage(ExplorePage):
         super().__init__(browser, wait, logger, base_url)
         self.logger = logger
 
-    def go_to_explore_morphology_page(self, lab_id: str, project_id: str):
-        path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/morphology"
-        try:
-            self.browser.set_page_load_timeout(90)
-            self.go_to_page(path)
-            self.wait_for_page_ready(timeout=60)
-        except TimeoutException:
-            raise RuntimeError("The Explore Morphology page did not load within 60 seconds")
-        return self.browser.current_url
+    def go_to_explore_morphology_page(self, lab_id: str, project_id: str, retries=3, delay=5):
+        path = f"/app/virtual-lab/{lab_id}/{project_id}/data/browse/entity/cell-morphology"
+        for attempt in range(retries):
+            try:
+                self.browser.set_page_load_timeout(90)
+                self.go_to_page(path)
+                self.wait_for_page_ready(timeout=60)
+            except TimeoutException:
+                print(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
+                time.sleep(delay)
+                if attempt == retries - 1:
+                    raise RuntimeError("The Explore Morphology page did not load within 60 seconds")
+            return self.browser.current_url
+        return None
 
     def clear_filters_btn(self):
         return self.find_element(ExploreMorphologyPageLocators.CLEAR_FILTERS_BTN)
@@ -63,7 +68,7 @@ class ExploreMorphologyPage(ExplorePage):
         return self.find_all_elements(ExploreMorphologyPageLocators.LV_THUMBNAIL)
 
     def find_results(self):
-        return self.find_element(ExploreMorphologyPageLocators.RESULTS)
+        return self.find_element(ExploreMorphologyPageLocators.RECORDS)
 
     def find_brain_region_column_title(self):
         return self.is_visible(ExploreMorphologyPageLocators.BRAIN_REGION_COLUMN_TITLE)

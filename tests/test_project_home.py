@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Blue Brain Project/EPFL
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
+import os
 
 import pytest
 
@@ -10,30 +11,29 @@ from pages.project_home import ProjectHome
 
 class TestProjectHomePage:
     @pytest.mark.project_page
-    def test_project_home(self, setup, login, logger, test_config):
-        browser, wait, base_url, lab_id, project_id = setup
+    def test_project_home(self, setup, logger, login_direct_complete, test_config):
+        browser, wait, base_url, lab_id, project_id = login_direct_complete
         project_home = ProjectHome(browser, wait, logger, base_url)
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
 
         project_home.go_to_project_page(lab_id, project_id)
         logger.info("Project Home page loaded successfully")
 
+        skip_onboarding = project_home.skip_onboardin_btn()
+        if skip_onboarding.is_displayed():
+           skip_onboarding.click()
+        logger.info("Clicked on 'Skip' on the overlay")
+
         project_menu_titles = [
-            (ProjectHomeLocators.PROJECT_HOME_TITLE, "Project Home"),
-            (ProjectHomeLocators.PROJECT_LIBRARY_TITLE, "Project Library"),
-            (ProjectHomeLocators.PROJECT_TEAM_TITLE, "Project Team"),
-            (ProjectHomeLocators.PROJECT_ACTIVITY_TITLE, "Activity"),
-            (ProjectHomeLocators.PROJECT_NOTEBOOKS_TITLE, "Project Notebooks"),
-            (ProjectHomeLocators.PROJECT_EXPLORE_TITLE, "Explore"),
-            (ProjectHomeLocators.PROJECT_BUILD_TITLE, "Build"),
-            (ProjectHomeLocators.PROJECT_EXPERIMENT_TITLE, "Experiment"),
-            (ProjectHomeLocators.PROJECT_ADMIN_TITLE, "Admin"),
-            (ProjectHomeLocators.MEMBERS_SECTION, "Members"),
-            (ProjectHomeLocators.PROJECT_NAME_TITLE, "Project Name"),
-            (ProjectHomeLocators.MEMBERS_TITLE, "Members"),
-            (ProjectHomeLocators.ADMIN_TITLE, "Admin"),
-            (ProjectHomeLocators.CREATION_DATE_TITLE, "Creation Date"),
-            (ProjectHomeLocators.CREDIT_BALANCE_TITLE, "Credit Balance"),
+            (ProjectHomeLocators.TOP_MENU_PROJECT_HOME_BTN, "Project Home"),
+            (ProjectHomeLocators.TOP_MENU_PROJECT_DATA_BTN, "Data"),
+            (ProjectHomeLocators.TOP_MENU_PROJECT_WORKFLOWS_BTN, "Workflows"),
+            (ProjectHomeLocators.TOP_MENU_PROJECT_NOTEBOOKS_BTN, "Notebooks"),
+            (ProjectHomeLocators.TOP_MENU_PROJECT_REPORTS_BTN, "Reports"),
+            (ProjectHomeLocators.TOP_MENU_PROJECT_HELP_BTN, "Help"),
+            (ProjectHomeLocators.TOP_MENU_VLAB_MENU, "Virtual Lab"),
+            (ProjectHomeLocators.TOP_MENU_PROJECT_CREDITS_BTN, "Credits button"),
+
         ]
 
         titles_mapping = dict(project_menu_titles)
@@ -71,5 +71,19 @@ class TestProjectHomePage:
         edit_btn_unlocked = project_home.edit_btn_unlock()
         assert edit_btn_unlocked.is_displayed(), "Edit button is not locked"
         logger.info("It is possible to edit the project name")
+        edit_btn_unlocked.click()
+        logger.info("Project editing is saved")
+
+        left_menu_project_overview_tab = project_home.project_overview_tab()
+        assert left_menu_project_overview_tab.is_displayed()
+        logger.info("Left menuL: 'Overview tab' is displayed")
+
+        left_menu_members_tab = project_home.members_tab()
+        assert left_menu_members_tab.is_displayed()
+        logger.info("Left menu: 'Members' tab is displayed")
+
+        left_menu_members_tab = project_home.credits_tab()
+        assert left_menu_members_tab.is_displayed()
+        logger.info("Left menu: 'Credits' tab is displayed")
 
 
