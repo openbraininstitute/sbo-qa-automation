@@ -20,7 +20,7 @@ staging:
 	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_*.py --html=report.html --self-contained-html"
 
 smoke:
-	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_build_synaptome.py tests/test_about.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_explore_page.py tests/test_about.py --html=report.html --self-contained-html"
 
 smoke-staging:
 	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_homepage.py tests/test_about.py --html=report.html --self-contained-html"

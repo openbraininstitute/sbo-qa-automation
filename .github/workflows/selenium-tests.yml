@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - feature/**
-      - v2/login-2
+      - v2/login-fix
   pull_request:
     branches:
       - main
