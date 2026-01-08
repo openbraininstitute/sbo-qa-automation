@@ -29,7 +29,7 @@ class TestProjectNotebooks:
             "Name",
             "Description",
             "Contributors",
-            "Creation date",
+            "Registration date",
             "Scale",
             ""
         ]
