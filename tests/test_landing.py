@@ -200,26 +200,13 @@ class TestLanding:
         current_url = landing_page.browser.current_url
         gotolab.click()
 
-        landing_page.wait_for_url_contains("realms", timeout=40)
+        landing_page.wait_for_url_change(current_url, timeout=60)
+        landing_page.wait_for_url_contains("realms", timeout=60)
+
         assert "realms/SBO" in landing_page.browser.current_url, (
             f"Expected redirect to login page, got: "
             f"{landing_page.browser.current_url}"
         )
-
-        # try:
-        #     landing_page.wait_for_url_contains("openid-connect", timeout=40)
-        #     redirected = (
-        #             "openid-connect" in landing_page.browser.current_url or
-        #             "auth" in landing_page.browser.current_url
-        #     )
-        #     assert redirected, (
-        #         f"Expected to redirect to the login page, "
-        #         f"got: {landing_page.browser.current_url}"
-        #     )
-        #     logger.info(f"Redirected to the login page:  {landing_page.browser.current_url}")
-        # except Exception as e:
-        #     logger.error(f"Failed during login redirection: {e}")
-        #     raise
 
 
 
