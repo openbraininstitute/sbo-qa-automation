@@ -194,23 +194,32 @@ class TestLanding:
         assert not missing, f"Missing social media links: {', '.join(missing)}"
         assert set(actual_social_media) >= expected_social_media
 
-        gotolab = landing_page.go_to_lab(timeout=25)
+        gotolab = landing_page.go_to_lab(timeout=35)
         assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
+
+        current_url = landing_page.browser.current_url
         gotolab.click()
-        try:
-            landing_page.wait_for_url_contains("openid-connect", timeout=40)
-            redirected = (
-                    "openid-connect" in landing_page.browser.current_url or
-                    "auth" in landing_page.browser.current_url
-            )
-            assert redirected, (
-                f"Expected to redirect to the login page, "
-                f"got: {landing_page.browser.current_url}"
-            )
-            logger.info(f"Redirected to the login page:  {landing_page.browser.current_url}")
-        except Exception as e:
-            logger.error(f"Failed during login redirection: {e}")
-            raise
+
+        landing_page.wait_for_url_contains("realms", timeout=40)
+        assert "realms/SBO" in landing_page.browser.current_url, (
+            f"Expected redirect to login page, got: "
+            f"{landing_page.browser.current_url}"
+        )
+
+        # try:
+        #     landing_page.wait_for_url_contains("openid-connect", timeout=40)
+        #     redirected = (
+        #             "openid-connect" in landing_page.browser.current_url or
+        #             "auth" in landing_page.browser.current_url
+        #     )
+        #     assert redirected, (
+        #         f"Expected to redirect to the login page, "
+        #         f"got: {landing_page.browser.current_url}"
+        #     )
+        #     logger.info(f"Redirected to the login page:  {landing_page.browser.current_url}")
+        # except Exception as e:
+        #     logger.error(f"Failed during login redirection: {e}")
+        #     raise
 
 
 

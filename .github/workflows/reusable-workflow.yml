@@ -86,6 +86,9 @@ jobs:
             tests/test_landing.py \
             tests/test_login.py \
             tests/test_project_home.py \
+            tests/test_project_notebooks.py \
+            tests/test_explore_page.py \
+            tests/test_explore_emodel.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
             -s \
