@@ -196,9 +196,11 @@ class TestLanding:
 
         gotolab = landing_page.go_to_lab(timeout=35)
         assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
+        logger.info("'Go to Lab' button is found")
 
         current_url = landing_page.browser.current_url
         gotolab.click()
+        time.sleep(5)
 
         landing_page.wait_for_url_change(current_url, timeout=60)
         landing_page.wait_for_url_contains("realms", timeout=60)

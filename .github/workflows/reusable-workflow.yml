@@ -91,7 +91,7 @@ jobs:
             tests/test_explore_emodel.py \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
-            -s \
+            -sv \
             --headless \
             --html="latest_logs/report_${ENV_NAME}_chrome.html" \
             --self-contained-html \
