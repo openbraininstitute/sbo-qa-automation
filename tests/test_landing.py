@@ -4,6 +4,7 @@
 
 import time
 import pytest
+from selenium.webdriver.common.by import By
 
 from locators.landing_locators import LandingLocators
 from pages.landing_page import LandingPage
@@ -198,20 +199,24 @@ class TestLanding:
         assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
         logger.info("'Go to Lab' button is found")
 
-        time.sleep(5)
         current_url = landing_page.browser.current_url
         gotolab.click()
         logger.info("Clicked on 'Go to Lab' button waiting for redirect to the login page")
-        browser.refresh()
-        logger.info("Refreshed the page")
-        landing_page.wait_for_url_change(current_url, timeout=60)
-        landing_page.wait_for_url_contains("realms", timeout=60)
+
+        landing_page.wait_for_url_contains("/auth/realms/", timeout=60)
+        logger.info("Waiting so that the page URL contains 'realms'")
+
+        login_form_locator = (By.ID, "kc-form-wrapper")
+        landing_page.wait_for_long_load(login_form_locator, timeout=60)
+        logger.info("Waiting for the login form to be loaded")
+
+        landing_page.wait_for_page_ready(timeout=60)
 
         assert "realms/SBO" in landing_page.browser.current_url, (
             f"Expected redirect to login page, got: "
             f"{landing_page.browser.current_url}"
         )
-        time.sleep(5)
+
 
 
 
