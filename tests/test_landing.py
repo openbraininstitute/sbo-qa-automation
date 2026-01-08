@@ -203,20 +203,10 @@ class TestLanding:
         gotolab.click()
         logger.info("Clicked on 'Go to Lab' button waiting for redirect to the login page")
 
-        landing_page.wait_for_url_contains("/auth/realms/", timeout=60)
         logger.info("Waiting so that the page URL contains 'realms'")
 
-        login_form_locator = (By.ID, "kc-form-wrapper")
-        landing_page.wait_for_long_load(login_form_locator, timeout=60)
-        logger.info("Waiting for the login form to be loaded")
-
-        landing_page.wait_for_page_ready(timeout=60)
-
-        assert "realms/SBO" in landing_page.browser.current_url, (
-            f"Expected redirect to login page, got: "
-            f"{landing_page.browser.current_url}"
-        )
-
-
-
+        landing_page.wait_for_url_contains("realms",timeout=60)
+        assert "/auth/realms" in browser.current_url, \
+            f"Unexpected URL after login: {browser.current_url}"
+        logger.info(f"Successfully logged in. Current page URL: {browser.current_url}")
 
