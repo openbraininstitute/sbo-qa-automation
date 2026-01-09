@@ -48,14 +48,14 @@ jobs:
       test-type: "stability"
     secrets: inherit
 
-  # Run full tests on v2/login-remote-issue for debugging
+  # Run full tests on v2/login-remote-issue for debugging  
   test-v2-branch:
     if: contains(github.ref, 'v2/login-remote-issue')
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "production"
-      artifact-name: "Full Test Suite - v2 Branch"
+      artifact-name: "v2-branch-testing"
       test-type: "full"
     secrets: inherit
 
@@ -70,13 +70,13 @@ jobs:
     secrets: inherit
 
   test-production:
-    # Run full production tests on main branch, manual trigger, or v2 branch
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || contains(github.ref, 'v2/login-remote-issue')
+    # Run full production tests on main branch or manual trigger (exclude v2/login-remote-issue)
+    if: (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch') && !contains(github.ref, 'v2/login-remote-issue')
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "production"
-      artifact-name: "Testing in Production"
+      artifact-name: "production-testing"
       test-type: ${{ github.event_name == 'workflow_dispatch' && inputs.test-suite || 'full' }}
     secrets: inherit
 

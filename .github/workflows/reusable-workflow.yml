@@ -152,7 +152,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: stability-report-${{ inputs.env }}-${{ matrix.browser }}
+          name: stability-report-${{ inputs.test-type }}-${{ inputs.env }}-${{ matrix.browser }}-${{ github.run_id }}
           path: latest_logs/stability_report_${{ inputs.env }}_${{ matrix.browser }}.html
           if-no-files-found: warn
 
@@ -161,28 +161,30 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-html-report-${{ inputs.env }}-${{ matrix.browser }}
-          path: latest_logs/report_${{ inputs.env }}_${{ matrix.browser }}.html
+          name: html-report-${{ inputs.test-type }}-${{ inputs.env }}-${{ matrix.browser }}-${{ github.run_id }}
+          path: latest_logs/report_${{ inputs.env }}_${{ matrix.browser }}_${{ inputs.test-type }}.html
+          if-no-files-found: warn
 
       - name: Annotation - Test Summary - Failures
         if: failure()
         run: |
-          echo "## UI Test Failures for ${{ inputs.env }} - ${{ matrix.browser }}" > failures_${{ inputs.env }}_${{ matrix.browser }}.md
-          echo "" >> failures_${{ inputs.env }}_${{ matrix.browser }}.md
-
+          # Create a simple failure summary
+          FAILED_TESTS=""
           if [ -f test_output.log ]; then
-            sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log \
-              | grep -E '^- tests/' \
-              | sort | uniq >> failures_${{ inputs.env }}_${{ matrix.browser }}.md
+            FAILED_TESTS=$(sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log | grep -E '^- tests/' | head -3 | tr '\n' ' ')
           fi
-
-          echo "::error title=UI Test Failure in ${{ inputs.env }} (${{ matrix.browser }})::$(sed ':a;N;$!ba;s/\n/%0A/g' failures_${{ inputs.env }}_${{ matrix.browser }}.md)"
+          
+          if [ -n "$FAILED_TESTS" ]; then
+            echo "::error title=Test Failures (${{ inputs.test-type }} suite)::$FAILED_TESTS"
+          else
+            echo "::error title=Test Failures (${{ inputs.test-type }} suite)::Some tests failed - check logs for details"
+          fi
 
       - name: Upload Failure Summary
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ui-test-failures-${{ inputs.env }}-${{ matrix.browser }}
+          name: test-failures-${{ inputs.test-type }}-${{ inputs.env }}-${{ matrix.browser }}-${{ github.run_id }}
           path: failures_${{ inputs.env }}_${{ matrix.browser }}.md
           if-no-files-found: warn
 
