@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - /v2/login-remote-issue
+      - feature/**
   pull_request:
     branches:
       - main

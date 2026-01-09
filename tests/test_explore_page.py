@@ -315,4 +315,4 @@ class TestExplorePage:
             (f"The element is not fully in the viewport. Element top: {element_top}, "
              f"Element bottom: {element_bottom}, Viewport height: {viewport_height}")
         logger.info(f"Scrolled through the M-types in the Neurons' panel")
-'''
+        '''

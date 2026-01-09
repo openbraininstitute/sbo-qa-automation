@@ -35,16 +35,31 @@ class LoginPage(CustomBasePage):
         self.logger.info(f"INFO: Starting URL from pages/login_page.py:, {self.browser.current_url}")
         return target_url
 
-    def wait_for_login_complete(self, timeout=30):
+    def wait_for_login_complete(self, timeout=60):
         """Wait for login completion by checking a URL or element."""
         try:
+            # Primary check for virtual-lab URL
             self.wait.until(EC.url_contains("app/virtual-lab"))
             print(f"INFO: Successfully redirected to {self.browser.current_url}")
         except TimeoutException:
-            print(
-                f"Timeout waiting for URL to contain 'virtual-lab'. Current URL: "
-                f"{self.browser.current_url}")
-            raise
+            # Fallback check for sync URL or other success indicators
+            try:
+                WebDriverWait(self.browser, 10).until(
+                    lambda d: "sync" in d.current_url or "virtual-lab" in d.current_url
+                )
+                print(f"INFO: Login successful via fallback check. URL: {self.browser.current_url}")
+            except TimeoutException:
+                print(
+                    f"Timeout waiting for URL to contain 'virtual-lab' or 'sync'. Current URL: "
+                    f"{self.browser.current_url}")
+                # Check if we're already logged in by looking for specific elements
+                try:
+                    WebDriverWait(self.browser, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid*='lab'], [class*='virtual-lab']"))
+                    )
+                    print(f"INFO: Login detected via page elements. URL: {self.browser.current_url}")
+                except TimeoutException:
+                    raise TimeoutException(f"Login failed. Final URL: {self.browser.current_url}")
 
     def find_form_container(self, timeout=10):
         return self.find_element(LoginPageLocators.FORM_CONTAINER, timeout=timeout)

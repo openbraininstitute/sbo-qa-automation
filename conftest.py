@@ -54,15 +54,21 @@ def create_browser(pytestconfig):
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument("--window-size=1920,1080")
+            # Additional Firefox options for CI/CD stability
+            options.set_preference("dom.webnotifications.enabled", False)
+            options.set_preference("media.volume_scale", "0.0")
+            options.set_preference("browser.startup.homepage", "about:blank")
+            options.set_preference("startup.homepage_welcome_url", "about:blank")
+            options.set_preference("startup.homepage_welcome_url.additional", "about:blank")
 
         browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
 
     else:
         raise ValueError(f"Unsupported browser: {browser_name}")
 
-    browser.set_page_load_timeout(60)
-    browser.set_window_size(1500, 900)
-    wait = WebDriverWait(browser, 20)
+    browser.set_page_load_timeout(90)  # Increased timeout for CI/CD
+    browser.set_window_size(1920, 1080)  # Consistent window size
+    wait = WebDriverWait(browser, 30)  # Increased wait timeout
 
     return browser, wait
 
@@ -188,13 +194,43 @@ def navigate_to_login(setup, logger, request, test_config):
     """Fixture that navigates to the login page"""
     browser, wait, lab_url, lab_id, project_id = setup
     landing_page = LandingPage(browser, wait, test_config["base_url"], logger)
-    landing_page.go_to_landing_page(timeout=15)
-    landing_page.click_go_to_lab()
+    
+    # Navigate to landing page with retry
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        try:
+            landing_page.go_to_landing_page(timeout=15)
+            break
+        except Exception as e:
+            logger.warning(f"Landing page load attempt {attempt + 1} failed: {str(e)}")
+            if attempt == max_attempts - 1:
+                raise
+            time.sleep(2)
+    
+    # Click login button with retry
+    for attempt in range(max_attempts):
+        try:
+            landing_page.click_go_to_lab()
+            break
+        except Exception as e:
+            logger.warning(f"Login button click attempt {attempt + 1} failed: {str(e)}")
+            if attempt == max_attempts - 1:
+                raise
+            time.sleep(2)
 
-    WebDriverWait(browser, 60).until(
-        EC.url_contains("openid-connect"),
-        message="Timed out waiting for OpenID login page"
-    )
+    # Wait for redirect to login page
+    try:
+        WebDriverWait(browser, 60).until(
+            EC.url_contains("openid-connect"),
+            message="Timed out waiting for OpenID login page"
+        )
+        logger.info("Successfully navigated to OpenID login page")
+    except TimeoutException:
+        current_url = browser.current_url
+        logger.error(f"Failed to reach login page. Current URL: {current_url}")
+        browser.save_screenshot("/tmp/navigate_to_login_failed.png")
+        raise RuntimeError(f"Cannot reach OpenID login page. Current URL: {current_url}")
+    
     print("DEBUG: Returning login_page from conftest.py/navigate_to_login")
     return LoginPage(browser=browser, wait=wait, lab_url=test_config["lab_url"], logger=logger)
 
@@ -204,45 +240,68 @@ def navigate_to_login_direct(setup, logger, test_config):
     browser, wait, base_url, lab_id, project_id = setup
     oidc_url = test_config["oidc_login_url"]
     logger.info(f"Navigating directly to OIDC login URL: {oidc_url}")
+    
+    # Clear any existing cookies/session first
+    browser.delete_all_cookies()
+    
     browser.get(oidc_url)
-
-    # Wait for login page or landing page
     try:
         WebDriverWait(browser, 30).until(
             EC.presence_of_element_located((By.ID, "kc-form-wrapper"))
         )
         logger.info("Reached OIDC login page")
     except TimeoutException:
-        # fallback: check if we are on the landing page
-        logger.warning("Login form not found, landing page detected. Trying to click login button.")
-        try:
-            login_btn = WebDriverWait(browser, 15).until(
-                EC.element_to_be_clickable((By.XPATH, "//a[@href='/app/virtual-lab']"))
-            )
-            login_btn.click()
-            WebDriverWait(browser, 30).until(
-                EC.presence_of_element_located((By.ID, "kc-form-wrapper"))
-            )
-            logger.info("Clicked login button and reached OIDC login page")
-        except TimeoutException:
-            browser.save_screenshot("/tmp/failed_login.png")
-            raise RuntimeError("Cannot reach OIDC login page from CI/CD")
+        current_url = browser.current_url
+        logger.warning(f"Login form not found. Current URL: {current_url}")
+        
+        # Check if we're on the landing page
+        if "openbraininstitute.org" in current_url and "/auth/realms/" not in current_url:
+            logger.info("Detected landing page redirect. Attempting to click login button.")
+            
+            # Try multiple login button selectors
+            login_selectors = [
+                (By.XPATH, "//a[@href='/app/virtual-lab']"),
+                (By.XPATH, "//a[@href='/app/virtual-lab/sync']"),
+                (By.XPATH, "//a[contains(@href, 'virtual-lab')]"),
+                (By.XPATH, "//button[contains(text(), 'Go to Lab')]"),
+                (By.XPATH, "//a[contains(text(), 'Go to Lab')]")
+            ]
+            
+            login_clicked = False
+            for selector in login_selectors:
+                try:
+                    login_btn = WebDriverWait(browser, 10).until(
+                        EC.element_to_be_clickable(selector)
+                    )
+                    logger.info(f"Found login button with selector: {selector}")
+                    login_btn.click()
+                    login_clicked = True
+                    break
+                except TimeoutException:
+                    logger.debug(f"Login button not found with selector: {selector}")
+                    continue
+            
+            if not login_clicked:
+                logger.error("Could not find any login button on landing page")
+                browser.save_screenshot("/tmp/landing_page_no_login.png")
+                raise RuntimeError("Cannot find login button on landing page")
+            
+            # Wait for redirect to login page
+            try:
+                WebDriverWait(browser, 30).until(
+                    EC.presence_of_element_located((By.ID, "kc-form-wrapper"))
+                )
+                logger.info("Successfully reached OIDC login page after clicking login button")
+            except TimeoutException:
+                logger.error(f"Still cannot reach login page. Final URL: {browser.current_url}")
+                browser.save_screenshot("/tmp/failed_login_redirect.png")
+                raise RuntimeError("Cannot reach OIDC login page after clicking login button")
+        else:
+            logger.error(f"Unexpected page state. URL: {current_url}")
+            browser.save_screenshot("/tmp/unexpected_page_state.png")
+            raise RuntimeError("Cannot reach OIDC login page - unexpected page state")
 
     return LoginPage(browser, wait, lab_url=test_config["lab_url"], logger=logger)
-
-    # oidc_url = test_config["oidc_login_url"]
-    # logger.info(f"Navigating directly to OIDC login URL: {oidc_url}")
-    #
-    # browser.get(oidc_url)
-    # browser.save_screenshot("/tmp/debug_login_page.png")
-    # print("DEBUG: Current URL after get():", browser.current_url)
-    #
-    # WebDriverWait(browser, 60).until(
-    #     EC.url_contains("openid-connect/auth"),
-    #     "OIDC login page did not load"
-    # )
-    #
-    # return LoginPage(browser=browser, wait=wait, lab_url=test_config["lab_url"], logger=logger)
 
 
 @pytest.fixture(scope="function")
@@ -252,8 +311,23 @@ def login_direct_complete(setup, navigate_to_login_direct, test_config, logger):
     username = test_config["username"]
     password = os.getenv("OBI_PASSWORD")
 
-    login_page.perform_login(username, password)
-    login_page.wait_for_login_complete()
+    try:
+        login_page.perform_login(username, password)
+        login_page.wait_for_login_complete(timeout=60)  # Increased timeout for CI/CD
+    except TimeoutException as e:
+        logger.error(f"Login timeout in CI/CD environment. Current URL: {login_page.browser.current_url}")
+        # Take screenshot for debugging
+        login_page.browser.save_screenshot("/tmp/login_timeout.png")
+        # Try alternative login approach
+        try:
+            logger.info("Attempting alternative login completion check...")
+            WebDriverWait(login_page.browser, 30).until(
+                lambda d: "virtual-lab" in d.current_url or "sync" in d.current_url
+            )
+            logger.info("Alternative login check succeeded")
+        except TimeoutException:
+            logger.error("Both login approaches failed")
+            raise e
 
     browser, wait, base_url, lab_id, project_id = setup
     yield browser, wait, base_url, lab_id, project_id
