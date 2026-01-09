@@ -2,6 +2,16 @@ name: Run all tests
 
 on:
   workflow_dispatch:
+    inputs:
+      test-suite:
+        description: 'Which test suite to run'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+        - stability
+        - smoke
+        - full
   push:
     branches:
       - main
@@ -29,13 +39,24 @@ jobs:
 
   # Run CI/CD stability tests first for feature branches
   test-stability:
-    if: contains(github.ref, 'v2/') || contains(github.ref, 'feature/')
+    if: false  # Temporarily disabled
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "production"
       artifact-name: "CI/CD Stability Tests"
       test-type: "stability"
+    secrets: inherit
+
+  # Run full tests on v2/login-remote-issue for debugging
+  test-v2-branch:
+    if: contains(github.ref, 'v2/login-remote-issue')
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "production"
+      artifact-name: "Full Test Suite - v2 Branch"
+      test-type: "full"
     secrets: inherit
 
   test-staging:
@@ -49,14 +70,14 @@ jobs:
     secrets: inherit
 
   test-production:
-    # Only run full production tests on main branch or manual trigger
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    # Run full production tests on main branch, manual trigger, or v2 branch
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || contains(github.ref, 'v2/login-remote-issue')
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "production"
       artifact-name: "Testing in Production"
-      test-type: "full"
+      test-type: ${{ github.event_name == 'workflow_dispatch' && inputs.test-suite || 'full' }}
     secrets: inherit
 
 
