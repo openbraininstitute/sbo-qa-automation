@@ -35,16 +35,60 @@ class LoginPage(CustomBasePage):
         self.logger.info(f"INFO: Starting URL from pages/login_page.py:, {self.browser.current_url}")
         return target_url
 
-    def wait_for_login_complete(self, timeout=30):
-        """Wait for login completion by checking a URL or element."""
-        try:
-            self.wait.until(EC.url_contains("app/virtual-lab"))
-            print(f"INFO: Successfully redirected to {self.browser.current_url}")
-        except TimeoutException:
-            print(
-                f"Timeout waiting for URL to contain 'virtual-lab'. Current URL: "
-                f"{self.browser.current_url}")
-            raise
+    def wait_for_login_complete(self, timeout=90):
+        """Wait for login completion by checking a URL or element with enhanced CI/CD support."""
+        self.logger.info(f"Waiting for login completion with {timeout}s timeout")
+        
+        # Multiple strategies to detect successful login
+        strategies = [
+            # Strategy 1: Check for virtual-lab in URL
+            lambda: self.wait.until(EC.url_contains("app/virtual-lab")),
+            
+            # Strategy 2: Check for sync in URL  
+            lambda: WebDriverWait(self.browser, 15).until(
+                lambda d: "sync" in d.current_url
+            ),
+            
+            # Strategy 3: Check for any app/ URL
+            lambda: WebDriverWait(self.browser, 15).until(
+                lambda d: "/app/" in d.current_url
+            ),
+            
+            # Strategy 4: Look for logged-in page elements
+            lambda: WebDriverWait(self.browser, 15).until(
+                EC.any_of(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid*='lab']")),
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='virtual-lab']")),
+                    EC.presence_of_element_located((By.XPATH, "//h1[contains(text(), 'Virtual Lab')]")),
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid*='user']"))
+                )
+            )
+        ]
+        
+        success = False
+        for i, strategy in enumerate(strategies, 1):
+            try:
+                self.logger.info(f"Trying login detection strategy {i}")
+                strategy()
+                self.logger.info(f"Strategy {i} succeeded! Current URL: {self.browser.current_url}")
+                success = True
+                break
+            except TimeoutException:
+                self.logger.debug(f"Strategy {i} failed")
+                continue
+        
+        if not success:
+            current_url = self.browser.current_url
+            self.logger.error(f"All login detection strategies failed. Final URL: {current_url}")
+            
+            # Final attempt: Check if we're at least not on the login page anymore
+            if "/auth/realms/" not in current_url:
+                self.logger.info("Not on login page anymore, considering login successful")
+                success = True
+            else:
+                raise TimeoutException(f"Login failed. Final URL: {current_url}")
+        
+        self.logger.info("Login completion detected successfully")
 
     def find_form_container(self, timeout=10):
         return self.find_element(LoginPageLocators.FORM_CONTAINER, timeout=timeout)

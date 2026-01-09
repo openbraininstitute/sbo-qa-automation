@@ -2,11 +2,22 @@ name: Run all tests
 
 on:
   workflow_dispatch:
+    inputs:
+      test-suite:
+        description: 'Which test suite to run'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+        - stability
+        - smoke
+        - full
   push:
     branches:
       - main
+      - v2/login-remote-issue  # Fixed: removed leading slash
       - feature/**
-      - v2/login-fix
+      - v2/**  # Added: catch all v2 branches
   pull_request:
     branches:
       - main
@@ -26,22 +37,37 @@ jobs:
         with:
           python-version: '3.11'
 
+  # Run full tests on v2/login-remote-issue for debugging  
+  test-v2-branch:
+    if: contains(github.ref, 'v2/login-remote-issue')
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "production"
+      artifact-name: "v2-branch-testing"
+      test-type: "full"
+    secrets: inherit
+
   test-staging:
-    if: false
+    # Run staging tests on v2 branch for testing both environments
+    if: contains(github.ref, 'v2/login-remote-issue')
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "staging"
       artifact-name: "testing in staging"
+      test-type: "smoke"
     secrets: inherit
 
-
   test-production:
+    # Run full production tests on main branch or manual trigger (exclude v2/login-remote-issue)
+    if: (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch') && !contains(github.ref, 'v2/login-remote-issue')
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "production"
-      artifact-name: "Testing in Production"
+      artifact-name: "production-testing"
+      test-type: ${{ github.event_name == 'workflow_dispatch' && inputs.test-suite || 'full' }}
     secrets: inherit
 
 

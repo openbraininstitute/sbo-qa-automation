@@ -6,13 +6,20 @@ from selenium.webdriver.common.by import By
 
 class ProjectNotebooksLocators:
     COLUMN_HEADER = (By.XPATH, "//thead/tr/th")
-    COLUMN_NAME_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Name']")
-    COLUMN_DESCRIPTION_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Description']")
-    COLUMN_SCALE_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Scale']")
-    COLUMN_CONTRIBUTORS_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Contributors']")
-    COLUMN_CREATION_DATE_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Creation date']")
+    COLUMN_NAME_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Name']")
+    COLUMN_DESCRIPTION_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Description']")
+    COLUMN_CONTRIBUTORS_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Contributors']")
+    COLUMN_REGISTRATION_DATE_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Registration date']")
+    COLUMN_SCALE_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Scale']")
+    COLUMN_EMPTY_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='']")
+    
+    # Keep the old creation date locator for backward compatibility if needed
+    COLUMN_CREATION_DATE_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Creation date']")
     DATA_ROW_KEY_SEARCH_RESULT = (By.CSS_SELECTOR, "td[title='Visualize skeletonized neuronal morphologies including "
                                             "neuronal meshes and segmented spine meshes.']")
+    # Alternative more robust locator for search results
+    DATA_ROW_ANY_RESULT = (By.XPATH, "//tbody/tr[not(contains(@style,'display: none'))]")
+    DATA_ROW_FILTERED_RESULT = (By.XPATH, "//tbody/tr/td[contains(text(), 'Visualize') or contains(text(), 'neuronal')]")
     DATA_ROW_NAME = (By.XPATH, "//td[@aria-label='Name']")
     DATA_ROW_DESCRIPTION = (By.XPATH, "//td[@aria-label='Description']")
     DATA_ROW_OBJECT_OF_INTEREST = (By.XPATH, "//td[@aria-label='Object of interest']")

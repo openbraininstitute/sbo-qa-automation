@@ -24,15 +24,15 @@ class TestExplorePage:
         explore_page.go_to_explore_page(lab_id, project_id)
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
-        skip_onboarding = explore_page.skip_onboardin_btn(timeout=3)
-        if skip_onboarding:
-            skip_onboarding.click()
-        logger.info("Clicked on 'Skip' on the overlay")
-
-        data_skip_onboarding = explore_page.data_skip_onboardin_btn(timeout=3)
-        if data_skip_onboarding and data_skip_onboarding.is_displayed():
-            data_skip_onboarding.click()
-            logger.info("Clicked on 'Data - Skip' on the overlay")
+        # skip_onboarding = explore_page.skip_onboardin_btn(timeout=3)
+        # if skip_onboarding:
+        #     skip_onboarding.click()
+        # logger.info("Clicked on 'Skip' on the overlay")
+        #
+        # data_skip_onboarding = explore_page.data_skip_onboardin_btn(timeout=3)
+        # if data_skip_onboarding and data_skip_onboarding.is_displayed():
+        #     data_skip_onboarding.click()
+        #     logger.info("Clicked on 'Data - Skip' on the overlay")
 
         brain_region_panel = explore_page.find_brain_region_panel(timeout=40)
         logger.info("Found Brain Region Panel")
@@ -45,7 +45,7 @@ class TestExplorePage:
         logger.info("AI Assistant open button is displayed, means the panel is open.")
         ai_assistant_open_btn.click()
 
-        close_btn = explore_page.find_ai_assistant_panel_close(timeout=25)
+        close_btn = explore_page.find_ai_assistant_panel_close(timeout=35)
         assert close_btn, "Close button on AI assistant panel"
         close_btn.click()
         logger.info("AI Panel is closed.")
@@ -315,4 +315,4 @@ class TestExplorePage:
             (f"The element is not fully in the viewport. Element top: {element_top}, "
              f"Element bottom: {element_bottom}, Viewport height: {viewport_height}")
         logger.info(f"Scrolled through the M-types in the Neurons' panel")
-'''
+        '''

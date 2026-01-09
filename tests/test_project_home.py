@@ -19,10 +19,10 @@ class TestProjectHomePage:
         project_home.go_to_project_page(lab_id, project_id)
         logger.info("Project Home page loaded successfully")
 
-        skip_onboarding = project_home.skip_onboardin_btn()
-        if skip_onboarding.is_displayed():
-           skip_onboarding.click()
-        logger.info("Clicked on 'Skip' on the overlay")
+        # skip_onboarding = project_home.skip_onboardin_btn()
+        # if skip_onboarding.is_displayed():
+        #    skip_onboarding.click()
+        # logger.info("Clicked on 'Skip' on the overlay")
 
         project_menu_titles = [
             (ProjectHomeLocators.TOP_MENU_PROJECT_HOME_BTN, "Project Home"),
