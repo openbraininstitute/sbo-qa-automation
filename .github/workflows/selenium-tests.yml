@@ -37,17 +37,6 @@ jobs:
         with:
           python-version: '3.11'
 
-  # Run CI/CD stability tests first for feature branches
-  test-stability:
-    if: false  # Temporarily disabled
-    needs: run-tests
-    uses: ./.github/workflows/reusable-workflow.yml
-    with:
-      env: "production"
-      artifact-name: "CI/CD Stability Tests"
-      test-type: "stability"
-    secrets: inherit
-
   # Run full tests on v2/login-remote-issue for debugging  
   test-v2-branch:
     if: contains(github.ref, 'v2/login-remote-issue')
@@ -60,7 +49,8 @@ jobs:
     secrets: inherit
 
   test-staging:
-    if: false  # Keep disabled for now
+    # Run staging tests on v2 branch for testing both environments
+    if: contains(github.ref, 'v2/login-remote-issue')
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
