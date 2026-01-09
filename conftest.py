@@ -38,22 +38,22 @@ def create_browser(pytestconfig):
         options = ChromeOptions()
         if headless:
             options.add_argument("--headless=new")
-            options.add_argument("--window-size=1920,1080")
+            options.add_argument("--window-size=1400,900")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--disable-gpu")
-            options.add_argument("--window-size=1920,1080")
+            options.add_argument("--window-size=1400,900")
             options.add_argument("--ignore-certificate-errors")
             options.add_argument('--blink-settings=imagesEnabled=true')
         browser = webdriver.Chrome(options=options)
-        browser.set_window_size(1920, 1080)
+        browser.set_window_size(1400, 900)
 
     elif browser_name == "firefox":
         options = FirefoxOptions()
         if headless:
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
-            options.add_argument("--window-size=1920,1080")
+            options.add_argument("--window-size=1400,900")
             # Additional Firefox options for CI/CD stability
             options.set_preference("dom.webnotifications.enabled", False)
             options.set_preference("media.volume_scale", "0.0")
@@ -67,7 +67,7 @@ def create_browser(pytestconfig):
         raise ValueError(f"Unsupported browser: {browser_name}")
 
     browser.set_page_load_timeout(90)  # Increased timeout for CI/CD
-    browser.set_window_size(1920, 1080)  # Consistent window size
+    browser.set_window_size(1400, 900)  # Consistent window size for Mac 14"
     wait = WebDriverWait(browser, 30)  # Increased wait timeout
 
     return browser, wait
