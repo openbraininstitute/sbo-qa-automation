@@ -6,11 +6,15 @@ from selenium.webdriver.common.by import By
 
 class ProjectNotebooksLocators:
     COLUMN_HEADER = (By.XPATH, "//thead/tr/th")
-    COLUMN_NAME_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Name']")
-    COLUMN_DESCRIPTION_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Description']")
-    COLUMN_SCALE_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Scale']")
-    COLUMN_CONTRIBUTORS_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Contributors']")
-    COLUMN_CREATION_DATE_HEADER = (By.XPATH, "//th[@data-testid='column-header']/descendant::div[text()='Creation date']")
+    COLUMN_NAME_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Name']")
+    COLUMN_DESCRIPTION_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Description']")
+    COLUMN_CONTRIBUTORS_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Contributors']")
+    COLUMN_REGISTRATION_DATE_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Registration date']")
+    COLUMN_SCALE_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Scale']")
+    COLUMN_EMPTY_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='']")
+    
+    # Keep the old creation date locator for backward compatibility if needed
+    COLUMN_CREATION_DATE_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Creation date']")
     DATA_ROW_KEY_SEARCH_RESULT = (By.CSS_SELECTOR, "td[title='Visualize skeletonized neuronal morphologies including "
                                             "neuronal meshes and segmented spine meshes.']")
     DATA_ROW_NAME = (By.XPATH, "//td[@aria-label='Name']")

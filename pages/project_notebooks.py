@@ -42,6 +42,18 @@ class ProjectNotebooks(HomePage):
         )
     def column_headers(self):
         return self.find_all_elements(ProjectNotebooksLocators.COLUMN_HEADER)
+    
+    def get_column_header_texts(self):
+        """Get the text content of all column headers using the specific column title class."""
+        try:
+            column_title_elements = self.find_all_elements(
+                (By.CSS_SELECTOR, "th[data-testid='column-header'] .table-module__1pe1kq__columnTitle"),
+                timeout=10
+            )
+            return [header.text.strip() for header in column_title_elements]
+        except Exception as e:
+            self.logger.error(f"Failed to get column header texts: {str(e)}")
+            return []
 
     def filter_apply_btn(self):
         return self.find_element(ProjectNotebooksLocators.FILTER_APPLY_BTN)
@@ -68,21 +80,32 @@ class ProjectNotebooks(HomePage):
         return self.find_element(ProjectNotebooksLocators.FILTER_SCALE_TITLE, timeout=timeout)
 
     def get_column_cells(self, column_name: str) -> List[WebElement]:
-        headers = self.column_headers()
-        column_index = None
+        """Get all cells in a specific column by column name."""
+        try:
+            # Get column headers using the improved method
+            header_texts = self.get_column_header_texts()
+            column_index = None
 
-        for i, th in enumerate(headers, start=1):
-            if th.text.strip().lower() == column_name.lower():
-                column_index = i
-                break
+            # Find the column index
+            for i, header_text in enumerate(header_texts, start=1):
+                if header_text.lower() == column_name.lower():
+                    column_index = i
+                    break
 
-        if column_index is None:
-            raise ValueError(f"Column '{column_name}' not found")
+            if column_index is None:
+                available_columns = ", ".join([f"'{h}'" for h in header_texts])
+                raise ValueError(f"Column '{column_name}' not found. Available columns: {available_columns}")
 
-        xpath = f"//tbody/tr[not(contains(@style,'display: none'))]/td[{column_index}]"
-        cells = self.find_all_elements((By.XPATH, xpath))
+            # Get cells from that column (excluding hidden rows)
+            xpath = f"//tbody/tr[not(contains(@style,'display: none'))]/td[{column_index}]"
+            cells = self.find_all_elements((By.XPATH, xpath))
 
-        return [cell for cell in cells if cell.text.strip()]
+            # Filter out empty cells
+            return [cell for cell in cells if cell.text.strip()]
+            
+        except Exception as e:
+            self.logger.error(f"Failed to get column cells for '{column_name}': {str(e)}")
+            return []
 
     def page_filter(self):
         return self.find_element(ProjectNotebooksLocators.PAGE_FILTER)
@@ -117,31 +140,56 @@ class ProjectNotebooks(HomePage):
     def validate_table_headers(self, expected_headers):
         """
         Validates the column headers of the table. Logs an error if the headers do not match.
+        Works with Ant Design table structure.
 
         :param expected_headers: List of expected column headers in order.
         :return: None
         """
         try:
+            # Wait for table to load
             table_element = self.find_element(ProjectNotebooksLocators.TABLE_ELEMENT, timeout=20)
-            column_headers = table_element.find_elements(By.TAG_NAME, "th")
-
-            actual_headers = [header.text.strip() for header in column_headers]
+            
+            # Get all column header elements with the specific class for column titles
+            column_title_elements = self.find_all_elements(
+                (By.CSS_SELECTOR, "th[data-testid='column-header'] .table-module__1pe1kq__columnTitle"),
+                timeout=10
+            )
+            
+            # Extract text from column title elements
+            actual_headers = [header.text.strip() for header in column_title_elements]
+            
+            self.logger.info(f"Expected Headers: {expected_headers}")
             self.logger.info(f"Actual Headers: {actual_headers}")
+            print(f"Expected Headers: {expected_headers}")
             print(f"Actual Headers: {actual_headers}")
 
-            if actual_headers != expected_headers:
+            # Compare headers
+            if len(actual_headers) != len(expected_headers):
                 self.logger.error(
-                    f"Column headers do not match!\nExpected: {expected_headers}\nActual: {actual_headers}"
+                    f"Header count mismatch! Expected {len(expected_headers)} headers, got {len(actual_headers)}"
                 )
                 raise AssertionError(
-                    f"Column headers do not match!\nExpected: {expected_headers}\nActual: {actual_headers}"
+                    f"Header count mismatch! Expected {len(expected_headers)} headers, got {len(actual_headers)}"
                 )
 
-            self.logger.info("Table headers validated successfully and match the expected headers.")
-            print("Table headers validated successfully and match the expected headers.")
+            for i, (expected, actual) in enumerate(zip(expected_headers, actual_headers)):
+                if expected != actual:
+                    self.logger.error(
+                        f"Header mismatch at position {i+1}! Expected: '{expected}', Actual: '{actual}'"
+                    )
+                    raise AssertionError(
+                        f"Header mismatch at position {i+1}! Expected: '{expected}', Actual: '{actual}'"
+                    )
+
+            self.logger.info("✅ Table headers validated successfully and match the expected headers.")
+            print("✅ Table headers validated successfully and match the expected headers.")
+            
         except TimeoutException:
-            self.logger.error("The table element was not found on the Project Notebooks page.")
+            self.logger.error("❌ The table element was not found on the Project Notebooks page.")
             raise RuntimeError("The table element was not loaded within the timeout.")
+        except Exception as e:
+            self.logger.error(f"❌ Error validating table headers: {str(e)}")
+            raise
 
     def wait_for_scale_to_be(self, value: str, timeout: int = 10):
         value = value.lower()
