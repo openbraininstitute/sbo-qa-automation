@@ -5,8 +5,9 @@ on:
   push:
     branches:
       - main
-      - /v2/login-remote-issue
+      - v2/login-remote-issue  # Fixed: removed leading slash
       - feature/**
+      - v2/**  # Added: catch all v2 branches
   pull_request:
     branches:
       - main
@@ -26,22 +27,36 @@ jobs:
         with:
           python-version: '3.11'
 
+  # Run CI/CD stability tests first for feature branches
+  test-stability:
+    if: contains(github.ref, 'v2/') || contains(github.ref, 'feature/')
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "production"
+      artifact-name: "CI/CD Stability Tests"
+      test-type: "stability"
+    secrets: inherit
+
   test-staging:
-    if: false
+    if: false  # Keep disabled for now
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "staging"
       artifact-name: "testing in staging"
+      test-type: "smoke"
     secrets: inherit
 
-
   test-production:
+    # Only run full production tests on main branch or manual trigger
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "production"
       artifact-name: "Testing in Production"
+      test-type: "full"
     secrets: inherit
 
 

@@ -11,6 +11,11 @@ on:
         description: "The name of the artifact to download"
         required: true
         type: string
+      test-type:
+        description: "Type of tests to run (stability, smoke, full)"
+        required: false
+        type: string
+        default: "smoke"
 
 jobs:
   test:
@@ -86,7 +91,7 @@ jobs:
             --html="latest_logs/stability_report_${ENV_NAME}_${{ matrix.browser }}.html" \
             --self-contained-html || echo "Stability tests completed with issues"
 
-      - name: Run Main Test Suite
+      - name: Run Test Suite
         env:
           ENV_URL: ${{ vars.ENV_URL }}
           ENV_NAME: ${{ inputs.env }}
@@ -99,30 +104,36 @@ jobs:
           DISPLAY: :99
         run: |
           echo "RUN_URL=https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> ${GITHUB_ENV}
-          echo "Running tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
+          echo "Running ${{ inputs.test-type }} tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
           echo "ENV_URL: $ENV_URL"
           echo "ENV_NAME: $ENV_NAME"
           echo "Browser: ${{ matrix.browser }}"
+          echo "Test Type: ${{ inputs.test-type }}"
 
           source .venv/bin/activate
           set -o pipefail
+          
+          # Determine which tests to run based on test-type
+          if [ "${{ inputs.test-type }}" = "stability" ]; then
+            TEST_FILES="tests/test_ci_cd_stability.py"
+            echo "Running CI/CD stability tests only"
+          elif [ "${{ inputs.test-type }}" = "smoke" ]; then
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py"
+            echo "Running smoke tests"
+          else
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py"
+            echo "Running full test suite"
+          fi
+          
           uv run pytest \
-            tests/test_about.py \
-            tests/test_mission.py \
-            tests/test_news.py \
-            tests/test_landing.py \
-            tests/test_login.py \
-            tests/test_project_home.py \
-            tests/test_project_notebooks.py \
-            tests/test_explore_page.py \
-            tests/test_explore_emodel.py \
+            $TEST_FILES \
             --env="$ENV_NAME" \
             --env_url="$ENV_URL" \
             --browser-name=${{ matrix.browser }} \
             --headless \
             -v \
             --tb=short \
-            --html="latest_logs/report_${ENV_NAME}_${{ matrix.browser }}.html" \
+            --html="latest_logs/report_${ENV_NAME}_${{ matrix.browser }}_${{ inputs.test-type }}.html" \
             --self-contained-html \
             --maxfail=3 | tee test_output.log
 

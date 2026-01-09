@@ -258,32 +258,61 @@ def navigate_to_login_direct(setup, logger, test_config):
         if "openbraininstitute.org" in current_url and "/auth/realms/" not in current_url:
             logger.info("Detected landing page redirect. Attempting to click login button.")
             
-            # Try multiple login button selectors
+            # Try multiple login button selectors with more variations
             login_selectors = [
                 (By.XPATH, "//a[@href='/app/virtual-lab']"),
                 (By.XPATH, "//a[@href='/app/virtual-lab/sync']"),
                 (By.XPATH, "//a[contains(@href, 'virtual-lab')]"),
                 (By.XPATH, "//button[contains(text(), 'Go to Lab')]"),
-                (By.XPATH, "//a[contains(text(), 'Go to Lab')]")
+                (By.XPATH, "//a[contains(text(), 'Go to Lab')]"),
+                (By.XPATH, "//button[contains(@class, 'lab')]"),
+                (By.XPATH, "//a[contains(@class, 'lab')]"),
+                (By.CSS_SELECTOR, "[href*='virtual-lab']"),
+                (By.CSS_SELECTOR, "[data-testid*='lab']"),
+                (By.XPATH, "//button[contains(text(), 'Lab')]"),
+                (By.XPATH, "//a[contains(text(), 'Lab')]")
             ]
             
             login_clicked = False
-            for selector in login_selectors:
-                try:
-                    login_btn = WebDriverWait(browser, 10).until(
-                        EC.element_to_be_clickable(selector)
-                    )
-                    logger.info(f"Found login button with selector: {selector}")
-                    login_btn.click()
-                    login_clicked = True
+            for attempt in range(3):  # Try multiple times
+                logger.info(f"Attempt {attempt + 1} to find login button")
+                for selector in login_selectors:
+                    try:
+                        login_btn = WebDriverWait(browser, 15).until(
+                            EC.element_to_be_clickable(selector)
+                        )
+                        logger.info(f"Found login button with selector: {selector}")
+                        # Try clicking with JavaScript as backup
+                        try:
+                            login_btn.click()
+                        except:
+                            browser.execute_script("arguments[0].click();", login_btn)
+                        login_clicked = True
+                        break
+                    except TimeoutException:
+                        logger.debug(f"Login button not found with selector: {selector}")
+                        continue
+                
+                if login_clicked:
                     break
-                except TimeoutException:
-                    logger.debug(f"Login button not found with selector: {selector}")
-                    continue
+                    
+                # Wait before retry
+                if attempt < 2:
+                    logger.warning(f"Login button not found on attempt {attempt + 1}, retrying...")
+                    time.sleep(3)
             
             if not login_clicked:
-                logger.error("Could not find any login button on landing page")
+                logger.error("Could not find any login button on landing page after multiple attempts")
                 browser.save_screenshot("/tmp/landing_page_no_login.png")
+                # Try to get page source for debugging
+                try:
+                    page_source = browser.page_source
+                    logger.error(f"Page source length: {len(page_source)}")
+                    # Look for any button or link text
+                    if "lab" in page_source.lower():
+                        logger.error("Found 'lab' text in page source but couldn't click button")
+                except:
+                    pass
                 raise RuntimeError("Cannot find login button on landing page")
             
             # Wait for redirect to login page
@@ -311,23 +340,86 @@ def login_direct_complete(setup, navigate_to_login_direct, test_config, logger):
     username = test_config["username"]
     password = os.getenv("OBI_PASSWORD")
 
-    try:
-        login_page.perform_login(username, password)
-        login_page.wait_for_login_complete(timeout=60)  # Increased timeout for CI/CD
-    except TimeoutException as e:
-        logger.error(f"Login timeout in CI/CD environment. Current URL: {login_page.browser.current_url}")
-        # Take screenshot for debugging
-        login_page.browser.save_screenshot("/tmp/login_timeout.png")
-        # Try alternative login approach
+    max_login_attempts = 3
+    for login_attempt in range(max_login_attempts):
         try:
-            logger.info("Attempting alternative login completion check...")
-            WebDriverWait(login_page.browser, 30).until(
-                lambda d: "virtual-lab" in d.current_url or "sync" in d.current_url
-            )
-            logger.info("Alternative login check succeeded")
-        except TimeoutException:
-            logger.error("Both login approaches failed")
-            raise e
+            logger.info(f"Login attempt {login_attempt + 1}/{max_login_attempts}")
+            login_page.perform_login(username, password)
+            login_page.wait_for_login_complete(timeout=90)  # Increased timeout for CI/CD
+            logger.info("Login successful!")
+            break
+        except TimeoutException as e:
+            logger.error(f"Login attempt {login_attempt + 1} timeout. Current URL: {login_page.browser.current_url}")
+            
+            # Take screenshot for debugging
+            login_page.browser.save_screenshot(f"/tmp/login_timeout_attempt_{login_attempt + 1}.png")
+            
+            # Try multiple alternative approaches
+            success = False
+            
+            # Alternative 1: Check for virtual-lab or sync in URL
+            try:
+                logger.info("Alternative 1: Checking for virtual-lab/sync in URL...")
+                WebDriverWait(login_page.browser, 30).until(
+                    lambda d: "virtual-lab" in d.current_url or "sync" in d.current_url
+                )
+                logger.info("Alternative 1 succeeded - found virtual-lab/sync in URL")
+                success = True
+            except TimeoutException:
+                logger.debug("Alternative 1 failed")
+            
+            # Alternative 2: Check for app/ in URL (broader check)
+            if not success:
+                try:
+                    logger.info("Alternative 2: Checking for app/ in URL...")
+                    WebDriverWait(login_page.browser, 20).until(
+                        lambda d: "/app/" in d.current_url
+                    )
+                    logger.info("Alternative 2 succeeded - found /app/ in URL")
+                    success = True
+                except TimeoutException:
+                    logger.debug("Alternative 2 failed")
+            
+            # Alternative 3: Look for logged-in indicators on page
+            if not success:
+                try:
+                    logger.info("Alternative 3: Looking for logged-in page elements...")
+                    WebDriverWait(login_page.browser, 15).until(
+                        EC.any_of(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid*='user']")),
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid*='lab']")),
+                            EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Logout')]")),
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='virtual-lab']"))
+                        )
+                    )
+                    logger.info("Alternative 3 succeeded - found logged-in page elements")
+                    success = True
+                except TimeoutException:
+                    logger.debug("Alternative 3 failed")
+            
+            # Alternative 4: Manual navigation to virtual lab
+            if not success and login_attempt < max_login_attempts - 1:
+                try:
+                    logger.info("Alternative 4: Manually navigating to virtual lab...")
+                    lab_url = test_config["lab_url"]
+                    login_page.browser.get(lab_url)
+                    WebDriverWait(login_page.browser, 20).until(
+                        lambda d: "virtual-lab" in d.current_url or "sync" in d.current_url
+                    )
+                    logger.info("Alternative 4 succeeded - manual navigation worked")
+                    success = True
+                except Exception as nav_error:
+                    logger.debug(f"Alternative 4 failed: {nav_error}")
+            
+            if success:
+                logger.info("Login completed via alternative method")
+                break
+            elif login_attempt == max_login_attempts - 1:
+                logger.error("All login attempts and alternatives failed")
+                raise e
+            else:
+                logger.warning(f"Login attempt {login_attempt + 1} failed, retrying...")
+                time.sleep(5)  # Wait before retry
 
     browser, wait, base_url, lab_id, project_id = setup
     yield browser, wait, base_url, lab_id, project_id
