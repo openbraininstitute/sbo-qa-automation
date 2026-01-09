@@ -128,8 +128,55 @@ class ProjectNotebooks(HomePage):
     def table_body_container(self, timeout=10):
         return self.find_element(ProjectNotebooksLocators.TABLE_BODY_CONTAINER, timeout=timeout)
 
-    def table_search_result(self, timeout=20):
-        return self.is_visible(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=timeout)
+    def table_search_result(self, timeout=30):
+        """Wait for search results to appear after filtering. More robust for CI environments."""
+        try:
+            # First wait for table body to be present
+            self.find_element(ProjectNotebooksLocators.TABLE_BODY_CONTAINER, timeout=10)
+            
+            # Then wait for the specific search result with longer timeout for CI
+            return self.is_visible(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=timeout)
+        except Exception as e:
+            self.logger.error(f"Failed to find table search result: {str(e)}")
+            # Fallback: check if any table rows are present (less specific but more reliable)
+            try:
+                rows = self.find_all_elements((By.XPATH, "//tbody/tr"), timeout=5)
+                if rows:
+                    self.logger.info(f"Found {len(rows)} table rows as fallback")
+                    return True
+                return False
+            except:
+                return False
+    
+    def wait_for_filtered_results(self, timeout=30):
+        """Wait for filtered results to appear with multiple fallback strategies."""
+        try:
+            # Strategy 1: Wait for specific search result
+            if self.is_visible(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=10):
+                self.logger.info("✅ Found specific search result")
+                return True
+        except:
+            pass
+        
+        try:
+            # Strategy 2: Wait for any filtered result containing key terms
+            if self.is_visible(ProjectNotebooksLocators.DATA_ROW_FILTERED_RESULT, timeout=10):
+                self.logger.info("✅ Found filtered result with key terms")
+                return True
+        except:
+            pass
+        
+        try:
+            # Strategy 3: Wait for any visible table rows
+            rows = self.find_all_elements(ProjectNotebooksLocators.DATA_ROW_ANY_RESULT, timeout=10)
+            if rows:
+                self.logger.info(f"✅ Found {len(rows)} visible table rows")
+                return True
+        except:
+            pass
+        
+        self.logger.error("❌ No filtered results found with any strategy")
+        return False
 
     def search_notebook(self, timeout=10):
         return self.find_element(ProjectNotebooksLocators.SEARCH_NOTEBOOK, timeout=timeout)

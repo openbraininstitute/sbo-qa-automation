@@ -17,6 +17,9 @@ class ProjectNotebooksLocators:
     COLUMN_CREATION_DATE_HEADER = (By.XPATH, "//th[@data-testid='column-header']//div[@class='table-module__1pe1kq__columnTitle' and text()='Creation date']")
     DATA_ROW_KEY_SEARCH_RESULT = (By.CSS_SELECTOR, "td[title='Visualize skeletonized neuronal morphologies including "
                                             "neuronal meshes and segmented spine meshes.']")
+    # Alternative more robust locator for search results
+    DATA_ROW_ANY_RESULT = (By.XPATH, "//tbody/tr[not(contains(@style,'display: none'))]")
+    DATA_ROW_FILTERED_RESULT = (By.XPATH, "//tbody/tr/td[contains(text(), 'Visualize') or contains(text(), 'neuronal')]")
     DATA_ROW_NAME = (By.XPATH, "//td[@aria-label='Name']")
     DATA_ROW_DESCRIPTION = (By.XPATH, "//td[@aria-label='Description']")
     DATA_ROW_OBJECT_OF_INTEREST = (By.XPATH, "//td[@aria-label='Object of interest']")
