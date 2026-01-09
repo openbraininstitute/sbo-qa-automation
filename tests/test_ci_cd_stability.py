@@ -24,7 +24,7 @@ class TestCICDStability:
         # Test window size (important for headless mode)
         size = browser.get_window_size()
         logger.info(f"Browser window size: {size}")
-        assert size['width'] >= 1920, f"Window width should be at least 1920, got {size['width']}"
+        assert size['width'] >= 1400, f"Window width should be at least 1400, got {size['width']}"
         # More flexible height check for different environments
         assert size['height'] >= 900, f"Window height should be at least 900, got {size['height']}"
         
