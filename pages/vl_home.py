@@ -8,12 +8,11 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from locators.vlab_home_locators import VLHomeLocators
 from pages.home_page import HomePage
-from util.util_links_checker import LinkChecker
 from selenium.common import TimeoutException
 import logging
 
 
-class VlabHome(HomePage, LinkChecker):
+class VlabHome(HomePage):
     def __init__(self, browser, wait, base_url, logger=None):
         super().__init__(browser, wait, base_url)
         self.home_page = HomePage(browser, wait, base_url)

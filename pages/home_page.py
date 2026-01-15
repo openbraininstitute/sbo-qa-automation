@@ -3,9 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from locators.home_page_locators import HomePageLocators
-from util.util_links_checker import LinkChecker
 from .base_page import CustomBasePage
-from util.util_scraper import UrlScraper
 
 
 class HomePage(CustomBasePage):

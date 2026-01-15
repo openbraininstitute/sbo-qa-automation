@@ -1,179 +1,284 @@
 # UI Tests with Selenium Python Pytest
-# Documentation
+
+## Overview
+Comprehensive test automation framework for the Open Brain Institute platform using Selenium, Python, and Pytest. Includes functional tests, performance monitoring, and test generation tools.
 
 ## Features
-- The tests use setup/teardown methods for the session. 
-- Test with Chrome and Firefox (also in headless).
-- Possibility to visually see the execution.
-- Possibility to see the screenshots of the errors.
-- A html report generated at each test run.
+- **Functional Testing** - Setup/teardown methods, Chrome and Firefox support (headless mode available)
+- **Visual Debugging** - See test execution in real-time, automatic screenshots on failures
+- **HTML Reports** - Detailed test reports generated for each run
+- **Performance Tracking** - Measure page load times, DOM processing, and network metrics
+- **Test Recording** - Auto-generate test code from user interactions
+- **Page Object Model** - Maintainable test structure with separate locators, pages, and tests
+- **CI/CD Integration** - GitHub Actions workflows for automated testing
+- **Easy Sharing** - Share tests via Git, Docker, or CI/CD pipelines
 
-## Important Notes for Forked Repositories
-If you’ve forked the repository, make sure to sync it with the original repository:
+## Quick Start
 
-**Sync Your Fork:** 
+### Prerequisites
+- Python 3.11+
+- pip package manager
+- uv (recommended) or virtualenv
+
+### Installation
+
+1. **Install uv** (recommended):
+```bash
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# macOS with Homebrew
+brew install uv
+
+# Cross-platform with pip
+pip install uv
+```
+
+2. **Create virtual environment**:
+```bash
+# Using uv (recommended)
+uv venv -p 3.11
+source .venv/bin/activate  # Linux/macOS
+# or
+.venv\Scripts\activate  # Windows
+
+# Install dependencies
+uv pip install -r requirements.txt
+```
+
+3. **Set environment variables**:
+```bash
+export OBI_USERNAME="your-username"
+export OBI_PASSWORD="your-password"
+export LAB_ID_STAGING="your-lab-id"
+export PROJECT_ID_STAGING="your-project-id"
+export LAB_ID_PRODUCTION="your-lab-id"
+export PROJECT_ID_PRODUCTION="your-project-id"
+```
+
+### Running Tests
+
+```bash
+# Run all tests in staging
+make staging
+
+# Run all tests in production
+make production
+
+# Run smoke tests (core functionality)
+make smoke-staging
+
+# Run performance tests
+make performance
+
+# Run specific test file
+make run-tests TEST="tests/test_landing.py" ENV=staging
+
+# Run in headless mode
+make run-tests TEST="tests/test_*.py" ENV=staging HEADLESS="--headless"
+```
+
+## Available Make Targets
+
+| Command | Description |
+|---------|-------------|
+| `make setup` | Install dependencies and setup environment |
+| `make production` | Run all tests in production |
+| `make staging` | Run all tests in staging |
+| `make smoke` | Run smoke tests in production |
+| `make smoke-staging` | Run smoke tests in staging |
+| `make performance` | Run performance tests in staging |
+| `make performance-production` | Run performance tests in production |
+| `make regression` | Run full regression suite |
+| `make feature` | Run feature-specific tests |
+| `make help` | Show all available targets |
+
+## Performance Testing
+
+### Run Performance Tests
+```bash
+# Run all performance tests
+make performance
+
+# View results in terminal
+python view_performance.py performance_*.json
+
+# Generate HTML reports
+python generate_performance_html.py performance_public_pages.json
+python generate_performance_html.py performance_authenticated_pages.json
+python generate_performance_html.py performance_login_flow.json
+
+# Open reports in browser
+open performance_*.html
+```
+
+### Performance Metrics Tracked
+- Total page load time
+- DNS lookup time
+- TCP connection time
+- Request/response time
+- DOM processing time
+- DOM interactive time
+- DOM content loaded time
+
+See [PERFORMANCE_ANALYSIS.md](PERFORMANCE_ANALYSIS.md) for detailed guide.
+
+## Test Recording
+
+Record user interactions to auto-generate test code:
+
+```bash
+# Record from landing page
+python record_test.py --test-name "my_test" --env staging
+
+# Record from authenticated page (auto-login)
+python record_test.py --test-name "notebook_test" --start-page notebooks --env staging
+
+# Record with custom URL
+python record_test.py --test-name "custom" --start-url "https://example.com/page"
+```
+
+**Note**: Generated tests are starting points and need manual refinement. See [RECORDER_LIMITATIONS.md](RECORDER_LIMITATIONS.md) for details.
+
+## Project Structure
 
 ```
+sbo-qa-automation/
+├── tests/              # Test files
+├── pages/              # Page object classes
+├── locators/           # Element locators
+├── util/               # Utility modules (performance tracker, test recorder)
+├── data/               # Test data
+├── conftest.py         # Pytest fixtures and configuration
+├── pytest.ini          # Pytest settings
+├── Makefile            # Command shortcuts
+├── requirements.txt    # Python dependencies
+└── README.md           # This file
+```
+
+## Test Coverage
+
+### Public Pages
+- Landing page (titles, navigation, logos)
+- About page
+- Mission page
+- News page
+
+### Authenticated Pages
+- Virtual lab home
+- Project home
+- Notebooks page
+- Data page
+
+### Explore Page
+- Experimental data types display
+- Model data display
+- Brain region search
+- 3D Atlas interaction
+- Morphology, Electrophysiology, Neuron density tabs
+
+### Functional Tests
+- Login/logout flows
+- Navigation between pages
+- Form interactions
+- Data filtering and search
+- Table operations
+- Detail view verification
+
+## Documentation
+
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Quick command reference
+- **[TEST_GENERATION_GUIDE.md](TEST_GENERATION_GUIDE.md)** - Performance tracking and test recording guide
+- **[PERFORMANCE_ANALYSIS.md](PERFORMANCE_ANALYSIS.md)** - Analyzing performance test results
+- **[RECORDER_LIMITATIONS.md](RECORDER_LIMITATIONS.md)** - Test recorder best practices
+- **[SHARING_TESTS.md](SHARING_TESTS.md)** - How to share tests with colleagues
+
+## Test Reports
+
+### HTML Reports
+Generated automatically after each test run:
+- `report.html` - Main test report
+- `performance_*.html` - Performance reports
+
+### Screenshots
+Failed test screenshots saved to:
+- `latest_logs/errors/` - Error screenshots with test names
+
+### Logs
+- `allure_reports/report.log` - Detailed test execution logs
+
+## CI/CD Integration
+
+Tests run automatically via GitHub Actions:
+- On pull requests
+- On push to main branch
+- Scheduled daily runs
+- Manual workflow dispatch
+
+See `.github/workflows/` for workflow configurations.
+
+## Forked Repositories
+
+If you've forked this repository, sync with upstream:
+
+```bash
 git remote add upstream git@github.com:openbraininstitute/sbo-qa-automation.git
 git fetch upstream
 git checkout main
 git merge upstream/main
+git push origin main
 ```
 
-**Push Your Changes:**
- ```
- git push origin main
-```
+## Troubleshooting
 
+### Common Issues
 
-## Install
-### Prerequisites
-- Python 3.x installed
-- ```pip``` package manager installed
-- Make sure pip is installed in your system (please see the instructions below).
-- Install virtual environment.
-- A json file with login credentials would need to be created. 
+**Tests fail with "element not found"**
+- Check if selectors have changed in the UI
+- Update locators in `locators/` directory
+- Add explicit waits if needed
 
-** Linux/Unix: **
-- Run: 
-```
-sudo apt update && sudo apt install python3-pip
-```
+**Performance metrics show 0 or negative values**
+- Ensure page is fully loaded before capturing metrics
+- Add `time.sleep(1)` after page load
+- Check browser console for JavaScript errors
 
-### Install uv
-Before setting up your virtual environment, make sure to install uv.
-Follow these steps:
+**Login tests fail**
+- Verify environment variables are set
+- Check credentials are correct
+- Ensure network connectivity to auth server
 
-- For Linux and macOS:
-```
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+**Headless mode issues**
+- Some tests may behave differently in headless mode
+- Try running without `--headless` flag first
+- Check window size settings in conftest.py
 
-- Alternatively, with Homebrew (macOS):
-```
-brew install uv
-```
+## Contributing
 
-- With Pip (cross-platform):
-```
-pip install uv
-```
+1. Create a feature branch
+2. Make your changes
+3. Run tests locally: `make smoke-staging`
+4. Update documentation if needed
+5. Submit a pull request
 
-### Create the virtual environment
+## Best Practices
 
-**Using uv (recommended):**
-```
-uv venv -p 3.11
-```
+1. **Use Page Object Model** - Keep locators, pages, and tests separate
+2. **Add data-testid attributes** - Makes selectors more stable
+3. **Write meaningful assertions** - Don't just check page loaded
+4. **Add logging** - Help debug when tests fail
+5. **Run performance tests regularly** - Track performance trends
+6. **Keep tests independent** - Each test should run standalone
+7. **Use fixtures** - Reduce code duplication
 
-**Alternatively, using virtualenv:**
+## Support
 
-**Windows/Linux/Unix**
-1. Install virtualenv if not already installed: 
-    ```
-    pip install virtualenv
-    ```
-   or use Python's built-in venv module:
-    ```
-    python -m venv myenv
-2. Create a virtual environment:
-    ```
-    virtualenv myenv
-    ```
-3. Activate the virtual environment:
-    - **Windows:**
-        ```
-        myenv\Scripts\activate
-        ```
-    - **Linux/Unix:**
-        ```
-        source myenv/bin/activate
-        ```
-4. Upgrade pip:
-    ```
-    python -m pip install --upgrade pip
-    ```
-5. Install project dependencies
-    ```
-    uv pip install -r requirements.txt
-    ```
-   
-Make sure to replace `myenv` with your preferred name for the virtual environment.
+For issues or questions:
+- Check documentation in this repository
+- Review existing test examples
+- Contact the QA team
 
-#### JSON File for Login Credentials
-- Create a JSON file with login credentials to authorize test execution.
-
-### Running Tests & Linting with Makefile
-- The purpose of the Makefile is to simplify the execution of commands.
-- Please refer to the instructions for running the tests.
-
-#### Navigate to the directory containing your test files. 
-
-**Run Tests in Production environment:** 
-
-```
-make production
-```
-This command is equivalent to:
-```
-uv run pytest tests/test_file.py --env=production --env_url=production -sv --browser-name=firefox --headless
-```
-
-Run Tests in Staging:
-```commandline
-make staging
-```
-
-Run Tests in Sauce-Labs:
-```commandline
-make sauce-labs
-```
-
-### Test Artifacts, Logs, and Reports
-* Screenshots (in case of test failures) are stored in the latest_logs/errors directory.
-* Logs are stored in the latest_logs directory.
-* Reports generated by pytest are stored as HTML files in the latest_logs directory,
-with filenames indicating the environment and browser used.
-These files are created during the test run and can be found in the GitHub Actions 
-workspace for further investigation.
-
-
-## The current execution run tests on:
-
-### Homepage
-* The display of: 
-  * Main titles
-  * Small titles
-  * Top nav buttons
-  * Logos
-  
-
-### Explore 
-  * The display of:
-    * Titles, eg. experimental data types, model data etc.
-    * Number of records (resources)
-    * Neurons panel & m-types
-    * 3D Atlas (fullscreen)
-  * Searching for a specific brain region
-  
-
-### Explore experimental data tabs:
-* Morphology
-* Electrophysiology
-* Neuron density
-* Model data page
-  * The display of column headers
-  * Ticking check boxes
-  * Using the free text search and the filter for searching for M-types
-  * Verifying the presence of thumbnails
-  * Clicking on rows to see the detail view
-  * Verifying the presence of detail view headers and metadata
-
-## Spelling/Links
-
-This README file has been checked for spelling errors and links have been verified.
-
-### Acknowledgment
+## Acknowledgment
 
 The development of this software was supported by funding to the Blue Brain Project, 
 a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government's ETH Board of the Swiss Federal Institutes of Technology.

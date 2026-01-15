@@ -5,7 +5,6 @@ import time
 from socket import send_fds
 
 from pages.home_page import HomePage
-from util.util_links_checker import LinkChecker
 from locators.vlab_overview_locators import VLOverviewLocators
 from selenium.common import TimeoutException
 

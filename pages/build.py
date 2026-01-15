@@ -6,11 +6,10 @@ import time
 from selenium.webdriver.common.by import By
 
 from pages.home_page import HomePage
-from util.util_links_checker import LinkChecker
 from locators.build_locators import BuildLocators
 from selenium.common import TimeoutException
 
-class Build(HomePage, LinkChecker):
+class Build(HomePage):
     def __init__(self, browser, wait, base_url):
         super().__init__(browser, wait, base_url)
         self.home_page = HomePage(browser, wait, base_url)
