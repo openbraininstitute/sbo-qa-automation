@@ -19,7 +19,7 @@ class TestLanding:
 
         _visit, base_url = visit_public_pages
         browser, wait = _visit("")
-        landing_page = LandingPage(browser, wait, logger, base_url)
+        landing_page = LandingPage(browser, wait, base_url, logger)
         logger.info("✅ Landing Page loaded successfully.")
 
         background_page_image = landing_page.hero_background_img(timeout=25)

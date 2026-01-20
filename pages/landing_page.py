@@ -9,12 +9,14 @@ from pages.home_page import HomePage
 
 
 class LandingPage(HomePage):
-    def __init__(self, browser, wait, logger, base_url):
-        super().__init__(browser, wait, base_url)
+    def __init__(self, browser, wait, base_url, logger):
+        # Don't call super().__init__ to avoid parameter confusion
+        # Initialize directly
         self.browser = browser
         self.wait = wait
         self.logger = logger
         self.base_url = base_url
+        self.browser.set_page_load_timeout(60)
 
     def go_to_landing_page(self, timeout=20):
         self.browser.get(self.base_url)
