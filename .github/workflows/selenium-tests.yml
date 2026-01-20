@@ -51,8 +51,8 @@ jobs:
     secrets: inherit
 
   test-on-push-production:
-    # Run production tests for login-remote-issue branch or main
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2/login-remote-issue')
+    # Run production tests for ai-chat branch or main
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2/ai-chat')
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
@@ -62,8 +62,8 @@ jobs:
     secrets: inherit
 
   test-on-push-performance:
-    # Run performance tests for login-remote-issue branch
-    if: github.event_name == 'push' && github.ref == 'refs/heads/v2/login-remote-issue'
+    # Run performance tests for ai-chat branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/v2/ai-chat'
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:

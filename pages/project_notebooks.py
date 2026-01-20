@@ -237,14 +237,31 @@ class ProjectNotebooks(HomePage):
             raise
 
     def wait_for_scale_to_be(self, value: str, timeout: int = 10):
+        """Wait for all Scale column cells to have the specified value, handling stale elements."""
         value = value.lower()
 
-        WebDriverWait(self.browser, timeout).until(
-            lambda d: all(
-                cell.text.strip().lower() == value
-                for cell in self.get_column_cells("Scale")
-            )
-        )
+        def check_scale_values(driver):
+            try:
+                # Re-fetch elements on each check to avoid stale element exceptions
+                cells = self.get_column_cells("Scale")
+                if not cells:
+                    return False
+                
+                # Check if all cells have the expected value
+                for cell in cells:
+                    try:
+                        cell_text = cell.text.strip().lower()
+                        if cell_text != value:
+                            return False
+                    except Exception:
+                        # If we get a stale element exception, return False to retry
+                        return False
+                return True
+            except Exception:
+                # If any error occurs, return False to retry
+                return False
+
+        WebDriverWait(self.browser, timeout).until(check_scale_values)
 
     def notebook_actions_button_1(self):
         """Get the first notebook action button."""
