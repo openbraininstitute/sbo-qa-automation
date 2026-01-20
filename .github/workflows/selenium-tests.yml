@@ -39,15 +39,37 @@ jobs:
         with:
           python-version: '3.11'
 
-  test-on-push:
+  test-on-push-staging:
     # Run smoke tests on any push (except main)
     if: github.event_name == 'push' && github.ref != 'refs/heads/main'
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "staging"
-      artifact-name: "push-testing-${{ github.ref_name }}"
+      artifact-name: "push-staging-${{ github.ref_name }}"
       test-type: "smoke"
+    secrets: inherit
+
+  test-on-push-production:
+    # Run production tests for login-remote-issue branch or main
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2/login-remote-issue')
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "production"
+      artifact-name: "push-production-${{ github.ref_name }}"
+      test-type: "smoke"
+    secrets: inherit
+
+  test-on-push-performance:
+    # Run performance tests for login-remote-issue branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/v2/login-remote-issue'
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "staging"
+      artifact-name: "push-performance-${{ github.ref_name }}"
+      test-type: "performance"
     secrets: inherit
 
   test-production:
