@@ -9,8 +9,8 @@ from pages.home_page import HomePage
 
 
 class LandingPage(HomePage):
-    def __init__(self, browser, wait, base_url, logger):
-        super().__init__(browser, wait, logger)
+    def __init__(self, browser, wait, logger, base_url):
+        super().__init__(browser, wait, base_url)
         self.browser = browser
         self.wait = wait
         self.logger = logger
@@ -42,32 +42,102 @@ class LandingPage(HomePage):
             self.browser.execute_script("window.scrollTo(0, 0);")
             
             import time
-            time.sleep(1)  # Wait for scroll to complete
+            time.sleep(2)  # Increased wait for scroll to complete
+            
+            # Log current URL before clicking
+            current_url = self.browser.current_url
+            self.logger.info(f"Current URL before clicking: {current_url}")
             
             # Try the menu "Login" button first (since it's what the user expects)
             try:
                 self.logger.info("Attempting to click the menu 'Login' button")
                 login_button = self.element_to_be_clickable(LandingLocators.LOGIN_BUTTON, timeout=15)
+                
+                # Log button details for debugging
+                button_href = login_button.get_attribute('href')
+                button_text = login_button.text
+                self.logger.info(f"Login button found - href: {button_href}, text: '{button_text}'")
+                
+                # Click and wait briefly
                 login_button.click()
-                self.logger.info("✅ Clicked menu 'Login' button")
-                return
+                time.sleep(3)  # Wait for navigation to start
+                
+                # Log URL after click
+                new_url = self.browser.current_url
+                self.logger.info(f"URL after clicking Login button: {new_url}")
+                
+                # Check if navigation started
+                if new_url != current_url:
+                    self.logger.info("✅ Navigation started successfully with Login button")
+                    return
+                else:
+                    self.logger.warning("URL didn't change after clicking Login button")
+                    
             except Exception as menu_btn_error:
                 self.logger.warning(f"Menu Login button failed: {menu_btn_error}")
             
             # Fallback to the big "Go to Virtual Labs" button
             try:
                 self.logger.info("Attempting to click the main 'Go to Virtual Labs' button as fallback")
-                self.scroll_into_view_and_click(LandingLocators.GOTO_LAB, timeout=15)
-                self.logger.info("✅ Clicked main 'Go to Virtual Labs' button")
-                return
+                
+                # Scroll to the main button
+                main_button = self.find_element(LandingLocators.GOTO_LAB, timeout=15)
+                self.browser.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", main_button)
+                time.sleep(2)
+                
+                # Log button details
+                button_href = main_button.get_attribute('href')
+                self.logger.info(f"Main button found - href: {button_href}")
+                
+                # Make it clickable and click
+                clickable_button = self.element_to_be_clickable(LandingLocators.GOTO_LAB, timeout=10)
+                clickable_button.click()
+                time.sleep(3)
+                
+                # Log URL after click
+                new_url = self.browser.current_url
+                self.logger.info(f"URL after clicking main button: {new_url}")
+                
+                if new_url != current_url:
+                    self.logger.info("✅ Navigation started successfully with main button")
+                    return
+                else:
+                    self.logger.warning("URL didn't change after clicking main button")
+                    
             except Exception as main_btn_error:
                 self.logger.warning(f"Main button failed: {main_btn_error}")
             
-            # If both fail, raise an error
-            raise Exception("Both login buttons failed to click")
+            # If both fail, try JavaScript click as last resort
+            try:
+                self.logger.info("Trying JavaScript click as last resort")
+                login_button = self.find_element(LandingLocators.LOGIN_BUTTON, timeout=10)
+                self.browser.execute_script("arguments[0].click();", login_button)
+                time.sleep(3)
+                
+                new_url = self.browser.current_url
+                self.logger.info(f"URL after JavaScript click: {new_url}")
+                
+                if new_url != current_url:
+                    self.logger.info("✅ Navigation started with JavaScript click")
+                    return
+                    
+            except Exception as js_error:
+                self.logger.warning(f"JavaScript click failed: {js_error}")
+            
+            # If all methods fail, raise an error
+            raise Exception("All login button click methods failed - no navigation occurred")
             
         except Exception as e:
             self.logger.error(f"❌ Failed to click any login button: {e}")
+            
+            # Take screenshot for debugging
+            try:
+                screenshot_path = f"login_click_failed_{int(time.time())}.png"
+                self.browser.save_screenshot(screenshot_path)
+                self.logger.info(f"Screenshot saved: {screenshot_path}")
+            except:
+                pass
+                
             raise
 
     def digital_brains_video(self):

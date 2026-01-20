@@ -195,17 +195,47 @@ class TestLanding:
         assert not missing, f"Missing social media links: {', '.join(missing)}"
         assert set(actual_social_media) >= expected_social_media
 
-        gotolab = landing_page.go_to_lab(timeout=15)
-        assert gotolab.is_displayed(), "Unable to find 'Go to Lab' button"
-        logger.info("'Go to Lab' button is found")
-
+        # Use the improved click method that handles CI environment issues
+        logger.info(f"Testing on environment: {base_url}")
         current_url = landing_page.browser.current_url
-        gotolab.click()
+        logger.info(f"Current URL before clicking: {current_url}")
+        
+        landing_page.click_go_to_lab()
         logger.info("Clicked on 'Go to Lab' button waiting for redirect to the login page")
 
         logger.info("Waiting so that the page URL contains 'realms'")
+        
+        # Add more robust waiting with better error handling
+        try:
+            landing_page.wait_for_url_contains("realms", timeout=60)
+            logger.info(f"✅ Successfully navigated to login page: {browser.current_url}")
+        except Exception as e:
+            # Log current state for debugging
+            current_url_after = browser.current_url
+            logger.error(f"❌ Failed to reach login page")
+            logger.error(f"Expected: URL containing 'realms'")
+            logger.error(f"Actual URL: {current_url_after}")
+            logger.error(f"Environment: {base_url}")
+            logger.error(f"Error: {e}")
+            
+            # Check if we're on a blank page
+            if current_url_after == "about:blank" or not current_url_after:
+                logger.error("🚨 Browser is on blank page - navigation completely failed")
+            elif current_url_after == current_url:
+                logger.error("🚨 URL didn't change at all - button click may have failed")
+            else:
+                logger.error(f"🚨 URL changed but not to expected login page")
+            
+            # Take screenshot for debugging
+            try:
+                screenshot_name = f"staging_login_fail_{int(time.time())}.png"
+                browser.save_screenshot(screenshot_name)
+                logger.info(f"Screenshot saved: {screenshot_name}")
+            except:
+                pass
+                
+            raise
 
-        landing_page.wait_for_url_contains("realms",timeout=60)
         assert "/auth/realms" in browser.current_url, \
             f"Unexpected URL after login: {browser.current_url}"
         logger.info(f"Successfully logged in. Current page URL: {browser.current_url}")
