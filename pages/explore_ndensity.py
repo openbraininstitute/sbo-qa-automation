@@ -7,8 +7,6 @@ from selenium.common import TimeoutException
 
 from pages.explore_page import ExplorePage
 from locators.explore_ndensity_locators import ExploreNDensityPageLocators
-from util.util_links_checker import LinkChecker
-from util.util_scraper import UrlScraper
 
 
 class ExploreNeuronDensityPage(ExplorePage):

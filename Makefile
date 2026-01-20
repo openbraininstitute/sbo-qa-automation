@@ -33,7 +33,16 @@ smoke:
             --html=report.html --self-contained-html"
 
 smoke-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_homepage.py tests/test_about.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_landing.py \
+            tests/test_about.py \
+            tests/test_mission.py \
+            tests/test_news.py \
+            tests/test_login.py \
+            tests/test_explore_page.py \
+            tests/test_project_home.py \
+            tests/test_project_notebooks.py \
+            tests/test_explore_emodel.py \
+            --html=report.html --self-contained-html"
 
 # New CI/CD stability tests
 ci-cd-stability:
@@ -42,14 +51,28 @@ ci-cd-stability:
 ci-cd-stability-headless:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_ci_cd_stability.py --html=report.html --self-contained-html" HEADLESS="--headless"
 
+# Performance tests
+performance:
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_performance_example.py --html=report.html --self-contained-html"
+	@echo "\n📊 Performance reports generated:"
+	@echo "  - performance_public_pages.json"
+	@echo "  - performance_authenticated_pages.json"
+	@echo "  - performance_login_flow.json"
+	@echo "\nView reports:"
+	@echo "  python view_performance.py performance_*.json"
+	@echo "  python generate_performance_html.py performance_public_pages.json"
+
+performance-production:
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_performance_example.py --html=report.html --self-contained-html"
+
 regression:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py --html=report.html --self-contained-html"
 
 feature:
-	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_explore_page.py -vs --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_landing.py -vs --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_page.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_landing.py --html=report.html --self-contained-html"
 
 # Debug failing tests
 debug-explore:
@@ -75,6 +98,8 @@ help:
 	@echo "  smoke-staging        Run smoke tests (basic group) in staging."
 	@echo "  ci-cd-stability      Run CI/CD stability tests."
 	@echo "  ci-cd-stability-headless Run CI/CD stability tests in headless mode."
+	@echo "  performance          Run performance tests in staging."
+	@echo "  performance-production Run performance tests in production."
 	@echo "  regression           Run full regression suite."
 	@echo "  feature              Run feature-specific tests."
 	@echo "  debug-explore        Debug explore page tests with verbose output."

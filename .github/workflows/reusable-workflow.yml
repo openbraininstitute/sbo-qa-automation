@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       env:
-        description: "The name of environment (eg. STAGING, PRODUCTION, SAUCE-LABS)"
+        description: "The name of environment (eg. STAGING, PRODUCTION)"
         required: true
         type: string
       artifact-name:
@@ -12,7 +12,7 @@ on:
         required: true
         type: string
       test-type:
-        description: "Type of tests to run (stability, smoke, full)"
+        description: "Type of tests to run (stability, smoke, full, performance)"
         required: false
         type: string
         default: "smoke"
@@ -24,6 +24,18 @@ jobs:
         browser: [ chrome ]
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
+    
+    env:
+      # Common environment variables used across all steps
+      ENV_URL: ${{ vars.ENV_URL }}
+      ENV_NAME: ${{ inputs.env }}
+      OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
+      OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
+      LAB_ID_STAGING: ${{ secrets.LAB_ID_STAGING }}
+      PROJECT_ID_STAGING: ${{ secrets.PROJECT_ID_STAGING }}
+      LAB_ID_PRODUCTION: ${{ secrets.LAB_ID_PRODUCTION }}
+      PROJECT_ID_PRODUCTION: ${{ secrets.PROJECT_ID_PRODUCTION }}
+      DISPLAY: :99
 
     steps:
       - name: Checkout repo
@@ -67,16 +79,6 @@ jobs:
         run: mkdir -p latest_logs/errors
 
       - name: Run CI/CD Stability Tests First
-        env:
-          ENV_URL: ${{ vars.ENV_URL }}
-          ENV_NAME: ${{ inputs.env }}
-          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-          LAB_ID_STAGING: ${{ secrets.LAB_ID_STAGING }}
-          PROJECT_ID_STAGING: ${{ secrets.PROJECT_ID_STAGING }}
-          LAB_ID_PRODUCTION: ${{ secrets.LAB_ID_PRODUCTION }}
-          PROJECT_ID_PRODUCTION: ${{ secrets.PROJECT_ID_PRODUCTION }}
-          DISPLAY: :99
         run: |
           echo "Running CI/CD stability tests first..."
           source .venv/bin/activate
@@ -92,16 +94,6 @@ jobs:
             --self-contained-html || echo "Stability tests completed with issues"
 
       - name: Run Test Suite
-        env:
-          ENV_URL: ${{ vars.ENV_URL }}
-          ENV_NAME: ${{ inputs.env }}
-          OBI_USERNAME: ${{ secrets.OBI_USERNAME }}
-          OBI_PASSWORD: ${{ secrets.OBI_PASSWORD }}
-          LAB_ID_STAGING: ${{ secrets.LAB_ID_STAGING }}
-          PROJECT_ID_STAGING: ${{ secrets.PROJECT_ID_STAGING }}
-          LAB_ID_PRODUCTION: ${{ secrets.LAB_ID_PRODUCTION }}
-          PROJECT_ID_PRODUCTION: ${{ secrets.PROJECT_ID_PRODUCTION }}
-          DISPLAY: :99
         run: |
           echo "RUN_URL=https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> ${GITHUB_ENV}
           echo "Running ${{ inputs.test-type }} tests for ${{ matrix.browser }} in $ENV_URL with Username $OBI_USERNAME"
@@ -118,8 +110,11 @@ jobs:
             TEST_FILES="tests/test_ci_cd_stability.py"
             echo "Running CI/CD stability tests only"
           elif [ "${{ inputs.test-type }}" = "smoke" ]; then
-            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py"
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py"
             echo "Running smoke tests"
+          elif [ "${{ inputs.test-type }}" = "performance" ]; then
+            TEST_FILES="tests/test_performance_example.py"
+            echo "Running performance tests"
           else
             TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py"
             echo "Running full test suite"
@@ -163,6 +158,28 @@ jobs:
         with:
           name: html-report-${{ inputs.test-type }}-${{ inputs.env }}-${{ matrix.browser }}-${{ github.run_id }}
           path: latest_logs/report_${{ inputs.env }}_${{ matrix.browser }}_${{ inputs.test-type }}.html
+          if-no-files-found: warn
+
+      # Upload performance reports if performance tests were run
+      - name: Generate Performance HTML Reports
+        if: always() && inputs.test-type == 'performance'
+        run: |
+          source .venv/bin/activate
+          for json_file in performance_*.json; do
+            if [ -f "$json_file" ]; then
+              echo "Generating HTML report for $json_file"
+              python generate_performance_html.py "$json_file"
+            fi
+          done
+
+      - name: Upload Performance Reports
+        if: always() && inputs.test-type == 'performance'
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-reports-${{ inputs.env }}-${{ matrix.browser }}-${{ github.run_id }}
+          path: |
+            performance_*.json
+            performance_*.html
           if-no-files-found: warn
 
       - name: Annotation - Test Summary - Failures

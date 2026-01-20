@@ -9,7 +9,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from locators.explore_page_locators import ExplorePageLocators
 from selenium.webdriver.support import expected_conditions as EC
 from pages.home_page import HomePage
-from util.util_links_checker import LinkChecker
 
 
 class ExplorePage(HomePage):

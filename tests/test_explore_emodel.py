@@ -5,7 +5,7 @@
 import time
 import os.path
 import pytest
-from selenium.common import NoSuchElementException, ElementClickInterceptedException
+from selenium.common import NoSuchElementException, ElementClickInterceptedException, StaleElementReferenceException
 from selenium.webdriver import Keys, ActionChains
 
 from locators.explore_emodel_locators import ExploreEModelPageLocators
@@ -86,7 +86,6 @@ class TestExploreModelPage:
             time.sleep(0.2)
         logger.info("Searching for 'cadpyr'")
         explore_emodel.wait_for_spinner_to_disappear(timeout=25)
-        # time.sleep(15)
 
         lv_row = explore_emodel.find_lv_row()
         assert lv_row.is_displayed(), "The table and the rows are not found"
@@ -98,12 +97,22 @@ class TestExploreModelPage:
         assert lv_searched_emodel.is_displayed(), "The selected emodel is not found"
         logger.info("Selected resource found")
 
-        try:
-            lv_searched_emodel.click()
-        except ElementClickInterceptedException:
-            logger.warning("Click intercepted. Retrying after wait.")
-            time.sleep(1)
-            lv_searched_emodel.click()
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            try:
+                if attempt > 0:
+                    lv_searched_emodel = explore_emodel.find_lv_selected_resource(timeout=10)
+                
+                lv_searched_emodel.click()
+                logger.info(f"Successfully clicked on attempt {attempt + 1}")
+                break
+                
+            except (ElementClickInterceptedException, StaleElementReferenceException) as e:
+                logger.warning(f"Attempt {attempt + 1} failed: {type(e).__name__}. Retrying...")
+                if attempt == max_attempts - 1:
+                    logger.error("All click attempts failed")
+                    raise
+                time.sleep(1)
 
         old_url = browser.current_url
         explore_emodel.wait_for_spinner_to_disappear(timeout=25)

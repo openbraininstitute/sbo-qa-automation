@@ -5,6 +5,7 @@ import time
 
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.project_notebooks_locators import ProjectNotebooksLocators
@@ -129,16 +130,13 @@ class ProjectNotebooks(HomePage):
         return self.find_element(ProjectNotebooksLocators.TABLE_BODY_CONTAINER, timeout=timeout)
 
     def table_search_result(self, timeout=30):
-        """Wait for search results to appear after filtering. More robust for CI environments."""
+        """Wait for search results to appear after filtering."""
         try:
-            # First wait for table body to be present
             self.find_element(ProjectNotebooksLocators.TABLE_BODY_CONTAINER, timeout=10)
             
-            # Then wait for the specific search result with longer timeout for CI
             return self.is_visible(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=timeout)
         except Exception as e:
             self.logger.error(f"Failed to find table search result: {str(e)}")
-            # Fallback: check if any table rows are present (less specific but more reliable)
             try:
                 rows = self.find_all_elements((By.XPATH, "//tbody/tr"), timeout=5)
                 if rows:
@@ -239,12 +237,57 @@ class ProjectNotebooks(HomePage):
             raise
 
     def wait_for_scale_to_be(self, value: str, timeout: int = 10):
+        """Wait for all Scale column cells to have the specified value, handling stale elements."""
         value = value.lower()
 
-        WebDriverWait(self.browser, timeout).until(
-            lambda d: all(
-                cell.text.strip().lower() == value
-                for cell in self.get_column_cells("Scale")
-            )
-        )
+        def check_scale_values(driver):
+            try:
+                # Re-fetch elements on each check to avoid stale element exceptions
+                cells = self.get_column_cells("Scale")
+                if not cells:
+                    return False
+                
+                # Check if all cells have the expected value
+                for cell in cells:
+                    try:
+                        cell_text = cell.text.strip().lower()
+                        if cell_text != value:
+                            return False
+                    except Exception:
+                        # If we get a stale element exception, return False to retry
+                        return False
+                return True
+            except Exception:
+                # If any error occurs, return False to retry
+                return False
+
+        WebDriverWait(self.browser, timeout).until(check_scale_values)
+
+    def notebook_actions_button_1(self):
+        """Get the first notebook action button."""
+        return self.find_element(ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_1)
+    
+    def notebook_actions_button_2(self):
+        """Get the second notebook action button."""
+        return self.find_element(ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_2)
+    
+    def notebook_actions_button_3(self):
+        """Get the third notebook action button."""
+        return self.find_element(ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_3)
+    
+    def action_menu_readme(self):
+        """Get the readme action menu item."""
+        return self.find_element(ProjectNotebooksLocators.ACTION_MENU_README)
+    
+    def action_menu_download(self):
+        """Get the download action menu item."""
+        return self.find_element(ProjectNotebooksLocators.ACTION_MENU_DOWNLOAD)
+    
+    def action_menu_run(self):
+        """Get the run action menu item."""
+        return self.find_element(ProjectNotebooksLocators.ACTION_MENU_RUN)
+    
+    def modal_close_button(self):
+        """Get the modal close button."""
+        return self.find_element(ProjectNotebooksLocators.MODAL_CLOSE_BUTTON)
 

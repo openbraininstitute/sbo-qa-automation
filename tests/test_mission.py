@@ -43,8 +43,8 @@ class TestMission:
         assert minor_page_paragraph.is_displayed(), "The supporting paragraph describing the mission is not found."
         logger.info("The supporting paragraph describing the mission is displayed.")
 
-        platform_sections = mission_page.platform_sections()
-        assert platform_sections.is_displayed(), "The sections describing the platform are not found."
+        platform_sections = mission_page.platform_sections(timeout=20)
+        assert platform_sections and platform_sections.is_displayed(), "The sections describing the platform are not found."
         logger.info("The sections describing the platform are displayed")
 
         page_titles = mission_page.section_titles()

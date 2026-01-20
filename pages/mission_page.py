@@ -66,8 +66,60 @@ class MissionPage(HomePage):
     def new_tab_pdf(self):
         return self.find_element(MissionLocators.PDF_NEW_TAB)
 
-    def platform_sections(self):
-        return self.find_element(MissionLocators.PLATFORM_SECTIONS)
+    def debug_platform_sections(self):
+        """Debug method to help identify platform section elements."""
+        try:
+            # Look for any div with VirtualLab in class name
+            virtual_lab_elements = self.browser.find_elements(By.XPATH, "//div[contains(@class, 'VirtualLab')]")
+            self.logger.info(f"Found {len(virtual_lab_elements)} elements with 'VirtualLab' in class")
+            
+            # Look for any div with Panel in class name  
+            panel_elements = self.browser.find_elements(By.XPATH, "//div[contains(@class, 'Panel')]")
+            self.logger.info(f"Found {len(panel_elements)} elements with 'Panel' in class")
+            
+            # Look for section elements
+            section_elements = self.browser.find_elements(By.XPATH, "//section")
+            self.logger.info(f"Found {len(section_elements)} section elements")
+            
+            # Log some class names for debugging
+            all_divs = self.browser.find_elements(By.XPATH, "//div[@class]")[:20]  # First 20 divs with classes
+            for i, div in enumerate(all_divs):
+                class_name = div.get_attribute('class')
+                if 'module' in class_name.lower() or 'panel' in class_name.lower():
+                    self.logger.info(f"Div {i}: class='{class_name}'")
+                    
+        except Exception as e:
+            self.logger.error(f"Debug failed: {e}")
+
+    def platform_sections(self, timeout=20):
+        """Get platform sections using base page wrapper methods."""
+        try:
+            self.logger.info("Looking for platform sections...")
+            
+            # Use the base page wrapper method to wait for element presence
+            element = self.find_element(MissionLocators.PLATFORM_SECTIONS, timeout=timeout)
+            
+            # Scroll to the element to ensure it's in view
+            self.browser.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
+            
+            # Wait a moment for any animations
+            import time
+            time.sleep(2)
+            
+            # Use the base page wrapper method to wait for visibility
+            visible_element = self.element_visibility(MissionLocators.PLATFORM_SECTIONS, timeout=10)
+            
+            self.logger.info("✅ Platform sections found and visible")
+            return visible_element
+                
+        except Exception as e:
+            self.logger.error(f"Failed to find platform sections: {e}")
+            
+            # Run debug to see what's available
+            self.debug_platform_sections()
+            
+            # Re-raise the exception to fail the test with debug info
+            raise
 
     def page_titles(self):
         return self.find_all_elements(MissionLocators.MAIN_TITLES)

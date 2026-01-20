@@ -12,6 +12,7 @@ on:
         - stability
         - smoke
         - full
+        - performance
   push:
     branches:
       - main
@@ -23,7 +24,8 @@ on:
       - main
       - test-branch
   schedule:
-    - cron: "0 6 * * *"  # 8:00 AM Zurich time during CEST (summer)
+    - cron: "0 6 * * *"  # Daily at 8:00 AM Zurich time during CEST (summer)
+    - cron: "0 2 * * 1"  # Weekly on Monday at 2:00 AM UTC for performance tests
 
 jobs:
   run-tests:
@@ -37,37 +39,59 @@ jobs:
         with:
           python-version: '3.11'
 
-  # Run full tests on v2/login-remote-issue for debugging  
-  test-v2-branch:
-    if: contains(github.ref, 'v2/login-remote-issue')
-    needs: run-tests
-    uses: ./.github/workflows/reusable-workflow.yml
-    with:
-      env: "production"
-      artifact-name: "v2-branch-testing"
-      test-type: "full"
-    secrets: inherit
-
-  test-staging:
-    # Run staging tests on v2 branch for testing both environments
-    if: contains(github.ref, 'v2/login-remote-issue')
+  test-on-push-staging:
+    # Run smoke tests on any push (except main)
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "staging"
-      artifact-name: "testing in staging"
+      artifact-name: "push-staging-${{ github.ref_name }}"
       test-type: "smoke"
     secrets: inherit
 
+  test-on-push-production:
+    # Run production tests for ai-chat branch or main
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2/ai-chat')
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "production"
+      artifact-name: "push-production-${{ github.ref_name }}"
+      test-type: "smoke"
+    secrets: inherit
+
+  test-on-push-performance:
+    # Run performance tests for ai-chat branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/v2/ai-chat'
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "staging"
+      artifact-name: "push-performance-${{ github.ref_name }}"
+      test-type: "performance"
+    secrets: inherit
+
   test-production:
-    # Run full production tests on main branch or manual trigger (exclude v2/login-remote-issue)
-    if: (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch') && !contains(github.ref, 'v2/login-remote-issue')
+    # Run full production tests on main branch, PRs, schedule, or manual trigger
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       env: "production"
       artifact-name: "production-testing"
       test-type: ${{ github.event_name == 'workflow_dispatch' && inputs.test-suite || 'full' }}
+    secrets: inherit
+
+  performance-tests:
+    # Run performance tests weekly on Monday or when manually triggered with performance option
+    if: (github.event.schedule && github.event.schedule == '0 2 * * 1') || (github.event_name == 'workflow_dispatch' && inputs.test-suite == 'performance')
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "staging"
+      artifact-name: "performance-testing"
+      test-type: "performance"
     secrets: inherit
 
 
