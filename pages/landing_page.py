@@ -35,12 +35,39 @@ class LandingPage(HomePage):
         return self.find_element(LandingLocators.GOTO_LAB, timeout=timeout)
 
     def click_go_to_lab(self):
+        """Click the Go to Lab button with improved reliability for CI environments."""
         try:
-            go_to_lab = self.find_element(LandingLocators.LOGIN_BUTTON)
-            go_to_lab.click()
-            self.logger.info("✅ Clicked 'Go to Lab' button.")
+            # First scroll to top to ensure the navigation menu is visible
+            self.logger.info("Scrolling to top to ensure navigation menu is visible")
+            self.browser.execute_script("window.scrollTo(0, 0);")
+            
+            import time
+            time.sleep(1)  # Wait for scroll to complete
+            
+            # Try the menu "Login" button first (since it's what the user expects)
+            try:
+                self.logger.info("Attempting to click the menu 'Login' button")
+                login_button = self.element_to_be_clickable(LandingLocators.LOGIN_BUTTON, timeout=15)
+                login_button.click()
+                self.logger.info("✅ Clicked menu 'Login' button")
+                return
+            except Exception as menu_btn_error:
+                self.logger.warning(f"Menu Login button failed: {menu_btn_error}")
+            
+            # Fallback to the big "Go to Virtual Labs" button
+            try:
+                self.logger.info("Attempting to click the main 'Go to Virtual Labs' button as fallback")
+                self.scroll_into_view_and_click(LandingLocators.GOTO_LAB, timeout=15)
+                self.logger.info("✅ Clicked main 'Go to Virtual Labs' button")
+                return
+            except Exception as main_btn_error:
+                self.logger.warning(f"Main button failed: {main_btn_error}")
+            
+            # If both fail, raise an error
+            raise Exception("Both login buttons failed to click")
+            
         except Exception as e:
-            self.logger.error(f"❌ Failed to click 'Go to Lab' button: {e}")
+            self.logger.error(f"❌ Failed to click any login button: {e}")
             raise
 
     def digital_brains_video(self):
