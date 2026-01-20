@@ -110,7 +110,7 @@ jobs:
             TEST_FILES="tests/test_ci_cd_stability.py"
             echo "Running CI/CD stability tests only"
           elif [ "${{ inputs.test-type }}" = "smoke" ]; then
-            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py"
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py"
             echo "Running smoke tests"
           elif [ "${{ inputs.test-type }}" = "performance" ]; then
             TEST_FILES="tests/test_performance_example.py"
