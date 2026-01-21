@@ -108,8 +108,13 @@ class LoginPage(CustomBasePage):
     def perform_login(self, username, password):
         self.logger.info("Performing login with the provided credentials.")
 
-        self.wait.until(EC.url_contains("/auth/realms/"))
-        print(f"DEBUG: Current URL: {self.browser.current_url}")
+        # We should already be on the login page, but let's verify
+        current_url = self.browser.current_url
+        print(f"DEBUG: Current URL: {current_url}")
+        
+        # If we're not on the auth page, something went wrong
+        if "/auth/realms/" not in current_url:
+            raise RuntimeError(f"Expected to be on auth page, but current URL is: {current_url}")
 
         self.wait.until(EC.presence_of_element_located((By.ID, "kc-form-wrapper")))
 

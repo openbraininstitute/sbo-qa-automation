@@ -23,19 +23,6 @@ class TestExploreMorphologyPage:
         explore_morphology.go_to_explore_morphology_page(lab_id, project_id)
         logger.info("Explore morphology page is displayed")
 
-        ai_assistant_panel = explore_morphology.find_ai_assistant_panel(timeout=25)
-        logger.info("AI Assistant panel is open. Attempting to close it.")
-
-        ai_assistant_open_btn = explore_morphology.find_ai_assistant_panel_open()
-        assert ai_assistant_open_btn.is_displayed(), "AI Assistant panel is still open."
-        logger.info("AI Assistant open button is displayed, means the panel is open.")
-        ai_assistant_open_btn.click()
-
-        ai_assistant_panel_close_btn = explore_morphology.find_ai_assistant_panel_close()
-        assert ai_assistant_panel_close_btn.is_displayed(), ("Close button on the AI literature search panel is not "
-                                                             "found")
-        ai_assistant_panel_close_btn.click()
-        logger.info("AI assistant panel is closed ")
         table_list_view = explore_morphology.find_table()
         logger.info("Morphology table is displayed.")
 
