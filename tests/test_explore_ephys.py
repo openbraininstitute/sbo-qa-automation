@@ -24,12 +24,6 @@ class TestExploreEphys:
         lv_explore_grid = explore_ephys_page.find_explore_section_grid()
         logger.info("Explore section grid/table view is displayed")
 
-        ai_assistant_panel = explore_ephys_page.find_ai_assistant_panel()
-        logger.info("Found Ai Assistant Panel")
-        ai_assistant_panel_close = explore_ephys_page.find_ai_assistant_panel_close()
-        ai_assistant_panel_close.click()
-        logger.info("Found the AI assistant close button and clicked")
-
         """
         The thumbnails are temporarily failing as not displayed for Homo Sapiens. 
         thumbnail_img = explore_ephys_page.verify_all_thumbnails_displayed()

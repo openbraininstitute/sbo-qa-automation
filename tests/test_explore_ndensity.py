@@ -21,12 +21,6 @@ class TestExploreNeuronDensity:
         explore_ndensity.wait_for_ndensity_tab(timeout=120)
         logger.info(f"Neuron density tab is displayed, {browser.current_url}")
 
-        ai_assistant_panel = explore_ndensity.find_ai_assistant_panel(timeout=10)
-        logger.info("Found Ai Assistant Panel")
-        ai_assistant_panel_close = explore_ndensity.find_ai_assistant_panel_close()
-        ai_assistant_panel_close.click()
-        logger.info("Found the AI assistant close button and clicked")
-
         brain_regions_panel_btn = explore_ndensity.find_brain_regions_panel_btn(timeout=10)
         assert brain_regions_panel_btn.is_displayed(), "Button to close Brain regions panel is not found"
         brain_regions_panel_btn.click()
