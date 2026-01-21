@@ -205,12 +205,12 @@ jobs:
           path: failures_${{ inputs.env }}_${{ matrix.browser }}.md
           if-no-files-found: warn
 
-      # MS Teams notification - commented out until tests are stable
-      # - name: MS Teams Notification
-      #   if: always()
-      #   uses: skitionek/notify-microsoft-teams@master
-      #   with:
-      #     webhook_url: ${{ secrets.MS_TEAMS_WEBHOOK_URL }}
-      #     needs: ${{ toJson(needs) }}
-      #     job: ${{ toJson(job) }}
-      #     steps: ${{ toJson(steps) }}
+      # MS Teams notification
+      - name: MS Teams Notification
+        if: always()
+        uses: skitionek/notify-microsoft-teams@master
+        with:
+          webhook_url: ${{ secrets.MS_TEAMS_WEBHOOK_URL }}
+          needs: ${{ toJson(needs) }}
+          job: ${{ toJson(job) }}
+          steps: ${{ toJson(steps) }}
