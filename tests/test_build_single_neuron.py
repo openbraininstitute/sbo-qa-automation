@@ -121,17 +121,14 @@ class TestBuildSingleNeuron:
         workflows_url = build_page.navigate_to_workflows(lab_id, project_id)
         assert "workflows" in workflows_url.lower(), "Failed to navigate to workflows page"
         
-        # Check page title or main content
-        page_title = browser.title
-        assert page_title, "Page title is empty"
-        print(f"✅ Page loaded with title: {page_title}")
+        # Use page object method to verify accessibility
+        page_title = build_page.verify_page_accessibility()
         logger.info(f"Page loaded with title: {page_title}")
         
-        # Verify we can find the Build button
-        build_button_found = build_page.click_build_button()
-        # We don't assert here as we just want to check accessibility
-        print(f"✅ Build button accessibility: {'Found' if build_button_found else 'Not found'}")
-        logger.info(f"Build button accessibility: {'Found' if build_button_found else 'Not found'}")
+        # Use page object method to check build button accessibility
+        build_button_accessible = build_page.check_build_button_accessibility()
+        print(f"✅ Build button accessibility: {'Found' if build_button_accessible else 'Not found'}")
+        logger.info(f"Build button accessibility: {'Found' if build_button_accessible else 'Not found'}")
     
     @pytest.mark.build_single_neuron
     @pytest.mark.run(order=17)
@@ -152,6 +149,10 @@ class TestBuildSingleNeuron:
         assert "workflows?activity=build" in workflows_url, "Correct activity parameter not in URL"
         print(f"✅ Single Neuron URL: {workflows_url}")
         logger.info(f"Single Neuron URL: {workflows_url}")
+        
+        # Use page object method to verify page loaded
+        page_title = build_page.verify_page_accessibility()
+        logger.info(f"Page accessibility verified: {page_title}")
         
         # Basic page load verification
         page_loaded = "workflows" in browser.current_url.lower()

@@ -205,9 +205,9 @@ jobs:
           path: failures_${{ inputs.env }}_${{ matrix.browser }}.md
           if-no-files-found: warn
 
-      # MS Teams notification
+      # MS Teams notification - only for scheduled test runs (daily/weekly), not on git push
       - name: MS Teams Notification
-        if: always()
+        if: always() && github.event_name == 'schedule'
         uses: skitionek/notify-microsoft-teams@master
         with:
           webhook_url: ${{ secrets.MS_TEAMS_WEBHOOK_URL }}
