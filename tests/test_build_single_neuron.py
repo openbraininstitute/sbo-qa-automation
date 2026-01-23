@@ -154,8 +154,24 @@ class TestBuildSingleNeuron:
         page_title = build_page.verify_page_accessibility()
         logger.info(f"Page accessibility verified: {page_title}")
         
-        # Basic page load verification
-        page_loaded = "workflows" in browser.current_url.lower()
-        assert page_loaded, "Workflows page not loaded"
+        # Basic page load verification with retry for CI stability
+        max_attempts = 3
+        page_loaded = False
+        
+        for attempt in range(max_attempts):
+            current_url = browser.current_url.lower()
+            page_loaded = "workflows" in current_url
+            
+            print(f"🔍 Attempt {attempt + 1}/{max_attempts}: URL check")
+            print(f"   Current URL: {browser.current_url}")
+            print(f"   Contains 'workflows': {page_loaded}")
+            
+            if page_loaded:
+                break
+            elif attempt < max_attempts - 1:
+                print("   ⏳ Retrying URL check in 2 seconds...")
+                time.sleep(2)
+        
+        assert page_loaded, f"Workflows page not loaded. Final URL: {browser.current_url}"
         print("✅ Page loaded successfully")
         logger.info("Page loaded successfully")
