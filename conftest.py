@@ -94,7 +94,7 @@ def visit_public_pages(public_browsing, logger):
     return _visit, base_url
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def test_config(pytestconfig):
     """Gets credentials and IDS returns the correct environment-specific settings."""
     username = os.getenv("OBI_USERNAME")
@@ -110,12 +110,12 @@ def test_config(pytestconfig):
         lab_id = os.getenv("LAB_ID_STAGING")
         project_id = os.getenv("PROJECT_ID_STAGING")
         oidc_login_url = (
-            "https://staging.openbraininstitute.org/auth/realms/SBO/protocol/"
+            "https://staging.cell-a.openbraininstitute.org/auth/realms/SBO/protocol/"
             "openid-connect/auth?"
             "client_id=core-webapp-main&"
             "scope=profile%20openid%20groups&"
             "response_type=code&"
-            "redirect_uri=https%3A%2F%2Fstaging.openbraininstitute.org%2Fapi%2Fauth%2Fcallback%2Fkeycloak&"
+            "redirect_uri=https%3A%2F%2Fstaging.cell-a.openbraininstitute.org%2Fapi%2Fauth%2Fcallback%2Fkeycloak&"
             "state=123&"  
             "code_challenge=abc&"
             "code_challenge_method=S256"
@@ -149,7 +149,7 @@ def test_config(pytestconfig):
     }
 
 
-@pytest.fixture(scope="class", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def setup(request, pytestconfig, test_config):
     """Fixture to set up the browser/webdriver"""
     environment = pytestconfig.getoption("env")
@@ -193,7 +193,13 @@ def navigate_to_landing_page(public_browsing, logger, test_config):
 def navigate_to_login(setup, logger, request, test_config):
     """Fixture that navigates to the login page"""
     browser, wait, lab_url, lab_id, project_id = setup
-    landing_page = LandingPage(browser, wait, test_config["base_url"], logger)
+    
+    landing_page = LandingPage(
+        browser=browser, 
+        wait=wait, 
+        base_url=test_config["base_url"],
+        logger=logger
+    )
     
     # Navigate to landing page with retry
     max_attempts = 3
@@ -263,10 +269,8 @@ def navigate_to_login_direct(setup, logger, test_config):
                 (By.XPATH, "//a[@href='/app/virtual-lab']"),
                 (By.XPATH, "//a[@href='/app/virtual-lab/sync']"),
                 (By.XPATH, "//a[contains(@href, 'virtual-lab')]"),
-                (By.XPATH, "//button[contains(text(), 'Go to Lab')]"),
-                (By.XPATH, "//a[contains(text(), 'Go to Lab')]"),
-                (By.XPATH, "//button[contains(@class, 'lab')]"),
-                (By.XPATH, "//a[contains(@class, 'lab')]"),
+                (By.XPATH, "//button[contains(text(), 'Go to')]"),
+                (By.XPATH, "//a[contains(text(), 'Virtual Lab')]"),
                 (By.CSS_SELECTOR, "[href*='virtual-lab']"),
                 (By.CSS_SELECTOR, "[data-testid*='lab']"),
                 (By.XPATH, "//button[contains(text(), 'Lab')]"),
@@ -506,6 +510,15 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         terminalreporter.write_line("")
         terminalreporter.write_sep("=", "✅ ALL TESTS PASSED", green=True)
 
+
+# def pytest_sessionfinish(session, exitstatus):
+#     """Print failed test summary at the end of the session"""
+#     if failed_tests:
+#         print("\n\033[91m❌ FAILED TEST SUMMARY:\033[0m")
+#         for test in failed_tests:
+#             print(f"\033[91m- {test}\033[0m")
+#     else:
+#         print("\n\033[92m✅ ALL TESTS PASSED\033[0m")
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):

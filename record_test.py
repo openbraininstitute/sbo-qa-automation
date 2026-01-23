@@ -168,7 +168,7 @@ def main():
     elif args.start_page:
         # Build URL from environment variables
         if args.env == 'staging':
-            base_url = 'https://staging.openbraininstitute.org'
+            base_url = 'https://dev.openbraininstitute.org'
             lab_id = os.getenv('LAB_ID_STAGING')
             project_id = os.getenv('PROJECT_ID_STAGING')
         else:
@@ -191,7 +191,7 @@ def main():
                 sys.exit(1)
             start_url = f"{base_url}/app/virtual-lab/{lab_id}/{project_id}/notebooks/public"
     elif args.env == 'staging':
-        start_url = 'https://staging.openbraininstitute.org'
+        start_url = 'https://dev.openbraininstitute.org'
     else:
         start_url = 'https://www.openbraininstitute.org'
     
