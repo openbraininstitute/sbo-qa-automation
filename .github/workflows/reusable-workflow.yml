@@ -110,13 +110,13 @@ jobs:
             TEST_FILES="tests/test_ci_cd_stability.py"
             echo "Running CI/CD stability tests only"
           elif [ "${{ inputs.test-type }}" = "smoke" ]; then
-            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py"
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py"
             echo "Running smoke tests"
           elif [ "${{ inputs.test-type }}" = "performance" ]; then
             TEST_FILES="tests/test_performance_example.py"
             echo "Running performance tests"
           else
-            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py"
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py"
             echo "Running full test suite"
           fi
           
@@ -205,12 +205,12 @@ jobs:
           path: failures_${{ inputs.env }}_${{ matrix.browser }}.md
           if-no-files-found: warn
 
-      # MS Teams notification - commented out until tests are stable
-      # - name: MS Teams Notification
-      #   if: always()
-      #   uses: skitionek/notify-microsoft-teams@master
-      #   with:
-      #     webhook_url: ${{ secrets.MS_TEAMS_WEBHOOK_URL }}
-      #     needs: ${{ toJson(needs) }}
-      #     job: ${{ toJson(job) }}
-      #     steps: ${{ toJson(steps) }}
+      # MS Teams notification - only for scheduled test runs (daily/weekly), not on git push
+      - name: MS Teams Notification
+        if: always() && github.event_name == 'schedule'
+        uses: skitionek/notify-microsoft-teams@master
+        with:
+          webhook_url: ${{ secrets.MS_TEAMS_WEBHOOK_URL }}
+          needs: ${{ toJson(needs) }}
+          job: ${{ toJson(job) }}
+          steps: ${{ toJson(steps) }}
