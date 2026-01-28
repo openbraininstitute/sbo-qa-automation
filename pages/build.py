@@ -6,7 +6,7 @@ import time
 from selenium.webdriver.common.by import By
 
 from pages.home_page import HomePage
-from locators.build_locators import BuildLocators
+from locators.build_single_neuron_locators import BuildSingleNeuronLocators as BuildLocators
 from selenium.common import TimeoutException
 
 class Build(HomePage):

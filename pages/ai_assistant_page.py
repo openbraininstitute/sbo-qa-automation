@@ -155,7 +155,46 @@ class AIAssistantPage(ProjectHome):
             time.sleep(10)
             self.logger.info("Waited for AI response (fallback timing)")
         
-        self.logger.info("✅ AI response received")
+        # Now wait for the response to complete
+        self.wait_for_ai_response_completion(timeout=60)
+        
+        self.logger.info("✅ AI response received and completed")
+    
+    def wait_for_ai_response_completion(self, timeout=60):
+        """Wait for AI response to fully complete by waiting for cancel button to disappear."""
+        self.logger.info("Waiting for AI response to complete (cancel button to disappear)...")
+        
+        # Wait for cancel button to disappear (indicates completion)
+        cancel_selectors = [
+            AIAssistantLocators.CANCEL_BUTTON,
+            AIAssistantLocators.CANCEL_BUTTON_ALT,
+            AIAssistantLocators.CANCEL_BUTTON_GENERIC
+        ]
+        
+        cancel_disappeared = False
+        for cancel_selector in cancel_selectors:
+            try:
+                # First check if cancel button exists
+                cancel_elements = self.browser.find_elements(*cancel_selector)
+                if cancel_elements:
+                    self.logger.info(f"Found cancel button, waiting for it to disappear: {cancel_selector}")
+                    # Wait for it to disappear
+                    self.wait.until_not(EC.presence_of_element_located(cancel_selector))
+                    self.logger.info(f"Cancel button disappeared: {cancel_selector}")
+                    cancel_disappeared = True
+                    break
+            except TimeoutException:
+                self.logger.info(f"Cancel button {cancel_selector} took too long to disappear or wasn't found")
+                continue
+            except Exception as e:
+                self.logger.info(f"Error waiting for cancel button {cancel_selector}: {e}")
+                continue
+        
+        if not cancel_disappeared:
+            self.logger.info("No cancel button found or it didn't disappear, using fallback wait")
+            time.sleep(10)  # Fallback wait
+        
+        self.logger.info("✅ AI response completion wait finished")
     
     def wait_for_ai_response_start(self, timeout=15):
         """Wait for AI to start responding (spinner appears)."""
@@ -238,12 +277,26 @@ class AIAssistantPage(ProjectHome):
         
         raise NoSuchElementException("Clear chat button not found")
     
-    def clear_chat(self):
+    def clear_chat(self, timeout=15):
         """Clear the chat conversation."""
-        clear_button = self.find_clear_chat_button()
-        clear_button.click()
-        self.logger.info("✅ Clicked clear chat button")
-        time.sleep(2)
+        self.logger.info("Attempting to clear chat...")
+        
+        # Try to find and click clear chat button
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            try:
+                clear_button = self.find_clear_chat_button(timeout=5)
+                clear_button.click()
+                self.logger.info("✅ Successfully clicked clear chat button")
+                time.sleep(2)
+                return
+            except NoSuchElementException:
+                if attempt < max_attempts - 1:
+                    self.logger.info(f"Clear chat button not available, waiting... (attempt {attempt + 1}/{max_attempts})")
+                    time.sleep(5)
+                else:
+                    self.logger.error("Clear chat button not found after multiple attempts")
+                    raise
     
     def find_history_button(self, timeout=10):
         """Find and return the history button."""

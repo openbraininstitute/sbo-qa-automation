@@ -24,7 +24,7 @@ on:
       - main
       - test-branch
   schedule:
-    - cron: "0 6 * * *"  # Daily at 8:00 AM Zurich time during CEST (summer)
+    - cron: "0 6 * * *"  # Daily at 6:00 AM UTC (8:00 AM CEST/7:00 AM CET Zurich time)
     - cron: "0 2 * * 1"  # Weekly on Monday at 2:00 AM UTC for performance tests
 
 jobs:

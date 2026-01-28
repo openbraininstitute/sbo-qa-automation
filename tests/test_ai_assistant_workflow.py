@@ -35,7 +35,13 @@ class TestAIAssistantWorkflow:
         first_question_text = first_question.get_attribute("textContent") or "First Question"
         ai_assistant_page.click_suggested_question(first_question, first_question_text)
         
+        # Enhanced waiting for AI response with debugging
+        print("🤖 Waiting for AI to complete response...")
+        logger.info("Waiting for AI to complete response...")
         ai_assistant_page.wait_for_ai_response()
+        print("✅ AI response completed, attempting to clear chat...")
+        logger.info("AI response completed, attempting to clear chat...")
+        
         ai_assistant_page.clear_chat()
         
         try:
@@ -86,10 +92,13 @@ class TestAIAssistantWorkflow:
         
         if cancel_success:
             logger.info("✅ Successfully cancelled AI response")
+            print("✅ Successfully cancelled second AI response")
         else:
             logger.info("Cancel button not available, waiting for response to complete...")
+            print("🤖 Cancel not available, waiting for second AI response to complete...")
             ai_assistant_page.wait_for_ai_response()
             logger.info("✅ Second AI response completed")
+            print("✅ Second AI response completed")
         
         history_opened = ai_assistant_page.open_history()
         history_verified = ai_assistant_page.verify_chat_history()

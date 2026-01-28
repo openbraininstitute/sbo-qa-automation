@@ -27,10 +27,22 @@ class BuildSingleNeuronPage(ProjectHome):
     def wait_for_page_load(self, timeout=10):
         """Wait for page to load completely"""
         try:
+            # Wait for document ready state
             self.wait_for_page_ready(timeout)
-            time.sleep(2)  # Additional wait for dynamic content
-        except TimeoutException:
-            print("Page load timeout - continuing anyway")
+            
+            # Additional wait for dynamic content and URL stabilization
+            time.sleep(3)  # Increased from 2 to 3 seconds for CI stability
+            
+            # Ensure page is fully loaded by checking for any loading indicators
+            try:
+                # Wait for any potential loading spinners to disappear
+                spinner_locator = (By.XPATH, "//div[contains(@class, 'loading') or contains(@class, 'spinner')]")
+                self.wait_for_element_to_disappear(spinner_locator, timeout=5)
+            except:
+                pass  # No spinners found, continue
+                
+        except Exception as e:
+            print(f"Page load timeout - continuing anyway: {e}")
     
     def click_build_button(self, timeout=10):
         """Click the main Build button"""
