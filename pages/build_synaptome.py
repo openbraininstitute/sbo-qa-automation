@@ -16,9 +16,32 @@ from pages.home_page import HomePage
 class BuildSynaptomePage(HomePage):
     def __init__(self, browser, wait, base_url, logger=None):
         super().__init__(browser, wait, base_url)
+        self.base_url = base_url
         self.logger = logger or logging.getLogger(__name__)
         self.home_page = HomePage(browser, wait, base_url)
-        self.logger = logger
+
+    def navigate_to_workflows(self, lab_id, project_id):
+        """Navigate to the workflows page with specific brain ID"""
+        workflows_url = f"{self.base_url}/app/virtual-lab/{lab_id}/{project_id}/workflows?activity=build"
+        self.browser.get(workflows_url)
+        self.wait_for_page_load()
+        return workflows_url
+    
+    def wait_for_page_load(self, timeout=10):
+        """Wait for page to load completely"""
+        try:
+            self.wait_for_page_ready(timeout)
+            
+            time.sleep(3)  # Increased from 2 to 3 seconds for CI stability
+            
+            try:
+                spinner_locator = (By.XPATH, "//div[contains(@class, 'loading') or contains(@class, 'spinner')]")
+                self.wait_for_element_to_disappear(spinner_locator, timeout=5)
+            except:
+                pass  # No spinners found, continue
+                
+        except Exception as e:
+            print(f"Page load timeout - continuing anyway: {e}")
 
     def go_to_build_synaptome(self, lab_id: str, project_id: str):
         path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/build"
