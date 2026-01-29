@@ -15,7 +15,7 @@ class AIAssistantLocators:
     # Suggested Questions
     SUGGESTED_QUESTIONS = (By.CSS_SELECTOR, "[data-testid*='suggestion'], [data-testid*='question'], .suggestion, .suggested-question, .ai-suggestion")
     SUGGESTED_QUESTIONS_ALT = (By.XPATH, "//button[contains(@class, 'suggestion')] | //div[contains(@class, 'suggestion')]//button")
-    SUGGESTED_QUESTIONS_FALLBACK = (By.XPATH, "//div[contains(@class, 'panel') or contains(@class, 'assistant') or contains(@class, 'ai')]//button")
+    SUGGESTED_QUESTIONS_FALLBACK = (By.XPATH, "//div[contains(@class, 'ai') or contains(@class, 'assistant')]//button[contains(text(), '?') or contains(@class, 'suggestion') or contains(@class, 'question')]")
     
     # AI Response Elements
     AI_RESPONSE = (By.CSS_SELECTOR, "[data-testid*='response'], [data-testid*='message'], .ai-response, .message, .response")
