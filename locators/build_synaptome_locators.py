@@ -83,5 +83,59 @@ class BuildSynaptomeLocators:
     USE_SN_MODEL_BTN = (By.XPATH, "//button[text()='Use single neuron model']")
     ZOOM_UI_CONTAINER = (By.CSS_SELECTOR, "div.absolute.bottom-4.right-6")
 
+    # Synaptome Workflow Locators
+    # Build section selectors
+    BUILD_BUTTON = (By.XPATH, "//button[contains(text(), 'Build')]")
+    BUILD_DIV = (By.XPATH, "//div[contains(text(), 'Build')]")
+    BUILD_ANY = (By.XPATH, "//*[contains(text(), 'Build')]")
+    BUILD_LINK = (By.XPATH, "//a[contains(text(), 'Build')]")
+    BUILD_SPAN = (By.XPATH, "//span[contains(text(), 'Build')]")
+    
+    # Synaptome card selectors
+    SYNAPTOME_CARD_PRIMARY = (By.XPATH, "//div[@data-slot='card']//div[text()='Synaptome']")
+    SYNAPTOME_CARD_CLASS = (By.XPATH, "//div[contains(@class, 'card')]//div[text()='Synaptome']")
+    SYNAPTOME_CARD_TEXT = (By.XPATH, "//div[text()='Synaptome']")
+    SYNAPTOME_CARD_ANY = (By.XPATH, "//*[contains(text(), 'Synaptome')]")
+    SYNAPTOME_CARD_BUTTON = (By.XPATH, "//button[contains(text(), 'Synaptome')]")
+    SYNAPTOME_CARD_CASE_INSENSITIVE = (By.XPATH, "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'synaptome')]")
+    
+    # Configuration form fields
+    CONFIG_NAME_FIELD = (By.ID, "single-model-configuration-form_name")
+    CONFIG_DESCRIPTION_FIELD = (By.ID, "single-model-configuration-form_description")
+    CONFIG_CREATED_BY = (By.XPATH, "//span[text()='Created by ']/following-sibling::div")
+    CONFIG_CREATED_AT = (By.XPATH, "//span[text()='created at ']/following-sibling::div")
+    
+    # ME-model button selectors
+    ME_MODEL_BUTTON_PRIMARY = (By.XPATH, "//button[.//div[text()='ME-model']]")
+    ME_MODEL_BUTTON_TEXT = (By.XPATH, "//button[contains(text(), 'ME-model')]")
+    ME_MODEL_BUTTON_ANCESTOR = (By.XPATH, "//div[text()='ME-model']/ancestor::button")
+    ME_MODEL_ANY = (By.XPATH, "//*[contains(text(), 'ME-model')]")
+    
+    # Project tab selectors
+    PROJECT_TAB_PRIMARY = (By.XPATH, "//button[@role='tab' and text()='Project']")
+    PROJECT_TAB_CLASS = (By.XPATH, "//button[contains(@class, 'tab') and text()='Project']")
+    PROJECT_TAB_TEXT = (By.XPATH, "//button[text()='Project']")
+    PROJECT_TAB_ROLE = (By.XPATH, "//*[@role='tab'][contains(text(), 'Project')]")
+    
+    # Model selection table and radio buttons
+    MODELS_TABLE = (By.XPATH, "//table")
+    RADIO_BUTTON_ANT_INPUT = (By.XPATH, "//span[contains(@class, 'ant-radio')]//input[@class='ant-radio-input']")
+    RADIO_BUTTON_INPUT_CLASS = (By.XPATH, "//input[@class='ant-radio-input']")
+    RADIO_BUTTON_SPAN_TARGET = (By.XPATH, "//span[@class='ant-radio ant-wave-target']//input[@type='radio']")
+    RADIO_BUTTON_SPAN_WRAPPER = (By.XPATH, "//span[contains(@class, 'ant-radio')]")
+    RADIO_BUTTON_TABLE_FIRST = (By.XPATH, "//table//input[@type='radio'][1]")
+    RADIO_BUTTON_ANY = (By.XPATH, "//input[@type='radio']")
+    
+    # Debug elements for model selection
+    CLICKABLE_ELEMENTS = (By.XPATH, "//button | //a | //div[@role='button'] | //tr[@role='button'] | //td[@role='button']")
+    TABLE_ROWS = (By.XPATH, "//tr")
+    
+    # Synapse sets tab selectors
+    SYNAPSE_SETS_TAB_PRIMARY = (By.XPATH, "//div[text()='Synapse sets']")
+    SYNAPSE_SETS_TAB_CLASS = (By.XPATH, "//div[@class='flex-shrink-0 font-bold' and text()='Synapse sets']")
+    SYNAPSE_SETS_TAB_ANY = (By.XPATH, "//*[contains(text(), 'Synapse sets')]")
+    SYNAPSE_SETS_TAB_BOLD = (By.XPATH, "//div[contains(@class, 'font-bold') and text()='Synapse sets']")
+    SYNAPSE_SETS_TAB_ANCESTOR = (By.XPATH, "//div[text()='Synapse sets']/ancestor::div[contains(@class, 'flex')]")
+
 
 
