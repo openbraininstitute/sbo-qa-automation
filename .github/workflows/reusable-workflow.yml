@@ -115,6 +115,9 @@ jobs:
           elif [ "${{ inputs.test-type }}" = "performance" ]; then
             TEST_FILES="tests/test_performance_example.py"
             echo "Running performance tests"
+          elif [ "${{ inputs.test-type }}" = "ai-assistant" ]; then
+            TEST_FILES="tests/test_ai_assistant_workflow.py"
+            echo "Running AI assistant tests only"
           else
             TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py"
             echo "Running full test suite"

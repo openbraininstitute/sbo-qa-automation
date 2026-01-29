@@ -167,16 +167,18 @@ class AIAssistantPage(ProjectHome):
             return False
         
         # Accept any text that's reasonably long (likely a suggested question)
-        if len(text.strip()) > 30:  # Longer text is likely a suggested question
+        # Lowered threshold to be more inclusive
+        if len(text.strip()) > 25:  # Most suggested questions are longer than 25 chars
             return True
         
-        # Check for question indicators
+        # Check for question indicators (very broad)
         question_indicators = [
             '?',  # Contains question mark
             'what', 'how', 'why', 'when', 'where', 'which', 'who',  # Question words
             'can you', 'could you', 'would you', 'do you', 'are you',  # Question phrases
             'tell me', 'show me', 'explain', 'describe', 'help', 'find',  # Request phrases
-            'visualize', 'display', 'list', 'compare', 'analyze'  # Action words
+            'visualize', 'display', 'list', 'compare', 'analyze',  # Action words
+            'brain', 'cerebrum', 'region', 'paper', 'circuit', 'knowledge'  # Domain-specific words
         ]
         
         if any(indicator in text_lower for indicator in question_indicators):

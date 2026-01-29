@@ -1,0 +1,35 @@
+name: AI Assistant Test Workflow
+
+on:
+  push:
+    branches:
+      - 'feature/ai-assistant-*'
+      - 'fix/ai-assistant-*'
+      - 'ai-assistant-*'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'pages/ai_assistant_page.py'
+      - 'locators/ai_assistant_locators.py'
+      - 'tests/test_ai_assistant_workflow.py'
+
+jobs:
+  test-ai-assistant-staging:
+    name: "AI Assistant Test - Staging"
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "STAGING"
+      artifact-name: "ai-assistant-staging-artifacts"
+      test-type: "ai-assistant"
+    secrets: inherit
+
+  test-ai-assistant-production:
+    name: "AI Assistant Test - Production"
+    needs: test-ai-assistant-staging
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "PRODUCTION"
+      artifact-name: "ai-assistant-production-artifacts"
+      test-type: "ai-assistant"
+    secrets: inherit
