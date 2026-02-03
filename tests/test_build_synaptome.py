@@ -32,7 +32,6 @@ class TestBuildSynaptome:
         print(f"✅ Successfully navigated to: {workflows_url}")
         logger.info(f"Successfully navigated to: {workflows_url}")
 
-        time.sleep(900)
         # Step 2: Click Build button/section to get to build activities
         print("\n📍 Step 2: Clicking Build section...")
         logger.info("Step 2: Clicking Build section")
