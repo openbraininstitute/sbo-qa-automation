@@ -275,6 +275,7 @@ jobs:
           # Get commit info
           COMMIT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
           COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s" 2>/dev/null || echo "Unknown commit")
+          RUN_URL="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           
           # Create environment variables for Teams notification
           echo "TOTAL_TESTS=$TOTAL_TESTS" >> $GITHUB_ENV
@@ -288,6 +289,7 @@ jobs:
           echo "STATUS_EMOJI=$STATUS_EMOJI" >> $GITHUB_ENV
           echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          echo "RUN_URL=$RUN_URL" >> $GITHUB_ENV
           
           # Debug output
           echo "Test Summary:"
@@ -305,28 +307,185 @@ jobs:
         if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
         with:
           webhook_url: ${{ secrets.MS_TEAMS_NEW_WEBHOOK_URI }}
-          title: "${{ env.STATUS_EMOJI }} Virtual Lab Test Results - ${{ env.OVERALL_STATUS }}"
-          summary: "${{ inputs.test-type }} tests on ${{ inputs.env }} environment"
-          text: |
-            **📊 Test Summary**
-            - **Total Tests:** ${{ env.TOTAL_TESTS }}
-            - **✅ Passed:** ${{ env.PASSED_TESTS }}
-            - **❌ Failed:** ${{ env.FAILED_TESTS }}
-            - **⏭️ Skipped:** ${{ env.SKIPPED_TESTS }}
-            - **⏱️ Duration:** ${{ env.TEST_DURATION }}
-            
-            **📋 Environment Details**
-            - **Environment:** ${{ inputs.env }}
-            - **Test Suite:** ${{ inputs.test-type }}
-            - **Browser:** ${{ matrix.browser }}
-            - **Branch:** ${{ github.ref_name }}
-            - **Commit:** ${{ env.COMMIT_SHA }} - ${{ env.COMMIT_MESSAGE }}
-            
-            ${{ env.FAILED_TESTS != '0' && format('**🚨 Failed Tests:** {0}', env.FAILED_TEST_LIST) || '' }}
-            
-            **🔗 Quick Links**
-            - [🔍 View Workflow Run](${{ env.RUN_URL }})
-            - [📊 Download HTML Report](${{ env.RUN_URL }})
-            ${{ env.FAILED_TESTS != '0' && format('- [🖼️ View Screenshots]({0})', env.RUN_URL) || '' }}
-            - [📋 View Test Plan](https://github.com/${{ github.repository }}/blob/main/Virtual_Lab_Test_Plan.xlsx)
-          theme_color: ${{ env.OVERALL_STATUS == 'FAILED' && 'FF0000' || env.OVERALL_STATUS == 'PASSED' && '00FF00' || 'FFA500' }}
+          raw: >-
+            {
+              "type": "message",
+              "attachments": [
+                {
+                  "contentType": "application/vnd.microsoft.card.adaptive",
+                  "content": {
+                    "type": "AdaptiveCard",
+                    "version": "1.4",
+                    "body": [
+                      {
+                        "type": "Container",
+                        "style": "${{ env.STATUS_COLOR }}",
+                        "items": [
+                          {
+                            "type": "ColumnSet",
+                            "columns": [
+                              {
+                                "type": "Column",
+                                "width": "auto",
+                                "items": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "${{ env.STATUS_EMOJI }}",
+                                    "size": "large"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Column",
+                                "width": "stretch",
+                                "items": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "Virtual Lab Test Results - ${{ env.OVERALL_STATUS }}",
+                                    "weight": "bolder",
+                                    "size": "medium"
+                                  },
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "${{ inputs.test-type }} tests on ${{ inputs.env }} environment",
+                                    "size": "small",
+                                    "spacing": "none"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "items": [
+                          {
+                            "type": "FactSet",
+                            "facts": [
+                              {
+                                "title": "Environment:",
+                                "value": "${{ inputs.env }}"
+                              },
+                              {
+                                "title": "Test Suite:",
+                                "value": "${{ inputs.test-type }}"
+                              },
+                              {
+                                "title": "Browser:",
+                                "value": "${{ matrix.browser }}"
+                              },
+                              {
+                                "title": "Branch:",
+                                "value": "${{ github.ref_name }}"
+                              },
+                              {
+                                "title": "Commit:",
+                                "value": "${{ env.COMMIT_SHA }} - ${{ env.COMMIT_MESSAGE }}"
+                              },
+                              {
+                                "title": "Duration:",
+                                "value": "${{ env.TEST_DURATION }}"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Container",
+                        "style": "emphasis",
+                        "items": [
+                          {
+                            "type": "TextBlock",
+                            "text": "📊 Test Summary",
+                            "weight": "bolder",
+                            "size": "medium"
+                          },
+                          {
+                            "type": "ColumnSet",
+                            "columns": [
+                              {
+                                "type": "Column",
+                                "width": "stretch",
+                                "items": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "**Total:** ${{ env.TOTAL_TESTS }}",
+                                    "wrap": true
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Column",
+                                "width": "stretch",
+                                "items": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "**✅ Passed:** ${{ env.PASSED_TESTS }}",
+                                    "wrap": true,
+                                    "color": "good"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Column",
+                                "width": "stretch",
+                                "items": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "**❌ Failed:** ${{ env.FAILED_TESTS }}",
+                                    "wrap": true,
+                                    "color": "${{ env.FAILED_TESTS != '0' && 'attention' || 'default' }}"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Column",
+                                "width": "stretch",
+                                "items": [
+                                  {
+                                    "type": "TextBlock",
+                                    "text": "**⏭️ Skipped:** ${{ env.SKIPPED_TESTS }}",
+                                    "wrap": true
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }${{ env.FAILED_TESTS != '0' && ',' || '' }}
+                      ${{ env.FAILED_TESTS != '0' && format('{
+                        "type": "Container",
+                        "style": "attention",
+                        "items": [
+                          {
+                            "type": "TextBlock",
+                            "text": "🚨 Failed Tests",
+                            "weight": "bolder",
+                            "color": "attention"
+                          },
+                          {
+                            "type": "TextBlock",
+                            "text": "{0}",
+                            "wrap": true,
+                            "size": "small"
+                          }
+                        ]
+                      }', env.FAILED_TEST_LIST) || '' }}
+                    ],
+                    "actions": [
+                      {
+                        "type": "Action.OpenUrl",
+                        "title": "🔍 View Workflow Run",
+                        "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                      },
+                      {
+                        "type": "Action.OpenUrl",
+                        "title": "📋 View Test Plan",
+                        "url": "https://github.com/${{ github.repository }}/blob/main/Virtual_Lab_Test_Plan.xlsx"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
