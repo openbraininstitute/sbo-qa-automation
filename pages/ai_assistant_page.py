@@ -68,121 +68,65 @@ class AIAssistantPage(ProjectHome):
         """Find and return list of suggested questions."""
         self.logger.info("Looking for suggestive questions...")
         
-        # Wait a bit for the AI panel to fully load
-        time.sleep(5)
+        # Wait for the AI panel to fully load and questions to appear
+        time.sleep(8)
         
         selectors = [
+            AIAssistantLocators.SUGGESTED_QUESTIONS_ALT,  # This one found 3 elements in the logs
             AIAssistantLocators.SUGGESTED_QUESTIONS,
-            AIAssistantLocators.SUGGESTED_QUESTIONS_ALT,
             AIAssistantLocators.SUGGESTED_QUESTIONS_FALLBACK
         ]
         
-        for selector in selectors:
-            try:
-                elements = self.browser.find_elements(*selector)
-                self.logger.info(f"Found {len(elements)} total elements with selector: {selector}")
-                
-                if elements:
-                    # Log all found elements for debugging
-                    for i, elem in enumerate(elements):
-                        try:
-                            if elem.is_displayed():
-                                text = elem.get_attribute("textContent") or ""
-                                self.logger.info(f"Element {i+1}: '{text.strip()[:100]}...'")
-                        except:
-                            pass
-                    
-                    # Filter elements to only include those that look like suggested questions
-                    valid_questions = []
-                    for elem in elements:
-                        if elem.is_displayed():
-                            text = elem.get_attribute("textContent") or ""
-                            # Check if it looks like a suggested question
-                            is_valid = self._is_valid_suggested_question(text, elem)
-                            self.logger.info(f"Text: '{text.strip()[:50]}...' - Valid: {is_valid}")
-                            if is_valid:
-                                valid_questions.append(elem)
-                    
-                    if valid_questions:
-                        self.logger.info(f"Found {len(valid_questions)} suggested questions with selector: {selector}")
-                        # Log the text of found questions for debugging
-                        for i, q in enumerate(valid_questions[:3]):  # Log first 3
-                            try:
-                                q_text = q.get_attribute("textContent") or ""
-                                self.logger.info(f"Question {i+1}: '{q_text.strip()[:50]}...'")
-                            except:
-                                pass
-                        return valid_questions
-                    else:
-                        self.logger.info(f"No valid questions found after filtering with selector: {selector}")
-            except Exception as e:
-                self.logger.info(f"Error with selector {selector}: {e}")
-                continue
-        
-        # Fallback: try to find any buttons in the AI panel area
-        self.logger.info("Trying fallback approach - looking for any buttons in AI panel area...")
-        try:
-            # Look for any buttons that might be suggested questions
-            all_buttons = self.browser.find_elements(By.TAG_NAME, "button")
-            self.logger.info(f"Found {len(all_buttons)} total buttons on page")
+        # Try multiple times with increasing waits to handle dynamic loading
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            self.logger.info(f"Attempt {attempt + 1}/{max_attempts} to find suggested questions")
             
-            potential_questions = []
-            for i, button in enumerate(all_buttons):
+            for selector in selectors:
                 try:
-                    if button.is_displayed():
-                        text = button.get_attribute("textContent") or ""
-                        if len(text.strip()) > 10:  # Only consider buttons with meaningful text
-                            self.logger.info(f"Button {i+1}: '{text.strip()[:100]}...'")
-                            # Use more lenient validation for fallback
-                            if self._is_potential_question(text):
-                                potential_questions.append(button)
-                                self.logger.info(f"  -> Potential question: '{text.strip()[:50]}...'")
-                except:
+                    elements = self.browser.find_elements(*selector)
+                    self.logger.info(f"Found {len(elements)} total elements with selector: {selector}")
+                    
+                    if elements:
+                        # Filter to only visible elements with meaningful text
+                        visible_questions = []
+                        for i, elem in enumerate(elements):
+                            try:
+                                if elem.is_displayed():
+                                    text = elem.get_attribute("textContent") or ""
+                                    text = text.strip()
+                                    self.logger.info(f"Element {i+1}: '{text[:100]}...'")
+                                    
+                                    # Simple validation: just check if it has meaningful text
+                                    if len(text) > 15:  # Reasonable length for a suggestion
+                                        visible_questions.append(elem)
+                                        self.logger.info(f"  -> Added as valid question (length: {len(text)})")
+                            except Exception as e:
+                                self.logger.info(f"  -> Skipped element {i+1}: {e}")
+                        
+                        if visible_questions:
+                            self.logger.info(f"Found {len(visible_questions)} valid suggested questions")
+                            # Log the questions for debugging
+                            for i, q in enumerate(visible_questions):
+                                try:
+                                    q_text = q.get_attribute("textContent") or ""
+                                    self.logger.info(f"Question {i+1}: '{q_text.strip()[:50]}...'")
+                                except:
+                                    pass
+                            return visible_questions
+                        else:
+                            self.logger.info("No visible questions with meaningful text found")
+                            
+                except Exception as e:
+                    self.logger.info(f"Error with selector {selector}: {e}")
                     continue
             
-            if potential_questions:
-                self.logger.info(f"Found {len(potential_questions)} potential questions via fallback")
-                return potential_questions[:3]  # Return first 3 potential questions
-                
-        except Exception as e:
-            self.logger.info(f"Fallback approach failed: {e}")
+            # If no questions found, wait a bit more and try again
+            if attempt < max_attempts - 1:
+                self.logger.info(f"No questions found on attempt {attempt + 1}, waiting 5 more seconds...")
+                time.sleep(5)
         
         raise NoSuchElementException("No suggested questions found")
-    
-    def _is_valid_suggested_question(self, text, element):
-        """Check if an element looks like a valid suggested question."""
-        if not text or len(text.strip()) < 5:  # Too short to be a question
-            return False
-        
-        text_lower = text.lower().strip()
-        
-        # Skip common UI buttons that are not questions
-        skip_keywords = [
-            'cancel', 'stop', 'clear', 'reset', 'new chat', 'history', 
-            'edit', 'delete', 'save', 'close', 'minimize', 'maximize',
-            'send', 'submit', 'ok', 'yes', 'no'
-        ]
-        
-        if any(keyword in text_lower for keyword in skip_keywords):
-            return False
-        
-        # Accept any text that's reasonably long (likely a suggested question)
-        if len(text.strip()) > 30:  # Longer text is likely a suggested question
-            return True
-        
-        # Check for question indicators
-        question_indicators = [
-            '?',  # Contains question mark
-            'what', 'how', 'why', 'when', 'where', 'which', 'who',  # Question words
-            'can you', 'could you', 'would you', 'do you', 'are you',  # Question phrases
-            'tell me', 'show me', 'explain', 'describe', 'help', 'find',  # Request phrases
-            'visualize', 'display', 'list', 'compare', 'analyze'  # Action words
-        ]
-        
-        if any(indicator in text_lower for indicator in question_indicators):
-            return True
-        
-        return False
     
     def click_suggested_question(self, question_element, question_text=""):
         """Click on a suggested question with stale element handling."""
@@ -558,36 +502,3 @@ class AIAssistantPage(ProjectHome):
         """Helper method to get By.TAG_NAME tuple."""
         from selenium.webdriver.common.by import By
         return (By.TAG_NAME, tag_name)
-    
-    def _is_potential_question(self, text):
-        """More lenient check for potential questions (used in fallback)."""
-        if not text or len(text.strip()) < 10:
-            return False
-        
-        text_lower = text.lower().strip()
-        
-        # Skip obvious UI buttons
-        skip_keywords = [
-            'cancel', 'stop', 'clear', 'reset', 'new chat', 'history', 
-            'edit', 'delete', 'save', 'close', 'minimize', 'maximize',
-            'send', 'submit', 'ok', 'yes', 'no', 'login', 'logout'
-        ]
-        
-        if any(keyword in text_lower for keyword in skip_keywords):
-            return False
-        
-        # More lenient - accept longer text that could be questions
-        if len(text.strip()) > 20:  # Longer text is likely a suggested question
-            return True
-        
-        # Check for question indicators (more lenient)
-        question_indicators = [
-            '?', 'what', 'how', 'why', 'when', 'where', 'which', 'who',
-            'can', 'could', 'would', 'do', 'are', 'is', 'will',
-            'tell', 'show', 'explain', 'describe', 'help', 'find'
-        ]
-        
-        if any(indicator in text_lower for indicator in question_indicators):
-            return True
-        
-        return False

@@ -115,6 +115,9 @@ jobs:
           elif [ "${{ inputs.test-type }}" = "performance" ]; then
             TEST_FILES="tests/test_performance_example.py"
             echo "Running performance tests"
+          elif [ "${{ inputs.test-type }}" = "ai-assistant" ]; then
+            TEST_FILES="tests/test_ai_assistant_workflow.py"
+            echo "Running AI assistant tests only"
           else
             TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py"
             echo "Running full test suite"
@@ -205,13 +208,125 @@ jobs:
           path: failures_${{ inputs.env }}_${{ matrix.browser }}.md
           if-no-files-found: warn
 
-      # MS Teams notification - only for scheduled test runs (daily/weekly), not on git push
-      - name: MS Teams Notification
+      # Parse test results and create Teams notification
+      - name: Parse Test Results and Create Teams Notification
+        if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
+        run: |
+          echo "Parsing test results for Teams notification..."
+          
+          # Initialize variables
+          TOTAL_TESTS=0
+          PASSED_TESTS=0
+          FAILED_TESTS=0
+          SKIPPED_TESTS=0
+          FAILED_TEST_LIST=""
+          TEST_DURATION="Unknown"
+          
+          # Parse pytest output if available
+          if [ -f test_output.log ]; then
+            echo "Found test output log, parsing results..."
+            
+            # Extract test summary line (e.g., "= 5 failed, 10 passed, 2 skipped in 45.67s =")
+            SUMMARY_LINE=$(grep -E "=.*failed.*passed.*in.*s.*=" test_output.log | tail -1)
+            
+            if [ -n "$SUMMARY_LINE" ]; then
+              echo "Summary line found: $SUMMARY_LINE"
+              
+              # Extract numbers using sed/grep
+              FAILED_TESTS=$(echo "$SUMMARY_LINE" | sed -n 's/.*= \([0-9]*\) failed.*/\1/p')
+              PASSED_TESTS=$(echo "$SUMMARY_LINE" | sed -n 's/.* \([0-9]*\) passed.*/\1/p')
+              SKIPPED_TESTS=$(echo "$SUMMARY_LINE" | sed -n 's/.* \([0-9]*\) skipped.*/\1/p')
+              TEST_DURATION=$(echo "$SUMMARY_LINE" | sed -n 's/.* in \([0-9]*\.[0-9]*s\).*/\1/p')
+              
+              # Handle cases where some numbers might be missing
+              FAILED_TESTS=${FAILED_TESTS:-0}
+              PASSED_TESTS=${PASSED_TESTS:-0}
+              SKIPPED_TESTS=${SKIPPED_TESTS:-0}
+              
+              TOTAL_TESTS=$((FAILED_TESTS + PASSED_TESTS + SKIPPED_TESTS))
+            else
+              # Try alternative parsing for different pytest output formats
+              FAILED_TESTS=$(grep -o "[0-9]* failed" test_output.log | head -1 | grep -o "[0-9]*" || echo "0")
+              PASSED_TESTS=$(grep -o "[0-9]* passed" test_output.log | head -1 | grep -o "[0-9]*" || echo "0")
+              SKIPPED_TESTS=$(grep -o "[0-9]* skipped" test_output.log | head -1 | grep -o "[0-9]*" || echo "0")
+              TEST_DURATION=$(grep -o "in [0-9]*\.[0-9]*s" test_output.log | head -1 | sed 's/in //' || echo "Unknown")
+              TOTAL_TESTS=$((FAILED_TESTS + PASSED_TESTS + SKIPPED_TESTS))
+            fi
+            
+            # Extract failed test names (limit to first 3 for readability)
+            FAILED_TEST_LIST=$(grep -E "^FAILED tests/" test_output.log | head -3 | sed 's/FAILED tests\///' | sed 's/::.*$//' | tr '\n' ', ' | sed 's/, $//')
+          fi
+          
+          # Determine overall status
+          if [ "$FAILED_TESTS" -gt 0 ]; then
+            OVERALL_STATUS="FAILED"
+            STATUS_COLOR="attention"
+            STATUS_EMOJI="❌"
+          elif [ "$TOTAL_TESTS" -gt 0 ]; then
+            OVERALL_STATUS="PASSED"
+            STATUS_COLOR="good"
+            STATUS_EMOJI="✅"
+          else
+            OVERALL_STATUS="NO_TESTS"
+            STATUS_COLOR="warning"
+            STATUS_EMOJI="⚠️"
+          fi
+          
+          # Get commit info
+          COMMIT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
+          COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s" 2>/dev/null || echo "Unknown commit")
+          
+          # Create environment variables for Teams notification
+          echo "TOTAL_TESTS=$TOTAL_TESTS" >> $GITHUB_ENV
+          echo "PASSED_TESTS=$PASSED_TESTS" >> $GITHUB_ENV
+          echo "FAILED_TESTS=$FAILED_TESTS" >> $GITHUB_ENV
+          echo "SKIPPED_TESTS=$SKIPPED_TESTS" >> $GITHUB_ENV
+          echo "FAILED_TEST_LIST=$FAILED_TEST_LIST" >> $GITHUB_ENV
+          echo "TEST_DURATION=$TEST_DURATION" >> $GITHUB_ENV
+          echo "OVERALL_STATUS=$OVERALL_STATUS" >> $GITHUB_ENV
+          echo "STATUS_COLOR=$STATUS_COLOR" >> $GITHUB_ENV
+          echo "STATUS_EMOJI=$STATUS_EMOJI" >> $GITHUB_ENV
+          echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          
+          # Debug output
+          echo "Test Summary:"
+          echo "  Total: $TOTAL_TESTS"
+          echo "  Passed: $PASSED_TESTS"
+          echo "  Failed: $FAILED_TESTS"
+          echo "  Skipped: $SKIPPED_TESTS"
+          echo "  Duration: $TEST_DURATION"
+          echo "  Status: $OVERALL_STATUS"
+          echo "  Failed Tests: $FAILED_TEST_LIST"
+          
+      # Send enhanced MS Teams notification with proper card format
+      - name: Send Teams Notification
         uses: skitionek/notify-microsoft-teams@v1.0.9
-        if: failure() && github.event_name == 'schedule'
+        if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
         with:
           webhook_url: ${{ secrets.MS_TEAMS_NEW_WEBHOOK_URI }}
-          job: ${{ toJson(job) }}
-          steps: ${{ toJson(steps) }}
-          raw: >-
-            {"type": "message","attachments": [{"contentType": "application/vnd.microsoft.card.adaptive","content": {"type": "AdaptiveCard","msteams": {"width": "Full"},"body": [{"type": "Container","items": [{"type": "RichTextBlock","inlines": [{"type": "TextRun","text": "Attention! Some UI tests failed, check the workflow for details.","color": "attention","size": "medium","weight": "bolder"}]}]}],"actions": [{"type": "Action.OpenUrl","title": "View Workflow Run","url": "${{ env.RUN_URL }}"}]}}]}
+          title: "${{ env.STATUS_EMOJI }} Virtual Lab Test Results - ${{ env.OVERALL_STATUS }}"
+          summary: "${{ inputs.test-type }} tests on ${{ inputs.env }} environment"
+          text: |
+            **📊 Test Summary**
+            - **Total Tests:** ${{ env.TOTAL_TESTS }}
+            - **✅ Passed:** ${{ env.PASSED_TESTS }}
+            - **❌ Failed:** ${{ env.FAILED_TESTS }}
+            - **⏭️ Skipped:** ${{ env.SKIPPED_TESTS }}
+            - **⏱️ Duration:** ${{ env.TEST_DURATION }}
+            
+            **📋 Environment Details**
+            - **Environment:** ${{ inputs.env }}
+            - **Test Suite:** ${{ inputs.test-type }}
+            - **Browser:** ${{ matrix.browser }}
+            - **Branch:** ${{ github.ref_name }}
+            - **Commit:** ${{ env.COMMIT_SHA }} - ${{ env.COMMIT_MESSAGE }}
+            
+            ${{ env.FAILED_TESTS != '0' && format('**🚨 Failed Tests:** {0}', env.FAILED_TEST_LIST) || '' }}
+            
+            **🔗 Quick Links**
+            - [🔍 View Workflow Run](${{ env.RUN_URL }})
+            - [📊 Download HTML Report](${{ env.RUN_URL }})
+            ${{ env.FAILED_TESTS != '0' && format('- [🖼️ View Screenshots]({0})', env.RUN_URL) || '' }}
+            - [📋 View Test Plan](https://github.com/${{ github.repository }}/blob/main/Virtual_Lab_Test_Plan.xlsx)
+          theme_color: ${{ env.OVERALL_STATUS == 'FAILED' && 'FF0000' || env.OVERALL_STATUS == 'PASSED' && '00FF00' || 'FFA500' }}
