@@ -31,6 +31,9 @@ smoke:
             tests/test_explore_emodel.py \
 			tests/test_ai_assistant_workflow.py \
 			tests/test_build_single_neuron.py \
+			tests/test_digital_brain_story.py \
+			tests/test_team.py \
+			tests/test_contact.py \
             -sv \
             --html=report.html --self-contained-html"
 
@@ -46,6 +49,9 @@ smoke-staging:
             tests/test_explore_emodel.py \
 			tests/test_ai_assistant_workflow.py \
 			tests/test_build_single_neuron.py \
+			tests/test_digital_brain_story.py \
+			tests/test_team.py \
+			tests/test_contact.py \
             --html=report.html --self-contained-html"
 
 # New CI/CD stability tests
