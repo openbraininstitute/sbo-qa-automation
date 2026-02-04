@@ -16,16 +16,15 @@ on:
   push:
     branches:
       - main
-      - v2/login-remote-issue  # Fixed: removed leading slash
+      - v2/login-remote-issue
       - feature/**
-      - fix/**  # Added: catch all fix branches
-      - v2/**  # Added: catch all v2 branches
+      - fix/** 
   pull_request:
     branches:
       - main
       - test-branch
   schedule:
-    - cron: "0 6 * * *"  # Daily at 6:00 AM UTC (8:00 AM CEST/7:00 AM CET Zurich time)
+    - cron: "0 7 * * *"  # Daily at 7:00 AM UTC (8:00 AM CET/9:00 AM CEST Zurich time)
     - cron: "0 2 * * 1"  # Weekly on Monday at 2:00 AM UTC for performance tests
 
 jobs:
