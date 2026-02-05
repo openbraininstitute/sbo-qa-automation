@@ -110,7 +110,7 @@ jobs:
             TEST_FILES="tests/test_ci_cd_stability.py"
             echo "Running CI/CD stability tests only"
           elif [ "${{ inputs.test-type }}" = "smoke" ]; then
-            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py"
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py tests/test_digital_brain_story.py tests/test_team.py tests/test_contact.py"
             echo "Running smoke tests"
           elif [ "${{ inputs.test-type }}" = "performance" ]; then
             TEST_FILES="tests/test_performance_example.py"
@@ -119,7 +119,7 @@ jobs:
             TEST_FILES="tests/test_ai_assistant_workflow.py"
             echo "Running AI assistant tests only"
           else
-            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py"
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py tests/test_digital_brain_story.py tests/test_team.py tests/test_contact.py"
             echo "Running full test suite"
           fi
           
@@ -185,19 +185,37 @@ jobs:
             performance_*.html
           if-no-files-found: warn
 
-      - name: Annotation - Test Summary - Failures
+      - name: Create and Upload Failure Summary
         if: failure()
         run: |
-          # Create a simple failure summary
-          FAILED_TESTS=""
-          if [ -f test_output.log ]; then
-            FAILED_TESTS=$(sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log | grep -E '^- tests/' | head -3 | tr '\n' ' ')
-          fi
+          # Create a failure summary file
+          FAILURE_FILE="failures_${{ inputs.env }}_${{ matrix.browser }}.md"
+          echo "# Test Failures Summary" > "$FAILURE_FILE"
+          echo "" >> "$FAILURE_FILE"
+          echo "**Environment:** ${{ inputs.env }}" >> "$FAILURE_FILE"
+          echo "**Browser:** ${{ matrix.browser }}" >> "$FAILURE_FILE"
+          echo "**Test Type:** ${{ inputs.test-type }}" >> "$FAILURE_FILE"
+          echo "**Run ID:** ${{ github.run_id }}" >> "$FAILURE_FILE"
+          echo "" >> "$FAILURE_FILE"
           
-          if [ -n "$FAILED_TESTS" ]; then
-            echo "::error title=Test Failures (${{ inputs.test-type }} suite)::$FAILED_TESTS"
+          if [ -f test_output.log ]; then
+            echo "## Failed Tests" >> "$FAILURE_FILE"
+            FAILED_TESTS=$(sed -n '/=* FAILURES =*/,/short test summary info/p' test_output.log | grep -E '^FAILED tests/' | head -5)
+            if [ -n "$FAILED_TESTS" ]; then
+              echo '```' >> "$FAILURE_FILE"
+              echo "$FAILED_TESTS" >> "$FAILURE_FILE"
+              echo '```' >> "$FAILURE_FILE"
+              
+              # Also create annotation
+              FAILED_LIST=$(echo "$FAILED_TESTS" | sed 's/FAILED tests\///' | sed 's/::.*$//' | tr '\n' ', ' | sed 's/, $//')
+              echo "::error title=Test Failures (${{ inputs.test-type }} suite)::$FAILED_LIST"
+            else
+              echo "No specific test failures found in logs" >> "$FAILURE_FILE"
+              echo "::error title=Test Failures (${{ inputs.test-type }} suite)::Some tests failed - check logs for details"
+            fi
           else
-            echo "::error title=Test Failures (${{ inputs.test-type }} suite)::Some tests failed - check logs for details"
+            echo "No test output log found" >> "$FAILURE_FILE"
+            echo "::error title=Test Failures (${{ inputs.test-type }} suite)::Tests failed but no output log available"
           fi
 
       - name: Upload Failure Summary
@@ -453,10 +471,11 @@ jobs:
                             ]
                           }
                         ]
-                      }${{ env.FAILED_TESTS != '0' && ',' || '' }}
-                      ${{ env.FAILED_TESTS != '0' && format('{
+                      },
+                      {
                         "type": "Container",
                         "style": "attention",
+                        "isVisible": "${{ env.FAILED_TESTS != '0' }}",
                         "items": [
                           {
                             "type": "TextBlock",
@@ -466,12 +485,12 @@ jobs:
                           },
                           {
                             "type": "TextBlock",
-                            "text": "{0}",
+                            "text": "${{ env.FAILED_TEST_LIST }}",
                             "wrap": true,
                             "size": "small"
                           }
                         ]
-                      }', env.FAILED_TEST_LIST) || '' }}
+                      }
                     ],
                     "actions": [
                       {
