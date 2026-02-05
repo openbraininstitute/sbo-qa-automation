@@ -40,7 +40,7 @@ jobs:
           python-version: '3.11'
 
   test-on-push-staging:
-    # Run smoke tests on any push (except main)
+    # Run smoke tests on any push to non-main branches
     if: github.event_name == 'push' && github.ref != 'refs/heads/main'
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
@@ -51,8 +51,8 @@ jobs:
     secrets: inherit
 
   test-on-push-production:
-    # Run production tests for ai-chat branch or main
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2/ai-chat')
+    # Run smoke tests on push to main branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
@@ -61,20 +61,9 @@ jobs:
       test-type: "smoke"
     secrets: inherit
 
-  test-on-push-performance:
-    # Run performance tests for ai-chat branch
-    if: github.event_name == 'push' && github.ref == 'refs/heads/v2/ai-chat'
-    needs: run-tests
-    uses: ./.github/workflows/reusable-workflow.yml
-    with:
-      env: "staging"
-      artifact-name: "push-performance-${{ github.ref_name }}"
-      test-type: "performance"
-    secrets: inherit
-
   test-production:
-    # Run full production tests on main branch, PRs, schedule, or manual trigger
-    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    # Run full production tests on PRs, schedule, or manual trigger (not on push)
+    if: github.event_name == 'pull_request' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     needs: run-tests
     uses: ./.github/workflows/reusable-workflow.yml
     with:
