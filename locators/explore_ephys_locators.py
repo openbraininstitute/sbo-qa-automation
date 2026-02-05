@@ -6,6 +6,23 @@ from selenium.webdriver.common.by import By
 
 
 class ExploreEphysLocators:
+    # Public/Project tab selector
+    PUBLIC_PROJECT_TAB_CONTAINER = (By.XPATH, "//div[@role='tablist' and @aria-orientation='horizontal']")
+    PUBLIC_TAB = (By.XPATH, "//button[@role='tab' and text()='Public']")
+    PROJECT_TAB = (By.XPATH, "//button[@role='tab' and text()='Project']")
+    
+    # Search functionality (updated)
+    SEARCH_BUTTON = (By.XPATH, "//button[@aria-label='Open search']")
+    SEARCH_INPUT = (By.XPATH, "//input[@placeholder='Search for entities...']")
+    SEARCH_CLEAR_BTN = (By.XPATH, "//button[@aria-label='Clear search']")
+    
+    # Filter functionality (updated)
+    FILTER_BUTTON = (By.XPATH, "//button[@aria-label='listing-view-filter-button']")
+    FILTER_COUNT = (By.XPATH, "//span[@class='bg-primary-8 rounded-sm px-2.5 py-1 text-sm font-bold text-white']")
+    
+    # Thumbnails
+    THUMBNAILS = (By.XPATH, "//img[@alt='img preview']")
+    
     # Data type selector tabs (Experimental, Model, Simulations)
     DATA_TYPE_SELECTOR = (By.CSS_SELECTOR, "#data-type-selector")
     EXPERIMENTAL_TAB = (By.CSS_SELECTOR, "#radix-_r_2_-trigger-experimental")
@@ -92,7 +109,7 @@ class ExploreEphysLocators:
     FILTER_ETYPE_INPUT_TYPE_AREA = (By.XPATH, "//div[@class='ant-select-selection-search']")
     FILTER_ETYPE_SEARCH = (By.XPATH, "//div[@class='ant-select-selection-overflow']")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
-    LV_GRID_VIEW = (By.XPATH, "//div[@data-testid='explore-section-listing-view']")
+    LV_GRID_VIEW = (By.CSS_SELECTOR, "#base-table-wrapper")
     LV_BRAIN_REGION = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Brain region']")
     LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
     LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-type']")
@@ -108,7 +125,7 @@ class ExploreEphysLocators:
     LV_THUMBNAIL = (By.XPATH, "//img[@alt='img preview']")
     LV_TOTAL_RESULTS = (By.XPATH, "//div[@class='w-max']")
     SEARCHED_SPECIES = (By.XPATH, "//td[@title='Rattus norvegicus' and contains(text(),'Rattus norvegicus')][1]")
-    SEARCH_INPUT_FIELD = (By.XPATH, "//input[@placeholder='Search for resources...']")
+    SEARCH_INPUT_FIELD = (By.XPATH, "button[aria-label='Open search']")
     TABLE = (By.XPATH, "//tbody[@class='ant-table-tbody']")
     TABLE_CELLS = (By.CSS_SELECTOR, "tbody.ant-table-tbody td.ant-table-cell.text-primary-7.cursor-pointer.ant-table-cell-ellipsis")
     TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")

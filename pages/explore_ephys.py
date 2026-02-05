@@ -6,6 +6,7 @@ import time
 from selenium.common import ElementNotVisibleException, TimeoutException, StaleElementReferenceException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 from pages.explore_page import ExplorePage
 from locators.explore_ephys_locators import ExploreEphysLocators
@@ -28,12 +29,291 @@ class ExploreElectrophysiologyPage(ExplorePage):
                 self.go_to_page(path)
                 self.wait_for_page_ready(timeout=60)
                 self.logger.info(f"Successfully navigated to explore ephys page: {self.browser.current_url}")
+                return self.browser.current_url  # Return immediately on success
             except TimeoutException:
                 self.logger.warning(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
                 time.sleep(delay)
                 if attempt == retries - 1:
                     raise RuntimeError("The Explore Electrophysiology page did not load within 60 seconds")
+        
+        # This should never be reached due to the return above, but just in case
         return self.browser.current_url
+
+    # Public/Project tab methods (new functionality)
+    def find_public_project_tab_container(self, timeout=10):
+        """Find the Public/Project tab container"""
+        return self.find_element(ExploreEphysLocators.PUBLIC_PROJECT_TAB_CONTAINER, timeout=timeout)
+
+    def find_public_tab(self, timeout=10):
+        """Find the Public tab"""
+        return self.find_element(ExploreEphysLocators.PUBLIC_TAB, timeout=timeout)
+
+    def find_project_tab(self, timeout=10):
+        """Find the Project tab"""
+        return self.find_element(ExploreEphysLocators.PROJECT_TAB, timeout=timeout)
+
+    def verify_public_tab_selected(self):
+        """Verify that the Public tab is selected"""
+        public_tab = self.find_public_tab()
+        is_selected = public_tab.get_attribute('aria-selected') == 'true'
+        assert is_selected, "Public tab should be selected by default"
+        self.logger.info("✅ Public tab is selected")
+        return is_selected
+
+    def click_public_tab(self):
+        """Click the Public tab"""
+        public_tab = self.find_public_tab()
+        public_tab.click()
+        self.logger.info("Clicked Public tab")
+        return True
+
+    def click_project_tab(self):
+        """Click the Project tab"""
+        project_tab = self.find_project_tab()
+        project_tab.click()
+        self.logger.info("Clicked Project tab")
+        return True
+
+    # Enhanced search functionality
+    def perform_name_search(self, search_term):
+        """Perform a search by name"""
+        search_button = self.find_search_button()
+        search_button.click()
+        self.logger.info("Clicked search button")
+        
+        # Wait for search input to appear
+        time.sleep(1)
+        
+        search_input = self.find_search_input()
+        search_input.clear()
+        search_input.send_keys(search_term)
+        self.logger.info(f"Entered search term: {search_term}")
+        
+        # Press Enter or wait for search results
+        search_input.send_keys("\n")
+        time.sleep(2)  # Wait for search results to load
+        return True
+
+    def clear_search(self):
+        """Clear the search input"""
+        try:
+            clear_button = self.find_element(ExploreEphysLocators.SEARCH_CLEAR_BTN, timeout=5)
+            clear_button.click()
+            self.logger.info("Cleared search")
+            return True
+        except TimeoutException:
+            self.logger.warning("Clear search button not found")
+            return False
+
+    # Thumbnail verification
+    def find_thumbnails(self):
+        """Find all thumbnails"""
+        return self.find_all_elements(ExploreEphysLocators.THUMBNAILS)
+
+    def verify_thumbnails_present(self):
+        """Verify that thumbnails are present and displayed"""
+        thumbnails = self.find_thumbnails()
+        displayed_thumbnails = []
+        failed_thumbnails = []
+        
+        for i, thumbnail in enumerate(thumbnails):
+            try:
+                if thumbnail.is_displayed():
+                    displayed_thumbnails.append(i)
+                    self.logger.info(f"✅ Thumbnail {i+1} is displayed")
+                else:
+                    failed_thumbnails.append(i)
+                    self.logger.warning(f"❌ Thumbnail {i+1} is not displayed")
+            except Exception as e:
+                failed_thumbnails.append(i)
+                self.logger.warning(f"❌ Thumbnail {i+1} error: {e}")
+        
+        self.logger.info(f"Found {len(displayed_thumbnails)} displayed thumbnails out of {len(thumbnails)} total")
+        return displayed_thumbnails, failed_thumbnails
+
+    def verify_search_results_brain_region(self, expected_brain_region):
+        """Verify that search results contain the expected brain region"""
+        table_rows = self.get_table_rows()
+        if not table_rows:
+            self.logger.warning("No table rows found after search")
+            return False
+        
+        matching_rows = 0
+        total_checked = 0
+        
+        for i, row in enumerate(table_rows[:10]):  # Check first 10 rows
+            try:
+                # Look for brain region column (typically 2nd column after Preview)
+                # Try multiple approaches to find the brain region cell
+                brain_region_cell = None
+                
+                # Approach 1: Look for cell by position (brain region is usually 2nd column)
+                try:
+                    brain_region_cell = row.find_element(By.XPATH, ".//td[2]")
+                except:
+                    pass
+                
+                # Approach 2: Look for cell containing brain region data
+                if not brain_region_cell:
+                    try:
+                        brain_region_cell = row.find_element(By.XPATH, ".//td[contains(@class, 'brain') or contains(text(), 'CA') or contains(text(), 'Field')]")
+                    except:
+                        pass
+                
+                # Approach 3: Look for any cell that might contain the brain region
+                if not brain_region_cell:
+                    try:
+                        cells = row.find_elements(By.XPATH, ".//td")
+                        for cell in cells:
+                            if expected_brain_region.lower() in cell.text.lower():
+                                brain_region_cell = cell
+                                break
+                    except:
+                        pass
+                
+                if brain_region_cell:
+                    cell_text = brain_region_cell.text.strip()
+                    total_checked += 1
+                    
+                    if expected_brain_region.lower() in cell_text.lower():
+                        matching_rows += 1
+                        self.logger.info(f"✅ Row {i+1}: Found '{expected_brain_region}' in '{cell_text}'")
+                    else:
+                        self.logger.debug(f"Row {i+1}: Brain region '{cell_text}' does not match '{expected_brain_region}'")
+                else:
+                    self.logger.debug(f"Row {i+1}: Could not find brain region cell")
+                    
+            except Exception as e:
+                self.logger.debug(f"Error checking row {i+1}: {e}")
+                continue
+        
+        if matching_rows > 0:
+            self.logger.info(f"✅ Search verification: Found {matching_rows} out of {total_checked} rows containing '{expected_brain_region}'")
+            return True
+        else:
+            self.logger.warning(f"❌ Search verification: No rows found containing '{expected_brain_region}' out of {total_checked} checked")
+            return False
+
+    def get_search_results_count(self):
+        """Get the number of search results"""
+        try:
+            # Look for results count indicator
+            results_count_element = self.find_element((By.XPATH, "//div[contains(text(), 'results') or contains(text(), 'found')]"), timeout=5)
+            return results_count_element.text
+        except TimeoutException:
+            # Fallback: count table rows
+            rows = self.get_table_rows()
+            return f"{len(rows)} rows found"
+
+    # Enhanced filter functionality
+    def apply_species_filter(self, species_name):
+        """Apply filter by species"""
+        # Click filter button
+        filter_button = self.find_filter_button()
+        filter_button.click()
+        self.logger.info("Opened filter panel")
+        time.sleep(1)
+        
+        # Look for species filter option
+        try:
+            species_filter = self.find_element((By.XPATH, "//span[text()='Species']"), timeout=10)
+            species_filter.click()
+            self.logger.info("Clicked Species filter")
+            time.sleep(1)
+            
+            # Enter species name in search
+            species_search = self.find_element((By.XPATH, "//input[@placeholder='Search species...']"), timeout=5)
+            species_search.send_keys(species_name)
+            self.logger.info(f"Entered species: {species_name}")
+            time.sleep(1)
+            
+            # Select the species from dropdown
+            species_option = self.find_element((By.XPATH, f"//div[contains(text(), '{species_name}')]"), timeout=5)
+            species_option.click()
+            self.logger.info(f"Selected species: {species_name}")
+            
+            return True
+        except TimeoutException:
+            self.logger.warning("Species filter not found or not accessible")
+            return False
+
+    def apply_contributor_filter(self, contributor_name):
+        """Apply filter by contributor"""
+        try:
+            contributor_filter = self.find_element((By.XPATH, "//span[text()='Contributors']"), timeout=10)
+            contributor_filter.click()
+            self.logger.info("Clicked Contributors filter")
+            time.sleep(1)
+            
+            # Enter contributor name in search
+            contributor_search = self.find_element((By.XPATH, "//input[@placeholder='Search contributors...']"), timeout=5)
+            contributor_search.send_keys(contributor_name)
+            self.logger.info(f"Entered contributor: {contributor_name}")
+            time.sleep(1)
+            
+            # Select the contributor from dropdown
+            contributor_option = self.find_element((By.XPATH, f"//div[contains(text(), '{contributor_name}')]"), timeout=5)
+            contributor_option.click()
+            self.logger.info(f"Selected contributor: {contributor_name}")
+            
+            return True
+        except TimeoutException:
+            self.logger.warning("Contributor filter not found or not accessible")
+            return False
+
+    def apply_filters(self):
+        """Apply the selected filters"""
+        try:
+            apply_button = self.find_element((By.XPATH, "//button[text()='Apply']"), timeout=10)
+            apply_button.click()
+            self.logger.info("Applied filters")
+            time.sleep(2)  # Wait for results to load
+            return True
+        except TimeoutException:
+            self.logger.warning("Apply button not found")
+            return False
+
+    def close_filter_panel(self):
+        """Close the filter panel"""
+        try:
+            close_button = self.find_element((By.XPATH, "//button[@aria-label='Close']"), timeout=5)
+            close_button.click()
+            self.logger.info("Closed filter panel")
+            return True
+        except TimeoutException:
+            self.logger.warning("Close button not found")
+            return False
+
+    def verify_filtered_results(self, expected_value, column_type="species"):
+        """Verify that filtered results contain the expected value"""
+        table_rows = self.get_table_rows()
+        if not table_rows:
+            self.logger.warning("No table rows found")
+            return False
+        
+        found_matches = 0
+        for row in table_rows[:5]:  # Check first 5 rows
+            try:
+                if column_type == "species":
+                    # Look for species column data
+                    species_cell = row.find_element(By.XPATH, ".//td[contains(@class, 'species') or position()=5]")
+                    if expected_value.lower() in species_cell.text.lower():
+                        found_matches += 1
+                elif column_type == "contributor":
+                    # Look for contributor column data
+                    contributor_cell = row.find_element(By.XPATH, ".//td[contains(@class, 'contributor') or position()=6]")
+                    if expected_value.lower() in contributor_cell.text.lower():
+                        found_matches += 1
+            except Exception as e:
+                self.logger.debug(f"Could not check row for {column_type}: {e}")
+                continue
+        
+        if found_matches > 0:
+            self.logger.info(f"✅ Found {found_matches} matching results for {column_type}: {expected_value}")
+            return True
+        else:
+            self.logger.warning(f"❌ No matching results found for {column_type}: {expected_value}")
+            return False
 
     # Data type selector methods (new functionality)
     def find_data_type_selector(self, timeout=10):
