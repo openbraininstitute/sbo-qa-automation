@@ -392,7 +392,107 @@ class TestExploreEphys:
         else:
             logger.warning("⚠️ Subject section not found")
         
+        # Test Overview and Interactive Details tabs
+        logger.info("🔍 Testing Overview and Interactive Details tabs...")
+        
+        # Verify Overview tab is displayed and clickable
+        overview_tab_results = explore_ephys_page.verify_detail_view_tabs()
+        if overview_tab_results.get('overview', {}).get('active'):
+            logger.info("✅ Overview tab is active")
+        else:
+            logger.warning("⚠️ Overview tab is not active, clicking it...")
+            explore_ephys_page.click_overview_tab()
+            time.sleep(2)
+        
+        # Test Overview tab content
+        logger.info("🔍 Testing Overview tab plots...")
+        overview_plots = explore_ephys_page.find_overview_plots()
+        if overview_plots:
+            logger.info(f"✅ Found {len(overview_plots)} plots in Overview tab")
+            
+            # Verify plots are displayed
+            displayed_count = sum(1 for plot in overview_plots if plot.is_displayed())
+            logger.info(f"✅ {displayed_count}/{len(overview_plots)} plots are displayed")
+        else:
+            logger.warning("⚠️ No plots found in Overview tab")
+        
+        # Test plot interaction functionality
+        logger.info("🔍 Testing plot interaction controls...")
+        plot_interactions = explore_ephys_page.verify_plot_interactions()
+        
+        if plot_interactions.get('modebar_present'):
+            logger.info("✅ Plot modebar is present")
+            if plot_interactions.get('zoom_available'):
+                logger.info("✅ Zoom control available")
+            if plot_interactions.get('pan_available'):
+                logger.info("✅ Pan control available")
+            if plot_interactions.get('reset_available'):
+                logger.info("✅ Reset control available")
+            if plot_interactions.get('download_available'):
+                logger.info("✅ Download control available")
+        else:
+            logger.warning("⚠️ Plot modebar not found (may require hover)")
+        
+        # Switch to Interactive Details tab
+        logger.info("🔍 Switching to Interactive Details tab...")
+        explore_ephys_page.click_interactive_details_tab()
+        time.sleep(2)
+        
+        # Verify Interactive Details tab is now active
+        is_interactive_active = explore_ephys_page.is_interactive_details_tab_active()
+        if is_interactive_active:
+            logger.info("✅ Interactive Details tab is now active")
+        else:
+            logger.warning("⚠️ Interactive Details tab is not active")
+        
+        # Test Interactive Details content
+        logger.info("🔍 Testing Interactive Details plots...")
+        interactive_plots = explore_ephys_page.find_interactive_plots()
+        if interactive_plots:
+            logger.info(f"✅ Found {len(interactive_plots)} interactive plots")
+            
+            # Verify plots are displayed
+            displayed_count = sum(1 for plot in interactive_plots if plot.is_displayed())
+            logger.info(f"✅ {displayed_count}/{len(interactive_plots)} interactive plots are displayed")
+        else:
+            logger.warning("⚠️ No interactive plots found")
+        
+        # Verify interactive controls
+        logger.info("🔍 Testing interactive controls...")
+        controls = explore_ephys_page.verify_interactive_controls()
+        
+        if controls.get('stimulus_selector'):
+            logger.info("✅ Stimulus selector is present")
+            
+            # Test stimulus selector functionality
+            logger.info("🔍 Testing stimulus selector functionality...")
+            stimulus_changed = explore_ephys_page.test_stimulus_selector()
+            if stimulus_changed:
+                logger.info("✅ Stimulus selector is functional")
+            else:
+                logger.warning("⚠️ Could not test stimulus selector functionality")
+        else:
+            logger.warning("⚠️ Stimulus selector not found")
+        
+        if controls.get('repetition_selector'):
+            logger.info("✅ Repetition selector is present")
+        if controls.get('sweep_selector'):
+            logger.info("✅ Sweep selector is present")
+        
+        # Switch back to Overview tab
+        logger.info("🔍 Switching back to Overview tab...")
+        explore_ephys_page.click_overview_tab()
+        time.sleep(2)
+        
+        # Verify Overview tab is active again
+        is_overview_active = explore_ephys_page.is_overview_tab_active()
+        if is_overview_active:
+            logger.info("✅ Overview tab is active again - tab switching works")
+        else:
+            logger.warning("⚠️ Overview tab is not active after switching back")
+        
         logger.info("✅ All explore ephys page tests completed successfully")
+
 
 
 

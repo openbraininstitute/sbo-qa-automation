@@ -1046,3 +1046,201 @@ class ExploreElectrophysiologyPage(ExplorePage):
                 self.logger.debug(f"Subject {name} not found: {e}")
         
         return results
+
+    # Overview and Interactive Details tab methods
+    def find_overview_tab(self, timeout=10):
+        """Find the Overview tab button"""
+        return self.find_element(ExploreEphysLocators.DV_OVERVIEW_TAB_BUTTON, timeout=timeout)
+
+    def find_interactive_details_tab(self, timeout=10):
+        """Find the Interactive Details tab button"""
+        return self.find_element(ExploreEphysLocators.DV_INTERACTIVE_DETAILS_TAB_BUTTON, timeout=timeout)
+
+    def is_overview_tab_active(self):
+        """Check if Overview tab is active"""
+        try:
+            self.find_element(ExploreEphysLocators.DV_OVERVIEW_TAB_ACTIVE, timeout=5)
+            return True
+        except TimeoutException:
+            return False
+
+    def is_interactive_details_tab_active(self):
+        """Check if Interactive Details tab is active"""
+        try:
+            self.find_element(ExploreEphysLocators.DV_INTERACTIVE_DETAILS_TAB_ACTIVE, timeout=5)
+            return True
+        except TimeoutException:
+            return False
+
+    def click_overview_tab(self):
+        """Click the Overview tab"""
+        overview_tab = self.find_overview_tab()
+        
+        # Scroll into view
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", overview_tab)
+        time.sleep(0.5)
+        
+        # Click the tab
+        try:
+            overview_tab.click()
+        except Exception as e:
+            self.logger.warning(f"Regular click failed, using JavaScript click: {e}")
+            self.browser.execute_script("arguments[0].click();", overview_tab)
+        
+        self.logger.info("Clicked Overview tab")
+        time.sleep(1)
+        return True
+
+    def click_interactive_details_tab(self):
+        """Click the Interactive Details tab"""
+        interactive_tab = self.find_interactive_details_tab()
+        
+        # Scroll into view
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", interactive_tab)
+        time.sleep(0.5)
+        
+        # Click the tab
+        try:
+            interactive_tab.click()
+        except Exception as e:
+            self.logger.warning(f"Regular click failed, using JavaScript click: {e}")
+            self.browser.execute_script("arguments[0].click();", interactive_tab)
+        
+        self.logger.info("Clicked Interactive Details tab")
+        time.sleep(1)
+        return True
+
+    def find_overview_plots(self):
+        """Find all plots in Overview tab"""
+        try:
+            plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOTS)
+            if not plots:
+                # Fallback to plot images
+                plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOT_IMAGES)
+            return plots
+        except TimeoutException:
+            self.logger.warning("No overview plots found")
+            return []
+
+    def verify_plot_interactions(self):
+        """Verify plot interaction controls are available"""
+        results = {}
+        
+        try:
+            # Hover over a plot to make modebar appear
+            plots = self.find_overview_plots()
+            if plots:
+                first_plot = plots[0]
+                self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", first_plot)
+                time.sleep(0.5)
+                
+                # Move mouse to plot to trigger modebar
+                from selenium.webdriver.common.action_chains import ActionChains
+                actions = ActionChains(self.browser)
+                actions.move_to_element(first_plot).perform()
+                time.sleep(1)
+                
+                # Check for modebar
+                try:
+                    modebar = self.find_element(ExploreEphysLocators.DV_PLOT_MODEBAR, timeout=3)
+                    results['modebar_present'] = True
+                    
+                    # Check for specific controls
+                    controls = [
+                        ('zoom', ExploreEphysLocators.DV_PLOT_ZOOM_BUTTON),
+                        ('pan', ExploreEphysLocators.DV_PLOT_PAN_BUTTON),
+                        ('reset', ExploreEphysLocators.DV_PLOT_RESET_BUTTON),
+                        ('download', ExploreEphysLocators.DV_PLOT_DOWNLOAD_BUTTON)
+                    ]
+                    
+                    for control_name, locator in controls:
+                        try:
+                            self.find_element(locator, timeout=2)
+                            results[f'{control_name}_available'] = True
+                        except TimeoutException:
+                            results[f'{control_name}_available'] = False
+                
+                except TimeoutException:
+                    results['modebar_present'] = False
+            else:
+                results['no_plots'] = True
+        
+        except Exception as e:
+            results['error'] = str(e)
+            self.logger.debug(f"Error testing plot interactions: {e}")
+        
+        return results
+
+    def find_interactive_plots(self):
+        """Find all plots in Interactive Details tab"""
+        try:
+            plots = self.find_all_elements(ExploreEphysLocators.DV_INTERACTIVE_PLOTS)
+            return plots
+        except TimeoutException:
+            self.logger.warning("No interactive plots found")
+            return []
+
+    def verify_interactive_controls(self):
+        """Verify interactive controls are present"""
+        results = {}
+        
+        # Check for stimulus selector
+        try:
+            stimulus_selector = self.find_element(ExploreEphysLocators.DV_STIMULUS_SELECTOR, timeout=10)
+            results['stimulus_selector'] = stimulus_selector.is_displayed()
+        except TimeoutException:
+            results['stimulus_selector'] = False
+        
+        # Check for repetition label
+        try:
+            repetition_label = self.find_element(ExploreEphysLocators.DV_REPETITION_LABEL, timeout=5)
+            results['repetition_selector'] = repetition_label.is_displayed()
+        except TimeoutException:
+            results['repetition_selector'] = False
+        
+        # Check for sweep label
+        try:
+            sweep_label = self.find_element(ExploreEphysLocators.DV_SWEEP_LABEL, timeout=5)
+            results['sweep_selector'] = sweep_label.is_displayed()
+        except TimeoutException:
+            results['sweep_selector'] = False
+        
+        return results
+
+    def test_stimulus_selector(self):
+        """Test stimulus selector functionality"""
+        try:
+            # Click stimulus selector to open dropdown
+            stimulus_selector = self.find_element(ExploreEphysLocators.DV_STIMULUS_SELECTOR, timeout=10)
+            stimulus_selector.click()
+            self.logger.info("Clicked stimulus selector")
+            time.sleep(1)
+            
+            # Check if dropdown options appear
+            try:
+                dropdown_options = self.find_all_elements(ExploreEphysLocators.DV_STIMULUS_DROPDOWN)
+                if dropdown_options:
+                    self.logger.info(f"Found {len(dropdown_options)} stimulus options")
+                    
+                    # Try to select "All" option if available
+                    try:
+                        all_option = self.find_element(ExploreEphysLocators.DV_STIMULUS_ALL_OPTION, timeout=3)
+                        all_option.click()
+                        self.logger.info("Selected 'All' stimulus option")
+                        time.sleep(2)
+                        return True
+                    except TimeoutException:
+                        # Click first option if "All" not found
+                        if dropdown_options:
+                            dropdown_options[0].click()
+                            self.logger.info("Selected first stimulus option")
+                            time.sleep(2)
+                            return True
+                else:
+                    return False
+            except TimeoutException:
+                return False
+        
+        except Exception as e:
+            self.logger.debug(f"Error testing stimulus selector: {e}")
+            return False

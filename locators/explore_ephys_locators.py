@@ -154,7 +154,33 @@ class ExploreEphysLocators:
     DV_SUBJECT_AGE_PERIOD_LABEL = (By.XPATH, "//h2[text()='Subject']/following::div[@class='text-neutral-4 uppercase' and text()='Age period'][1]")
     DV_SUBJECT_AGE_PERIOD_VALUE = (By.XPATH, "//h2[text()='Subject']/following::div[@class='text-neutral-4 uppercase' and text()='Age period'][1]/following-sibling::div")
     
+    # Overview and Interactive Details tabs (in detail view)
+    DV_OVERVIEW_TAB_BUTTON = (By.XPATH, "//label[contains(@class, 'ant-radio-button-wrapper')]//span[contains(text(), 'Overview')]")
+    DV_INTERACTIVE_DETAILS_TAB_BUTTON = (By.XPATH, "//label[contains(@class, 'ant-radio-button-wrapper')]//span[contains(text(), 'Interactive Details')]")
+    DV_OVERVIEW_TAB_ACTIVE = (By.XPATH, "//label[contains(@class, 'ant-radio-button-wrapper-checked')]//span[contains(text(), 'Overview')]")
+    DV_INTERACTIVE_DETAILS_TAB_ACTIVE = (By.XPATH, "//label[contains(@class, 'ant-radio-button-wrapper-checked')]//span[contains(text(), 'Interactive Details')]")
+    
+    # Overview plots
+    DV_OVERVIEW_PLOTS = (By.XPATH, "//div[@class='plot-container plotly']")
+    DV_OVERVIEW_PLOT_IMAGES = (By.XPATH, "//div[@class='flex flex-col gap-10']//div[contains(@class, 'aspect-4/3')]")
+    
+    # Interactive Details plots and controls
+    DV_INTERACTIVE_PLOTS = (By.XPATH, "//div[@class='plot-container plotly']")
+    DV_STIMULUS_SELECTOR = (By.XPATH, "//div[@class='ant-select-selector']")
+    DV_STIMULUS_DROPDOWN = (By.XPATH, "//div[@class='ant-select-item-option-content']")
+    DV_STIMULUS_ALL_OPTION = (By.XPATH, "//div[@class='ant-select-item-option-content' and text()='All']")
+    DV_REPETITION_LABEL = (By.XPATH, "//label[text()='Repetition']")
+    DV_SWEEP_LABEL = (By.XPATH, "//span[text()='Sweep']")
+    
+    # Plot interaction controls (Plotly)
+    DV_PLOT_MODEBAR = (By.CSS_SELECTOR, ".modebar-container")
+    DV_PLOT_ZOOM_BUTTON = (By.CSS_SELECTOR, "[data-title='Zoom']")
+    DV_PLOT_PAN_BUTTON = (By.CSS_SELECTOR, "[data-title='Pan']")
+    DV_PLOT_RESET_BUTTON = (By.CSS_SELECTOR, "[data-title='Reset axes']")
+    DV_PLOT_DOWNLOAD_BUTTON = (By.CSS_SELECTOR, "[data-title='Download plot as a png']")
+    
     # Legacy Detail View locators (keeping for backward compatibility)
+
     DV_AGE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Age']")
     DV_BRAIN_REG_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Brain Region']")
     DV_BR_REG = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Brain Region']/following-sibling::div[@class='mt-2 break-words']")
