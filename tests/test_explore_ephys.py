@@ -83,11 +83,6 @@ class TestExploreEphys:
             assert header.is_displayed(), f"Column header {header} is not displayed."
             logger.info(f"Displayed column header text: {header.text.strip() if header.text else 'No text found'}")
 
-        # thumbnail_img = explore_ephys_page.verify_all_thumbnails_displayed()
-        # logger.info("Ephys thumbnail is displayed")
-
-        # NEW FUNCTIONALITY TESTS
-        
         # 1. Verify Public tab is selected
         try:
             explore_ephys_page.verify_public_tab_selected()
@@ -125,7 +120,6 @@ class TestExploreEphys:
         except Exception as e:
             logger.warning(f"⚠️ Search test failed: {e}")
 
-        # 3. Verify thumbnails are present
         try:
             logger.info("🖼️ Testing thumbnail presence...")
             displayed_thumbnails, failed_thumbnails = explore_ephys_page.verify_thumbnails_present()
@@ -136,11 +130,9 @@ class TestExploreEphys:
         except Exception as e:
             logger.warning(f"⚠️ Thumbnail verification failed: {e}")
 
-        # 4. Test filter functionality (species and contributor)
         try:
             logger.info("🔧 Testing filter functionality...")
             
-            # Open filter panel
             filter_button = explore_ephys_page.find_filter_button()
             explore_ephys_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", filter_button)
             time.sleep(1)
@@ -148,7 +140,6 @@ class TestExploreEphys:
             logger.info("Opened filter panel")
             time.sleep(2)
             
-            # Try to apply species filter (using a common species)
             species_applied = explore_ephys_page.apply_species_filter("Rattus norvegicus")
             if species_applied:
                 logger.info("✅ Species filter applied successfully")
@@ -180,8 +171,6 @@ class TestExploreEphys:
                 explore_ephys_page.close_filter_panel()
             except:
                 pass
-
-        # END NEW FUNCTIONALITY TESTS
 
         all_checkbox = explore_ephys_page.find_btn_all_checkboxes()
         time.sleep(2)

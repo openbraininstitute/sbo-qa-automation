@@ -29,7 +29,6 @@ class ExploreEphysLocators:
     SINGLE_CELL_ELECTROPHYSIOLOGY_BTN = (By.CSS_SELECTOR, "#counter-electrical_cell_recording")
     SINGLE_CELL_ELECTROPHYSIOLOGY_TEXT = (By.CSS_SELECTOR, "a[id='counter-electrical_cell_recording'] div["
                                                            "class='font-bold text-current']")
-    
     # Data table with filters
     DATA_TABLE_WITH_FILTERS = (By.CSS_SELECTOR, "#data-table-with-filters")
     
@@ -59,7 +58,6 @@ class ExploreEphysLocators:
     TABLE_BRAIN_REGION_CELL_PARTIAL_TEMPLATE = ("//td[@class='ant-table-cell text-primary-7 cursor-pointer "
                                                 "before:!content-none ant-table-cell-ellipsis' and contains(@title, "
                                                 "'{}')]")
-    
     # Filter panel locators
     FILTER_SPECIES_BUTTON = (By.XPATH, "//span[text()='Species']")
     FILTER_SPECIES_TEXT = (By.XPATH, "//span[text()='Rattus norvegicus']")
@@ -96,8 +94,6 @@ class ExploreEphysLocators:
     BRAIN_REGION_PANEL_OPEN_BTN = (By.CSS_SELECTOR, "span[class='anticon anticon-plus']")
     CHECKBOXES = (By.XPATH, "//input[@class='ant-checkbox-input' and @type='checkbox']")
     DOWNLOAD_RESOURCES = (By.XPATH, "//button[@type='button' and @aria-label='download-resources-button']")
-    
-    # Detail View locators (new structure)
     # Breadcrumbs
     DV_BREADCRUMB_DATA = (By.XPATH, "//span[@class='text-primary-8']//a[text()='Data']")
     DV_BREADCRUMB_EXPERIMENTAL = (By.XPATH, "//span[@class='text-primary-8']//a[text()='Experimental']")
@@ -178,9 +174,6 @@ class ExploreEphysLocators:
     DV_PLOT_PAN_BUTTON = (By.CSS_SELECTOR, "[data-title='Pan']")
     DV_PLOT_RESET_BUTTON = (By.CSS_SELECTOR, "[data-title='Reset axes']")
     DV_PLOT_DOWNLOAD_BUTTON = (By.CSS_SELECTOR, "[data-title='Download plot as a png']")
-    
-    # Legacy Detail View locators (keeping for backward compatibility)
-
     DV_AGE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Age']")
     DV_BRAIN_REG_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Brain Region']")
     DV_BR_REG = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Brain Region']/following-sibling::div[@class='mt-2 break-words']")
@@ -201,7 +194,6 @@ class ExploreEphysLocators:
     DV_NAME = (By.XPATH, "//div[text()='Name']//following::div[@class='col-span-3 text-2xl font-bold']")
     DV_NAME_TITLE = (By.XPATH, "//div[@class='text font-thin' and text()='Name']")
     DV_NUM_MEAS_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='N° of Measurements']")
-
     DV_OVERVIEW = (By.XPATH, "//span[contains(text(),' Overview')]")
     DV_PLOTS = (By.XPATH, "//div[@class='plot-container plotly']")
     DV_REG_DATE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Registration date']/following-sibling::div[@class='mt-2 break-words']")
@@ -236,9 +228,7 @@ class ExploreEphysLocators:
     LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
     LV_THUMBNAIL = (By.XPATH, "//td//img")
     LV_TOTAL_RESULTS = (By.XPATH, "//div[@class='w-max']")
-    MINI_DETAIL_VIEW = (By.CSS_SELECTOR, "#mini-detail-view-container")
     SEARCHED_SPECIES = (By.XPATH, "//td[@title='Rattus norvegicus' and contains(text(),'Rattus norvegicus')][1]")
     SEARCH_INPUT_FIELD = (By.XPATH, "button[aria-label='Open search']")
     TABLE = (By.XPATH, "//tbody[@class='ant-table-tbody']")
-    TABLE_CELLS = (By.CSS_SELECTOR, "tbody.ant-table-tbody td.ant-table-cell.text-primary-7.cursor-pointer.ant-table-cell-ellipsis")
-    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
+    # TABLE_CELLS = (By.CSS_SELECTOR, "tbody.ant-table-tbody td.ant-table-cell.text-primary-7.cursor-pointer.ant-table-cell-ellipsis")

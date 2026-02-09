@@ -489,7 +489,6 @@ class ExploreElectrophysiologyPage(ExplorePage):
         except (TimeoutException, ValueError):
             return 0
 
-    # Legacy methods (keeping for backward compatibility with existing tests)
     def brain_region_panel_close_btn(self):
         return self.find_element(ExploreEphysLocators.BRAIN_REGION_PANEL_CLOSE_BTN)
 
