@@ -133,65 +133,56 @@ class ExploreElectrophysiologyPage(ExplorePage):
 
     def verify_search_results_brain_region(self, expected_brain_region):
         """Verify that search results contain the expected brain region"""
+        # Wait for table to load after search
+        time.sleep(2)
+        
         table_rows = self.get_table_rows()
         if not table_rows:
             self.logger.warning("No table rows found after search")
             return False
         
         matching_rows = 0
-        total_checked = 0
         
-        for i, row in enumerate(table_rows[:10]):  # Check first 10 rows
-            try:
-                # Look for brain region column (typically 2nd column after Preview)
-                # Try multiple approaches to find the brain region cell
-                brain_region_cell = None
+        # Look for cells with the specific brain region using locators from locators file
+        try:
+            # Find all cells that contain the expected brain region in the title attribute (exact match)
+            # Format the template string from locators file
+            exact_xpath = ExploreEphysLocators.TABLE_BRAIN_REGION_CELL_EXACT_TEMPLATE.format(expected_brain_region)
+            brain_region_cells = self.find_all_elements((By.XPATH, exact_xpath))
+            
+            if brain_region_cells:
+                matching_rows = len(brain_region_cells)
+                self.logger.info(f"✅ Found {matching_rows} cells with brain region '{expected_brain_region}'")
                 
-                # Approach 1: Look for cell by position (brain region is usually 2nd column)
-                try:
-                    brain_region_cell = row.find_element(By.XPATH, ".//td[2]")
-                except:
-                    pass
+                # Log first few matches for verification
+                for i, cell in enumerate(brain_region_cells[:5]):
+                    cell_text = cell.text.strip()
+                    self.logger.info(f"  Row {i+1}: '{cell_text}'")
                 
-                # Approach 2: Look for cell containing brain region data
-                if not brain_region_cell:
-                    try:
-                        brain_region_cell = row.find_element(By.XPATH, ".//td[contains(@class, 'brain') or contains(text(), 'CA') or contains(text(), 'Field')]")
-                    except:
-                        pass
+                return True
+            else:
+                self.logger.warning(f"❌ No cells found with brain region '{expected_brain_region}'")
                 
-                # Approach 3: Look for any cell that might contain the brain region
-                if not brain_region_cell:
-                    try:
-                        cells = row.find_elements(By.XPATH, ".//td")
-                        for cell in cells:
-                            if expected_brain_region.lower() in cell.text.lower():
-                                brain_region_cell = cell
-                                break
-                    except:
-                        pass
+                # Fallback: Try partial match in case the exact title doesn't match
+                partial_xpath = ExploreEphysLocators.TABLE_BRAIN_REGION_CELL_PARTIAL_TEMPLATE.format(expected_brain_region)
+                partial_match_cells = self.find_all_elements((By.XPATH, partial_xpath))
                 
-                if brain_region_cell:
-                    cell_text = brain_region_cell.text.strip()
-                    total_checked += 1
+                if partial_match_cells:
+                    matching_rows = len(partial_match_cells)
+                    self.logger.info(f"✅ Found {matching_rows} cells with brain region containing '{expected_brain_region}' (partial match)")
                     
-                    if expected_brain_region.lower() in cell_text.lower():
-                        matching_rows += 1
-                        self.logger.info(f"✅ Row {i+1}: Found '{expected_brain_region}' in '{cell_text}'")
-                    else:
-                        self.logger.debug(f"Row {i+1}: Brain region '{cell_text}' does not match '{expected_brain_region}'")
+                    # Log first few matches
+                    for i, cell in enumerate(partial_match_cells[:5]):
+                        cell_title = cell.get_attribute('title')
+                        self.logger.info(f"  Row {i+1}: '{cell_title}'")
+                    
+                    return True
                 else:
-                    self.logger.debug(f"Row {i+1}: Could not find brain region cell")
+                    self.logger.warning(f"❌ No cells found containing '{expected_brain_region}' even with partial match")
+                    return False
                     
-            except Exception as e:
-                self.logger.debug(f"Error checking row {i+1}: {e}")
-                continue
-        
-        if matching_rows > 0:
-            self.logger.info(f"✅ Search verification: Found {matching_rows} out of {total_checked} rows containing '{expected_brain_region}'")
-            return True
-        else:
-            self.logger.warning(f"❌ Search verification: No rows found containing '{expected_brain_region}' out of {total_checked} checked")
+        except Exception as e:
+            self.logger.error(f"Error verifying search results: {e}")
             return False
 
     def get_search_results_count(self):
@@ -207,46 +198,67 @@ class ExploreElectrophysiologyPage(ExplorePage):
 
     # Enhanced filter functionality
     def apply_species_filter(self, species_name):
-        """Apply filter by species"""
-        # Click filter button
-        filter_button = self.find_filter_button()
-        filter_button.click()
-        self.logger.info("Opened filter panel")
-        time.sleep(1)
-        
-        # Look for species filter option
+        """Apply filter by species using checkbox selection"""
         try:
-            species_filter = self.find_element((By.XPATH, "//span[text()='Species']"), timeout=10)
-            species_filter.click()
-            self.logger.info("Clicked Species filter")
+            # First, ensure the Species filter section is expanded
+            species_filter = self.find_element(ExploreEphysLocators.FILTER_SPECIES_BUTTON, timeout=10)
+            
+            # Scroll element into view and wait a bit
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", species_filter)
             time.sleep(1)
             
-            # Enter species name in search
-            species_search = self.find_element((By.XPATH, "//input[@placeholder='Search species...']"), timeout=5)
-            species_search.send_keys(species_name)
-            self.logger.info(f"Entered species: {species_name}")
-            time.sleep(1)
+            # Check if the species section is already expanded by looking for the species name
+            try:
+                species_text = self.find_element((By.XPATH, f"//span[@class='font-bold text-white' and text()='{species_name}']"), timeout=2)
+                self.logger.info(f"Species section already expanded, found '{species_name}'")
+            except TimeoutException:
+                # Need to expand the species section
+                try:
+                    species_filter.click()
+                except Exception as e:
+                    self.logger.warning(f"Regular click failed, using JavaScript click: {e}")
+                    self.browser.execute_script("arguments[0].click();", species_filter)
+                
+                self.logger.info("Clicked Species filter to expand")
+                time.sleep(1)
             
-            # Select the species from dropdown
-            species_option = self.find_element((By.XPATH, f"//div[contains(text(), '{species_name}')]"), timeout=5)
-            species_option.click()
-            self.logger.info(f"Selected species: {species_name}")
+            # Now find and click the checkbox for the specific species
+            # The checkbox is next to the species name in the HTML structure
+            species_checkbox_xpath = f"//span[@class='font-bold text-white' and text()='{species_name}']/ancestor::div[@class='flex items-center justify-between pt-3']//button[@role='checkbox']"
+            species_checkbox = self.find_element((By.XPATH, species_checkbox_xpath), timeout=5)
+            
+            # Scroll checkbox into view
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", species_checkbox)
+            time.sleep(0.5)
+            
+            # Click the checkbox
+            try:
+                species_checkbox.click()
+            except Exception as e:
+                self.logger.warning(f"Regular click failed on checkbox, using JavaScript click: {e}")
+                self.browser.execute_script("arguments[0].click();", species_checkbox)
+            
+            self.logger.info(f"Selected species checkbox: {species_name}")
+            time.sleep(1)
             
             return True
-        except TimeoutException:
-            self.logger.warning("Species filter not found or not accessible")
+        except TimeoutException as e:
+            self.logger.warning(f"Species filter not found or not accessible: {e}")
+            return False
+        except Exception as e:
+            self.logger.warning(f"Error applying species filter: {e}")
             return False
 
     def apply_contributor_filter(self, contributor_name):
         """Apply filter by contributor"""
         try:
-            contributor_filter = self.find_element((By.XPATH, "//span[text()='Contributors']"), timeout=10)
+            contributor_filter = self.find_element(ExploreEphysLocators.FILTER_CONTRIBUTORS_BUTTON, timeout=10)
             contributor_filter.click()
             self.logger.info("Clicked Contributors filter")
             time.sleep(1)
             
             # Enter contributor name in search
-            contributor_search = self.find_element((By.XPATH, "//input[@placeholder='Search contributors...']"), timeout=5)
+            contributor_search = self.find_element(ExploreEphysLocators.FILTER_CONTRIBUTORS_SEARCH, timeout=5)
             contributor_search.send_keys(contributor_name)
             self.logger.info(f"Entered contributor: {contributor_name}")
             time.sleep(1)
@@ -264,8 +276,20 @@ class ExploreElectrophysiologyPage(ExplorePage):
     def apply_filters(self):
         """Apply the selected filters"""
         try:
-            apply_button = self.find_element((By.XPATH, "//button[text()='Apply']"), timeout=10)
-            apply_button.click()
+            # Look for the Apply button - it has a span with text "Apply" inside
+            apply_button = self.find_element((By.XPATH, "//button[@role='button']//span[text()='Apply']//parent::button"), timeout=10)
+            
+            # Scroll into view
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", apply_button)
+            time.sleep(0.5)
+            
+            # Click the button
+            try:
+                apply_button.click()
+            except Exception as e:
+                self.logger.warning(f"Regular click failed on Apply button, using JavaScript click: {e}")
+                self.browser.execute_script("arguments[0].click();", apply_button)
+            
             self.logger.info("Applied filters")
             time.sleep(2)  # Wait for results to load
             return True
@@ -276,7 +300,7 @@ class ExploreElectrophysiologyPage(ExplorePage):
     def close_filter_panel(self):
         """Close the filter panel"""
         try:
-            close_button = self.find_element((By.XPATH, "//button[@aria-label='Close']"), timeout=5)
+            close_button = self.find_element(ExploreEphysLocators.FILTER_CLOSE_BUTTON, timeout=5)
             close_button.click()
             self.logger.info("Closed filter panel")
             return True
@@ -292,27 +316,51 @@ class ExploreElectrophysiologyPage(ExplorePage):
             return False
         
         found_matches = 0
-        for row in table_rows[:5]:  # Check first 5 rows
+        total_checked = 0
+        
+        for row in table_rows[:10]:  # Check first 10 rows
             try:
+                total_checked += 1
+                cells = row.find_elements(By.TAG_NAME, "td")
+                
                 if column_type == "species":
-                    # Look for species column data
-                    species_cell = row.find_element(By.XPATH, ".//td[contains(@class, 'species') or position()=5]")
-                    if expected_value.lower() in species_cell.text.lower():
-                        found_matches += 1
+                    # Based on the column headers order: Preview, Brain region, E-type, Name, Species, Contributors, Registration date
+                    # Species should be at index 5 (6th column)
+                    species_cell = None
+                    
+                    if len(cells) > 5:
+                        # Try index 5 (Species column - 6th column)
+                        species_cell = cells[5]
+                    
+                    if species_cell:
+                        cell_text = species_cell.text.strip()
+                        cell_title = species_cell.get_attribute('title') or ""
+                        
+                        # Check both text and title attribute
+                        if expected_value.lower() in cell_text.lower() or expected_value.lower() in cell_title.lower():
+                            found_matches += 1
+                            self.logger.debug(f"Row {total_checked}: ✅ Found match - text: '{cell_text}', title: '{cell_title}'")
+                        else:
+                            # Log all cells for debugging
+                            all_cells_text = [f"[{i}]: '{c.text.strip()}'" for i, c in enumerate(cells)]
+                            self.logger.debug(f"Row {total_checked}: ❌ No match in column 5 - text: '{cell_text}', title: '{cell_title}'. All cells: {', '.join(all_cells_text[:7])}")
+                    
                 elif column_type == "contributor":
-                    # Look for contributor column data
-                    contributor_cell = row.find_element(By.XPATH, ".//td[contains(@class, 'contributor') or position()=6]")
-                    if expected_value.lower() in contributor_cell.text.lower():
-                        found_matches += 1
+                    # Contributors is at index 6 (7th column)
+                    if len(cells) > 6:
+                        contributor_cell = cells[6]
+                        if expected_value.lower() in contributor_cell.text.lower():
+                            found_matches += 1
+                            
             except Exception as e:
-                self.logger.debug(f"Could not check row for {column_type}: {e}")
+                self.logger.debug(f"Could not check row {total_checked} for {column_type}: {e}")
                 continue
         
         if found_matches > 0:
-            self.logger.info(f"✅ Found {found_matches} matching results for {column_type}: {expected_value}")
+            self.logger.info(f"✅ Found {found_matches} matching results out of {total_checked} rows for {column_type}: {expected_value}")
             return True
         else:
-            self.logger.warning(f"❌ No matching results found for {column_type}: {expected_value}")
+            self.logger.warning(f"❌ No matching results found for {column_type}: {expected_value} (checked {total_checked} rows)")
             return False
 
     # Data type selector methods (new functionality)
@@ -322,7 +370,12 @@ class ExploreElectrophysiologyPage(ExplorePage):
 
     def find_experimental_tab(self, timeout=10):
         """Find the Experimental tab"""
-        return self.find_element(ExploreEphysLocators.EXPERIMENTAL_TAB, timeout=timeout)
+        try:
+            # First try to find the active tab
+            return self.find_element(ExploreEphysLocators.EXPERIMENTAL_TAB, timeout=timeout)
+        except TimeoutException:
+            # Fallback to finding any Experimental tab (active or not)
+            return self.find_element(ExploreEphysLocators.EXPERIMENTAL_TAB_ANY, timeout=timeout)
 
     def find_model_tab(self, timeout=10):
         """Find the Model tab"""
@@ -503,9 +556,6 @@ class ExploreElectrophysiologyPage(ExplorePage):
             metadata.extend(self.find_all_elements(data))
         return metadata
 
-    def find_ephys_tab_title(self):
-        return self.find_element(ExploreEphysLocators.EPHYS_TAB_TITLE)
-
     def filter_etype_btn(self):
         return self.find_element(ExploreEphysLocators.FILTER_ETYPE_BTN)
 
@@ -638,3 +688,361 @@ class ExploreElectrophysiologyPage(ExplorePage):
         except TimeoutException:
             # Fallback to legacy grid view
             self.find_explore_section_grid()
+
+    # Mini-detail view methods
+    def find_mini_detail_view(self, timeout=10):
+        """Find the mini-detail view container"""
+        return self.find_element(ExploreEphysLocators.MINI_DETAIL_VIEW, timeout=timeout)
+
+    def verify_mini_detail_view_present(self):
+        """Verify that the mini-detail view is displayed"""
+        mini_view = self.find_mini_detail_view()
+        assert mini_view.is_displayed(), "Mini-detail view should be displayed"
+        self.logger.info("✅ Mini-detail view is displayed")
+        return mini_view
+
+    def get_mdv_name(self, timeout=10):
+        """Get the name from mini-detail view"""
+        element = self.find_element(ExploreEphysLocators.MDV_NAME, timeout=timeout)
+        return element.text.strip()
+
+    def get_mdv_description(self, timeout=10):
+        """Get the description from mini-detail view"""
+        element = self.find_element(ExploreEphysLocators.MDV_DESCRIPTION, timeout=timeout)
+        return element.text.strip()
+
+    def get_mdv_image(self, timeout=10):
+        """Get the image element from mini-detail view"""
+        return self.find_element(ExploreEphysLocators.MDV_IMAGE, timeout=timeout)
+
+    def get_mdv_brain_region(self, timeout=10):
+        """Get the brain region value from mini-detail view"""
+        element = self.find_element(ExploreEphysLocators.MDV_BRAIN_REGION_VALUE, timeout=timeout)
+        return element.text.strip()
+
+    def get_mdv_etype(self, timeout=10):
+        """Get the E-type value from mini-detail view"""
+        element = self.find_element(ExploreEphysLocators.MDV_ETYPE_VALUE, timeout=timeout)
+        return element.text.strip()
+
+    def get_mdv_species(self, timeout=10):
+        """Get the species value from mini-detail view"""
+        element = self.find_element(ExploreEphysLocators.MDV_SPECIES_VALUE, timeout=timeout)
+        return element.text.strip()
+
+    def get_mdv_license(self, timeout=10):
+        """Get the license link element from mini-detail view"""
+        return self.find_element(ExploreEphysLocators.MDV_LICENSE_VALUE, timeout=timeout)
+
+    def find_mdv_copy_button(self, timeout=10):
+        """Find the Copy button in mini-detail view"""
+        return self.find_element(ExploreEphysLocators.MDV_COPY_BUTTON, timeout=timeout)
+
+    def find_mdv_download_button(self, timeout=10):
+        """Find the Download button in mini-detail view"""
+        return self.find_element(ExploreEphysLocators.MDV_DOWNLOAD_BUTTON, timeout=timeout)
+
+    def find_mdv_view_details_button(self, timeout=10):
+        """Find the View Details button in mini-detail view"""
+        return self.find_element(ExploreEphysLocators.MDV_VIEW_DETAILS_BUTTON, timeout=timeout)
+
+    def verify_mini_detail_view_fields(self):
+        """Verify all fields in mini-detail view have values and are displayed"""
+        results = {}
+        
+        # Verify name
+        try:
+            name = self.get_mdv_name()
+            results['name'] = {'present': True, 'has_value': bool(name), 'value': name}
+            self.logger.info(f"✅ Name: '{name}'")
+        except Exception as e:
+            results['name'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ Name field error: {e}")
+        
+        # Verify description
+        try:
+            description = self.get_mdv_description()
+            results['description'] = {'present': True, 'has_value': bool(description), 'value': description[:50] + '...' if len(description) > 50 else description}
+            self.logger.info(f"✅ Description: '{description[:50]}...'")
+        except Exception as e:
+            results['description'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ Description field error: {e}")
+        
+        # Verify image
+        try:
+            image = self.get_mdv_image()
+            is_displayed = image.is_displayed()
+            src = image.get_attribute('src')
+            results['image'] = {'present': True, 'displayed': is_displayed, 'has_src': bool(src)}
+            self.logger.info(f"✅ Image: displayed={is_displayed}, has_src={bool(src)}")
+        except Exception as e:
+            results['image'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ Image field error: {e}")
+        
+        # Verify brain region
+        try:
+            brain_region = self.get_mdv_brain_region()
+            results['brain_region'] = {'present': True, 'has_value': bool(brain_region), 'value': brain_region}
+            self.logger.info(f"✅ Brain Region: '{brain_region}'")
+        except Exception as e:
+            results['brain_region'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ Brain Region field error: {e}")
+        
+        # Verify E-type
+        try:
+            etype = self.get_mdv_etype()
+            results['etype'] = {'present': True, 'has_value': bool(etype) and etype != '—', 'value': etype}
+            self.logger.info(f"✅ E-Type: '{etype}'")
+        except Exception as e:
+            results['etype'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ E-Type field error: {e}")
+        
+        # Verify species
+        try:
+            species = self.get_mdv_species()
+            results['species'] = {'present': True, 'has_value': bool(species), 'value': species}
+            self.logger.info(f"✅ Species: '{species}'")
+        except Exception as e:
+            results['species'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ Species field error: {e}")
+        
+        # Verify license (should be clickable link)
+        try:
+            license_link = self.get_mdv_license()
+            is_displayed = license_link.is_displayed()
+            license_text = license_link.text.strip()
+            href = license_link.get_attribute('href')
+            results['license'] = {'present': True, 'displayed': is_displayed, 'has_value': bool(license_text), 'value': license_text, 'clickable': bool(href), 'href': href}
+            self.logger.info(f"✅ License: '{license_text}' (clickable: {bool(href)})")
+        except Exception as e:
+            results['license'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ License field error: {e}")
+        
+        return results
+
+    def verify_mini_detail_view_buttons(self):
+        """Verify all buttons in mini-detail view are present and clickable"""
+        results = {}
+        
+        # Verify Copy button
+        try:
+            copy_btn = self.find_mdv_copy_button()
+            is_displayed = copy_btn.is_displayed()
+            is_enabled = copy_btn.is_enabled()
+            results['copy'] = {'present': True, 'displayed': is_displayed, 'clickable': is_enabled}
+            self.logger.info(f"✅ Copy button: displayed={is_displayed}, clickable={is_enabled}")
+        except Exception as e:
+            results['copy'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ Copy button error: {e}")
+        
+        # Verify Download button
+        try:
+            download_btn = self.find_mdv_download_button()
+            is_displayed = download_btn.is_displayed()
+            is_enabled = download_btn.is_enabled()
+            results['download'] = {'present': True, 'displayed': is_displayed, 'clickable': is_enabled}
+            self.logger.info(f"✅ Download button: displayed={is_displayed}, clickable={is_enabled}")
+        except Exception as e:
+            results['download'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ Download button error: {e}")
+        
+        # Verify View Details button
+        try:
+            view_details_btn = self.find_mdv_view_details_button()
+            is_displayed = view_details_btn.is_displayed()
+            href = view_details_btn.get_attribute('href')
+            results['view_details'] = {'present': True, 'displayed': is_displayed, 'clickable': bool(href), 'href': href}
+            self.logger.info(f"✅ View Details button: displayed={is_displayed}, clickable={bool(href)}")
+        except Exception as e:
+            results['view_details'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ View Details button error: {e}")
+        
+        return results
+
+    def click_mdv_view_details(self):
+        """Click the View Details button in mini-detail view"""
+        view_details_btn = self.find_mdv_view_details_button()
+        
+        # Scroll into view
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", view_details_btn)
+        time.sleep(0.5)
+        
+        # Click the button
+        try:
+            view_details_btn.click()
+        except Exception as e:
+            self.logger.warning(f"Regular click failed, using JavaScript click: {e}")
+            self.browser.execute_script("arguments[0].click();", view_details_btn)
+        
+        self.logger.info("Clicked 'View Details' button")
+        time.sleep(2)  # Wait for navigation
+        return True
+
+    # Detail View verification methods
+    def verify_detail_view_breadcrumbs(self):
+        """Verify breadcrumbs are present and clickable"""
+        results = {}
+        breadcrumbs = [
+            ('Data', ExploreEphysLocators.DV_BREADCRUMB_DATA),
+            ('Experimental', ExploreEphysLocators.DV_BREADCRUMB_EXPERIMENTAL),
+            ('Single cell electrophysiology', ExploreEphysLocators.DV_BREADCRUMB_SINGLE_CELL)
+        ]
+        
+        for name, locator in breadcrumbs:
+            try:
+                element = self.find_element(locator, timeout=10)
+                is_displayed = element.is_displayed()
+                href = element.get_attribute('href')
+                results[name] = {'present': True, 'displayed': is_displayed, 'clickable': bool(href)}
+                self.logger.info(f"✅ Breadcrumb '{name}': displayed={is_displayed}, clickable={bool(href)}")
+            except Exception as e:
+                results[name] = {'present': False, 'error': str(e)}
+                self.logger.warning(f"❌ Breadcrumb '{name}' error: {e}")
+        
+        return results
+
+    def verify_detail_view_tabs(self):
+        """Verify Overview tab is displayed and active"""
+        results = {}
+        
+        try:
+            overview_tab = self.find_element(ExploreEphysLocators.DV_OVERVIEW_TAB, timeout=10)
+            is_displayed = overview_tab.is_displayed()
+            # Check if tab is active by looking at parent label class
+            parent = overview_tab.find_element(By.XPATH, "..")
+            is_active = 'ant-radio-button-wrapper-checked' in parent.get_attribute('class')
+            results['overview'] = {'present': True, 'displayed': is_displayed, 'active': is_active}
+            self.logger.info(f"✅ Overview tab: displayed={is_displayed}, active={is_active}")
+        except Exception as e:
+            results['overview'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ Overview tab error: {e}")
+        
+        return results
+
+    def verify_detail_view_buttons(self):
+        """Verify Copy ID and Download buttons are present and clickable"""
+        results = {}
+        buttons = [
+            ('Copy ID', ExploreEphysLocators.DV_COPY_ID_BUTTON),
+            ('Download', ExploreEphysLocators.DV_DOWNLOAD_BUTTON)
+        ]
+        
+        for name, locator in buttons:
+            try:
+                element = self.find_element(locator, timeout=10)
+                is_displayed = element.is_displayed()
+                # Check if element or parent is clickable
+                is_clickable = element.is_enabled()
+                results[name] = {'present': True, 'displayed': is_displayed, 'clickable': is_clickable}
+                self.logger.info(f"✅ Button '{name}': displayed={is_displayed}, clickable={is_clickable}")
+            except Exception as e:
+                results[name] = {'present': False, 'error': str(e)}
+                self.logger.warning(f"❌ Button '{name}' error: {e}")
+        
+        return results
+
+    def verify_detail_view_main_fields(self):
+        """Verify main detail view fields"""
+        results = {}
+        # Fields that must have values
+        required_fields = [
+            ('Name', ExploreEphysLocators.DV_NAME_VALUE),
+            ('Registered by', ExploreEphysLocators.DV_REGISTERED_BY_VALUE),
+            ('Registration date', ExploreEphysLocators.DV_REGISTRATION_DATE_VALUE),
+            ('Brain Region', ExploreEphysLocators.DV_BRAIN_REGION_VALUE)
+        ]
+        
+        # Fields that may not have values
+        optional_fields = [
+            ('Description', ExploreEphysLocators.DV_DESCRIPTION_VALUE),
+            ('Contributors', ExploreEphysLocators.DV_CONTRIBUTORS_VALUE),
+            ('Institutional Contributors', ExploreEphysLocators.DV_INSTITUTIONAL_CONTRIBUTORS_VALUE),
+            ('E-Type', ExploreEphysLocators.DV_ETYPE_VALUE)
+        ]
+        
+        # Check required fields
+        for name, locator in required_fields:
+            try:
+                element = self.find_element(locator, timeout=10)
+                value = element.text.strip()
+                has_value = bool(value) and value != '—'
+                results[name] = {'present': True, 'has_value': has_value, 'value': value[:50] if len(value) > 50 else value}
+                if has_value:
+                    self.logger.info(f"✅ {name}: '{value[:50]}...' (required)")
+                else:
+                    self.logger.warning(f"⚠️ {name}: No value (required field)")
+            except Exception as e:
+                results[name] = {'present': False, 'error': str(e)}
+                self.logger.warning(f"❌ {name} error: {e}")
+        
+        # Check optional fields
+        for name, locator in optional_fields:
+            try:
+                element = self.find_element(locator, timeout=10)
+                value = element.text.strip()
+                has_value = bool(value) and value != '—'
+                results[name] = {'present': True, 'has_value': has_value, 'value': value[:50] if len(value) > 50 else value}
+                if has_value:
+                    self.logger.info(f"✅ {name}: '{value[:50]}...' (optional)")
+                else:
+                    self.logger.info(f"ℹ️ {name}: No value (optional field)")
+            except Exception as e:
+                results[name] = {'present': False, 'error': str(e)}
+                self.logger.warning(f"❌ {name} error: {e}")
+        
+        # Check license (should be clickable link)
+        try:
+            license_link = self.find_element(ExploreEphysLocators.DV_LICENSE_LINK, timeout=10)
+            value = license_link.text.strip()
+            href = license_link.get_attribute('href')
+            results['License'] = {'present': True, 'has_value': bool(value), 'value': value, 'clickable': bool(href), 'href': href}
+            self.logger.info(f"✅ License: '{value}' (clickable: {bool(href)})")
+        except Exception as e:
+            results['License'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ License error: {e}")
+        
+        return results
+
+    def verify_detail_view_subject_fields(self):
+        """Verify Subject section fields"""
+        results = {}
+        
+        # Check Subject header
+        try:
+            subject_header = self.find_element(ExploreEphysLocators.DV_SUBJECT_HEADER, timeout=10)
+            results['Subject Header'] = {'present': True, 'displayed': subject_header.is_displayed()}
+            self.logger.info("✅ Subject section header is present")
+        except Exception as e:
+            results['Subject Header'] = {'present': False, 'error': str(e)}
+            self.logger.warning(f"❌ Subject header error: {e}")
+            return results  # If header not found, skip field checks
+        
+        # All subject fields (all optional)
+        subject_fields = [
+            ('Name', ExploreEphysLocators.DV_SUBJECT_NAME_VALUE),
+            ('Description', ExploreEphysLocators.DV_SUBJECT_DESCRIPTION_VALUE),
+            ('Species', ExploreEphysLocators.DV_SUBJECT_SPECIES_VALUE),
+            ('Strain', ExploreEphysLocators.DV_SUBJECT_STRAIN_VALUE),
+            ('Sex', ExploreEphysLocators.DV_SUBJECT_SEX_VALUE),
+            ('Weight', ExploreEphysLocators.DV_SUBJECT_WEIGHT_VALUE),
+            ('Age', ExploreEphysLocators.DV_SUBJECT_AGE_VALUE),
+            ('Age min', ExploreEphysLocators.DV_SUBJECT_AGE_MIN_VALUE),
+            ('Age max', ExploreEphysLocators.DV_SUBJECT_AGE_MAX_VALUE),
+            ('Age period', ExploreEphysLocators.DV_SUBJECT_AGE_PERIOD_VALUE)
+        ]
+        
+        for name, locator in subject_fields:
+            try:
+                element = self.find_element(locator, timeout=5)
+                value = element.text.strip()
+                has_value = bool(value) and value != '—'
+                results[f'Subject {name}'] = {'present': True, 'has_value': has_value, 'value': value}
+                if has_value:
+                    self.logger.info(f"✅ Subject {name}: '{value}'")
+                else:
+                    self.logger.info(f"ℹ️ Subject {name}: No value")
+            except Exception as e:
+                results[f'Subject {name}'] = {'present': False, 'error': str(e)}
+                self.logger.debug(f"Subject {name} not found: {e}")
+        
+        return results
