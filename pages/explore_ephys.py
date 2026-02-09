@@ -1109,13 +1109,13 @@ class ExploreElectrophysiologyPage(ExplorePage):
         time.sleep(1)
         return True
 
-    def find_overview_plots(self):
+    def find_overview_plots(self, timeout=10):
         """Find all plots in Overview tab"""
         try:
-            plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOTS)
+            plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOTS, timeout=timeout)
             if not plots:
                 # Fallback to plot images
-                plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOT_IMAGES)
+                plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOT_IMAGES, timeout=timeout)
             return plots
         except TimeoutException:
             self.logger.warning("No overview plots found")

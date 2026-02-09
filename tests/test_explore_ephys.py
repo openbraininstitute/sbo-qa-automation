@@ -395,7 +395,7 @@ class TestExploreEphys:
         
         # Test Overview tab content
         logger.info("🔍 Testing Overview tab plots...")
-        overview_plots = explore_ephys_page.find_overview_plots()
+        overview_plots = explore_ephys_page.find_overview_plots(timeout=10)
         if overview_plots:
             logger.info(f"✅ Found {len(overview_plots)} plots in Overview tab")
             
