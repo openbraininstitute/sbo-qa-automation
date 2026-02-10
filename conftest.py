@@ -368,6 +368,22 @@ def login_direct_complete(setup, navigate_to_login_direct, test_config, logger):
                     lambda d: "virtual-lab" in d.current_url or "sync" in d.current_url
                 )
                 logger.info("Alternative 1 succeeded - found virtual-lab/sync in URL")
+                
+                # Additional wait for sync redirect to complete (same as in login_page.py)
+                if "sync" in login_page.browser.current_url:
+                    logger.info("Detected sync URL, waiting for redirect to complete...")
+                    try:
+                        # Wait for redirect away from sync page (up to 30 seconds)
+                        WebDriverWait(login_page.browser, 30).until(
+                            lambda d: "sync" not in d.current_url
+                        )
+                        logger.info(f"Sync redirect completed. Final URL: {login_page.browser.current_url}")
+                    except TimeoutException:
+                        logger.warning(f"Sync redirect timeout, but continuing. Current URL: {login_page.browser.current_url}")
+                        # Don't fail here, just log and continue
+                
+                # Final wait to ensure page is fully loaded
+                time.sleep(2)
                 success = True
             except TimeoutException:
                 logger.debug("Alternative 1 failed")
@@ -380,6 +396,19 @@ def login_direct_complete(setup, navigate_to_login_direct, test_config, logger):
                         lambda d: "/app/" in d.current_url
                     )
                     logger.info("Alternative 2 succeeded - found /app/ in URL")
+                    
+                    # Additional wait for sync redirect to complete if needed
+                    if "sync" in login_page.browser.current_url:
+                        logger.info("Detected sync URL in Alternative 2, waiting for redirect...")
+                        try:
+                            WebDriverWait(login_page.browser, 30).until(
+                                lambda d: "sync" not in d.current_url
+                            )
+                            logger.info(f"Alternative 2 sync redirect completed. Final URL: {login_page.browser.current_url}")
+                        except TimeoutException:
+                            logger.warning(f"Alternative 2 sync redirect timeout. Current URL: {login_page.browser.current_url}")
+                        time.sleep(2)
+                    
                     success = True
                 except TimeoutException:
                     logger.debug("Alternative 2 failed")

@@ -89,6 +89,22 @@ class LoginPage(CustomBasePage):
                 raise TimeoutException(f"Login failed. Final URL: {current_url}")
         
         self.logger.info("Login completion detected successfully")
+        
+        # Additional wait for sync redirect to complete in CI environment
+        if "sync" in self.browser.current_url:
+            self.logger.info("Detected sync URL, waiting for redirect to complete...")
+            try:
+                # Wait for redirect away from sync page (up to 30 seconds)
+                WebDriverWait(self.browser, 30).until(
+                    lambda d: "sync" not in d.current_url
+                )
+                self.logger.info(f"Sync redirect completed. Final URL: {self.browser.current_url}")
+            except TimeoutException:
+                self.logger.warning(f"Sync redirect timeout, but continuing. Current URL: {self.browser.current_url}")
+                # Don't fail here, just log and continue
+        
+        # Final wait to ensure page is fully loaded
+        time.sleep(2)
 
     def find_form_container(self, timeout=10):
         return self.find_element(LoginPageLocators.FORM_CONTAINER, timeout=timeout)

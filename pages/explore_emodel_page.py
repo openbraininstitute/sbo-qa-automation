@@ -61,11 +61,11 @@ class ExploreEModelDataPage(ExplorePage):
     def find_dv_brain_region_value(self):
         return self.find_element(ExploreEModelPageLocators.DV_BRAIN_REGION_VALUE)
 
-    def find_dv_created_by_label(self):
-        return self.find_element(ExploreEModelPageLocators.DV_CREATED_BY_LABEL)
+    def find_dv_registered_by_label(self):
+        return self.find_element(ExploreEModelPageLocators.DV_REGISTERED_BY_LABEL)
 
-    def find_dv_created_by_value(self):
-        return self.find_element(ExploreEModelPageLocators.DV_CREATED_BY_VALUE)
+    def find_dv_registered_by_value(self):
+        return self.find_element(ExploreEModelPageLocators.DV_REGISTERED_BY_VALUE)
 
     def find_dv_species_label(self):
         return self.find_element(ExploreEModelPageLocators.DV_SPECIES_LABEL)

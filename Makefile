@@ -34,6 +34,7 @@ smoke:
 			tests/test_digital_brain_story.py \
 			tests/test_team.py \
 			tests/test_contact.py \
+			tests/test_explore_ephys.py \
             -sv \
             --html=report.html --self-contained-html"
 
@@ -52,6 +53,7 @@ smoke-staging:
 			tests/test_digital_brain_story.py \
 			tests/test_team.py \
 			tests/test_contact.py \
+			tests/test_explore_ephys.py \
             --html=report.html --self-contained-html"
 
 # New CI/CD stability tests
@@ -79,10 +81,10 @@ regression:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py --html=report.html --self-contained-html"
 
 feature:
-	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_ai_assistant_workflow.py -vs --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_explore_emodel.py -vs --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_ai_assistant_workflow.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_project_notebooks.py --html=report.html --self-contained-html"
 
 # Debug failing tests
 debug-explore:

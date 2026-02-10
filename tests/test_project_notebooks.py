@@ -102,6 +102,7 @@ class TestProjectNotebooks:
         filter_apply_btn = project_notebooks.filter_apply_btn()
         assert filter_apply_btn.is_displayed(), "Filter apply button is not displayed"
         logger.info("Filter apply button is found")
+
         filter_apply_btn.click()
         logger.info("Filter is applied")
 
@@ -114,15 +115,12 @@ class TestProjectNotebooks:
         table_body_container = project_notebooks.table_body_container(timeout=15)
         logger.info("Looking for table container")
         
-        # Wait longer for CI environments and use more robust result detection
-        time.sleep(3)  # Reduced from 5 to 3 seconds
+        time.sleep(3)
         
-        # Use the more robust method for CI compatibility
         search_result_found = project_notebooks.wait_for_filtered_results(timeout=30)
         assert search_result_found, "No filtered search results found after applying filter"
         logger.info("✅ Filtered search results found")
         
-        # Also try the original method as a secondary check
         try:
             data_search_result = project_notebooks.table_search_result(timeout=10)
             if data_search_result and data_search_result.is_displayed():

@@ -18,7 +18,9 @@ on:
       - main
       - v2/login-remote-issue
       - feature/**
-      - fix/** 
+      - fix/**
+      - add/**
+      - add-ephys-page 
   pull_request:
     branches:
       - main

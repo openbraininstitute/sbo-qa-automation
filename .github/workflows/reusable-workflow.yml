@@ -110,7 +110,7 @@ jobs:
             TEST_FILES="tests/test_ci_cd_stability.py"
             echo "Running CI/CD stability tests only"
           elif [ "${{ inputs.test-type }}" = "smoke" ]; then
-            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py tests/test_digital_brain_story.py tests/test_team.py tests/test_contact.py"
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py tests/test_digital_brain_story.py tests/test_team.py tests/test_contact.py tests/test_explore_ephys.py"
             echo "Running smoke tests"
           elif [ "${{ inputs.test-type }}" = "performance" ]; then
             TEST_FILES="tests/test_performance_example.py"
@@ -119,7 +119,7 @@ jobs:
             TEST_FILES="tests/test_ai_assistant_workflow.py"
             echo "Running AI assistant tests only"
           else
-            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py tests/test_digital_brain_story.py tests/test_team.py tests/test_contact.py"
+            TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py tests/test_digital_brain_story.py tests/test_team.py tests/test_contact.py tests/test_explore_ephys.py"
             echo "Running full test suite"
           fi
           
@@ -271,8 +271,34 @@ jobs:
               TOTAL_TESTS=$((FAILED_TESTS + PASSED_TESTS + SKIPPED_TESTS))
             fi
             
-            # Extract failed test names (limit to first 3 for readability)
-            FAILED_TEST_LIST=$(grep -E "^FAILED tests/" test_output.log | head -3 | sed 's/FAILED tests\///' | sed 's/::.*$//' | tr '\n' ', ' | sed 's/, $//')
+            # Extract failed test names and create clickable links (limit to first 5)
+            FAILED_TEST_LIST=""
+            FAILED_TEST_LINKS=""
+            if [ -f test_output.log ]; then
+              FAILED_TESTS_RAW=$(grep -E "^FAILED tests/" test_output.log | head -5 | sed 's/FAILED tests\///')
+              
+              if [ -n "$FAILED_TESTS_RAW" ]; then
+                # Create comma-separated list for summary
+                FAILED_TEST_LIST=$(echo "$FAILED_TESTS_RAW" | sed 's/::.*$//' | tr '\n' ', ' | sed 's/, $//')
+                
+                # Create JSON array of failed test links for Teams card
+                FAILED_TEST_LINKS="["
+                FIRST=true
+                while IFS= read -r line; do
+                  TEST_FILE=$(echo "$line" | sed 's/::.*$//')
+                  TEST_NAME=$(echo "$line" | sed 's/^.*:://')
+                  
+                  if [ "$FIRST" = true ]; then
+                    FIRST=false
+                  else
+                    FAILED_TEST_LINKS="$FAILED_TEST_LINKS,"
+                  fi
+                  
+                  FAILED_TEST_LINKS="$FAILED_TEST_LINKS{\"type\":\"Action.OpenUrl\",\"title\":\"❌ $TEST_FILE\",\"url\":\"https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/$TEST_FILE\"}"
+                done <<< "$FAILED_TESTS_RAW"
+                FAILED_TEST_LINKS="$FAILED_TEST_LINKS]"
+              fi
+            fi
           fi
           
           # Determine overall status
@@ -301,6 +327,9 @@ jobs:
           echo "FAILED_TESTS=$FAILED_TESTS" >> $GITHUB_ENV
           echo "SKIPPED_TESTS=$SKIPPED_TESTS" >> $GITHUB_ENV
           echo "FAILED_TEST_LIST=$FAILED_TEST_LIST" >> $GITHUB_ENV
+          echo "FAILED_TEST_LINKS<<EOF" >> $GITHUB_ENV
+          echo "$FAILED_TEST_LINKS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
           echo "TEST_DURATION=$TEST_DURATION" >> $GITHUB_ENV
           echo "OVERALL_STATUS=$OVERALL_STATUS" >> $GITHUB_ENV
           echo "STATUS_COLOR=$STATUS_COLOR" >> $GITHUB_ENV
@@ -318,6 +347,185 @@ jobs:
           echo "  Duration: $TEST_DURATION"
           echo "  Status: $OVERALL_STATUS"
           echo "  Failed Tests: $FAILED_TEST_LIST"
+      
+      # Build Teams notification payload with dynamic failed test links
+      - name: Build Teams Notification Payload
+        if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
+        run: |
+          python3 << 'PYTHON_SCRIPT'
+          import json
+          import os
+          import re
+          
+          # Read environment variables
+          total_tests = os.getenv('TOTAL_TESTS', '0')
+          passed_tests = os.getenv('PASSED_TESTS', '0')
+          failed_tests = os.getenv('FAILED_TESTS', '0')
+          skipped_tests = os.getenv('SKIPPED_TESTS', '0')
+          test_duration = os.getenv('TEST_DURATION', 'Unknown')
+          overall_status = os.getenv('OVERALL_STATUS', 'UNKNOWN')
+          status_emoji = os.getenv('STATUS_EMOJI', '❓')
+          commit_sha = os.getenv('COMMIT_SHA', 'unknown')
+          commit_message = os.getenv('COMMIT_MESSAGE', 'Unknown commit')
+          
+          # Build base actions
+          actions = [
+              {
+                  "type": "Action.OpenUrl",
+                  "title": "🔍 View Workflow Run",
+                  "url": f"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              },
+              {
+                  "type": "Action.OpenUrl",
+                  "title": "📋 View Test Plan",
+                  "url": "https://github.com/${{ github.repository }}/blob/main/Virtual_Lab_Test_Plan.xlsx"
+              }
+          ]
+          
+          # Add failed test links if there are failures
+          if int(failed_tests) > 0:
+              try:
+                  with open('test_output.log', 'r') as f:
+                      content = f.read()
+                      failed_pattern = r'FAILED tests/(.+?)(?=\s|$)'
+                      matches = re.findall(failed_pattern, content)
+                      
+                      for match in matches[:5]:  # Limit to 5 failed tests
+                          test_file = match.split('::')[0]
+                          actions.append({
+                              "type": "Action.OpenUrl",
+                              "title": f"❌ {test_file}",
+                              "url": f"https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/tests/{test_file}"
+                          })
+              except Exception as e:
+                  print(f"Error reading failed tests: {e}")
+          
+          # Build complete payload
+          payload = {
+              "type": "message",
+              "attachments": [
+                  {
+                      "contentType": "application/vnd.microsoft.card.adaptive",
+                      "contentUrl": None,
+                      "content": {
+                          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                          "type": "AdaptiveCard",
+                          "version": "1.4",
+                          "body": [
+                              {
+                                  "type": "TextBlock",
+                                  "text": f"{status_emoji} Virtual Lab Test Results - {overall_status}",
+                                  "weight": "bolder",
+                                  "size": "large",
+                                  "color": "attention" if overall_status == "FAILED" else "good"
+                              },
+                              {
+                                  "type": "FactSet",
+                                  "facts": [
+                                      {"title": "Environment:", "value": "${{ inputs.env }}"},
+                                      {"title": "Test Suite:", "value": "${{ inputs.test-type }}"},
+                                      {"title": "Browser:", "value": "${{ matrix.browser }}"},
+                                      {"title": "Branch:", "value": "${{ github.ref_name }}"},
+                                      {"title": "Commit:", "value": f"{commit_sha} - {commit_message}"},
+                                      {"title": "Duration:", "value": test_duration}
+                                  ]
+                              },
+                              {
+                                  "type": "Container",
+                                  "style": "emphasis",
+                                  "items": [
+                                      {
+                                          "type": "TextBlock",
+                                          "text": "📊 Test Summary",
+                                          "weight": "bolder"
+                                      },
+                                      {
+                                          "type": "ColumnSet",
+                                          "columns": [
+                                              {
+                                                  "type": "Column",
+                                                  "width": "stretch",
+                                                  "items": [
+                                                      {
+                                                          "type": "TextBlock",
+                                                          "text": f"**Total:** {total_tests}",
+                                                          "wrap": True
+                                                      }
+                                                  ]
+                                              },
+                                              {
+                                                  "type": "Column",
+                                                  "width": "stretch",
+                                                  "items": [
+                                                      {
+                                                          "type": "TextBlock",
+                                                          "text": f"**✅ Passed:** {passed_tests}",
+                                                          "wrap": True,
+                                                          "color": "good"
+                                                      }
+                                                  ]
+                                              },
+                                              {
+                                                  "type": "Column",
+                                                  "width": "stretch",
+                                                  "items": [
+                                                      {
+                                                          "type": "TextBlock",
+                                                          "text": f"**❌ Failed:** {failed_tests}",
+                                                          "wrap": True,
+                                                          "color": "attention" if int(failed_tests) > 0 else "default"
+                                                      }
+                                                  ]
+                                              },
+                                              {
+                                                  "type": "Column",
+                                                  "width": "stretch",
+                                                  "items": [
+                                                      {
+                                                          "type": "TextBlock",
+                                                          "text": f"**⏭️ Skipped:** {skipped_tests}",
+                                                          "wrap": True
+                                                      }
+                                                  ]
+                                              }
+                                          ]
+                                      }
+                                  ]
+                              }
+                          ],
+                          "actions": actions
+                      }
+                  }
+              ]
+          }
+          
+          # Add failed tests section if there are failures
+          if int(failed_tests) > 0:
+              payload["attachments"][0]["content"]["body"].append({
+                  "type": "Container",
+                  "style": "attention",
+                  "items": [
+                      {
+                          "type": "TextBlock",
+                          "text": "🚨 Failed Tests (click links below to view)",
+                          "weight": "bolder",
+                          "color": "attention"
+                      }
+                  ]
+              })
+          
+          # Save payload to file
+          with open('teams_payload.json', 'w') as f:
+              json.dump(payload, f, indent=2)
+          
+          print("Teams payload generated successfully")
+          PYTHON_SCRIPT
+          
+          # Read the payload and set as output
+          PAYLOAD=$(cat teams_payload.json)
+          echo "TEAMS_PAYLOAD<<EOF" >> $GITHUB_ENV
+          echo "$PAYLOAD" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
           
       # Send enhanced MS Teams notification with proper card format
       - name: Send Teams Notification
@@ -325,186 +533,4 @@ jobs:
         if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
         with:
           webhook_url: ${{ secrets.MS_TEAMS_NEW_WEBHOOK_URI }}
-          raw: >-
-            {
-              "type": "message",
-              "attachments": [
-                {
-                  "contentType": "application/vnd.microsoft.card.adaptive",
-                  "content": {
-                    "type": "AdaptiveCard",
-                    "version": "1.4",
-                    "body": [
-                      {
-                        "type": "Container",
-                        "style": "${{ env.STATUS_COLOR }}",
-                        "items": [
-                          {
-                            "type": "ColumnSet",
-                            "columns": [
-                              {
-                                "type": "Column",
-                                "width": "auto",
-                                "items": [
-                                  {
-                                    "type": "TextBlock",
-                                    "text": "${{ env.STATUS_EMOJI }}",
-                                    "size": "large"
-                                  }
-                                ]
-                              },
-                              {
-                                "type": "Column",
-                                "width": "stretch",
-                                "items": [
-                                  {
-                                    "type": "TextBlock",
-                                    "text": "Virtual Lab Test Results - ${{ env.OVERALL_STATUS }}",
-                                    "weight": "bolder",
-                                    "size": "medium"
-                                  },
-                                  {
-                                    "type": "TextBlock",
-                                    "text": "${{ inputs.test-type }} tests on ${{ inputs.env }} environment",
-                                    "size": "small",
-                                    "spacing": "none"
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Container",
-                        "items": [
-                          {
-                            "type": "FactSet",
-                            "facts": [
-                              {
-                                "title": "Environment:",
-                                "value": "${{ inputs.env }}"
-                              },
-                              {
-                                "title": "Test Suite:",
-                                "value": "${{ inputs.test-type }}"
-                              },
-                              {
-                                "title": "Browser:",
-                                "value": "${{ matrix.browser }}"
-                              },
-                              {
-                                "title": "Branch:",
-                                "value": "${{ github.ref_name }}"
-                              },
-                              {
-                                "title": "Commit:",
-                                "value": "${{ env.COMMIT_SHA }} - ${{ env.COMMIT_MESSAGE }}"
-                              },
-                              {
-                                "title": "Duration:",
-                                "value": "${{ env.TEST_DURATION }}"
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Container",
-                        "style": "emphasis",
-                        "items": [
-                          {
-                            "type": "TextBlock",
-                            "text": "📊 Test Summary",
-                            "weight": "bolder",
-                            "size": "medium"
-                          },
-                          {
-                            "type": "ColumnSet",
-                            "columns": [
-                              {
-                                "type": "Column",
-                                "width": "stretch",
-                                "items": [
-                                  {
-                                    "type": "TextBlock",
-                                    "text": "**Total:** ${{ env.TOTAL_TESTS }}",
-                                    "wrap": true
-                                  }
-                                ]
-                              },
-                              {
-                                "type": "Column",
-                                "width": "stretch",
-                                "items": [
-                                  {
-                                    "type": "TextBlock",
-                                    "text": "**✅ Passed:** ${{ env.PASSED_TESTS }}",
-                                    "wrap": true,
-                                    "color": "good"
-                                  }
-                                ]
-                              },
-                              {
-                                "type": "Column",
-                                "width": "stretch",
-                                "items": [
-                                  {
-                                    "type": "TextBlock",
-                                    "text": "**❌ Failed:** ${{ env.FAILED_TESTS }}",
-                                    "wrap": true,
-                                    "color": "${{ env.FAILED_TESTS != '0' && 'attention' || 'default' }}"
-                                  }
-                                ]
-                              },
-                              {
-                                "type": "Column",
-                                "width": "stretch",
-                                "items": [
-                                  {
-                                    "type": "TextBlock",
-                                    "text": "**⏭️ Skipped:** ${{ env.SKIPPED_TESTS }}",
-                                    "wrap": true
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Container",
-                        "style": "attention",
-                        "isVisible": "${{ env.FAILED_TESTS != '0' }}",
-                        "items": [
-                          {
-                            "type": "TextBlock",
-                            "text": "🚨 Failed Tests",
-                            "weight": "bolder",
-                            "color": "attention"
-                          },
-                          {
-                            "type": "TextBlock",
-                            "text": "${{ env.FAILED_TEST_LIST }}",
-                            "wrap": true,
-                            "size": "small"
-                          }
-                        ]
-                      }
-                    ],
-                    "actions": [
-                      {
-                        "type": "Action.OpenUrl",
-                        "title": "🔍 View Workflow Run",
-                        "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                      },
-                      {
-                        "type": "Action.OpenUrl",
-                        "title": "📋 View Test Plan",
-                        "url": "https://github.com/${{ github.repository }}/blob/main/Virtual_Lab_Test_Plan.xlsx"
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
+          raw: ${{ env.TEAMS_PAYLOAD }}

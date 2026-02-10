@@ -142,7 +142,7 @@ class TestExploreModelPage:
              explore_emodel.find_dv_model_score_value),
             ("M-TYPE", explore_emodel.find_dv_mtype_label, explore_emodel.find_dv_mtype_value),
             ("E-TYPE", explore_emodel.find_dv_etype_label, explore_emodel.find_dv_etype_value),
-            ("CREATED BY", explore_emodel.find_dv_created_by_label, explore_emodel.find_dv_created_by_value),
+            ("REGISTERED BY", explore_emodel.find_dv_registered_by_label, explore_emodel.find_dv_registered_by_value),
             ("SPECIES", explore_emodel.find_dv_species_label, explore_emodel.find_dv_species_value),
         ]
 
