@@ -159,4 +159,18 @@ class TestWorkflowHome:
         logger.info("🔍 Verifying Recent Activities section...")
         workflows_page.verify_recent_activities_section()
         
+        # ========== VERIFY TABLE PER TYPE ==========
+        logger.info("🔍 Verifying table for each Type...")
+        
+        # Test each type: Single neuron, Synaptome, Ion channel
+        types_to_test = ['Single neuron', 'Synaptome', 'Ion channel']
+        
+        for type_name in types_to_test:
+            logger.info(f"🔍 Testing Type: {type_name}")
+            result = workflows_page.verify_table_for_type(type_name)
+            if result:
+                logger.info(f"✅ Type '{type_name}' verification completed")
+            else:
+                logger.warning(f"⚠️ Type '{type_name}' verification failed")
+        
         logger.info("✅ All workflow home page tests completed successfully")

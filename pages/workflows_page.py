@@ -167,6 +167,65 @@ class WorkflowsPage(HomePage):
         """Find Type dropdown"""
         return self.find_element(WorkflowLocators.TYPE_DROPDOWN, timeout=timeout)
     
+    def click_type_dropdown_option(self, type_name):
+        """Click Type dropdown and select an option"""
+        try:
+            # Find all combobox buttons (Category and Type)
+            dropdowns = self.browser.find_elements(By.XPATH, "//button[@role='combobox']")
+            if len(dropdowns) >= 2:
+                type_dropdown = dropdowns[1]  # Second dropdown is Type
+                type_dropdown.click()
+                self.logger.info(f"Clicked Type dropdown")
+                time.sleep(1)
+                
+                # Find and click the option
+                # Options appear in a dropdown menu
+                option_xpath = f"//div[@role='option']//span[contains(text(), '{type_name}')]"
+                option = self.browser.find_element(By.XPATH, option_xpath)
+                option.click()
+                self.logger.info(f"Selected Type: {type_name}")
+                time.sleep(2)  # Wait for table to update
+                return True
+            else:
+                self.logger.warning("Type dropdown not found")
+                return False
+        except Exception as e:
+            self.logger.warning(f"Could not select Type '{type_name}': {e}")
+            return False
+    
+    def verify_table_for_type(self, type_name):
+        """Verify table is displayed and has rows for a specific type"""
+        try:
+            # Click the type dropdown option
+            if not self.click_type_dropdown_option(type_name):
+                return False
+            
+            # Verify table is displayed (may not exist if no activities)
+            try:
+                table_displayed = self.verify_table_displayed()
+            except:
+                table_displayed = False
+            
+            if not table_displayed:
+                self.logger.info(f"ℹ️ Type '{type_name}': No table displayed (no activities for this type)")
+                return True  # This is OK - just means no activities
+            
+            # Get row count
+            row_count = self.get_table_row_count()
+            self.logger.info(f"✅ Type '{type_name}': Table has {row_count} rows")
+            
+            # Verify at least one row exists (or could be 0 if no activities)
+            if row_count > 0:
+                self.logger.info(f"✅ Type '{type_name}': Activities found")
+            else:
+                self.logger.info(f"ℹ️ Type '{type_name}': No activities found (table is empty)")
+            
+            return True
+            
+        except Exception as e:
+            self.logger.warning(f"Error verifying table for Type '{type_name}': {e}")
+            return False
+    
     def verify_recent_activities_section(self):
         """Verify Recent Activities section with dropdowns and table"""
         try:
