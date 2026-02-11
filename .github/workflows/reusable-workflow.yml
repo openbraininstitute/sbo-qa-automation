@@ -231,6 +231,8 @@ jobs:
         if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
         run: |
           echo "Parsing test results for Teams notification..."
+          echo "Event: ${{ github.event_name }}"
+          echo "Job status: ${{ job.status }}"
           
           # Initialize variables
           TOTAL_TESTS=0
@@ -238,14 +240,22 @@ jobs:
           FAILED_TESTS=0
           SKIPPED_TESTS=0
           FAILED_TEST_LIST=""
+          FAILED_TEST_FILES=""
           TEST_DURATION="Unknown"
           
           # Parse pytest output if available
           if [ -f test_output.log ]; then
             echo "Found test output log, parsing results..."
             
+            # Extract failed test files for clickable links
+            FAILED_TEST_FILES=$(grep -E '^FAILED tests/' test_output.log | sed 's/FAILED tests\///' | sed 's/::.*$//' | head -5 | tr '\n' ',')
+            echo "Failed test files: $FAILED_TEST_FILES"
+            
             # Extract test summary line (e.g., "= 5 failed, 10 passed, 2 skipped in 45.67s =")
             SUMMARY_LINE=$(grep -E "=.*failed.*passed.*in.*s.*=" test_output.log | tail -1)
+          else
+            echo "⚠️ Warning: test_output.log not found - notification will have limited information"
+          fi
             
             if [ -n "$SUMMARY_LINE" ]; then
               echo "Summary line found: $SUMMARY_LINE"
@@ -321,6 +331,12 @@ jobs:
           COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s" 2>/dev/null || echo "Unknown commit")
           RUN_URL="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           
+          # Ensure all numeric variables have valid values (never empty)
+          TOTAL_TESTS=${TOTAL_TESTS:-0}
+          PASSED_TESTS=${PASSED_TESTS:-0}
+          FAILED_TESTS=${FAILED_TESTS:-0}
+          SKIPPED_TESTS=${SKIPPED_TESTS:-0}
+          
           # Create environment variables for Teams notification
           echo "TOTAL_TESTS=$TOTAL_TESTS" >> $GITHUB_ENV
           echo "PASSED_TESTS=$PASSED_TESTS" >> $GITHUB_ENV
@@ -357,11 +373,11 @@ jobs:
           import os
           import re
           
-          # Read environment variables
-          total_tests = os.getenv('TOTAL_TESTS', '0')
-          passed_tests = os.getenv('PASSED_TESTS', '0')
-          failed_tests = os.getenv('FAILED_TESTS', '0')
-          skipped_tests = os.getenv('SKIPPED_TESTS', '0')
+          # Read environment variables with proper defaults
+          total_tests = os.getenv('TOTAL_TESTS', '0').strip() or '0'
+          passed_tests = os.getenv('PASSED_TESTS', '0').strip() or '0'
+          failed_tests = os.getenv('FAILED_TESTS', '0').strip() or '0'
+          skipped_tests = os.getenv('SKIPPED_TESTS', '0').strip() or '0'
           test_duration = os.getenv('TEST_DURATION', 'Unknown')
           overall_status = os.getenv('OVERALL_STATUS', 'UNKNOWN')
           status_emoji = os.getenv('STATUS_EMOJI', '❓')
@@ -501,17 +517,26 @@ jobs:
           
           # Add failed tests section if there are failures
           if int(failed_tests) > 0:
+              failed_items = [
+                  {
+                      "type": "TextBlock",
+                      "text": "🚨 Failed Tests",
+                      "weight": "bolder",
+                      "color": "attention"
+                  },
+                  {
+                      "type": "TextBlock",
+                      "text": "Click the test file links below to view the code:",
+                      "wrap": True,
+                      "size": "small",
+                      "isSubtle": True
+                  }
+              ]
+              
               payload["attachments"][0]["content"]["body"].append({
                   "type": "Container",
                   "style": "attention",
-                  "items": [
-                      {
-                          "type": "TextBlock",
-                          "text": "🚨 Failed Tests (click links below to view)",
-                          "weight": "bolder",
-                          "color": "attention"
-                      }
-                  ]
+                  "items": failed_items
               })
           
           # Save payload to file
