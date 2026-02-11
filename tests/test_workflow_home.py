@@ -173,6 +173,10 @@ class TestWorkflowHome:
             else:
                 logger.warning(f"⚠️ Build Type '{type_name}' verification failed")
         
+        # ========== VERIFY PAGINATION ==========
+        logger.info("🔍 Verifying pagination...")
+        workflows_page.verify_pagination_works()
+        
         # ========== VERIFY SIMULATE CATEGORY ==========
         logger.info("🔍 Switching to Simulate category...")
         

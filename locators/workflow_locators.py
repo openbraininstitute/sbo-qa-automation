@@ -62,7 +62,8 @@ class WorkflowLocators:
     TABLE_CELLS = (By.XPATH, "//table//tbody//td")
     
     # Pagination
-    PAGINATION_CONTAINER = (By.XPATH, "//nav[@aria-label='pagination']")
-    PAGINATION_NEXT = (By.XPATH, "//button[@aria-label='Go to next page']")
-    PAGINATION_PREVIOUS = (By.XPATH, "//button[@aria-label='Go to previous page']")
-    PAGINATION_PAGES = (By.XPATH, "//nav[@aria-label='pagination']//button[not(@aria-label)]")
+    PAGINATION_CONTAINER = (By.CSS_SELECTOR, "ul.ant-pagination")
+    PAGINATION_NEXT = (By.CSS_SELECTOR, "li.ant-pagination-next button")
+    PAGINATION_PREVIOUS = (By.CSS_SELECTOR, "li.ant-pagination-prev button")
+    PAGINATION_ITEM = (By.CSS_SELECTOR, "li.ant-pagination-item")
+    PAGINATION_ACTIVE_ITEM = (By.CSS_SELECTOR, "li.ant-pagination-item-active")

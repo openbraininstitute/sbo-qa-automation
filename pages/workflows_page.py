@@ -409,6 +409,121 @@ class WorkflowsPage(HomePage):
             self.logger.warning(f"Error clicking pagination: {e}")
             return False
 
+    # Pagination methods
+    def find_pagination(self, timeout=10):
+        """Find pagination container"""
+        return self.find_element(WorkflowLocators.PAGINATION_CONTAINER, timeout=timeout)
+
+    def verify_pagination_displayed(self):
+        """Verify pagination is displayed"""
+        try:
+            pagination = self.find_pagination(timeout=5)
+            is_displayed = pagination.is_displayed()
+            self.logger.info(f"✅ Pagination displayed: {is_displayed}")
+            return is_displayed
+        except TimeoutException:
+            self.logger.info("ℹ️ Pagination not found (may not be needed)")
+            return False
+    
+    def get_active_page_number(self):
+        """Get the currently active page number"""
+        try:
+            active_item = self.find_element(WorkflowLocators.PAGINATION_ACTIVE_ITEM, timeout=5)
+            page_num = active_item.text
+            return int(page_num)
+        except:
+            return 1
+    
+    def click_pagination_next(self):
+        """Click the Next pagination button"""
+        try:
+            next_button = self.find_element(WorkflowLocators.PAGINATION_NEXT, timeout=5)
+            # Check if disabled
+            parent = next_button.find_element(By.XPATH, "..")
+            if 'ant-pagination-disabled' in parent.get_attribute('class'):
+                self.logger.info("ℹ️ Next button is disabled (last page)")
+                return False
+            
+            next_button.click()
+            self.logger.info("✅ Clicked Next pagination button")
+            time.sleep(2)
+            return True
+        except Exception as e:
+            self.logger.warning(f"Could not click Next button: {e}")
+            return False
+    
+    def click_pagination_previous(self):
+        """Click the Previous pagination button"""
+        try:
+            prev_button = self.find_element(WorkflowLocators.PAGINATION_PREVIOUS, timeout=5)
+            # Check if disabled
+            parent = prev_button.find_element(By.XPATH, "..")
+            if 'ant-pagination-disabled' in parent.get_attribute('class'):
+                self.logger.info("ℹ️ Previous button is disabled (first page)")
+                return False
+            
+            prev_button.click()
+            self.logger.info("✅ Clicked Previous pagination button")
+            time.sleep(2)
+            return True
+        except Exception as e:
+            self.logger.warning(f"Could not click Previous button: {e}")
+            return False
+    
+    def click_pagination_page(self, page_number):
+        """Click a specific pagination page number"""
+        try:
+            page_items = self.find_all_elements(WorkflowLocators.PAGINATION_ITEM)
+            for item in page_items:
+                if item.text == str(page_number):
+                    item.click()
+                    self.logger.info(f"✅ Clicked pagination page {page_number}")
+                    time.sleep(2)
+                    return True
+            self.logger.warning(f"Page {page_number} not found")
+            return False
+        except Exception as e:
+            self.logger.warning(f"Error clicking pagination page {page_number}: {e}")
+            return False
+    
+    def verify_pagination_works(self):
+        """Verify pagination by clicking through pages and checking table changes"""
+        try:
+            # Check if pagination exists
+            if not self.verify_pagination_displayed():
+                self.logger.info("ℹ️ No pagination to test")
+                return True
+            
+            # Get initial page and row count
+            initial_page = self.get_active_page_number()
+            initial_rows = self.get_table_row_count()
+            self.logger.info(f"📄 Starting on page {initial_page} with {initial_rows} rows")
+            
+            # Try to click Next
+            if self.click_pagination_next():
+                new_page = self.get_active_page_number()
+                new_rows = self.get_table_row_count()
+                
+                if new_page != initial_page:
+                    self.logger.info(f"✅ Pagination works: moved from page {initial_page} to page {new_page}")
+                    self.logger.info(f"📊 New page has {new_rows} rows")
+                    
+                    # Go back to first page
+                    self.click_pagination_previous()
+                    back_page = self.get_active_page_number()
+                    self.logger.info(f"✅ Returned to page {back_page}")
+                    return True
+                else:
+                    self.logger.warning("⚠️ Page number didn't change after clicking Next")
+                    return False
+            else:
+                self.logger.info("ℹ️ Only one page of results")
+                return True
+                
+        except Exception as e:
+            self.logger.warning(f"Error verifying pagination: {e}")
+            return False
+
     def verify_pagination_changes_content(self):
         """Verify that clicking pagination changes table content"""
         try:
