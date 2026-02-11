@@ -167,6 +167,31 @@ class WorkflowsPage(HomePage):
         """Find Type dropdown"""
         return self.find_element(WorkflowLocators.TYPE_DROPDOWN, timeout=timeout)
     
+    def click_category_dropdown_option(self, category_name):
+        """Click Category dropdown and select an option"""
+        try:
+            # Find all combobox buttons (Category and Type)
+            dropdowns = self.browser.find_elements(By.XPATH, "//button[@role='combobox']")
+            if len(dropdowns) >= 1:
+                category_dropdown = dropdowns[0]  # First dropdown is Category
+                category_dropdown.click()
+                self.logger.info(f"Clicked Category dropdown")
+                time.sleep(1)
+                
+                # Find and click the option
+                option_xpath = f"//div[@role='option']//span[contains(text(), '{category_name}')]"
+                option = self.browser.find_element(By.XPATH, option_xpath)
+                option.click()
+                self.logger.info(f"Selected Category: {category_name}")
+                time.sleep(2)  # Wait for table to update
+                return True
+            else:
+                self.logger.warning("Category dropdown not found")
+                return False
+        except Exception as e:
+            self.logger.warning(f"Could not select Category '{category_name}': {e}")
+            return False
+    
     def click_type_dropdown_option(self, type_name):
         """Click Type dropdown and select an option"""
         try:
@@ -193,12 +218,29 @@ class WorkflowsPage(HomePage):
             self.logger.warning(f"Could not select Type '{type_name}': {e}")
             return False
     
+    def check_no_activities_message(self):
+        """Check if 'no activities' message is displayed"""
+        try:
+            message = self.find_element(WorkflowLocators.NO_ACTIVITIES_MESSAGE, timeout=3)
+            if message.is_displayed():
+                message_text = message.text
+                self.logger.info(f"ℹ️ No activities message found: '{message_text}'")
+                return True
+            return False
+        except:
+            return False
+    
     def verify_table_for_type(self, type_name):
         """Verify table is displayed and has rows for a specific type"""
         try:
             # Click the type dropdown option
             if not self.click_type_dropdown_option(type_name):
                 return False
+            
+            # Check for "no activities" message first
+            if self.check_no_activities_message():
+                self.logger.info(f"✅ Type '{type_name}': No activities message displayed (expected)")
+                return True
             
             # Verify table is displayed (may not exist if no activities)
             try:

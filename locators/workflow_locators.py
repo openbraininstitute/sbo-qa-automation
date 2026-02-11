@@ -47,6 +47,9 @@ class WorkflowLocators:
     CATEGORY_DROPDOWN = (By.XPATH, "//div[contains(text(), 'Category')]/following-sibling::button[@role='combobox']")
     TYPE_DROPDOWN = (By.XPATH, "//div[contains(text(), 'Type')]/following-sibling::button[@role='combobox']")
     
+    # Empty state message
+    NO_ACTIVITIES_MESSAGE = (By.XPATH, "//*[contains(text(), 'do not have') or contains(text(), 'No activities') or contains(text(), 'no activities')]")
+    
     # Table elements
     ACTIVITIES_TABLE = (By.CSS_SELECTOR, "#workflow-activities-table")
     TABLE = (By.XPATH, "//table")

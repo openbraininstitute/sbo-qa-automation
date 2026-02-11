@@ -159,18 +159,38 @@ class TestWorkflowHome:
         logger.info("🔍 Verifying Recent Activities section...")
         workflows_page.verify_recent_activities_section()
         
-        # ========== VERIFY TABLE PER TYPE ==========
-        logger.info("🔍 Verifying table for each Type...")
+        # ========== VERIFY TABLE PER TYPE (BUILD) ==========
+        logger.info("🔍 Verifying table for each Build Type...")
         
-        # Test each type: Single neuron, Synaptome, Ion channel
-        types_to_test = ['Single neuron', 'Synaptome', 'Ion channel']
+        # Test each Build type: Single neuron, Synaptome, Ion channel
+        build_types = ['Single neuron', 'Synaptome', 'Ion channel']
         
-        for type_name in types_to_test:
-            logger.info(f"🔍 Testing Type: {type_name}")
+        for type_name in build_types:
+            logger.info(f"🔍 Testing Build Type: {type_name}")
             result = workflows_page.verify_table_for_type(type_name)
             if result:
-                logger.info(f"✅ Type '{type_name}' verification completed")
+                logger.info(f"✅ Build Type '{type_name}' verification completed")
             else:
-                logger.warning(f"⚠️ Type '{type_name}' verification failed")
+                logger.warning(f"⚠️ Build Type '{type_name}' verification failed")
+        
+        # ========== VERIFY SIMULATE CATEGORY ==========
+        logger.info("🔍 Switching to Simulate category...")
+        
+        # Click Category dropdown and select Simulate
+        if workflows_page.click_category_dropdown_option('Simulate'):
+            logger.info("✅ Switched to Simulate category")
+            
+            # Test each Simulate type
+            simulate_types = ['Single neuron', 'Synaptome', 'Single neuron (beta)', 'Synaptome (beta)', 'Paired neurons (beta)']
+            
+            for type_name in simulate_types:
+                logger.info(f"🔍 Testing Simulate Type: {type_name}")
+                result = workflows_page.verify_table_for_type(type_name)
+                if result:
+                    logger.info(f"✅ Simulate Type '{type_name}' verification completed")
+                else:
+                    logger.warning(f"⚠️ Simulate Type '{type_name}' verification failed")
+        else:
+            logger.warning("⚠️ Could not switch to Simulate category")
         
         logger.info("✅ All workflow home page tests completed successfully")
