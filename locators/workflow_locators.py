@@ -40,9 +40,15 @@ class WorkflowLocators:
     CAROUSEL_NEXT_BUTTON = (By.XPATH, "//button//span[@aria-label='right']")
     
     # Recent activities section
-    RECENT_ACTIVITIES_HEADER = (By.XPATH, "//h2[text()='Recent activities']")
+    RECENT_ACTIVITIES_SECTION = (By.CSS_SELECTOR, "#workflow-activity-content")
+    ACTIVITY_TABLE_SECTION = (By.CSS_SELECTOR, "#activity-table-with-filters")
+    
+    # Category and Type dropdowns
+    CATEGORY_DROPDOWN = (By.XPATH, "//div[contains(text(), 'Category')]/following-sibling::button[@role='combobox']")
+    TYPE_DROPDOWN = (By.XPATH, "//div[contains(text(), 'Type')]/following-sibling::button[@role='combobox']")
     
     # Table elements
+    ACTIVITIES_TABLE = (By.CSS_SELECTOR, "#workflow-activities-table")
     TABLE = (By.XPATH, "//table")
     TABLE_HEADER_NAME = (By.XPATH, "//th[text()='Name']")
     TABLE_HEADER_CATEGORY = (By.XPATH, "//th[text()='Category']")

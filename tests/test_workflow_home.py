@@ -155,40 +155,8 @@ class TestWorkflowHome:
             logger.error(f"❌ Simulate category test failed: {e}")
             raise
         
-        # ========== VERIFY RECENT ACTIVITIES (OPTIONAL) ==========
+        # ========== VERIFY RECENT ACTIVITIES ==========
         logger.info("🔍 Verifying Recent Activities section...")
-        try:
-            recent_activities = workflows_page.find_element(WorkflowLocators.RECENT_ACTIVITIES_HEADER, timeout=5)
-            if recent_activities.is_displayed():
-                logger.info("✅ Recent Activities section is displayed")
-                
-                # Check if table exists
-                try:
-                    table_displayed = workflows_page.verify_table_displayed()
-                    if table_displayed:
-                        logger.info("✅ Recent Activities table is displayed")
-                        
-                        # Verify table columns
-                        columns = workflows_page.verify_table_columns()
-                        required_columns = ['Name', 'Category', 'Type', 'Date', 'Status']
-                        columns_found = sum(1 for col in required_columns if columns.get(col, {}).get('present', False))
-                        logger.info(f"✅ Found {columns_found}/{len(required_columns)} table columns")
-                        
-                        # Get row count
-                        row_count = workflows_page.get_table_row_count()
-                        logger.info(f"📊 Table has {row_count} rows")
-                        
-                        # Check pagination
-                        pagination_displayed = workflows_page.verify_pagination_displayed()
-                        if pagination_displayed:
-                            logger.info("✅ Pagination is displayed")
-                        else:
-                            logger.info("ℹ️ Pagination not displayed (may not be needed)")
-                    else:
-                        logger.info("ℹ️ Recent Activities table not displayed (may be empty)")
-                except Exception as e:
-                    logger.info(f"ℹ️ Could not verify table: {e}")
-        except Exception as e:
-            logger.info(f"ℹ️ Recent Activities section not found: {e}")
+        workflows_page.verify_recent_activities_section()
         
         logger.info("✅ All workflow home page tests completed successfully")

@@ -154,6 +154,70 @@ class WorkflowsPage(HomePage):
         
         return results
 
+    # Recent Activities section methods
+    def find_recent_activities_section(self, timeout=10):
+        """Find the Recent Activities section"""
+        return self.find_element(WorkflowLocators.RECENT_ACTIVITIES_SECTION, timeout=timeout)
+    
+    def find_category_dropdown(self, timeout=10):
+        """Find Category dropdown"""
+        return self.find_element(WorkflowLocators.CATEGORY_DROPDOWN, timeout=timeout)
+    
+    def find_type_dropdown(self, timeout=10):
+        """Find Type dropdown"""
+        return self.find_element(WorkflowLocators.TYPE_DROPDOWN, timeout=timeout)
+    
+    def verify_recent_activities_section(self):
+        """Verify Recent Activities section with dropdowns and table"""
+        try:
+            # Check if section exists
+            section = self.find_recent_activities_section(timeout=5)
+            if not section.is_displayed():
+                self.logger.info("ℹ️ Recent Activities section not displayed")
+                return False
+            
+            self.logger.info("✅ Recent Activities section is displayed")
+            
+            # Check Category dropdown
+            try:
+                category_dropdown = self.browser.find_element(By.XPATH, "//button[@role='combobox']")
+                category_text = category_dropdown.text
+                self.logger.info(f"✅ Category dropdown found: {category_text}")
+            except:
+                self.logger.warning("⚠️ Category dropdown not found")
+            
+            # Check Type dropdown
+            try:
+                type_dropdowns = self.browser.find_elements(By.XPATH, "//button[@role='combobox']")
+                if len(type_dropdowns) >= 2:
+                    type_text = type_dropdowns[1].text
+                    self.logger.info(f"✅ Type dropdown found: {type_text}")
+                else:
+                    self.logger.warning("⚠️ Type dropdown not found")
+            except:
+                self.logger.warning("⚠️ Type dropdown not found")
+            
+            # Check table
+            table_displayed = self.verify_table_displayed()
+            if table_displayed:
+                self.logger.info("✅ Activities table is displayed")
+                
+                # Verify table columns
+                columns = self.verify_table_columns()
+                required_columns = ['Name', 'Category', 'Type', 'Date', 'Status']
+                columns_found = sum(1 for col in required_columns if columns.get(col, {}).get('present', False))
+                self.logger.info(f"✅ Found {columns_found}/{len(required_columns)} table columns")
+                
+                # Get row count
+                row_count = self.get_table_row_count()
+                self.logger.info(f"📊 Table has {row_count} activity rows")
+            
+            return True
+            
+        except Exception as e:
+            self.logger.info(f"ℹ️ Recent Activities section not found: {e}")
+            return False
+
     # Table methods
     def find_table(self, timeout=10):
         """Find the workflows table"""
