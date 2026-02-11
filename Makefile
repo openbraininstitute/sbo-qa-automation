@@ -84,7 +84,7 @@ feature:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_explore_emodel.py -vs --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_project_notebooks.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_workflow_home.py --html=report.html --self-contained-html"
 
 # Debug failing tests
 debug-explore:
