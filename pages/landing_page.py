@@ -20,6 +20,11 @@ class LandingPage(HomePage):
 
     def go_to_landing_page(self, timeout=20):
         self.browser.get(self.base_url)
+        # Set Matomo exclusion flag for automated tests
+        try:
+            self.browser.execute_script('window._isSeleniumTest = true;')
+        except Exception:
+            pass
         self.wait_for_page_loaded(timeout=timeout)
         banner_title = self.find_banner_title(timeout=timeout)
         return banner_title

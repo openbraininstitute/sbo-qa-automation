@@ -26,6 +26,12 @@ class CustomBasePage:
         url = self.lab_url + page_url
         print(f"INFO: CustomPage base_url + page_url = {url}" )
         self.browser.get(url)
+        
+        # Set Matomo exclusion flag for automated tests
+        try:
+            self.browser.execute_script('window._isSeleniumTest = true;')
+        except Exception:
+            pass  # Silently fail if script execution fails
 
     def assert_visible(self, element, description, file_path=None, line=None):
         if not element.is_displayed():
