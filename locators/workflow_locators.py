@@ -44,11 +44,8 @@ class WorkflowLocators:
     ACTIVITY_TABLE_SECTION = (By.CSS_SELECTOR, "#activity-table-with-filters")
     
     # Category and Type dropdowns
-    CATEGORY_DROPDOWN = (By.XPATH, "//div[contains(text(), 'Category')]/following-sibling::button[@role='combobox']")
-    TYPE_DROPDOWN = (By.XPATH, "//div[contains(text(), 'Type')]/following-sibling::button[@role='combobox']")
-    
-    # Empty state message
-    NO_ACTIVITIES_MESSAGE = (By.XPATH, "//*[contains(text(), 'do not have') or contains(text(), 'No activities') or contains(text(), 'no activities')]")
+    CATEGORY_DROPDOWN = (By.CSS_SELECTOR, "#workflow-category-and-type-selector button[role='combobox']:nth-of-type(1)")
+    TYPE_DROPDOWN = (By.CSS_SELECTOR, "#workflow-category-and-type-selector button[role='combobox']:nth-of-type(2)")
     
     # Table elements
     ACTIVITIES_TABLE = (By.CSS_SELECTOR, "#workflow-activities-table")
@@ -62,8 +59,7 @@ class WorkflowLocators:
     TABLE_CELLS = (By.XPATH, "//table//tbody//td")
     
     # Pagination
-    PAGINATION_CONTAINER = (By.CSS_SELECTOR, "ul.ant-pagination")
-    PAGINATION_NEXT = (By.CSS_SELECTOR, "li.ant-pagination-next button")
-    PAGINATION_PREVIOUS = (By.CSS_SELECTOR, "li.ant-pagination-prev button")
-    PAGINATION_ITEM = (By.CSS_SELECTOR, "li.ant-pagination-item")
-    PAGINATION_ACTIVE_ITEM = (By.CSS_SELECTOR, "li.ant-pagination-item-active")
+    PAGINATION_CONTAINER = (By.XPATH, "//nav[@aria-label='pagination']")
+    PAGINATION_NEXT = (By.XPATH, "//button[@aria-label='Go to next page']")
+    PAGINATION_PREVIOUS = (By.XPATH, "//button[@aria-label='Go to previous page']")
+    PAGINATION_PAGES = (By.XPATH, "//nav[@aria-label='pagination']//button[not(@aria-label)]")
