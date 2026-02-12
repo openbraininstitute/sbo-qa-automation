@@ -23,6 +23,11 @@ class LoginPage(CustomBasePage):
         print(f"INFO: From pages/login_page.py 'self.base_url': {self.lab_url}")
         target_url = self.lab_url
         self.browser.get(target_url)
+        # Set Matomo exclusion flag for automated tests
+        try:
+            self.browser.execute_script('window._isSeleniumTest = true;')
+        except Exception:
+            pass
         self.logger.info(f"INFO: Target URL is {target_url}")
         try:
             WebDriverWait(self.browser, 30).until(

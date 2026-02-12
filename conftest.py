@@ -69,6 +69,20 @@ def create_browser(pytestconfig):
     browser.set_page_load_timeout(90)  # Increased timeout for CI/CD
     browser.set_window_size(1400, 900)  # Consistent window size for Mac 14"
     wait = WebDriverWait(browser, 30)  # Increased wait timeout
+    
+    # Set flag to exclude automated tests from Matomo analytics
+    # For Chrome, use CDP to inject script on every page load
+    if browser_name == "chrome":
+        try:
+            browser.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
+                'source': 'window._isSeleniumTest = true;'
+            })
+        except Exception as e:
+            print(f"Warning: Could not set Matomo exclusion flag via CDP: {e}")
+    
+    # For Firefox and as fallback, it'll be injected after each navigation
+    # Store the flag setter function in browser for easy access
+    browser._set_matomo_flag = lambda: browser.execute_script('window._isSeleniumTest = true;')
 
     return browser, wait
 
@@ -458,9 +472,8 @@ def login_direct_complete(setup, navigate_to_login_direct, test_config, logger):
     yield browser, wait, base_url, lab_id, project_id
 
 @pytest.fixture(scope="function")
-def login(setup, navigate_to_login, test_config, logger):
+def login(navigate_to_login, test_config, logger):
     """Fixture to log in and ensure user is authenticated."""
-    browser, wait, lab_url, lab_id, project_id = setup
     login_page = navigate_to_login
 
     username = test_config.get("username")
@@ -471,10 +484,9 @@ def login(setup, navigate_to_login, test_config, logger):
 
     login_page.perform_login(test_config["username"], password)
     login_page.wait_for_login_complete()
-    print("Login successful. Current URL:", browser.current_url)
-    login_page = LoginPage(browser, wait, lab_url, logger)
+    print("Login successful. Current URL:", login_page.browser.current_url)
 
-    yield browser, wait
+    yield login_page.browser, login_page.wait
     login_page.browser.delete_all_cookies()
 
 @pytest.fixture(scope="function")
@@ -539,16 +551,6 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         terminalreporter.write_line("")
         terminalreporter.write_sep("=", "✅ ALL TESTS PASSED", green=True)
 
-
-# def pytest_sessionfinish(session, exitstatus):
-#     """Print failed test summary at the end of the session"""
-#     if failed_tests:
-#         print("\n\033[91m❌ FAILED TEST SUMMARY:\033[0m")
-#         for test in failed_tests:
-#             print(f"\033[91m- {test}\033[0m")
-#     else:
-#         print("\n\033[92m✅ ALL TESTS PASSED\033[0m")
-
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):
     """
@@ -591,9 +593,6 @@ def pytest_runtest_makereport(item):
                     _capture_screenshot(file_name, browser)
                     if os.path.exists(file_name):
                         print(f"Screenshot successfully saved at: {file_name}")
-                        # html = ('<div><img src="%s" alt="screenshot" '
-                        #         'style="width:304px;height:228px;" onclick="window.open(this.src)" '
-                        #         'align="right"/></div>') % os.path.relpath(file_name)
                         with open(file_name, "rb") as image_file:
                             encoded = base64.b64encode(image_file.read()).decode("utf-8")
                             html = f'<div><img src="data:image/png;base64,{encoded}" ' \

@@ -309,7 +309,6 @@ jobs:
                 FAILED_TEST_LINKS="$FAILED_TEST_LINKS]"
               fi
             fi
-          fi
           
           # Determine overall status
           if [ "$FAILED_TESTS" -gt 0 ]; then
