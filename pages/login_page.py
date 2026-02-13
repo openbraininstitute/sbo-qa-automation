@@ -28,6 +28,9 @@ class LoginPage(CustomBasePage):
             self.browser.execute_script('window._isSeleniumTest = true;')
         except Exception:
             pass
+        # Set Matomo exclusion cookie
+        if hasattr(self.browser, '_set_matomo_cookie'):
+            self.browser._set_matomo_cookie()
         self.logger.info(f"INFO: Target URL is {target_url}")
         try:
             WebDriverWait(self.browser, 30).until(

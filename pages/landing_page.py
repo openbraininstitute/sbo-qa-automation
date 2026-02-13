@@ -25,6 +25,9 @@ class LandingPage(HomePage):
             self.browser.execute_script('window._isSeleniumTest = true;')
         except Exception:
             pass
+        # Set Matomo exclusion cookie
+        if hasattr(self.browser, '_set_matomo_cookie'):
+            self.browser._set_matomo_cookie()
         self.wait_for_page_loaded(timeout=timeout)
         banner_title = self.find_banner_title(timeout=timeout)
         return banner_title

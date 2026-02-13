@@ -36,6 +36,8 @@ def create_browser(pytestconfig):
 
     if browser_name == "chrome":
         options = ChromeOptions()
+        # Set custom User-Agent to identify automated tests for Matomo exclusion
+        options.add_argument("--user-agent=Mozilla/5.0 (Selenium/AutomatedTest) Chrome/120.0.0.0")
         if headless:
             options.add_argument("--headless=new")
             options.add_argument("--window-size=1400,900")
@@ -50,6 +52,8 @@ def create_browser(pytestconfig):
 
     elif browser_name == "firefox":
         options = FirefoxOptions()
+        # Set custom User-Agent to identify automated tests for Matomo exclusion
+        options.set_preference("general.useragent.override", "Mozilla/5.0 (Selenium/AutomatedTest) Firefox/120.0")
         if headless:
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
@@ -83,6 +87,23 @@ def create_browser(pytestconfig):
     # For Firefox and as fallback, it'll be injected after each navigation
     # Store the flag setter function in browser for easy access
     browser._set_matomo_flag = lambda: browser.execute_script('window._isSeleniumTest = true;')
+    
+    # Store function to set Matomo exclusion cookie
+    # This will be called after first navigation when domain is known
+    def set_matomo_cookie():
+        try:
+            browser.add_cookie({
+                'name': 'matomo_ignore',
+                'value': 'true',
+                'path': '/',
+                'secure': True,
+                'sameSite': 'Lax'
+            })
+            print("✓ Matomo exclusion cookie set")
+        except Exception as e:
+            print(f"Warning: Could not set Matomo cookie: {e}")
+    
+    browser._set_matomo_cookie = set_matomo_cookie
 
     return browser, wait
 
