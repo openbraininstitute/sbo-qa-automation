@@ -62,7 +62,46 @@ class AIAssistantPage(ProjectHome):
         time.sleep(1)
         ai_button.click()
         self.logger.info("✅ Clicked AI assistant button")
-        time.sleep(3)  # Wait for panel to open
+        
+        # Wait for panel to open and verify it's visible
+        time.sleep(3)
+        
+        # Verify the panel is actually open by checking for panel content
+        panel_open = self.verify_panel_is_open()
+        if not panel_open:
+            self.logger.warning("AI panel doesn't appear to be open, trying to click button again...")
+            ai_button = self.find_ai_panel_button()
+            ai_button.click()
+            time.sleep(3)
+            panel_open = self.verify_panel_is_open()
+            if not panel_open:
+                raise Exception("AI assistant panel failed to open after multiple attempts")
+        
+        self.logger.info("✅ AI assistant panel is open")
+    
+    def verify_panel_is_open(self):
+        """Verify that the AI assistant panel is actually open."""
+        # Look for any panel-specific elements that indicate it's open
+        panel_indicators = [
+            AIAssistantLocators.AI_PANEL_CONTAINER,
+            AIAssistantLocators.AI_PANEL_CONTAINER_ALT,
+            AIAssistantLocators.AI_PANEL_OPEN,
+            AIAssistantLocators.SUGGESTED_QUESTIONS,
+            AIAssistantLocators.SUGGESTED_QUESTIONS_ALT,
+        ]
+        
+        for indicator in panel_indicators:
+            try:
+                elements = self.browser.find_elements(*indicator)
+                visible_elements = [e for e in elements if e.is_displayed()]
+                if visible_elements:
+                    self.logger.info(f"Panel verified open with indicator: {indicator}")
+                    return True
+            except Exception:
+                continue
+        
+        self.logger.warning("Could not verify panel is open")
+        return False
     
     def find_suggested_questions(self):
         """Find and return list of suggested questions."""

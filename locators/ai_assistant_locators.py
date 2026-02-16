@@ -64,3 +64,4 @@ class AIAssistantLocators:
     # AI Panel Container
     AI_PANEL_CONTAINER = (By.CSS_SELECTOR, "[data-testid*='ai-panel'], [data-testid*='assistant-panel'], .ai-panel, .assistant-panel")
     AI_PANEL_CONTAINER_ALT = (By.XPATH, "//div[contains(@class, 'panel') and (contains(@class, 'ai') or contains(@class, 'assistant'))]")
+    AI_PANEL_OPEN = (By.XPATH, "//div[contains(@class, 'panel') and contains(@class, 'open')]")

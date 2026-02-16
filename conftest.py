@@ -36,6 +36,8 @@ def create_browser(pytestconfig):
 
     if browser_name == "chrome":
         options = ChromeOptions()
+        # Set custom User-Agent to identify automated tests for Matomo exclusion
+        options.add_argument("--user-agent=Mozilla/5.0 (Selenium/AutomatedTest) Chrome/120.0.0.0")
         if headless:
             options.add_argument("--headless=new")
             options.add_argument("--window-size=1400,900")
@@ -50,6 +52,8 @@ def create_browser(pytestconfig):
 
     elif browser_name == "firefox":
         options = FirefoxOptions()
+        # Set custom User-Agent to identify automated tests for Matomo exclusion
+        options.set_preference("general.useragent.override", "Mozilla/5.0 (Selenium/AutomatedTest) Firefox/120.0")
         if headless:
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
@@ -83,6 +87,32 @@ def create_browser(pytestconfig):
     # For Firefox and as fallback, it'll be injected after each navigation
     # Store the flag setter function in browser for easy access
     browser._set_matomo_flag = lambda: browser.execute_script('window._isSeleniumTest = true;')
+    
+    # Helper function to set analytics exclusion cookie
+    # This navigates to /app/version (which doesn't trigger analytics) before setting the cookie
+    def set_analytics_exclusion_cookie(base_url):
+        try:
+            # Extract domain from base_url
+            from urllib.parse import urlparse
+            parsed = urlparse(base_url)
+            domain = parsed.netloc
+            
+            # Navigate to /app/version page first (doesn't trigger analytics)
+            version_url = f"{base_url.rstrip('/')}/app/version"
+            browser.get(version_url)
+            
+            # Set the analytics exclusion cookie
+            browser.add_cookie({
+                'name': 'disable_analytics',
+                'value': '1',
+                'domain': domain,
+                'path': '/'
+            })
+            print("✓ Analytics exclusion cookie set")
+        except Exception as e:
+            print(f"Warning: Could not set analytics exclusion cookie: {e}")
+    
+    browser._set_analytics_exclusion_cookie = set_analytics_exclusion_cookie
 
     return browser, wait
 
@@ -126,7 +156,7 @@ def test_config(pytestconfig):
         oidc_login_url = (
             "https://staging.cell-a.openbraininstitute.org/auth/realms/SBO/protocol/"
             "openid-connect/auth?"
-            "client_id=core-webapp-main&"
+            "client_id=core-webapp-cell-b-azure-staging&"
             "scope=profile%20openid%20groups&"
             "response_type=code&"
             "redirect_uri=https%3A%2F%2Fstaging.cell-a.openbraininstitute.org%2Fapi%2Fauth%2Fcallback%2Fkeycloak&"
@@ -192,6 +222,11 @@ def setup(request, pytestconfig, test_config):
 def navigate_to_landing_page(public_browsing, logger, test_config):
     """Fixture to open and verify the OBI Landing Page before login."""
     browser, wait, base_url = public_browsing
+    
+    # Set analytics exclusion cookie before navigating to landing page
+    if hasattr(browser, '_set_analytics_exclusion_cookie'):
+        browser._set_analytics_exclusion_cookie(test_config["base_url"])
+    
     landing_page = LandingPage(
         browser=browser,
         wait=wait,
@@ -207,6 +242,10 @@ def navigate_to_landing_page(public_browsing, logger, test_config):
 def navigate_to_login(setup, logger, request, test_config):
     """Fixture that navigates to the login page"""
     browser, wait, lab_url, lab_id, project_id = setup
+    
+    # Set analytics exclusion cookie before any navigation
+    if hasattr(browser, '_set_analytics_exclusion_cookie'):
+        browser._set_analytics_exclusion_cookie(test_config["base_url"])
     
     landing_page = LandingPage(
         browser=browser, 
@@ -256,97 +295,33 @@ def navigate_to_login(setup, logger, request, test_config):
 
 @pytest.fixture(scope="function")
 def navigate_to_login_direct(setup, logger, test_config):
-    """Navigate directly to the OIDC login page instead of the landing page."""
+    """Navigate to virtual lab which will redirect to login page naturally."""
     browser, wait, base_url, lab_id, project_id = setup
-    oidc_url = test_config["oidc_login_url"]
-    logger.info(f"Navigating directly to OIDC login URL: {oidc_url}")
+    lab_url = test_config["lab_url"]
+    
+    # Set analytics exclusion cookie before any navigation
+    if hasattr(browser, '_set_analytics_exclusion_cookie'):
+        browser._set_analytics_exclusion_cookie(test_config["base_url"])
+    
+    logger.info(f"Navigating to lab URL (will redirect to login): {lab_url}")
     
     # Clear any existing cookies/session first
     browser.delete_all_cookies()
     
-    browser.get(oidc_url)
+    # Navigate to lab URL - it will redirect to OIDC login automatically
+    browser.get(lab_url)
+    
     try:
+        # Wait for redirect to login page
         WebDriverWait(browser, 30).until(
             EC.presence_of_element_located((By.ID, "kc-form-wrapper"))
         )
-        logger.info("Reached OIDC login page")
+        logger.info("Successfully reached OIDC login page via natural redirect")
     except TimeoutException:
         current_url = browser.current_url
-        logger.warning(f"Login form not found. Current URL: {current_url}")
-        
-        # Check if we're on the landing page
-        if "openbraininstitute.org" in current_url and "/auth/realms/" not in current_url:
-            logger.info("Detected landing page redirect. Attempting to click login button.")
-            
-            # Try multiple login button selectors with more variations
-            login_selectors = [
-                (By.XPATH, "//a[@href='/app/virtual-lab']"),
-                (By.XPATH, "//a[@href='/app/virtual-lab/sync']"),
-                (By.XPATH, "//a[contains(@href, 'virtual-lab')]"),
-                (By.XPATH, "//button[contains(text(), 'Go to')]"),
-                (By.XPATH, "//a[contains(text(), 'Virtual Lab')]"),
-                (By.CSS_SELECTOR, "[href*='virtual-lab']"),
-                (By.CSS_SELECTOR, "[data-testid*='lab']"),
-                (By.XPATH, "//button[contains(text(), 'Lab')]"),
-                (By.XPATH, "//a[contains(text(), 'Lab')]")
-            ]
-            
-            login_clicked = False
-            for attempt in range(3):  # Try multiple times
-                logger.info(f"Attempt {attempt + 1} to find login button")
-                for selector in login_selectors:
-                    try:
-                        login_btn = WebDriverWait(browser, 15).until(
-                            EC.element_to_be_clickable(selector)
-                        )
-                        logger.info(f"Found login button with selector: {selector}")
-                        # Try clicking with JavaScript as backup
-                        try:
-                            login_btn.click()
-                        except:
-                            browser.execute_script("arguments[0].click();", login_btn)
-                        login_clicked = True
-                        break
-                    except TimeoutException:
-                        logger.debug(f"Login button not found with selector: {selector}")
-                        continue
-                
-                if login_clicked:
-                    break
-                    
-                # Wait before retry
-                if attempt < 2:
-                    logger.warning(f"Login button not found on attempt {attempt + 1}, retrying...")
-                    time.sleep(3)
-            
-            if not login_clicked:
-                logger.error("Could not find any login button on landing page after multiple attempts")
-                browser.save_screenshot("/tmp/landing_page_no_login.png")
-                # Try to get page source for debugging
-                try:
-                    page_source = browser.page_source
-                    logger.error(f"Page source length: {len(page_source)}")
-                    # Look for any button or link text
-                    if "lab" in page_source.lower():
-                        logger.error("Found 'lab' text in page source but couldn't click button")
-                except:
-                    pass
-                raise RuntimeError("Cannot find login button on landing page")
-            
-            # Wait for redirect to login page
-            try:
-                WebDriverWait(browser, 30).until(
-                    EC.presence_of_element_located((By.ID, "kc-form-wrapper"))
-                )
-                logger.info("Successfully reached OIDC login page after clicking login button")
-            except TimeoutException:
-                logger.error(f"Still cannot reach login page. Final URL: {browser.current_url}")
-                browser.save_screenshot("/tmp/failed_login_redirect.png")
-                raise RuntimeError("Cannot reach OIDC login page after clicking login button")
-        else:
-            logger.error(f"Unexpected page state. URL: {current_url}")
-            browser.save_screenshot("/tmp/unexpected_page_state.png")
-            raise RuntimeError("Cannot reach OIDC login page - unexpected page state")
+        logger.error(f"Failed to reach login page. Current URL: {current_url}")
+        browser.save_screenshot("/tmp/navigate_to_login_direct_failed.png")
+        raise RuntimeError(f"Cannot reach OIDC login page. Current URL: {current_url}")
 
     return LoginPage(browser, wait, lab_url=test_config["lab_url"], logger=logger)
 
