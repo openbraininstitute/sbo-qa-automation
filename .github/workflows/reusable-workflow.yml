@@ -291,6 +291,14 @@ jobs:
                 # Create comma-separated list for summary
                 FAILED_TEST_LIST=$(echo "$FAILED_TESTS_RAW" | sed 's/::.*$//' | tr '\n' ', ' | sed 's/, $//')
                 
+                # Determine the correct ref for GitHub URLs
+                # For PRs, use the head ref (source branch), otherwise use ref_name
+                if [ "${{ github.event_name }}" = "pull_request" ]; then
+                  GITHUB_REF="${{ github.head_ref }}"
+                else
+                  GITHUB_REF="${{ github.ref_name }}"
+                fi
+                
                 # Create JSON array of failed test links for Teams card
                 FAILED_TEST_LINKS="["
                 FIRST=true
@@ -304,7 +312,7 @@ jobs:
                     FAILED_TEST_LINKS="$FAILED_TEST_LINKS,"
                   fi
                   
-                  FAILED_TEST_LINKS="$FAILED_TEST_LINKS{\"type\":\"Action.OpenUrl\",\"title\":\"❌ $TEST_FILE\",\"url\":\"https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/$TEST_FILE\"}"
+                  FAILED_TEST_LINKS="$FAILED_TEST_LINKS{\"type\":\"Action.OpenUrl\",\"title\":\"❌ $TEST_FILE\",\"url\":\"https://github.com/${{ github.repository }}/blob/$GITHUB_REF/$TEST_FILE\"}"
                 done <<< "$FAILED_TESTS_RAW"
                 FAILED_TEST_LINKS="$FAILED_TEST_LINKS]"
               fi
