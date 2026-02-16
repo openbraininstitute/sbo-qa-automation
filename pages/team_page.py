@@ -20,12 +20,17 @@ class TeamPage(HomePage):
                 self.browser.set_page_load_timeout(60)
                 self.browser.get(page_url)
                 self.wait_for_page_ready(timeout=60)
+                
+                # Wait for actual content to load (page title element)
+                self.get_page_title()
+                
                 self.logger.info("✅ Team page loaded successfully.")
                 return
             except TimeoutException:
                 self.logger.warning(
                     f"⚠️ Team page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                self.wait.sleep(delay)
+                import time
+                time.sleep(delay)
         raise TimeoutException("❌ Failed to load Team page after multiple attempts.")
 
     def get_page_title(self):

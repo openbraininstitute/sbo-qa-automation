@@ -13,7 +13,11 @@ class TestTeam:
 
         # Navigate to page
         team_page.go_to_page()
-        assert "team" in browser.title.lower() or "Team" in browser.title
+        
+        # Wait for page title to be present before checking it
+        team_page.get_page_title()  # This will wait for the title element
+        logger.info(f"Page title: {browser.title}")
+        assert "team" in browser.title.lower() or "Team" in browser.title, f"Expected 'team' in title, got: '{browser.title}'"
         logger.info("Team page loaded successfully")
 
         # Test page title
