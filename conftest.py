@@ -88,22 +88,31 @@ def create_browser(pytestconfig):
     # Store the flag setter function in browser for easy access
     browser._set_matomo_flag = lambda: browser.execute_script('window._isSeleniumTest = true;')
     
-    # Store function to set Matomo exclusion cookie
-    # This will be called after first navigation when domain is known
-    def set_matomo_cookie():
+    # Helper function to set analytics exclusion cookie
+    # This navigates to /app/version (which doesn't trigger analytics) before setting the cookie
+    def set_analytics_exclusion_cookie(base_url):
         try:
+            # Extract domain from base_url
+            from urllib.parse import urlparse
+            parsed = urlparse(base_url)
+            domain = parsed.netloc
+            
+            # Navigate to /app/version page first (doesn't trigger analytics)
+            version_url = f"{base_url.rstrip('/')}/app/version"
+            browser.get(version_url)
+            
+            # Set the analytics exclusion cookie
             browser.add_cookie({
-                'name': 'matomo_ignore',
-                'value': 'true',
-                'path': '/',
-                'secure': True,
-                'sameSite': 'Lax'
+                'name': 'disable_analytics',
+                'value': '1',
+                'domain': domain,
+                'path': '/'
             })
-            print("✓ Matomo exclusion cookie set")
+            print("✓ Analytics exclusion cookie set")
         except Exception as e:
-            print(f"Warning: Could not set Matomo cookie: {e}")
+            print(f"Warning: Could not set analytics exclusion cookie: {e}")
     
-    browser._set_matomo_cookie = set_matomo_cookie
+    browser._set_analytics_exclusion_cookie = set_analytics_exclusion_cookie
 
     return browser, wait
 
@@ -213,6 +222,11 @@ def setup(request, pytestconfig, test_config):
 def navigate_to_landing_page(public_browsing, logger, test_config):
     """Fixture to open and verify the OBI Landing Page before login."""
     browser, wait, base_url = public_browsing
+    
+    # Set analytics exclusion cookie before navigating to landing page
+    if hasattr(browser, '_set_analytics_exclusion_cookie'):
+        browser._set_analytics_exclusion_cookie(test_config["base_url"])
+    
     landing_page = LandingPage(
         browser=browser,
         wait=wait,
@@ -228,6 +242,10 @@ def navigate_to_landing_page(public_browsing, logger, test_config):
 def navigate_to_login(setup, logger, request, test_config):
     """Fixture that navigates to the login page"""
     browser, wait, lab_url, lab_id, project_id = setup
+    
+    # Set analytics exclusion cookie before any navigation
+    if hasattr(browser, '_set_analytics_exclusion_cookie'):
+        browser._set_analytics_exclusion_cookie(test_config["base_url"])
     
     landing_page = LandingPage(
         browser=browser, 
@@ -280,6 +298,11 @@ def navigate_to_login_direct(setup, logger, test_config):
     """Navigate to virtual lab which will redirect to login page naturally."""
     browser, wait, base_url, lab_id, project_id = setup
     lab_url = test_config["lab_url"]
+    
+    # Set analytics exclusion cookie before any navigation
+    if hasattr(browser, '_set_analytics_exclusion_cookie'):
+        browser._set_analytics_exclusion_cookie(test_config["base_url"])
+    
     logger.info(f"Navigating to lab URL (will redirect to login): {lab_url}")
     
     # Clear any existing cookies/session first

@@ -32,10 +32,6 @@ class CustomBasePage:
             self.browser.execute_script('window._isSeleniumTest = true;')
         except Exception:
             pass  # Silently fail if script execution fails
-        
-        # Set Matomo exclusion cookie
-        if hasattr(self.browser, '_set_matomo_cookie'):
-            self.browser._set_matomo_cookie()
 
     def assert_visible(self, element, description, file_path=None, line=None):
         if not element.is_displayed():
