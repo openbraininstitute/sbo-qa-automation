@@ -12,7 +12,7 @@ class TeamPage(HomePage):
         self.logger = logger
         self.base_url = base_url
 
-    def go_to_page(self, retries=3, delay=5):
+    def go_to_page(self, retries=3):
         """Navigate to the Team page"""
         page_url = f"{self.base_url}/team"
         for attempt in range(retries):
@@ -27,10 +27,10 @@ class TeamPage(HomePage):
                 self.logger.info("✅ Team page loaded successfully.")
                 return
             except TimeoutException:
-                self.logger.warning(
-                    f"⚠️ Team page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                import time
-                time.sleep(delay)
+                if attempt < retries - 1:
+                    self.logger.warning(f"⚠️ Team page load attempt {attempt + 1} failed. Retrying...")
+                else:
+                    self.logger.error("❌ Failed to load Team page after multiple attempts.")
         raise TimeoutException("❌ Failed to load Team page after multiple attempts.")
 
     def get_page_title(self):
