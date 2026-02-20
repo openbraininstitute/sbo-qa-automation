@@ -184,6 +184,9 @@ class TestExplorePage:
         cerebrum_in_brpanel = explore_page.find_cerebrum_brp()
         logger.info("Found Cerebrum in the brain region panel")
 
+        cerebrum_in_brpanel.click()
+        logger.info("Clicked on the Cerebrum in the brain region panel")
+
         cerebrum_arrow_btn = explore_page.find_cerebrum_arrow_btn(timeout=15)
         assert cerebrum_arrow_btn, "The toggle arrow for Cerebrum is not found"
         logger.info("Cerebrum arrow button is found")

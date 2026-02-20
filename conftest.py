@@ -43,10 +43,14 @@ def create_browser(pytestconfig):
             options.add_argument("--window-size=1400,900")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--disable-gpu")
+            options.add_argument("--enable-webgl")
+            options.add_argument("--use-gl=swiftshader")
+            options.add_argument("--enable-accelerated-2d-canvas")
+            options.add_argument("--disable-software-rasterizer")
             options.add_argument("--window-size=1400,900")
             options.add_argument("--ignore-certificate-errors")
             options.add_argument('--blink-settings=imagesEnabled=true')
+        
         browser = webdriver.Chrome(options=options)
         browser.set_window_size(1400, 900)
 
