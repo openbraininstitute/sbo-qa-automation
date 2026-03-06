@@ -71,6 +71,27 @@ class ExploreSynaptomeDataPage(ExplorePage):
         """Find the mini detail view button"""
         return self.find_element(ExploreSynaptomePageLocators.MINI_DETAIL_VIEW, timeout)
 
+    def find_mini_detail_thumbnails(self, timeout=20):
+        """Find thumbnail images in mini detail view"""
+        return self.find_all_elements(ExploreSynaptomePageLocators.MINI_DETAIL_THUMBNAILS, timeout)
+
+    # Breadcrumb methods
+    def find_breadcrumb_data(self, timeout=20):
+        """Find Data breadcrumb in detail view"""
+        return self.find_element(ExploreSynaptomePageLocators.BREADCRUMB_DATA, timeout)
+
+    def find_breadcrumb_model(self, timeout=20):
+        """Find Model breadcrumb in detail view"""
+        return self.find_element(ExploreSynaptomePageLocators.BREADCRUMB_MODEL, timeout)
+
+    def find_breadcrumb_synaptome(self, timeout=20):
+        """Find Synaptome breadcrumb in detail view"""
+        return self.find_element(ExploreSynaptomePageLocators.BREADCRUMB_SYNAPTOME, timeout)
+
+    def find_breadcrumb_close(self, timeout=20):
+        """Find Close button in breadcrumb area"""
+        return self.find_element(ExploreSynaptomePageLocators.BREADCRUMB_CLOSE, timeout)
+
     # Detail view methods
     def find_dv_description_label(self):
         """Find description label in detail view"""
@@ -131,6 +152,99 @@ class ExploreSynaptomeDataPage(ExplorePage):
     def find_dv_overview_tab(self):
         """Find Overview tab in detail view"""
         return self.find_element(ExploreSynaptomePageLocators.DV_OVERVIEW_TAB)
+
+    def find_dv_configuration_tab(self):
+        """Find Configuration tab in detail view"""
+        return self.find_element(ExploreSynaptomePageLocators.DV_CONFIGURATION_TAB)
+
+    def find_dv_related_artifacts_tab(self):
+        """Find Related artifacts tab in detail view"""
+        return self.find_element(ExploreSynaptomePageLocators.DV_RELATED_ARTIFACTS_TAB)
+
+    def find_dv_copy_id_btn(self):
+        """Find Copy ID button in detail view"""
+        return self.find_element(ExploreSynaptomePageLocators.DV_COPY_ID_BTN)
+
+    def find_dv_simulate_btn(self):
+        """Find Simulate button in detail view"""
+        return self.find_element(ExploreSynaptomePageLocators.DV_SIMULATE_BTN)
+
+    def find_dv_download_btn(self):
+        """Find Download button in detail view"""
+        return self.find_element(ExploreSynaptomePageLocators.DV_DOWNLOAD_BTN)
+
+    # Configuration tab methods
+    def find_config_name_label(self):
+        """Find Name label in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_NAME_LABEL)
+
+    def find_config_name_value(self):
+        """Find Name value in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_NAME_VALUE)
+
+    def find_config_single_neuron_model_title(self):
+        """Find 'single neuron model' title in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_SINGLE_NEURON_MODEL_TITLE)
+
+    def find_config_me_model_label(self):
+        """Find ME-model NAME label in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_ME_MODEL_LABEL)
+
+    def find_config_me_model_value(self):
+        """Find ME-model NAME value in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_ME_MODEL_VALUE)
+
+    def find_config_m_model_label(self):
+        """Find m-model label in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_M_MODEL_LABEL)
+
+    def find_config_m_model_value(self):
+        """Find m-model value in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_M_MODEL_VALUE)
+
+    def find_config_e_model_label(self):
+        """Find e-model label in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_E_MODEL_LABEL)
+
+    def find_config_e_model_value(self):
+        """Find e-model value in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_E_MODEL_VALUE)
+
+    def find_config_brain_region_label(self):
+        """Find Brain Region label in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_BRAIN_REGION_LABEL)
+
+    def find_config_brain_region_value(self):
+        """Find Brain Region value in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_BRAIN_REGION_VALUE)
+
+    def find_config_e_type_label(self):
+        """Find E-Type label in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_E_TYPE_LABEL)
+
+    def find_config_e_type_value(self):
+        """Find E-Type value in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_E_TYPE_VALUE)
+
+    def find_config_m_type_label(self):
+        """Find M-Type label in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_M_TYPE_LABEL)
+
+    def find_config_m_type_value(self):
+        """Find M-Type value in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_M_TYPE_VALUE)
+
+    def find_config_view_details_btn(self):
+        """Find View details button in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_VIEW_DETAILS_BTN)
+
+    def find_config_synapse_groups_title(self):
+        """Find Synapse groups title in configuration tab"""
+        return self.find_element(ExploreSynaptomePageLocators.CONFIG_SYNAPSE_GROUPS_TITLE)
+
+    def find_config_thumbnail_images(self):
+        """Find thumbnail images in configuration tab"""
+        return self.find_all_elements(ExploreSynaptomePageLocators.CONFIG_THUMBNAIL_IMAGES)
 
     def wait_for_spinner_to_disappear(self, timeout=30):
         """Wait for loading spinner to disappear"""

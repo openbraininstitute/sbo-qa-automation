@@ -29,6 +29,15 @@ class ExploreSynaptomePageLocators:
     # Detail view
     MINI_DETAIL_VIEW = (By.CSS_SELECTOR, "a[title='Go to details page']")
     
+    # Thumbnail images in mini detail view
+    MINI_DETAIL_THUMBNAILS = (By.CSS_SELECTOR, ".ant-image img.ant-image-img")
+    
+    # Breadcrumbs in detail view
+    BREADCRUMB_DATA = (By.XPATH, "//a[@href and contains(text(), 'Data')]")
+    BREADCRUMB_MODEL = (By.XPATH, "//a[@href and contains(text(), 'Model')]")
+    BREADCRUMB_SYNAPTOME = (By.XPATH, "//a[@href and contains(text(), 'Synaptome')]")
+    BREADCRUMB_CLOSE = (By.XPATH, "//a[@title='Close']")
+    
     # Detail view labels and values
     DV_DESCRIPTION_LABEL = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Description']")
     DV_DESCRIPTION_VALUE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Description']/following-sibling::div")
@@ -47,6 +56,33 @@ class ExploreSynaptomePageLocators:
     
     # Tabs
     DV_OVERVIEW_TAB = (By.XPATH, "//a[normalize-space()='Overview']")
+    DV_CONFIGURATION_TAB = (By.XPATH, "//a[normalize-space()='Configuration']")
+    DV_RELATED_ARTIFACTS_TAB = (By.XPATH, "//a[normalize-space()='Related artifacts']")
+    
+    # Action buttons
+    DV_COPY_ID_BTN = (By.XPATH, "//div[text()='Copy ID']")
+    DV_SIMULATE_BTN = (By.XPATH, "//div[text()='Simulate']")
+    DV_DOWNLOAD_BTN = (By.XPATH, "//div[text()='Download']")
+    
+    # Configuration tab elements
+    CONFIG_NAME_LABEL = (By.XPATH, "//div[text()='Name']")
+    CONFIG_NAME_VALUE = (By.XPATH, "//div[text()='Name']/following-sibling::div")
+    CONFIG_SINGLE_NEURON_MODEL_TITLE = (By.XPATH, "//div[contains(text(), 'single neuron model')]")
+    CONFIG_ME_MODEL_LABEL = (By.XPATH, "//div[normalize-space()='NAME']")
+    CONFIG_ME_MODEL_VALUE = (By.XPATH, "//div[normalize-space()='NAME']/following-sibling::div")
+    CONFIG_M_MODEL_LABEL = (By.XPATH, "//div[text()='m-model']")
+    CONFIG_M_MODEL_VALUE = (By.XPATH, "//div[text()='m-model']/following-sibling::div")
+    CONFIG_E_MODEL_LABEL = (By.XPATH, "//div[text()='e-model']")
+    CONFIG_E_MODEL_VALUE = (By.XPATH, "//div[text()='e-model']/following-sibling::div")
+    CONFIG_BRAIN_REGION_LABEL = (By.XPATH, "//div[text()='Brain Region']")
+    CONFIG_BRAIN_REGION_VALUE = (By.XPATH, "//div[text()='Brain Region']/following-sibling::div")
+    CONFIG_E_TYPE_LABEL = (By.XPATH, "//div[text()='E-Type']")
+    CONFIG_E_TYPE_VALUE = (By.XPATH, "//div[text()='E-Type']/following-sibling::div")
+    CONFIG_M_TYPE_LABEL = (By.XPATH, "//div[text()='M-Type']")
+    CONFIG_M_TYPE_VALUE = (By.XPATH, "//div[text()='M-Type']/following-sibling::div")
+    CONFIG_VIEW_DETAILS_BTN = (By.XPATH, "//a[text()='View details']")
+    CONFIG_SYNAPSE_GROUPS_TITLE = (By.XPATH, "//h2[text()='Synapse groups']")
+    CONFIG_THUMBNAIL_IMAGES = (By.CSS_SELECTOR, "img[alt]")
     
     # Spinner
     SPINNER = (By.XPATH, "//div[@class='ant-spin ant-spin-spinning']")
