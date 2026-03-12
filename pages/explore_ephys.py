@@ -604,9 +604,6 @@ class ExploreElectrophysiologyPage(ExplorePage):
     def find_table(self):
         return self.find_element(ExploreEphysLocators.TABLE)
 
-    def find_thumbnails(self):
-        return self.visibility_of_all_elements(ExploreEphysLocators.LV_THUMBNAIL)
-
     def lv_filter_apply(self):
         return self.find_element(ExploreEphysLocators.LV_FILTER_APPLY_BTN)
 
@@ -637,18 +634,6 @@ class ExploreElectrophysiologyPage(ExplorePage):
                 if not cell.text.strip():
                     error_message = f'Error: Empty field in a row{row_index}, cell {cell_index}'
                     print(error_message)
-
-    def verify_all_thumbnails_displayed(self):
-        thumbnails = self.find_thumbnails()
-
-        thumbnail_status = []
-        for thumbnail in thumbnails:
-            thumbnail_status.append({
-                'element': thumbnail,
-                'is_displayed': thumbnail.is_displayed()
-            })
-
-        return thumbnail_status
 
     def wait_for_page_ready(self, timeout=30):
         """Wait for the page to be ready"""
