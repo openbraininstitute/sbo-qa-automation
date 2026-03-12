@@ -162,7 +162,7 @@ class TestExploreEphys:
                 
                 # Verify filtered results
                 time.sleep(3)  # Wait for results to load
-                results_verified = explore_ephys_page.verify_filtered_results("Rattus norvegicus", "species")
+                results_verified = explore_ephys_page.verify_filtered_results("Mus musculus", "species")
                 if results_verified:
                     logger.info("✅ Filtered results verified")
                 else:
@@ -208,7 +208,7 @@ class TestExploreEphys:
         # Testing E-type filter (not covered by new tests)
         try:
             logger.info("🔧 Testing E-type filter (legacy test)...")
-            
+
             find_filter_btn = explore_ephys_page.find_filter_button()
             explore_ephys_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", find_filter_btn)
             time.sleep(1)
@@ -245,7 +245,7 @@ class TestExploreEphys:
                 if filtered_etype:
                     expected = "bNAC"
                     value_found = any(expected in row.text for row in filtered_etype)
-                    assert value_found, (f'The value {expected} is not found in the table after applying the filter')
+                    assert value_found, f'The value {expected} is not found in the table after applying the filter'
                     logger.info(f"✅ E-type filter verified - found '{expected}' in results")
                 else:
                     logger.warning("⚠️ Filtered E-type cells cannot be found.")
@@ -265,6 +265,7 @@ class TestExploreEphys:
                 explore_ephys_page.close_filter_panel()
             except:
                 pass
+            time.sleep(100)
 
         # Mini-detail view testing
         logger.info("🔍 Testing mini-detail view...")
