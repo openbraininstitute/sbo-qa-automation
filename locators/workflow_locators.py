@@ -43,9 +43,10 @@ class WorkflowLocators:
     RECENT_ACTIVITIES_SECTION = (By.CSS_SELECTOR, "#workflow-activity-content")
     ACTIVITY_TABLE_SECTION = (By.CSS_SELECTOR, "#activity-table-with-filters")
     
-    # Category and Type dropdowns
-    CATEGORY_DROPDOWN = (By.CSS_SELECTOR, "#workflow-category-and-type-selector button[role='combobox']:nth-of-type(1)")
-    TYPE_DROPDOWN = (By.CSS_SELECTOR, "#workflow-category-and-type-selector button[role='combobox']:nth-of-type(2)")
+    # Category and Type dropdowns - simple approach that works
+    ALL_COMBOBOXES = (By.XPATH, "//div[@id='workflow-category-and-type-selector']//button[@role='combobox']")
+    FIRST_COMBOBOX = (By.XPATH, "(//div[@id='workflow-category-and-type-selector']//button[@role='combobox'])[1]")
+    SECOND_COMBOBOX = (By.XPATH, "(//div[@id='workflow-category-and-type-selector']//button[@role='combobox'])[2]")
     
     # Table elements
     ACTIVITIES_TABLE = (By.CSS_SELECTOR, "#workflow-activities-table")
@@ -59,7 +60,27 @@ class WorkflowLocators:
     TABLE_CELLS = (By.XPATH, "//table//tbody//td")
     
     # Pagination
-    PAGINATION_CONTAINER = (By.XPATH, "//nav[@aria-label='pagination']")
-    PAGINATION_NEXT = (By.XPATH, "//button[@aria-label='Go to next page']")
-    PAGINATION_PREVIOUS = (By.XPATH, "//button[@aria-label='Go to previous page']")
-    PAGINATION_PAGES = (By.XPATH, "//nav[@aria-label='pagination']//button[not(@aria-label)]")
+    PAGINATION_CONTAINER = (By.CSS_SELECTOR, "ul.ant-pagination")
+    PAGINATION_NEXT = (By.CSS_SELECTOR, "li.ant-pagination-next button")
+    PAGINATION_PREVIOUS = (By.CSS_SELECTOR, "li.ant-pagination-prev button")
+    PAGINATION_ITEM = (By.CSS_SELECTOR, "li.ant-pagination-item")
+    PAGINATION_ACTIVE_ITEM = (By.CSS_SELECTOR, "li.ant-pagination-item-active")
+    
+    # Radio buttons in table rows
+    RADIO_BUTTONS = (By.XPATH, "//table//tbody//tr//input[@type='radio']")
+    FIRST_RADIO_BUTTON = (By.XPATH, "(//table//tbody//tr//input[@type='radio'])[1]")
+    
+    # Action buttons at bottom (appear when radio button is selected)
+    ACTION_BUTTONS_CONTAINER = (By.CSS_SELECTOR, "#workflow-activity-actions, [data-testid='workflow-activity-actions']")
+    # View Configuration is an <a> tag with role="button"
+    VIEW_CONFIGURATION_BUTTON = (By.XPATH, "//a[@role='button' and contains(., 'View configuration')]")
+    # View Results is inside a button (may be disabled)
+    VIEW_RESULTS_BUTTON = (By.XPATH, "//button[contains(., 'View results')]//a | //a[contains(., 'View results')]")
+    # Duplicate is a button
+    DUPLICATE_BUTTON = (By.XPATH, "//button[@role='button' and contains(., 'Duplicate')]")
+    
+    # Dropdown options for Category and Type
+    DROPDOWN_OPTION = (By.XPATH, "//div[@role='option']")
+    
+    # No activities message
+    NO_ACTIVITIES_MESSAGE = (By.XPATH, "//div[contains(text(), 'No activities') or contains(text(), 'no activities')]")

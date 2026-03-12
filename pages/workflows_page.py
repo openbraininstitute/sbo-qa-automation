@@ -160,34 +160,29 @@ class WorkflowsPage(HomePage):
         return self.find_element(WorkflowLocators.RECENT_ACTIVITIES_SECTION, timeout=timeout)
     
     def find_category_dropdown(self, timeout=10):
-        """Find Category dropdown"""
-        return self.find_element(WorkflowLocators.CATEGORY_DROPDOWN, timeout=timeout)
+        """Find Category dropdown (first combobox)"""
+        return self.find_element(WorkflowLocators.FIRST_COMBOBOX, timeout=timeout)
     
     def find_type_dropdown(self, timeout=10):
-        """Find Type dropdown"""
-        return self.find_element(WorkflowLocators.TYPE_DROPDOWN, timeout=timeout)
+        """Find Type dropdown (second combobox)"""
+        return self.find_element(WorkflowLocators.SECOND_COMBOBOX, timeout=timeout)
     
     def click_category_dropdown_option(self, category_name):
         """Click Category dropdown and select an option"""
         try:
-            # Find all combobox buttons (Category and Type)
-            dropdowns = self.browser.find_elements(By.XPATH, "//button[@role='combobox']")
-            if len(dropdowns) >= 1:
-                category_dropdown = dropdowns[0]  # First dropdown is Category
-                category_dropdown.click()
-                self.logger.info(f"Clicked Category dropdown")
-                time.sleep(1)
-                
-                # Find and click the option
-                option_xpath = f"//div[@role='option']//span[contains(text(), '{category_name}')]"
-                option = self.browser.find_element(By.XPATH, option_xpath)
-                option.click()
-                self.logger.info(f"Selected Category: {category_name}")
-                time.sleep(2)  # Wait for table to update
-                return True
-            else:
-                self.logger.warning("Category dropdown not found")
-                return False
+            # Find Category dropdown using the label
+            category_dropdown = self.find_category_dropdown()
+            category_dropdown.click()
+            self.logger.info(f"Clicked Category dropdown")
+            time.sleep(1)
+            
+            # Find and click the option
+            option_xpath = f"//div[@role='option']//span[contains(text(), '{category_name}')]"
+            option = self.browser.find_element(By.XPATH, option_xpath)
+            option.click()
+            self.logger.info(f"Selected Category: {category_name}")
+            time.sleep(2)  # Wait for table to update
+            return True
         except Exception as e:
             self.logger.warning(f"Could not select Category '{category_name}': {e}")
             return False
@@ -195,25 +190,19 @@ class WorkflowsPage(HomePage):
     def click_type_dropdown_option(self, type_name):
         """Click Type dropdown and select an option"""
         try:
-            # Find all combobox buttons (Category and Type)
-            dropdowns = self.browser.find_elements(By.XPATH, "//button[@role='combobox']")
-            if len(dropdowns) >= 2:
-                type_dropdown = dropdowns[1]  # Second dropdown is Type
-                type_dropdown.click()
-                self.logger.info(f"Clicked Type dropdown")
-                time.sleep(1)
-                
-                # Find and click the option
-                # Options appear in a dropdown menu
-                option_xpath = f"//div[@role='option']//span[contains(text(), '{type_name}')]"
-                option = self.browser.find_element(By.XPATH, option_xpath)
-                option.click()
-                self.logger.info(f"Selected Type: {type_name}")
-                time.sleep(2)  # Wait for table to update
-                return True
-            else:
-                self.logger.warning("Type dropdown not found")
-                return False
+            # Find Type dropdown using the label
+            type_dropdown = self.find_type_dropdown()
+            type_dropdown.click()
+            self.logger.info(f"Clicked Type dropdown")
+            time.sleep(1)
+            
+            # Find and click the option
+            option_xpath = f"//div[@role='option']//span[contains(text(), '{type_name}')]"
+            option = self.browser.find_element(By.XPATH, option_xpath)
+            option.click()
+            self.logger.info(f"Selected Type: {type_name}")
+            time.sleep(2)  # Wait for table to update
+            return True
         except Exception as e:
             self.logger.warning(f"Could not select Type '{type_name}': {e}")
             return False
@@ -582,4 +571,207 @@ class WorkflowsPage(HomePage):
                 return False
         except Exception as e:
             self.logger.warning(f"Error clicking {type_name}: {e}")
+            return False
+
+
+    # Radio button methods
+    def get_all_radio_buttons(self):
+        """Get all radio buttons in the table"""
+        try:
+            return self.find_all_elements(WorkflowLocators.RADIO_BUTTONS)
+        except:
+            return []
+    
+    def click_radio_button_by_index(self, index=0):
+        """Click a radio button by index (0-based)"""
+        try:
+            radio_buttons = self.get_all_radio_buttons()
+            if index < len(radio_buttons):
+                radio_buttons[index].click()
+                self.logger.info(f"✅ Clicked radio button at index {index}")
+                time.sleep(1)
+                return True
+            else:
+                self.logger.warning(f"⚠️ Radio button index {index} out of range (total: {len(radio_buttons)})")
+                return False
+        except Exception as e:
+            self.logger.warning(f"Error clicking radio button: {e}")
+            return False
+    
+    def click_first_radio_button(self):
+        """Click the first radio button in the table"""
+        return self.click_radio_button_by_index(0)
+    
+    def is_radio_button_selected(self, index=0):
+        """Check if a radio button is selected"""
+        try:
+            radio_buttons = self.get_all_radio_buttons()
+            if index < len(radio_buttons):
+                return radio_buttons[index].is_selected()
+            return False
+        except:
+            return False
+    
+    def get_selected_row_data(self):
+        """Get data from the selected row"""
+        try:
+            # Find the selected radio button's row
+            selected_row = self.browser.find_element(
+                By.XPATH, 
+                "//table//tbody//tr[.//input[@type='radio' and @checked]]"
+            )
+            
+            # Extract cell data
+            cells = selected_row.find_elements(By.TAG_NAME, "td")
+            if len(cells) >= 6:
+                return {
+                    'name': cells[1].text,
+                    'category': cells[2].text,
+                    'type': cells[3].text,
+                    'date': cells[4].text,
+                    'status': cells[5].text
+                }
+            return None
+        except Exception as e:
+            self.logger.warning(f"Could not get selected row data: {e}")
+            return None
+    
+    # Action button methods
+    def find_view_configuration_button(self, timeout=5):
+        """Find View Configuration button"""
+        return self.find_element(WorkflowLocators.VIEW_CONFIGURATION_BUTTON, timeout=timeout)
+    
+    def find_view_results_button(self, timeout=5):
+        """Find View Results button"""
+        return self.find_element(WorkflowLocators.VIEW_RESULTS_BUTTON, timeout=timeout)
+    
+    def find_duplicate_button(self, timeout=5):
+        """Find Duplicate button"""
+        return self.find_element(WorkflowLocators.DUPLICATE_BUTTON, timeout=timeout)
+    
+    def click_view_configuration_button(self):
+        """Click View Configuration button (it's an <a> tag with role='button')"""
+        try:
+            button = self.find_view_configuration_button()
+            button.click()
+            self.logger.info("✅ Clicked View Configuration button")
+            time.sleep(2)
+            return True
+        except Exception as e:
+            self.logger.warning(f"Could not click View Configuration button: {e}")
+            return False
+    
+    def click_view_results_button(self):
+        """Click View Results button"""
+        try:
+            # Try to find the button (may be disabled)
+            button = self.find_view_results_button()
+            
+            # Check if parent button is disabled
+            try:
+                parent_button = button.find_element(By.XPATH, "./ancestor::button[@disabled]")
+                if parent_button:
+                    self.logger.info("ℹ️ View Results button is disabled")
+                    return False
+            except:
+                pass  # Not disabled or not in a button
+            
+            button.click()
+            self.logger.info("✅ Clicked View Results button")
+            time.sleep(2)
+            return True
+        except Exception as e:
+            self.logger.warning(f"Could not click View Results button: {e}")
+            return False
+    
+    def click_duplicate_button(self):
+        """Click Duplicate button"""
+        try:
+            button = self.find_duplicate_button()
+            
+            # Check if button is disabled
+            if button.get_attribute('disabled'):
+                self.logger.info("ℹ️ Duplicate button is disabled")
+                return False
+            
+            button.click()
+            self.logger.info("✅ Clicked Duplicate button")
+            time.sleep(2)
+            return True
+        except Exception as e:
+            self.logger.warning(f"Could not click Duplicate button: {e}")
+            return False
+    
+    def verify_action_buttons_appear(self):
+        """Verify that action buttons appear after selecting a radio button"""
+        try:
+            # Check for any of the action buttons
+            buttons_found = []
+            
+            try:
+                self.find_view_configuration_button(timeout=3)
+                buttons_found.append('View Configuration')
+            except:
+                pass
+            
+            try:
+                self.find_view_results_button(timeout=3)
+                buttons_found.append('View Results')
+            except:
+                pass
+            
+            try:
+                self.find_duplicate_button(timeout=3)
+                buttons_found.append('Duplicate')
+            except:
+                pass
+            
+            if buttons_found:
+                self.logger.info(f"✅ Action buttons found: {', '.join(buttons_found)}")
+                return True
+            else:
+                self.logger.warning("⚠️ No action buttons found")
+                return False
+        except Exception as e:
+            self.logger.warning(f"Error verifying action buttons: {e}")
+            return False
+    
+    def select_activity_and_verify_buttons(self, row_index=0):
+        """Select an activity row and verify action buttons appear"""
+        try:
+            # Click radio button
+            if not self.click_radio_button_by_index(row_index):
+                return False
+            
+            # Verify buttons appear
+            return self.verify_action_buttons_appear()
+        except Exception as e:
+            self.logger.warning(f"Error in select_activity_and_verify_buttons: {e}")
+            return False
+    
+    def test_view_configuration_redirect(self, expected_url_pattern):
+        """Test View Configuration button redirects correctly"""
+        try:
+            # Get current URL before clicking
+            initial_url = self.browser.current_url
+            
+            # Click View Configuration
+            if not self.click_view_configuration_button():
+                return False
+            
+            # Wait for navigation
+            time.sleep(3)
+            
+            # Get new URL
+            new_url = self.browser.current_url
+            
+            # Verify URL changed and matches pattern
+            if new_url != initial_url and expected_url_pattern in new_url:
+                self.logger.info(f"✅ Redirected to: {new_url}")
+                return True
+            else:
+                self.logger.warning(f"⚠️ URL did not match expected pattern. Got: {new_url}")
+                return False
+        except Exception as e:
+            self.logger.warning(f"Error testing View Configuration redirect: {e}")
             return False
