@@ -74,24 +74,36 @@ class TestBuildSynaptome:
         time.sleep(5)
         logger.info(f"URL after clicking ME-model: {browser.current_url}")
 
-        # Step 6: Click on "Project" tab
-        print("\n📍 Step 6: Clicking Project tab...")
-        logger.info("Step 6: Clicking Project tab")
-        project_clicked = build_synaptome.click_project_tab(logger)
-        if project_clicked:
-            print("✅ Project tab clicked successfully")
+        # Step 6: Click on "Public" tab
+        print("\n📍 Step 6: Clicking Public tab...")
+        logger.info("Step 6: Clicking Public tab")
+        public_clicked = build_synaptome.click_public_tab(logger)
+        if public_clicked:
+            print("✅ Public tab clicked successfully")
         else:
-            print("ℹ️ Project tab not found, may already be on project models")
+            print("ℹ️ Public tab not found, may already be on public models")
 
-        # Step 7: Select a model by ticking a radio button
-        print("\n📍 Step 7: Selecting model via radio button...")
-        logger.info("Step 7: Selecting model via radio button")
+
+        # Step 7: Search for "cadpyr" model (optional - may not be available)
+        print("\n📍 Step 7: Searching for cadpyr model...")
+        logger.info("Step 7: Searching for cadpyr model")
+        try:
+            search_success = build_synaptome.search_for_model("cadpyr", logger)
+            if search_success:
+                print("✅ Search completed successfully")
+        except Exception as e:
+            print(f"ℹ️ Search field not available, continuing without search: {e}")
+            logger.info(f"Search field not available, continuing without search: {e}")
+
+        # Step 8: Select a model by ticking a radio button
+        print("\n📍 Step 8: Selecting model via radio button...")
+        logger.info("Step 8: Selecting model via radio button")
         model_selected = build_synaptome.select_model_via_radio_button(logger)
         assert model_selected, "Failed to select model via radio button"
 
-        # Step 8: Click on "Synapse sets" tab
-        print("\n📍 Step 8: Clicking Synapse sets tab...")
-        logger.info("Step 8: Clicking Synapse sets tab")
+        # Step 9: Click on "Synapse sets" tab
+        print("\n📍 Step 9: Clicking Synapse sets tab...")
+        logger.info("Step 9: Clicking Synapse sets tab")
         synapse_sets_clicked = build_synaptome.click_synapse_sets_tab(logger)
         assert synapse_sets_clicked, "Failed to click Synapse sets tab"
 

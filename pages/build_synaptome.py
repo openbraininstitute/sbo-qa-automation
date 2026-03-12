@@ -5,6 +5,7 @@ import time
 from tkinter.constants import RADIOBUTTON
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common import TimeoutException, NoSuchElementException, StaleElementReferenceException
 import logging
@@ -519,8 +520,140 @@ class BuildSynaptomePage(HomePage):
             time.sleep(3)
             logger.info("Project models loaded")
             return True
-
-    def select_model_via_radio_button(self, logger):
+    
+    def click_public_tab(self, logger):
+        """Click on Public tab"""
+        logger.info("Looking for Public tab...")
+        time.sleep(3)
+        
+        # Try multiple selectors for Public tab
+        public_tab = None
+        public_tab_selectors = [
+            (By.XPATH, "//button[contains(., 'Public')]"),
+            (By.XPATH, "//div[@role='tab' and contains(., 'Public')]"),
+            (By.XPATH, "//*[contains(@class, 'tab') and contains(., 'Public')]"),
+            (By.XPATH, "//button[@role='tab' and contains(text(), 'Public')]"),
+            (By.XPATH, "//*[text()='Public' or contains(text(), 'Public')]"),
+        ]
+        
+        for i, selector in enumerate(public_tab_selectors):
+            try:
+                public_tab = self.browser.find_element(*selector)
+                logger.info(f"Found Public tab with selector {i+1}: {selector}")
+                break
+            except:
+                logger.info(f"Public tab selector {i+1} failed: {selector}")
+                continue
+        
+        if not public_tab:
+            logger.info("Public tab not found, checking if we're already on public models...")
+            return False
+        else:
+            assert public_tab.is_displayed(), "Public tab is not displayed"
+            public_tab.click()
+            logger.info("Clicked on Public tab")
+            
+            # Wait for public models to load
+            time.sleep(3)
+            logger.info("Public models loaded")
+            return True
+    
+    def search_for_model(self, search_text, logger=None):
+        """
+        Search for a model using the free text search field
+        
+        Args:
+            search_text: Text to search for (e.g., "cadpyr")
+            logger: Logger instance
+        """
+        if logger:
+            logger.info(f"Searching for model: {search_text}")
+        
+        # Wait for the page to fully load after clicking Public tab
+        time.sleep(3)
+        
+        # First, click the search button to open the search input
+        search_button = None
+        search_button_selectors = [
+            (By.XPATH, "//button[@aria-label='Open search']"),
+            (By.CSS_SELECTOR, "button[aria-label='Open search']"),
+            (By.XPATH, "//button[contains(@aria-label, 'search')]"),
+        ]
+        
+        for i, selector in enumerate(search_button_selectors):
+            try:
+                from selenium.webdriver.support.ui import WebDriverWait
+                from selenium.webdriver.support import expected_conditions as EC
+                search_button = WebDriverWait(self.browser, 3).until(
+                    EC.element_to_be_clickable(selector)
+                )
+                if logger:
+                    logger.info(f"Found search button with selector {i+1}: {selector}")
+                break
+            except:
+                if logger:
+                    logger.info(f"Search button selector {i+1} failed: {selector}")
+                continue
+        
+        if not search_button:
+            if logger:
+                logger.error("Could not find search button")
+            raise Exception("Cannot find search button")
+        
+        # Click the search button to open the search input
+        search_button.click()
+        if logger:
+            logger.info("Clicked search button to open search")
+        # Wait for the animation to complete (300ms transition + buffer)
+        time.sleep(2)
+        
+        # Now find the search input field
+        search_field = None
+        search_field_selectors = [
+            (By.XPATH, "//input[@placeholder='Search for entities...']"),
+            (By.XPATH, "//input[@aria-label='Search input']"),
+            (By.CSS_SELECTOR, "input[placeholder='Search for entities...']"),
+            (By.CSS_SELECTOR, "input[aria-label='Search input']"),
+        ]
+        
+        for i, selector in enumerate(search_field_selectors):
+            try:
+                from selenium.webdriver.support.ui import WebDriverWait
+                from selenium.webdriver.support import expected_conditions as EC
+                search_field = WebDriverWait(self.browser, 3).until(
+                    EC.visibility_of_element_located(selector)
+                )
+                if logger:
+                    logger.info(f"Found search field with selector {i+1}: {selector}")
+                break
+            except:
+                if logger:
+                    logger.info(f"Search field selector {i+1} failed: {selector}")
+                continue
+        
+        if not search_field:
+            if logger:
+                logger.error("Could not find search field after clicking button")
+            raise Exception("Cannot find search field")
+        
+        # Clear and enter search text
+        search_field.clear()
+        search_field.send_keys(search_text)
+        if logger:
+            logger.info(f"Entered search text: {search_text}")
+        
+        # Press Enter to trigger search
+        search_field.send_keys(Keys.RETURN)
+        if logger:
+            logger.info("Pressed Enter to search")
+        
+        # Wait for search results to load
+        time.sleep(3)
+        
+        if logger:
+            logger.info("Search completed, results should be filtered")
+        
+        return True
         """Select a model by clicking radio button"""
         # Wait for models table to load and select a model by ticking a radio button
         logger.info("Waiting for models table to load...")
@@ -685,4 +818,163 @@ class BuildSynaptomePage(HomePage):
         # Wait for synapse sets section to load
         time.sleep(3)
         logger.info("Synapse sets section loaded")
+        return True
+
+    
+    def create_synapse_set(self, name, target, synapse_type="Excitatory Synapses", formula="0.04", 
+                          min_filter=10, max_filter=900, logger=None):
+        """
+        Create a synapse set with the specified configuration
+        
+        Args:
+            name: Name of the synapse set (e.g., "apical1", "basal1", "soma1")
+            target: Target location (e.g., "apical", "basal", "soma")
+            synapse_type: Type of synapses (default: "Excitatory Synapses")
+            formula: Synapse distribution formula (default: "0.04")
+            min_filter: Minimum filter value (default: 10)
+            max_filter: Maximum filter value (default: 900)
+            logger: Logger instance
+        """
+        if logger:
+            logger.info(f"Creating synapse set: {name} on {target}")
+        
+        # Fill in the name field
+        name_field = self.browser.find_element(By.ID, "name")
+        name_field.clear()
+        name_field.send_keys(name)
+        if logger:
+            logger.info(f"Set name: {name}")
+        time.sleep(0.5)
+        
+        # Select target from dropdown
+        target_dropdown = self.browser.find_element(By.ID, "target")
+        target_dropdown.click()
+        time.sleep(1)
+        
+        # Find and click the target option
+        target_option_xpath = f"//div[@role='option' and contains(., '{target}')]"
+        target_option = self.browser.find_element(By.XPATH, target_option_xpath)
+        target_option.click()
+        if logger:
+            logger.info(f"Selected target: {target}")
+        time.sleep(0.5)
+        
+        # Type is already set to "Excitatory Synapses" by default, but verify/change if needed
+        type_field = self.browser.find_element(By.ID, "type")
+        current_type = type_field.get_attribute("value") or type_field.text
+        if synapse_type not in current_type:
+            type_field.click()
+            time.sleep(0.5)
+            type_option_xpath = f"//div[@role='option' and contains(., '{synapse_type}')]"
+            type_option = self.browser.find_element(By.XPATH, type_option_xpath)
+            type_option.click()
+            if logger:
+                logger.info(f"Selected type: {synapse_type}")
+            time.sleep(0.5)
+        
+        # Fill in the formula
+        formula_field = self.browser.find_element(By.ID, "formula")
+        formula_field.clear()
+        formula_field.send_keys(formula)
+        if logger:
+            logger.info(f"Set formula: {formula}")
+        time.sleep(0.5)
+        
+        # Expand filter synapses section
+        filter_header = self.browser.find_element(By.ID, "exclusion-rules-header")
+        filter_header.click()
+        time.sleep(1)
+        if logger:
+            logger.info("Expanded filter synapses section")
+        
+        # Click "Add rule" button
+        add_rule_btn = self.browser.find_element(By.XPATH, "//button[@aria-label='Add new rule']")
+        add_rule_btn.click()
+        time.sleep(1)
+        if logger:
+            logger.info("Clicked Add rule button")
+        
+        # Fill in min and max filter values
+        # Find the filter input fields (they appear after clicking Add rule)
+        filter_inputs = self.browser.find_elements(By.XPATH, "//input[@type='number']")
+        if len(filter_inputs) >= 2:
+            # First input is min, second is max
+            min_input = filter_inputs[-2]  # Get the last two added
+            max_input = filter_inputs[-1]
+            
+            min_input.clear()
+            min_input.send_keys(str(min_filter))
+            if logger:
+                logger.info(f"Set min filter: {min_filter}")
+            
+            max_input.clear()
+            max_input.send_keys(str(max_filter))
+            if logger:
+                logger.info(f"Set max filter: {max_filter}")
+            time.sleep(0.5)
+        
+        # Click "Apply changes" button
+        apply_btn = self.browser.find_element(By.XPATH, "//button[@type='submit' and contains(., 'Apply changes')]")
+        apply_btn.click()
+        if logger:
+            logger.info("Clicked Apply changes button")
+        time.sleep(2)
+        
+        if logger:
+            logger.info(f"✅ Synapse set '{name}' created successfully")
+    
+    def click_add_set_button(self, logger=None):
+        """Click the 'Add set' button to create a new synapse set"""
+        add_set_btn = self.browser.find_element(By.XPATH, "//button[contains(., 'Add set')]")
+        add_set_btn.click()
+        if logger:
+            logger.info("Clicked 'Add set' button")
+        time.sleep(2)
+
+    def select_model_via_radio_button(self, logger):
+        """Select a model by clicking radio button"""
+        # Wait for models table to load and select a model by ticking a radio button
+        logger.info("Waiting for models table to load...")
+        time.sleep(5)  # Give more time for table to load
+        
+        # Try to find and click radio button
+        radio_btn = None
+        radio_selectors = [
+            BuildSynaptomeLocators.RADIO_BUTTON_ANT_INPUT,
+            BuildSynaptomeLocators.RADIO_BUTTON_INPUT_CLASS,
+            BuildSynaptomeLocators.RADIO_BUTTON_SPAN_TARGET,
+            BuildSynaptomeLocators.RADIO_BUTTON_SPAN_WRAPPER,
+            BuildSynaptomeLocators.RADIO_BUTTON_TABLE_FIRST,
+            BuildSynaptomeLocators.RADIO_BUTTON_ANY,
+        ]
+        
+        for i, selector in enumerate(radio_selectors):
+            try:
+                from selenium.webdriver.support.ui import WebDriverWait
+                from selenium.webdriver.support import expected_conditions as EC
+                radio_btn = WebDriverWait(self.browser, 10).until(
+                    EC.element_to_be_clickable(selector)
+                )
+                logger.info(f"Found clickable radio button with selector {i+1}: {selector}")
+                break
+            except:
+                logger.info(f"Radio button selector {i+1} failed: {selector}")
+                continue
+        
+        if not radio_btn:
+            logger.error("Cannot find radio button")
+            raise Exception("Cannot find radio button or selectable model element")
+            
+        # Click the radio button
+        try:
+            radio_btn.click()
+            logger.info("Clicked on radio button to select model")
+        except:
+            # Try JavaScript click if regular click fails
+            self.browser.execute_script("arguments[0].click();", radio_btn)
+            logger.info("Clicked on radio button using JavaScript")
+        
+        # Wait for selection to register
+        time.sleep(2)
+        logger.info("Model selected via radio button")
         return True
