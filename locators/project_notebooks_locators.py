@@ -34,7 +34,7 @@ class ProjectNotebooksLocators:
     FILTER_DESCRIPTION_LABEL = (By.XPATH, "//div[starts-with(@class, 'mb-3 flex cursor-pointer') and contains(text(),'Description')]")
     FILTER_OBJECT_OF_INTEREST_LABEL = (By.XPATH, "//div[starts-with(@class, 'mb-3 flex cursor-pointer') and contains(text(),'Object of interest')]")
     Filter_NAME_LABEL = (By.XPATH, "//span[contains(text(),'Name')]")
-    FILTER_NAME_INPUT = (By.XPATH, "//input[@class='ant-input ant-input-outlined']")
+    FILTER_NAME_INPUT = (By.XPATH, "//input[starts-with(@class,'ant-input')]")
     FILTER_NAME_LABEL = (By.XPATH, "//div[starts-with(@class, 'mb-3 flex cursor-pointer') and contains(text(),'Name')]")
     FILTER_CONTRIBUTOR_LABEL = (By.XPATH, "//span[normalize-space()='Contributors']")
     FILTER_CONTRIBUTOR_CHECKBOX = (By.XPATH, "//button[@role='checkbox']")

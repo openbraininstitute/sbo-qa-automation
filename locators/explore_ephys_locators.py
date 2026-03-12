@@ -80,7 +80,7 @@ class ExploreEphysLocators:
     MDV_SPECIES_LABEL = (By.XPATH, "//div[text()='Species']")
     MDV_SPECIES_VALUE = (By.XPATH, "//div[text()='Species']/following-sibling::div")
     MDV_LICENSE_LABEL = (By.XPATH, "//div[text()='License']")
-    MDV_LICENSE_VALUE = (By.XPATH, "//div[text()='License']/following-sibling::div//a")
+    MDV_LICENSE_VALUE = (By.XPATH, "//div[text()='License']/following-sibling::div")
     MDV_COPY_BUTTON = (By.XPATH, "//button[@title='Copy ID']")
     MDV_DOWNLOAD_BUTTON = (By.XPATH, "//button[@title='download']")
     MDV_VIEW_DETAILS_BUTTON = (By.XPATH, "//a[@title='Go to details page' and contains(text(), 'View details')]")
@@ -112,8 +112,8 @@ class ExploreEphysLocators:
     DV_NAME_VALUE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Name']/following-sibling::div")
     DV_DESCRIPTION_LABEL = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Description']")
     DV_DESCRIPTION_VALUE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Description']/following-sibling::div")
-    DV_REGISTERED_BY_LABEL = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Registered by']")
-    DV_REGISTERED_BY_VALUE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Registered by']/following-sibling::div")
+    DV_CREATED_BY_LABEL = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Created by']")
+    DV_CREATED_BY_VALUE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Created by']/following-sibling::div")
     DV_CONTRIBUTORS_LABEL = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Contributors']")
     DV_CONTRIBUTORS_VALUE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Contributors']/following-sibling::div")
     DV_INSTITUTIONAL_CONTRIBUTORS_LABEL = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Institutional Contributors']")
@@ -125,7 +125,7 @@ class ExploreEphysLocators:
     DV_ETYPE_LABEL = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='E-Type']")
     DV_ETYPE_VALUE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='E-Type']/following-sibling::div")
     DV_LICENSE_LABEL = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='License']")
-    DV_LICENSE_LINK = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='License']/following-sibling::div//a")
+    DV_LICENSE_LINK = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='License']/following-sibling::div")
     
     # Subject section
     DV_SUBJECT_HEADER = (By.XPATH, "//h2[text()='Subject']")
