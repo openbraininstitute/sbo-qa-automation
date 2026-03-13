@@ -828,7 +828,7 @@ class BuildSynaptomePage(HomePage):
         
         Args:
             name: Name of the synapse set (e.g., "apical1", "basal1", "soma1")
-            target: Target location (e.g., "apical", "basal", "soma")
+            target: Target location (e.g., "Apical dendrites", "Basal dendrites", "Soma")
             synapse_type: Type of synapses (default: "Excitatory Synapses")
             formula: Synapse distribution formula (default: "0.04")
             min_filter: Minimum filter value (default: 10)
@@ -839,7 +839,7 @@ class BuildSynaptomePage(HomePage):
             logger.info(f"Creating synapse set: {name} on {target}")
         
         # Fill in the name field
-        name_field = self.browser.find_element(By.ID, "name")
+        name_field = self.find_element((By.ID, "name"))
         name_field.clear()
         name_field.send_keys(name)
         if logger:
@@ -847,89 +847,92 @@ class BuildSynaptomePage(HomePage):
         time.sleep(0.5)
         
         # Select target from dropdown
-        target_dropdown = self.browser.find_element(By.ID, "target")
-        target_dropdown.click()
+        target_dropdown_locator = (By.XPATH, "//input[@id='target']/ancestor::div[contains(@class, 'ant-select')]")
+        self.wait_and_click(target_dropdown_locator, timeout=10)
         time.sleep(1)
         
-        # Find and click the target option
-        target_option_xpath = f"//div[@role='option' and contains(., '{target}')]"
-        target_option = self.browser.find_element(By.XPATH, target_option_xpath)
+        # Wait for dropdown options and select target
+        target_option_locator = (By.XPATH, f"//div[@class='ant-select-item-option-content' and text()='{target}']")
+        target_option = self.element_to_be_clickable(target_option_locator, timeout=10)
         target_option.click()
         if logger:
             logger.info(f"Selected target: {target}")
         time.sleep(0.5)
         
-        # Type is already set to "Excitatory Synapses" by default, but verify/change if needed
-        type_field = self.browser.find_element(By.ID, "type")
-        current_type = type_field.get_attribute("value") or type_field.text
-        if synapse_type not in current_type:
-            type_field.click()
+        # Type is already set to "Excitatory Synapses" by default
+        # Only change if we need a different type
+        if synapse_type != "Excitatory Synapses":
+            type_dropdown_locator = (By.XPATH, "//input[@id='type']/ancestor::div[contains(@class, 'ant-select')]")
+            self.wait_and_click(type_dropdown_locator, timeout=10)
             time.sleep(0.5)
-            type_option_xpath = f"//div[@role='option' and contains(., '{synapse_type}')]"
-            type_option = self.browser.find_element(By.XPATH, type_option_xpath)
+            
+            # Select the type option
+            type_option_locator = (By.XPATH, f"//div[@class='ant-select-item-option-content' and text()='{synapse_type}']")
+            type_option = self.element_to_be_clickable(type_option_locator, timeout=10)
             type_option.click()
             if logger:
                 logger.info(f"Selected type: {synapse_type}")
             time.sleep(0.5)
+        else:
+            if logger:
+                logger.info(f"Type already set to: {synapse_type}")
         
         # Fill in the formula
-        formula_field = self.browser.find_element(By.ID, "formula")
+        formula_field = self.find_element((By.ID, "formula"))
         formula_field.clear()
         formula_field.send_keys(formula)
         if logger:
             logger.info(f"Set formula: {formula}")
-        time.sleep(0.5)
+        
+        # Wait for Apply button to become enabled after entering formula
+        time.sleep(2)
         
         # Expand filter synapses section
-        filter_header = self.browser.find_element(By.ID, "exclusion-rules-header")
-        filter_header.click()
-        time.sleep(1)
+        filter_header_locator = (By.ID, "exclusion-rules-header")
+        self.wait_and_click(filter_header_locator, timeout=10)
+        time.sleep(2)  # Wait for filter section to fully expand
         if logger:
             logger.info("Expanded filter synapses section")
         
-        # Click "Add rule" button
-        add_rule_btn = self.browser.find_element(By.XPATH, "//button[@aria-label='Add new rule']")
-        add_rule_btn.click()
-        time.sleep(1)
+        # Wait for filter input fields to appear and fill them
+        min_input_locator = (By.XPATH, "//input[contains(@id, 'distance_soma_gte')]")
+        min_input = self.element_to_be_clickable(min_input_locator, timeout=10)
+        min_input.clear()
+        min_input.send_keys(str(max_filter))  # Fill max value first (900)
         if logger:
-            logger.info("Clicked Add rule button")
+            logger.info(f"Set greater or equal to: {max_filter}")
+        time.sleep(0.5)
         
-        # Fill in min and max filter values
-        # Find the filter input fields (they appear after clicking Add rule)
-        filter_inputs = self.browser.find_elements(By.XPATH, "//input[@type='number']")
-        if len(filter_inputs) >= 2:
-            # First input is min, second is max
-            min_input = filter_inputs[-2]  # Get the last two added
-            max_input = filter_inputs[-1]
-            
-            min_input.clear()
-            min_input.send_keys(str(min_filter))
-            if logger:
-                logger.info(f"Set min filter: {min_filter}")
-            
-            max_input.clear()
-            max_input.send_keys(str(max_filter))
-            if logger:
-                logger.info(f"Set max filter: {max_filter}")
-            time.sleep(0.5)
+        max_input_locator = (By.XPATH, "//input[contains(@id, 'distance_soma_lte')]")
+        max_input = self.element_to_be_clickable(max_input_locator, timeout=10)
+        max_input.clear()
+        max_input.send_keys(str(min_filter))  # Fill min value second (10)
+        if logger:
+            logger.info(f"Set less or equal to: {min_filter}")
+        time.sleep(1)
         
-        # Click "Apply changes" button
-        apply_btn = self.browser.find_element(By.XPATH, "//button[@type='submit' and contains(., 'Apply changes')]")
+        # Wait for Apply button to become enabled after entering filter values
+        time.sleep(2)
+        
+        # Click "Apply changes" button - wait for it to be enabled
+        apply_btn_locator = (By.XPATH, "//button[@type='submit' and contains(., 'Apply changes')]")
+        apply_btn = self.element_to_be_clickable(apply_btn_locator, timeout=10)
         apply_btn.click()
         if logger:
             logger.info("Clicked Apply changes button")
-        time.sleep(2)
+        time.sleep(5)  # Wait for changes to be saved before proceeding
         
         if logger:
             logger.info(f"✅ Synapse set '{name}' created successfully")
     
     def click_add_set_button(self, logger=None):
         """Click the 'Add set' button to create a new synapse set"""
-        add_set_btn = self.browser.find_element(By.XPATH, "//button[contains(., 'Add set')]")
+        add_set_btn_locator = (By.XPATH, "//button[contains(., 'Add set')]")
+        add_set_btn = self.element_to_be_clickable(add_set_btn_locator, timeout=10)
         add_set_btn.click()
         if logger:
             logger.info("Clicked 'Add set' button")
-        time.sleep(2)
+        time.sleep(3)  # Wait for new set form to load
 
     def select_model_via_radio_button(self, logger):
         """Select a model by clicking radio button"""
@@ -950,11 +953,7 @@ class BuildSynaptomePage(HomePage):
         
         for i, selector in enumerate(radio_selectors):
             try:
-                from selenium.webdriver.support.ui import WebDriverWait
-                from selenium.webdriver.support import expected_conditions as EC
-                radio_btn = WebDriverWait(self.browser, 10).until(
-                    EC.element_to_be_clickable(selector)
-                )
+                radio_btn = self.element_to_be_clickable(selector, timeout=10)
                 logger.info(f"Found clickable radio button with selector {i+1}: {selector}")
                 break
             except:
