@@ -15,7 +15,7 @@ class ExploreNeuronDensityPage(ExplorePage):
         self.logger = logger
 
     def go_to_explore_neuron_density_page(self, lab_id: str, project_id: str, retries=3, delay=5):
-        path = f"/app/virtual-lab/lab/{lab_id}/project/{project_id}/explore/interactive/experimental/neuron-density"
+        path = f"/app/virtual-lab/{lab_id}/{project_id}/data/browse/entity/experimental-neuron-density"
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(90)
@@ -23,8 +23,8 @@ class ExploreNeuronDensityPage(ExplorePage):
                 self.wait_for_page_ready(timeout=60)
             except TimeoutException:
                 print(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                time.sleep(delay)  # Wait before retrying
-                delay *= 2  # Exponentially increase delay (e.g., 5, 10, 20 seconds)
+                time.sleep(delay)
+                delay *= 2
                 if attempt == retries - 1:
                     raise RuntimeError("The Explore page failed to load after multiple attempts.")
             return self.browser.current_url
@@ -43,6 +43,31 @@ class ExploreNeuronDensityPage(ExplorePage):
 
     def find_brain_regions_panel_btn(self, timeout=10):
         return self.find_element(ExploreNDensityPageLocators.BRAIN_REGIONS_PANEL_BTN, timeout=timeout)
+
+    def click_brain_region_banner(self, timeout=10):
+        banner = self.find_element(ExploreNDensityPageLocators.BR_REGION_BANNER, timeout=timeout)
+        banner.click()
+        time.sleep(1)
+        return banner
+
+    def remove_current_brain_region(self, timeout=10):
+        close_btn = self.find_element(ExploreNDensityPageLocators.BR_REGION_CLOSE_BTN, timeout=timeout)
+        close_btn.click()
+        time.sleep(1)
+
+    def search_and_select_brain_region(self, region_name, timeout=10):
+        from selenium.webdriver.common.keys import Keys
+        search_input = self.find_element(ExploreNDensityPageLocators.BR_REGION_SEARCH_INPUT, timeout=timeout)
+        search_input.clear()
+        search_input.send_keys(region_name)
+        time.sleep(2)
+        search_input.send_keys(Keys.RETURN)
+        time.sleep(2)
+
+    def select_root_brain_region(self, timeout=10):
+        root_btn = self.find_element(ExploreNDensityPageLocators.BR_REGION_ROOT_OPTION, timeout=timeout)
+        root_btn.click()
+        time.sleep(2)
 
     def find_column_headers(self, column_locators, timeout=30):
         column_headers = []
@@ -161,3 +186,27 @@ class ExploreNeuronDensityPage(ExplorePage):
 
     def scroll_sideways(self):
         return self.element_visibility(ExploreNDensityPageLocators.SCROLL_SIDEWAYS)
+
+    def find_mini_detail_view(self, timeout=10):
+        return self.find_element(ExploreNDensityPageLocators.MINI_DETAIL_VIEW, timeout=timeout)
+
+    def verify_mini_detail_view_present(self):
+        mini_view = self.find_mini_detail_view()
+        assert mini_view.is_displayed(), "Mini-detail view should be displayed"
+        self.logger.info("Mini-detail view is displayed")
+        return mini_view
+
+    def find_mdv_view_details_button(self, timeout=10):
+        return self.find_element(ExploreNDensityPageLocators.MDV_VIEW_DETAILS_BUTTON, timeout=timeout)
+
+    def click_mdv_view_details(self):
+        view_details_btn = self.find_mdv_view_details_button()
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", view_details_btn)
+        time.sleep(0.5)
+        try:
+            view_details_btn.click()
+        except Exception as e:
+            self.logger.warning(f"Regular click failed, using JavaScript click: {e}")
+            self.browser.execute_script("arguments[0].click();", view_details_btn)
+        self.logger.info("Clicked 'View Details' button")
+        time.sleep(2)
