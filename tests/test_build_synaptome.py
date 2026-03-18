@@ -102,11 +102,22 @@ class TestBuildSynaptome:
         assert model_selected, "Failed to select model via radio button"
 
         # Step 9: Click on "Synapse sets" tab
-        # Step 9: Click on "Synapse sets" tab
         print("\n📍 Step 9: Clicking Synapse sets tab...")
         logger.info("Step 9: Clicking Synapse sets tab")
         synapse_sets_clicked = build_synaptome.click_synapse_sets_tab(logger)
         assert synapse_sets_clicked, "Failed to click Synapse sets tab"
+
+        # Step 9a: Verify the Synapse sets info panel is displayed
+        print("\n📍 Step 9a: Verifying Synapse sets info panel...")
+        logger.info("Step 9a: Verifying Synapse sets info panel")
+        build_synaptome.verify_synapse_sets_info_panel(logger)
+        print("✅ Synapse sets info panel verified")
+
+        # Step 9b: Click the "Add set" button
+        print("\n📍 Step 9b: Clicking Add set button...")
+        logger.info("Step 9b: Clicking Add set button")
+        build_synaptome.click_add_set_button(logger)
+        print("✅ Add set button clicked")
 
         # Step 10: Wait for 3D morphology to load
         print("\n📍 Step 10: Waiting for 3D morphology to load...")
