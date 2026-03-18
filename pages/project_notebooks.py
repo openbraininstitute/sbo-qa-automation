@@ -83,11 +83,9 @@ class ProjectNotebooks(HomePage):
     def get_column_cells(self, column_name: str) -> List[WebElement]:
         """Get all cells in a specific column by column name."""
         try:
-            # Get column headers using the improved method
             header_texts = self.get_column_header_texts()
             column_index = None
 
-            # Find the column index
             for i, header_text in enumerate(header_texts, start=1):
                 if header_text.lower() == column_name.lower():
                     column_index = i
@@ -97,11 +95,9 @@ class ProjectNotebooks(HomePage):
                 available_columns = ", ".join([f"'{h}'" for h in header_texts])
                 raise ValueError(f"Column '{column_name}' not found. Available columns: {available_columns}")
 
-            # Get cells from that column (excluding hidden rows)
             xpath = f"//tbody/tr[not(contains(@style,'display: none'))]/td[{column_index}]"
             cells = self.find_all_elements((By.XPATH, xpath))
 
-            # Filter out empty cells
             return [cell for cell in cells if cell.text.strip()]
             
         except Exception as e:
@@ -133,7 +129,6 @@ class ProjectNotebooks(HomePage):
         """Wait for search results to appear after filtering."""
         try:
             self.find_element(ProjectNotebooksLocators.TABLE_BODY_CONTAINER, timeout=10)
-            
             return self.is_visible(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=timeout)
         except Exception as e:
             self.logger.error(f"Failed to find table search result: {str(e)}")
@@ -149,7 +144,6 @@ class ProjectNotebooks(HomePage):
     def wait_for_filtered_results(self, timeout=30):
         """Wait for filtered results to appear with multiple fallback strategies."""
         try:
-            # Strategy 1: Wait for specific search result
             if self.is_visible(ProjectNotebooksLocators.DATA_ROW_KEY_SEARCH_RESULT, timeout=10):
                 self.logger.info("✅ Found specific search result")
                 return True
@@ -157,7 +151,6 @@ class ProjectNotebooks(HomePage):
             pass
         
         try:
-            # Strategy 2: Wait for any filtered result containing key terms
             if self.is_visible(ProjectNotebooksLocators.DATA_ROW_FILTERED_RESULT, timeout=10):
                 self.logger.info("✅ Found filtered result with key terms")
                 return True
@@ -165,7 +158,6 @@ class ProjectNotebooks(HomePage):
             pass
         
         try:
-            # Strategy 3: Wait for any visible table rows
             rows = self.find_all_elements(ProjectNotebooksLocators.DATA_ROW_ANY_RESULT, timeout=10)
             if rows:
                 self.logger.info(f"✅ Found {len(rows)} visible table rows")
@@ -191,16 +183,13 @@ class ProjectNotebooks(HomePage):
         :return: None
         """
         try:
-            # Wait for table to load
             table_element = self.find_element(ProjectNotebooksLocators.TABLE_ELEMENT, timeout=20)
             
-            # Get all column header elements with the specific class for column titles
             column_title_elements = self.find_all_elements(
                 (By.CSS_SELECTOR, "th[data-testid='column-header'] .table-module__1pe1kq__columnTitle"),
                 timeout=10
             )
             
-            # Extract text from column title elements
             actual_headers = [header.text.strip() for header in column_title_elements]
             
             self.logger.info(f"Expected Headers: {expected_headers}")
@@ -208,7 +197,6 @@ class ProjectNotebooks(HomePage):
             print(f"Expected Headers: {expected_headers}")
             print(f"Actual Headers: {actual_headers}")
 
-            # Compare headers
             if len(actual_headers) != len(expected_headers):
                 self.logger.error(
                     f"Header count mismatch! Expected {len(expected_headers)} headers, got {len(actual_headers)}"
@@ -242,23 +230,19 @@ class ProjectNotebooks(HomePage):
 
         def check_scale_values(driver):
             try:
-                # Re-fetch elements on each check to avoid stale element exceptions
                 cells = self.get_column_cells("Scale")
                 if not cells:
                     return False
                 
-                # Check if all cells have the expected value
                 for cell in cells:
                     try:
                         cell_text = cell.text.strip().lower()
                         if cell_text != value:
                             return False
                     except Exception:
-                        # If we get a stale element exception, return False to retry
                         return False
                 return True
             except Exception:
-                # If any error occurs, return False to retry
                 return False
 
         WebDriverWait(self.browser, timeout).until(check_scale_values)
@@ -284,10 +268,114 @@ class ProjectNotebooks(HomePage):
         return self.find_element(ProjectNotebooksLocators.ACTION_MENU_DOWNLOAD)
     
     def action_menu_run(self):
-        """Get the run action menu item."""
-        return self.find_element(ProjectNotebooksLocators.ACTION_MENU_RUN)
+        """Get the run action menu item and scroll it into view."""
+        element = self.find_element(ProjectNotebooksLocators.ACTION_MENU_RUN)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+        return element
+
+    def js_click(self, element):
+        """Click an element using JavaScript to bypass overlay issues."""
+        self.browser.execute_script("arguments[0].click();", element)
     
     def modal_close_button(self):
         """Get the modal close button."""
         return self.find_element(ProjectNotebooksLocators.MODAL_CLOSE_BUTTON)
 
+
+    def wait_for_jupyter_tab(self, timeout=30):
+        """Wait for a second tab (Jupyter notebook) to open and verify it."""
+        WebDriverWait(self.browser, timeout).until(
+            lambda d: len(d.window_handles) > 1,
+            "Second tab (Jupyter notebook) did not open within timeout"
+        )
+        self.logger.info(f"Second tab opened. Total tabs: {len(self.browser.window_handles)}")
+
+        self.browser.switch_to.window(self.browser.window_handles[1])
+        time.sleep(5)  # Give Jupyter a moment to load
+        jupyter_url = self.browser.current_url
+        self.logger.info(f"Jupyter tab URL: {jupyter_url}")
+
+        self.browser.switch_to.window(self.browser.window_handles[0])
+        return jupyter_url
+
+    def verify_jupyter_notebook_loaded(self, timeout=120):
+        """
+        Switch to the Jupyter tab and verify the notebook actually loaded.
+        Waits for JupyterLab/JupyterHub UI elements to appear.
+        Returns True if the notebook loaded, switches back to the original tab.
+        """
+        original_window = self.browser.current_window_handle
+
+        self.browser.switch_to.window(self.browser.window_handles[1])
+        self.logger.info(f"Switched to Jupyter tab: {self.browser.current_url}")
+
+        jupyter_loaded = False
+        jupyter_selectors = [
+            (By.CSS_SELECTOR, "#main"),
+            (By.CSS_SELECTOR, ".jp-Notebook"),
+            (By.CSS_SELECTOR, ".jp-Cell"),
+            (By.CSS_SELECTOR, "#jp-main-content-panel"),
+            (By.CSS_SELECTOR, ".jp-NotebookPanel"),
+            (By.XPATH, "//div[contains(@class, 'jp-Notebook')]"),
+        ]
+
+        max_attempts = 3
+        for attempt in range(1, max_attempts + 1):
+            self.logger.info(f"Attempt {attempt}/{max_attempts} to detect Jupyter notebook...")
+            for selector in jupyter_selectors:
+                try:
+                    element = WebDriverWait(self.browser, timeout // max_attempts).until(
+                        EC.presence_of_element_located(selector)
+                    )
+                    self.logger.info(f"Jupyter notebook loaded — found element: {selector}")
+                    jupyter_loaded = True
+                    break
+                except TimeoutException:
+                    continue
+
+            if jupyter_loaded:
+                break
+
+            if attempt < max_attempts:
+                self.logger.info("Jupyter not loaded yet, refreshing page...")
+                self.browser.refresh()
+                time.sleep(5)
+
+        if not jupyter_loaded:
+            self.logger.error(f"Jupyter notebook did not load after {max_attempts} attempts")
+            self.browser.save_screenshot("debug_jupyter_not_loaded.png")
+            self.logger.info("Screenshot saved as debug_jupyter_not_loaded.png")
+
+        self.browser.switch_to.window(original_window)
+        self.logger.info("Switched back to original tab")
+        return jupyter_loaded
+
+    def open_notebook_actions_menu(self, button_index=1):
+        """Click the notebook action (+) button and wait for the popover menu to appear."""
+        locator_map = {
+            1: ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_1,
+            2: ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_2,
+            3: ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_3,
+        }
+        locator = locator_map.get(button_index, ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_1)
+        self.click_action_and_wait_for_menu(locator)
+
+    def click_action_and_wait_for_menu(self, action_button_locator, timeout=10, retries=3):
+        """Click the notebook action (+) button and wait for the popover menu to appear.
+        Retries if the menu doesn't show up."""
+        menu_locator = (By.CSS_SELECTOR, ".ant-popover-inner-content")
+        for attempt in range(1, retries + 1):
+            try:
+                btn = self.element_to_be_clickable(action_button_locator, timeout=5)
+                btn.click()
+                self.logger.info(f"Clicked action button (attempt {attempt})")
+                WebDriverWait(self.browser, timeout).until(
+                    EC.visibility_of_element_located(menu_locator)
+                )
+                self.logger.info("Popover menu appeared")
+                return True
+            except TimeoutException:
+                self.logger.info(f"Popover menu did not appear on attempt {attempt}, retrying...")
+                self.browser.find_element(By.TAG_NAME, "body").click()
+                time.sleep(1)
+        raise Exception(f"Popover menu did not appear after {retries} attempts")

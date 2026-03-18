@@ -4,17 +4,12 @@
 
 import time
 
-from selenium.common import TimeoutException
-from selenium.webdriver.support.wait import WebDriverWait
-
-from locators.about_locators import AboutLocators
-from pages.about_page import AboutPage
 from pages.pricing_page import PricingPage
 
 
 class TestPricing:
     def test_pricing(self, visit_public_pages, logger):
-        _visit, base_url  = visit_public_pages
+        _visit, base_url = visit_public_pages
         browser, wait = _visit("/pricing")
         pricing_page = PricingPage(browser, wait, base_url, logger=logger)
 
@@ -44,34 +39,53 @@ class TestPricing:
         assert pricing_hero_video, "The main hero/background video is not found."
         logger.info("The main hero/background video is found.")
 
-        page_title = pricing_page.page_title()
-        assert page_title.is_displayed(), "'Discover our plans' title is not found."
-        logger.info("'Discover our plans' title is found.")
+        discover_plans_btn = pricing_page.discover_plans_button()
+        assert discover_plans_btn.is_displayed(), "'Discover our plans' button is not found."
+        logger.info("'Discover our plans' button is found.")
 
-        create_your_vlab_btn = pricing_page.temp_goto_vlab_btn()
-        assert create_your_vlab_btn.is_displayed(), "'Create your virtual lab' button is not found."
-        logger.info("'Create your virtual lab' button is found.")
+        # Scroll to plans section and widen viewport for xl:grid visibility
+        pricing_page.scroll_to_plans()
 
-        price_list_container = pricing_page.price_list_container()
-        assert price_list_container.is_displayed(), "Price list container is not found."
-        logger.info("Price list container is found.")
+        # Verify plan cards container and all 4 plans
+        plan_cards_container = pricing_page.plan_cards_container()
+        assert plan_cards_container.is_displayed(), "Plan cards container is not found."
+        logger.info("Plan cards container is found.")
 
-        price_list_plans = pricing_page.price_list_plans()
-        assert price_list_plans, "Price list plans are not found."
-        logger.info( "Price list plans are found.")
+        plan_cards = pricing_page.plan_cards()
+        assert len(plan_cards) == 4, f"Expected 4 plan cards, found {len(plan_cards)}"
+        logger.info(f"Found {len(plan_cards)} plan cards.")
 
-        contact_us_btn_premium_plan = pricing_page.contact_us()
-        assert contact_us_btn_premium_plan.is_displayed(), "Button 'Contact us' is not found."
-        logger.info("Button 'Contact us' is found.")
+        free_plan = pricing_page.plan_card_free()
+        assert free_plan.is_displayed(), "Free plan card is not found."
+        logger.info("Free plan card is found.")
 
-        container_detail_plan = pricing_page.detail_plans()
-        assert container_detail_plan.is_displayed(), "Container with details of plans is not found."
-        logger.info("Container with details of plans is not found.")
+        pro_plan = pricing_page.plan_card_pro()
+        assert pro_plan.is_displayed(), "Pro plan card is not found."
+        logger.info("Pro plan card is found.")
+
+        enterprise_plan = pricing_page.plan_card_enterprise()
+        assert enterprise_plan.is_displayed(), "Enterprise plan card is not found."
+        logger.info("Enterprise plan card is found.")
+
+        education_plan = pricing_page.plan_card_education()
+        assert education_plan.is_displayed(), "Education plan card is not found."
+        logger.info("Education plan card is found.")
+
+        # Verify Contact Us links on Enterprise and Education
+        contact_us_enterprise = pricing_page.contact_us_enterprise()
+        assert contact_us_enterprise.is_displayed(), "Enterprise 'Contact Us' link is not found."
+        logger.info("Enterprise 'Contact Us' link is found.")
+
+        contact_us_education = pricing_page.contact_us_education()
+        assert contact_us_education.is_displayed(), "Education 'Contact Us' link is not found."
+        logger.info("Education 'Contact Us' link is found.")
+
+        # Verify Pro plan price
+        pro_price = pricing_page.pro_price()
+        assert pro_price.is_displayed(), "Pro plan price is not found."
+        assert "CHF" in pro_price.text, f"Expected CHF in price, got: {pro_price.text}"
+        logger.info(f"Pro plan price found: {pro_price.text}")
 
         page_footer = pricing_page.footer()
         assert page_footer.is_displayed(), "Page footer is not found."
         logger.info("Page footer is found.")
-
-
-
-

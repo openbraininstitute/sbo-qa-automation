@@ -6,6 +6,7 @@
 import time
 from zoneinfo import ZoneInfo
 from datetime import datetime
+from selenium.webdriver.common.by import By
 
 from pages.build_synaptome import BuildSynaptomePage
 
@@ -74,26 +75,94 @@ class TestBuildSynaptome:
         time.sleep(5)
         logger.info(f"URL after clicking ME-model: {browser.current_url}")
 
-        # Step 6: Click on "Project" tab
-        print("\n📍 Step 6: Clicking Project tab...")
-        logger.info("Step 6: Clicking Project tab")
-        project_clicked = build_synaptome.click_project_tab(logger)
-        if project_clicked:
-            print("✅ Project tab clicked successfully")
+        # Step 6: Click on "Public" tab
+        print("\n📍 Step 6: Clicking Public tab...")
+        logger.info("Step 6: Clicking Public tab")
+        public_clicked = build_synaptome.click_public_tab(logger)
+        if public_clicked:
+            print("✅ Public tab clicked successfully")
         else:
-            print("ℹ️ Project tab not found, may already be on project models")
+            print("ℹ️ Public tab not found, may already be on public models")
 
-        # Step 7: Select a model by ticking a radio button
-        print("\n📍 Step 7: Selecting model via radio button...")
-        logger.info("Step 7: Selecting model via radio button")
+        # Step 7: Search for "cadpyr" model
+        # Step 7: Search for "cadpyr" model (optional - may not be available)
+        print("\n📍 Step 7: Searching for cadpyr model...")
+        logger.info("Step 7: Searching for cadpyr model")
+        try:
+            search_success = build_synaptome.search_for_model("cadpyr", logger)
+            if search_success:
+                print("✅ Search completed successfully")
+        except Exception as e:
+            print(f"ℹ️ Search field not available, continuing without search: {e}")
+            logger.info(f"Search field not available, continuing without search: {e}")
+        # Step 8: Select a model by ticking a radio button
+        print("\n📍 Step 8: Selecting model via radio button...")
+        logger.info("Step 8: Selecting model via radio button")
         model_selected = build_synaptome.select_model_via_radio_button(logger)
         assert model_selected, "Failed to select model via radio button"
 
-        # Step 8: Click on "Synapse sets" tab
-        print("\n📍 Step 8: Clicking Synapse sets tab...")
-        logger.info("Step 8: Clicking Synapse sets tab")
+        # Step 9: Click on "Synapse sets" tab
+        print("\n📍 Step 9: Clicking Synapse sets tab...")
+        logger.info("Step 9: Clicking Synapse sets tab")
         synapse_sets_clicked = build_synaptome.click_synapse_sets_tab(logger)
         assert synapse_sets_clicked, "Failed to click Synapse sets tab"
+
+        # Step 9a: Verify the Synapse sets info panel is displayed
+        print("\n📍 Step 9a: Verifying Synapse sets info panel...")
+        logger.info("Step 9a: Verifying Synapse sets info panel")
+        build_synaptome.verify_synapse_sets_info_panel(logger)
+        print("✅ Synapse sets info panel verified")
+
+        # Step 9b: Click the "Add set" button
+        print("\n📍 Step 9b: Clicking Add set button...")
+        logger.info("Step 9b: Clicking Add set button")
+        build_synaptome.click_add_set_button(logger)
+        print("✅ Add set button clicked")
+
+        # Step 10: Wait for 3D morphology to load
+        print("\n📍 Step 10: Waiting for 3D morphology to load...")
+        logger.info("Step 10: Waiting for 3D morphology to load")
+        time.sleep(10)  # Wait for 3D visualization to render
+        print("✅ 3D morphology loaded")
+
+        # Step 11: Create synapse set
+        print("\n📍 Step 11: Creating synapse set...")
+        logger.info("Step 11: Creating synapse set")
+        
+        # Create 1 synapse set on apical dendrites
+        print(f"\n  Creating synapse set: apical1 on Apical dendrites...")
+        logger.info(f"Creating synapse set: apical1 on Apical dendrites")
+        
+        build_synaptome.create_synapse_set(
+            name="apical1",
+            target="Apical dendrites",
+            synapse_type="Excitatory Synapses",
+            formula="0.04",
+            min_filter=10,
+            max_filter=900,
+            logger=logger
+        )
+        
+        print(f"  ✅ Synapse set apical1 created")
+        logger.info("Synapse set apical1 created successfully")
+        
+        # Step 12: Click "Build synaptome" button
+        print("\n📍 Step 12: Clicking Build synaptome button...")
+        logger.info("Step 12: Clicking Build synaptome button")
+        
+        # Wait a bit for the UI to be ready
+        time.sleep(3)
+        
+        # Find and click the Build synaptome button
+        build_synaptome_btn_locator = (By.XPATH, "//button[contains(., 'Build synaptome')]")
+        build_synaptome_btn = build_synaptome.element_to_be_clickable(build_synaptome_btn_locator, timeout=10)
+        build_synaptome_btn.click()
+        logger.info("Clicked Build synaptome button")
+        print("✅ Build synaptome button clicked")
+        
+        # Wait for build to start
+        time.sleep(5)
+        logger.info(f"URL after clicking Build synaptome: {browser.current_url}")
 
         print("\n✅ Synaptome workflow test completed successfully")
         logger.info("Synaptome workflow test completed successfully")

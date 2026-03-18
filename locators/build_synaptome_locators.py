@@ -76,6 +76,7 @@ class BuildSynaptomeLocators:
     TABLE = (By.CSS_SELECTOR, ".ant-table-tbody")
     TYPE_FIELD = (By.XPATH, "(//span[@class='ant-select-selection-wrap'])[2]")
     TYPE_FIELD2 = (By.CSS_SELECTOR, "span[title='Inhibitory Synapses']")
+    TYPE_FIELD_CUSTOM = (By.CSS_SELECTOR, "div[title='Excitatory Synapses']")
     TYPE_EXCITATORY = (By.CSS_SELECTOR, "div[title='Excitatory Synapses']")
     TYPE_INHIBITORY = (By.XPATH, "(//span[@title='Excitatory Synapses'][normalize-space()='Excitatory Synapses'])[2]")
     SELECT_INHIBITORY = (By.XPATH, "(//div[@class='ant-select-item-option-content'][normalize-space()='Inhibitory "
@@ -131,11 +132,19 @@ class BuildSynaptomeLocators:
     TABLE_ROWS = (By.XPATH, "//tr")
     
     # Synapse sets tab selectors
-    SYNAPSE_SETS_TAB_PRIMARY = (By.XPATH, "//div[text()='Synapse sets']")
-    SYNAPSE_SETS_TAB_CLASS = (By.XPATH, "//div[@class='flex-shrink-0 font-bold' and text()='Synapse sets']")
+    SYNAPSE_SETS_TAB_PRIMARY = (By.XPATH, "//button[.//div[text()='Synapse sets']]")
+    SYNAPSE_SETS_TAB_CLASS = (By.XPATH, "//div[@class='shrink-0 font-bold' and text()='Synapse sets']/ancestor::button")
     SYNAPSE_SETS_TAB_ANY = (By.XPATH, "//*[contains(text(), 'Synapse sets')]")
-    SYNAPSE_SETS_TAB_BOLD = (By.XPATH, "//div[contains(@class, 'font-bold') and text()='Synapse sets']")
-    SYNAPSE_SETS_TAB_ANCESTOR = (By.XPATH, "//div[text()='Synapse sets']/ancestor::div[contains(@class, 'flex')]")
+    SYNAPSE_SETS_TAB_BOLD = (By.XPATH, "//div[contains(@class, 'font-bold') and text()='Synapse sets']/ancestor::button")
+    SYNAPSE_SETS_TAB_ANCESTOR = (By.XPATH, "//div[text()='Synapse sets']/ancestor::button[contains(@class, 'inline-flex')]")
+
+    # Synapse sets info panel (shown before any set is added)
+    SYNAPSE_SETS_INFO_PANEL = (By.CSS_SELECTOR, "div.add-new-set-module__kEEeeq__addNewSet")
+    SYNAPSE_SETS_INFO_HEADING = (By.XPATH, "//div[contains(@class, 'addNewSet')]//h2[text()='Synapse sets']")
+    SYNAPSE_SETS_INFO_TEXT = (By.XPATH, "//div[contains(@class, 'addNewSet')]//p[contains(text(), 'To create a new set')]")
+
+    # Add set button
+    ADD_SET_BUTTON = (By.XPATH, "//button[.//span[text()='Add set']]")
 
 
 

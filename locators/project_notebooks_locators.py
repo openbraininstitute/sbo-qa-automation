@@ -53,15 +53,15 @@ class ProjectNotebooksLocators:
     TABLE_BODY_CONTAINER = (By.CSS_SELECTOR, ".ant-table-body")
     TH = (By.XPATH, "//th")
 
-    # Notebook action buttons (plus buttons) - updated with correct selectors
-    NOTEBOOK_ACTIONS_BUTTON_1 = (By.CSS_SELECTOR, "#notebook-actions-1")
-    NOTEBOOK_ACTIONS_BUTTON_2 = (By.CSS_SELECTOR, "#notebook-actions-2") 
-    NOTEBOOK_ACTIONS_BUTTON_3 = (By.CSS_SELECTOR, "#notebook-actions-3")
-    
-    # Action menu items (appear after clicking plus button)
-    ACTION_MENU_README = (By.XPATH, "//button[contains(text(), 'Readme')]")
-    ACTION_MENU_DOWNLOAD = (By.XPATH, "//button[contains(text(), 'Download')]")
-    ACTION_MENU_RUN = (By.XPATH, "//button[contains(text(), 'Run')]")
+    # Notebook action buttons (plus icon spans inside the div) - zero-indexed IDs
+    NOTEBOOK_ACTIONS_BUTTON_1 = (By.CSS_SELECTOR, "#notebook-actions-0 span.anticon-plus")
+    NOTEBOOK_ACTIONS_BUTTON_2 = (By.CSS_SELECTOR, "#notebook-actions-1 span.anticon-plus")
+    NOTEBOOK_ACTIONS_BUTTON_3 = (By.CSS_SELECTOR, "#notebook-actions-2 span.anticon-plus")
+
+    # Action menu items (appear after clicking plus button) - using data-id attributes
+    ACTION_MENU_README = (By.CSS_SELECTOR, "button[data-id='readme-btn-0']")
+    ACTION_MENU_DOWNLOAD = (By.CSS_SELECTOR, "button[data-id='download-btn-0']")
+    ACTION_MENU_RUN = (By.CSS_SELECTOR, "button[data-id='run-btn-0']")
     
     # Modal/popup close button
     MODAL_CLOSE_BUTTON = (By.XPATH, "//button[@aria-label='Close']")

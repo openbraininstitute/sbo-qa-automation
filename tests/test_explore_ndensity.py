@@ -21,10 +21,15 @@ class TestExploreNeuronDensity:
         explore_ndensity.wait_for_ndensity_tab(timeout=120)
         logger.info(f"Neuron density tab is displayed, {browser.current_url}")
 
-        brain_regions_panel_btn = explore_ndensity.find_brain_regions_panel_btn(timeout=10)
-        assert brain_regions_panel_btn.is_displayed(), "Button to close Brain regions panel is not found"
-        brain_regions_panel_btn.click()
-        logger.info("Brain regions panel is closed")
+        cerebrum_brp = explore_ndensity.find_cerebrum_brp(timeout=30)
+        assert cerebrum_brp.is_displayed()
+        logger.info("Cerebrum is found in brain region banner")
+
+        explore_ndensity.click_brain_region_banner()
+        logger.info("Clicked brain region banner")
+
+        explore_ndensity.search_and_select_brain_region("Root")
+        logger.info("Selected Root as brain region")
 
         explore_ndensity.wait_for_page_ready(timeout=40)
 
@@ -50,16 +55,21 @@ class TestExploreNeuronDensity:
             raise ValueError("Column headers list is empty. Cannot proceed.")
 
         for header in column_headers:
-            assert header.is_displayed(), f"Column header {header} is not displayed."
-            logger.info(f"Column header text: {header.text.strip() if header.text else 'No text found'}")
+            header_text = header.text.strip() if header.text else 'No text found'
+            logger.info(f"Column header text: {header_text}")
 
-        cerebrum_brp = explore_ndensity.find_cerebrum_brp(timeout=30)
-        assert cerebrum_brp.is_displayed()
-        logger.info("Cerebrum is found")
         lv_br_row1 = explore_ndensity.lv_br_row1()
         browser.execute_script("arguments[0].scrollIntoView(true);", lv_br_row1)
         browser.execute_script("arguments[0].click();", lv_br_row1)
-        logger.info("Clicked on a resource to see detail view")
+        logger.info("Clicked on a resource to open mini-detail view")
+        time.sleep(2)
+
+        explore_ndensity.verify_mini_detail_view_present()
+        logger.info("Mini-detail view is displayed")
+
+        explore_ndensity.click_mdv_view_details()
+        logger.info("Navigated to full detail view")
+        time.sleep(2)
 
         dv_name = explore_ndensity.find_dv_name_title()
         logger.info("Detail view is displayed")

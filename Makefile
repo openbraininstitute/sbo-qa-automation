@@ -81,10 +81,20 @@ regression:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py --html=report.html --self-contained-html"
 
 feature:
-	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_project_notebooks.py -vs --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_pricing.py tests/test_news.py -vs --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_project_notebooks.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_ndensity.py --html=report.html --self-contained-html"
+
+# Workflow tests
+workflow:
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_workflow_home.py tests/test_workflow_activities.py --html=report.html --self-contained-html"
+
+workflow-activities:
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_workflow_activities.py --html=report.html --self-contained-html"
+
+workflow-production:
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_workflow_home.py tests/test_workflow_activities.py --html=report.html --self-contained-html"
 
 # Debug failing tests
 debug-explore:
@@ -114,6 +124,9 @@ help:
 	@echo "  performance-production Run performance tests in production."
 	@echo "  regression           Run full regression suite."
 	@echo "  feature              Run feature-specific tests."
+	@echo "  workflow             Run workflow tests (home + activities) in staging."
+	@echo "  workflow-activities  Run workflow activities tests in staging."
+	@echo "  workflow-production  Run workflow tests in production."
 	@echo "  debug-explore        Debug explore page tests with verbose output."
 	@echo "  debug-explore-headless Debug explore page tests in headless mode."
 	@echo "  run-tests            Run a specific test or test pattern. Specify TEST, ENV, etc."
