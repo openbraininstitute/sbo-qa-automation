@@ -13,8 +13,7 @@ class PricingPage(HomePage):
         self.home_page = HomePage(browser, wait, base_url)
         self.logger = logger
         self.base_url = base_url
-        self.lab_url  = lab_url
-
+        self.lab_url = lab_url
 
     def go_to_page(self, retries=3, delay=5):
         pricing_url = f"{self.base_url}/pricing"
@@ -23,29 +22,16 @@ class PricingPage(HomePage):
                 self.browser.set_page_load_timeout(60)
                 self.browser.get(pricing_url)
                 self.wait_for_page_ready(timeout=60)
-                self.logger.info("✅ About Page loaded successfully.")
+                self.logger.info("✅ Pricing Page loaded successfully.")
                 return
             except TimeoutException:
                 self.logger.warning(
-                    f"⚠️ Landing Page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                self.wait.sleep(delay)
-        raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
+                    f"⚠️ Pricing Page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
+                import time
+                time.sleep(delay)
+        raise TimeoutException("❌ Failed to load Pricing Page after multiple attempts.")
 
-    def contact_us(self):
-        return self.find_element(PricingLocators.CONTACT_US)
-
-    def detail_plans(self):
-        return self.find_element(PricingLocators.DETAIL_PLANS)
-
-    def footer(self):
-        return self.find_element(PricingLocators.FOOTER)
-
-    def notes_explanation(self):
-        return self.find_element(PricingLocators.NOTES_EXPLANATION)
-
-    def page_title(self):
-        return self.find_element(PricingLocators.DISCOVER_PLANS)
-
+    # Top nav
     def obi_homepage_logo(self):
         return self.is_visible(PricingLocators.OBI_HOMEPAGE_LOGO_BTN)
 
@@ -55,6 +41,7 @@ class PricingPage(HomePage):
     def obi_homepage_main_nav(self):
         return self.element_visibility(PricingLocators.OBI_HOMEPAGE_MAIN_NAV)
 
+    # Hero section
     def pricing_main_title(self, timeout=10):
         return self.element_visibility(PricingLocators.PRICING_TITLE, timeout=timeout)
 
@@ -64,11 +51,60 @@ class PricingPage(HomePage):
     def hero_video(self, timeout=20):
         return self.element_visibility(PricingLocators.HERO_VIDEO, timeout=timeout)
 
-    def price_list_container(self):
-        return self.find_element(PricingLocators.PRICE_LIST_CONTAINER)
+    def discover_plans_button(self, timeout=10):
+        return self.find_element(PricingLocators.DISCOVER_PLANS, timeout=timeout)
 
-    def price_list_plans(self):
-        return self.find_all_elements(PricingLocators.PRICE_LIST_PLANS)
+    def scroll_to_plans(self):
+        """Scroll down to the plan cards section and ensure window is wide enough for xl:grid."""
+        self.browser.set_window_size(1440, 900)
+        discover_btn = self.find_element(PricingLocators.DISCOVER_PLANS, timeout=10)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", discover_btn)
+        discover_btn.click()
+        import time
+        time.sleep(2)
+
+    # Plan cards
+    def plan_cards_container(self, timeout=10):
+        """Find the plan cards container. Note: uses presence check since the xl:grid
+        container may be hidden on smaller viewports."""
+        return self.find_element(PricingLocators.PLAN_CARDS_CONTAINER, timeout=timeout)
+
+    def plan_cards(self, timeout=10):
+        return self.find_all_elements(PricingLocators.PLAN_CARDS, timeout=timeout)
+
+    def plan_card_free(self, timeout=10):
+        return self.find_element(PricingLocators.PLAN_CARD_FREE, timeout=timeout)
+
+    def plan_card_pro(self, timeout=10):
+        return self.find_element(PricingLocators.PLAN_CARD_PRO, timeout=timeout)
+
+    def plan_card_enterprise(self, timeout=10):
+        return self.find_element(PricingLocators.PLAN_CARD_ENTERPRISE, timeout=timeout)
+
+    def plan_card_education(self, timeout=10):
+        return self.find_element(PricingLocators.PLAN_CARD_EDUCATION, timeout=timeout)
+
+    # Contact Us
+    def contact_us_enterprise(self, timeout=10):
+        return self.find_element(PricingLocators.CONTACT_US_ENTERPRISE, timeout=timeout)
+
+    def contact_us_education(self, timeout=10):
+        return self.find_element(PricingLocators.CONTACT_US_EDUCATION, timeout=timeout)
+
+    # Pro plan
+    def pro_price(self, timeout=10):
+        return self.find_element(PricingLocators.PRO_PRICE, timeout=timeout)
+
+    def pro_subscription_toggle(self, timeout=10):
+        return self.find_element(PricingLocators.PRO_SUBSCRIPTION_TOGGLE, timeout=timeout)
+
+    # Footer
+    def footer(self):
+        return self.find_element(PricingLocators.FOOTER)
+
+    # Legacy methods kept for backward compat
+    def page_title(self, timeout=10):
+        return self.discover_plans_button(timeout=timeout)
 
     def temp_goto_vlab_btn(self):
         return self.find_element(PricingLocators.TEMP_GOTO_VLAB_BTN)
