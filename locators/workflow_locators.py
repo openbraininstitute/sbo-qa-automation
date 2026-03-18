@@ -75,7 +75,7 @@ class WorkflowLocators:
     # View Configuration is an <a> tag with role="button"
     VIEW_CONFIGURATION_BUTTON = (By.XPATH, "//a[@role='button' and contains(., 'View configuration')]")
     # View Results is inside a button (may be disabled)
-    VIEW_RESULTS_BUTTON = (By.XPATH, "//button[contains(., 'View results')]//a | //a[contains(., 'View results')]")
+    VIEW_RESULTS_BUTTON = (By.XPATH, "//button[@role='button' and .//span[contains(text(), 'View results')]]")
     # Duplicate is a button
     DUPLICATE_BUTTON = (By.XPATH, "//button[@role='button' and contains(., 'Duplicate')]")
     

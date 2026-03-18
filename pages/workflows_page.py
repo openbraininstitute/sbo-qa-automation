@@ -664,19 +664,18 @@ class WorkflowsPage(HomePage):
     def click_view_results_button(self):
         """Click View Results button"""
         try:
-            # Try to find the button (may be disabled)
             button = self.find_view_results_button()
-            
-            # Check if parent button is disabled
+
+            if not button.is_enabled():
+                self.logger.info("ℹ️ View Results button is disabled")
+                return False
+
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
+            time.sleep(0.5)
             try:
-                parent_button = button.find_element(By.XPATH, "./ancestor::button[@disabled]")
-                if parent_button:
-                    self.logger.info("ℹ️ View Results button is disabled")
-                    return False
-            except:
-                pass  # Not disabled or not in a button
-            
-            button.click()
+                button.click()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", button)
             self.logger.info("✅ Clicked View Results button")
             time.sleep(2)
             return True
