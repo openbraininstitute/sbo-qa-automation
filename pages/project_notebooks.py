@@ -284,10 +284,121 @@ class ProjectNotebooks(HomePage):
         return self.find_element(ProjectNotebooksLocators.ACTION_MENU_DOWNLOAD)
     
     def action_menu_run(self):
-        """Get the run action menu item."""
-        return self.find_element(ProjectNotebooksLocators.ACTION_MENU_RUN)
+        """Get the run action menu item and scroll it into view."""
+        element = self.find_element(ProjectNotebooksLocators.ACTION_MENU_RUN)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+        return element
+
+    def js_click(self, element):
+        """Click an element using JavaScript to bypass overlay issues."""
+        self.browser.execute_script("arguments[0].click();", element)
     
     def modal_close_button(self):
         """Get the modal close button."""
         return self.find_element(ProjectNotebooksLocators.MODAL_CLOSE_BUTTON)
 
+
+    def wait_for_jupyter_tab(self, timeout=30):
+        """Wait for a second tab (Jupyter notebook) to open and verify it."""
+        WebDriverWait(self.browser, timeout).until(
+            lambda d: len(d.window_handles) > 1,
+            "Second tab (Jupyter notebook) did not open within timeout"
+        )
+        self.logger.info(f"Second tab opened. Total tabs: {len(self.browser.window_handles)}")
+
+        # Switch to the new tab and verify it's Jupyter
+        self.browser.switch_to.window(self.browser.window_handles[1])
+        time.sleep(5)  # Give Jupyter a moment to load
+        jupyter_url = self.browser.current_url
+        self.logger.info(f"Jupyter tab URL: {jupyter_url}")
+
+        # Switch back to original tab
+        self.browser.switch_to.window(self.browser.window_handles[0])
+        return jupyter_url
+
+    def verify_jupyter_notebook_loaded(self, timeout=120):
+        """
+        Switch to the Jupyter tab and verify the notebook actually loaded.
+        Waits for JupyterLab/JupyterHub UI elements to appear.
+        Returns True if the notebook loaded, switches back to the original tab.
+        """
+        original_window = self.browser.current_window_handle
+
+        # Switch to the Jupyter tab
+        self.browser.switch_to.window(self.browser.window_handles[1])
+        self.logger.info(f"Switched to Jupyter tab: {self.browser.current_url}")
+
+        jupyter_loaded = False
+        jupyter_selectors = [
+            (By.CSS_SELECTOR, "#main"),
+            (By.CSS_SELECTOR, ".jp-Notebook"),
+            (By.CSS_SELECTOR, ".jp-Cell"),
+            (By.CSS_SELECTOR, "#jp-main-content-panel"),
+            (By.CSS_SELECTOR, ".jp-NotebookPanel"),
+            (By.XPATH, "//div[contains(@class, 'jp-Notebook')]"),
+        ]
+
+        # Retry loop — Jupyter can take a while and sometimes needs a page refresh
+        max_attempts = 3
+        for attempt in range(1, max_attempts + 1):
+            self.logger.info(f"Attempt {attempt}/{max_attempts} to detect Jupyter notebook...")
+            for selector in jupyter_selectors:
+                try:
+                    element = WebDriverWait(self.browser, timeout // max_attempts).until(
+                        EC.presence_of_element_located(selector)
+                    )
+                    self.logger.info(f"Jupyter notebook loaded — found element: {selector}")
+                    jupyter_loaded = True
+                    break
+                except TimeoutException:
+                    continue
+
+            if jupyter_loaded:
+                break
+
+            # If not loaded yet, try refreshing the page
+            if attempt < max_attempts:
+                self.logger.info("Jupyter not loaded yet, refreshing page...")
+                self.browser.refresh()
+                time.sleep(5)
+
+        if not jupyter_loaded:
+            self.logger.error(f"Jupyter notebook did not load after {max_attempts} attempts")
+            self.browser.save_screenshot("debug_jupyter_not_loaded.png")
+            self.logger.info("Screenshot saved as debug_jupyter_not_loaded.png")
+
+        # Switch back to original tab
+        self.browser.switch_to.window(original_window)
+        self.logger.info("Switched back to original tab")
+        return jupyter_loaded
+
+    def open_notebook_actions_menu(self, button_index=1):
+        """Click the notebook action (+) button and wait for the popover menu to appear."""
+        locator_map = {
+            1: ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_1,
+            2: ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_2,
+            3: ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_3,
+        }
+        locator = locator_map.get(button_index, ProjectNotebooksLocators.NOTEBOOK_ACTIONS_BUTTON_1)
+        self.click_action_and_wait_for_menu(locator)
+
+    def click_action_and_wait_for_menu(self, action_button_locator, timeout=10, retries=3):
+        """Click the notebook action (+) button and wait for the popover menu to appear.
+        Retries if the menu doesn't show up."""
+        menu_locator = (By.CSS_SELECTOR, ".ant-popover-inner-content")
+        for attempt in range(1, retries + 1):
+            try:
+                btn = self.element_to_be_clickable(action_button_locator, timeout=5)
+                btn.click()
+                self.logger.info(f"Clicked action button (attempt {attempt})")
+                WebDriverWait(self.browser, timeout).until(
+                    EC.visibility_of_element_located(menu_locator)
+                )
+                self.logger.info("Popover menu appeared")
+                return True
+            except TimeoutException:
+                self.logger.info(f"Popover menu did not appear on attempt {attempt}, retrying...")
+                # Click elsewhere to dismiss any partial state
+                self.browser.find_element(By.TAG_NAME, "body").click()
+                time.sleep(1)
+        raise Exception(f"Popover menu did not appear after {retries} attempts")
