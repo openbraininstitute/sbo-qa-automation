@@ -74,6 +74,17 @@ jobs:
       test-type: ${{ github.event_name == 'workflow_dispatch' && inputs.test-suite || 'full' }}
     secrets: inherit
 
+  test-staging:
+    # Run full staging tests on PRs, schedule, or manual trigger (not on push)
+    if: github.event_name == 'pull_request' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: run-tests
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      env: "staging"
+      artifact-name: "staging-testing"
+      test-type: ${{ github.event_name == 'workflow_dispatch' && inputs.test-suite || 'full' }}
+    secrets: inherit
+
   performance-tests:
     # Run performance tests weekly on Monday or when manually triggered with performance option
     if: (github.event.schedule && github.event.schedule == '0 2 * * 1') || (github.event_name == 'workflow_dispatch' && inputs.test-suite == 'performance')

@@ -559,10 +559,18 @@ jobs:
           echo "$PAYLOAD" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
           
-      # Send enhanced MS Teams notification with proper card format
-      - name: Send Teams Notification
+      # Send enhanced MS Teams notification for PRODUCTION
+      - name: Send Teams Notification (Production)
         uses: skitionek/notify-microsoft-teams@v1.0.9
-        if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
+        if: always() && inputs.env == 'production' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
         with:
           webhook_url: ${{ secrets.MS_TEAMS_NEW_WEBHOOK_URI }}
+          raw: ${{ env.TEAMS_PAYLOAD }}
+
+      # Send enhanced MS Teams notification for STAGING
+      - name: Send Teams Notification (Staging)
+        uses: skitionek/notify-microsoft-teams@v1.0.9
+        if: always() && inputs.env == 'staging' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
+        with:
+          webhook_url: ${{ secrets.MS_TEAMS_STAGING_WEBHOOK_URI }}
           raw: ${{ env.TEAMS_PAYLOAD }}

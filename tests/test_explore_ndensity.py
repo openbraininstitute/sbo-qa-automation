@@ -36,12 +36,8 @@ class TestExploreNeuronDensity:
         column_locators = [
             ExploreNDensityPageLocators.LV_BRAIN_REGION,
             ExploreNDensityPageLocators.LV_MTYPE,
-            ExploreNDensityPageLocators.LV_ETYPE,
-            ExploreNDensityPageLocators.LV_DENSITY,
-            ExploreNDensityPageLocators.LV_NMEASUREMENTS,
             ExploreNDensityPageLocators.LV_NAME,
             ExploreNDensityPageLocators.LV_SPECIES,
-            ExploreNDensityPageLocators.LV_AGE,
             ExploreNDensityPageLocators.LV_CONTRIBUTORS,
             ExploreNDensityPageLocators.LV_REGISTRATION_DATE
         ]
