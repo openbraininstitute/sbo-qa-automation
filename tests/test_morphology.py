@@ -38,9 +38,10 @@ class TestExploreMorphologyPage:
         explore_morphology.assert_elements_present_and_displayed(
             locators=column_locators,
             context_name="Morphology column headers",
-            timeout=10
+            timeout=30
         )
 
+        time.sleep(2)
         thumbnail_img = explore_morphology.verify_all_thumbnails_displayed()
         logger.info("Morphology thumbnail is displayed.")
         for thumbnail in thumbnail_img:

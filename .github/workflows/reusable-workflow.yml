@@ -252,10 +252,7 @@ jobs:
             echo "Failed test files: $FAILED_TEST_FILES"
             
             # Extract test summary line (e.g., "= 5 failed, 10 passed, 2 skipped in 45.67s =")
-            SUMMARY_LINE=$(grep -E "=.*failed.*passed.*in.*s.*=" test_output.log | tail -1)
-          else
-            echo "⚠️ Warning: test_output.log not found - notification will have limited information"
-          fi
+            SUMMARY_LINE=$(grep -E "=.*(failed|passed|error).*in.*s.*=" test_output.log | tail -1)
             
             if [ -n "$SUMMARY_LINE" ]; then
               echo "Summary line found: $SUMMARY_LINE"
@@ -280,6 +277,9 @@ jobs:
               TEST_DURATION=$(grep -o "in [0-9]*\.[0-9]*s" test_output.log | head -1 | sed 's/in //' || echo "Unknown")
               TOTAL_TESTS=$((FAILED_TESTS + PASSED_TESTS + SKIPPED_TESTS))
             fi
+          else
+            echo "⚠️ Warning: test_output.log not found - notification will have limited information"
+          fi
             
             # Extract failed test names and create clickable links (limit to first 5)
             FAILED_TEST_LIST=""
@@ -572,5 +572,5 @@ jobs:
         uses: skitionek/notify-microsoft-teams@v1.0.9
         if: always() && inputs.env == 'staging' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || failure())
         with:
-          webhook_url: ${{ secrets.MS_TEAMS_STAGING_WEBHOOK_URI }}
+          webhook_url: ${{ secrets.MS_TEAMS_NEW_WEBHOOK_URI }}
           raw: ${{ env.TEAMS_PAYLOAD }}
