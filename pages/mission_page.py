@@ -2,6 +2,8 @@
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 
+import time
+
 from selenium.common import TimeoutException, ElementNotInteractableException, NoSuchElementException
 from selenium.webdriver import ActionChains
 from locators.mission_locators import MissionLocators
@@ -23,13 +25,14 @@ class MissionPage(HomePage):
                 self.browser.set_page_load_timeout(60)
                 self.browser.get(about_url)
                 self.wait_for_page_ready(timeout=60)
+                self.element_visibility(MissionLocators.MISSION_PAGE_TITLE, timeout=30)
                 self.logger.info("✅ Mission Page loaded successfully.")
                 return
             except TimeoutException:
                 self.logger.warning(
-                    f"⚠️ Landing Page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                self.wait.sleep(delay)
-        raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
+                    f"⚠️ Mission Page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
+                time.sleep(delay)
+        raise TimeoutException("❌ Failed to load Mission Page after multiple attempts.")
 
     def button_download_mission(self):
         return self.find_element(MissionLocators.BTN_DOWNLOAD_MISSION)

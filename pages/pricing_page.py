@@ -22,6 +22,7 @@ class PricingPage(HomePage):
                 self.browser.set_page_load_timeout(60)
                 self.browser.get(pricing_url)
                 self.wait_for_page_ready(timeout=60)
+                self.element_visibility(PricingLocators.PRICING_TITLE, timeout=30)
                 self.logger.info("✅ Pricing Page loaded successfully.")
                 return
             except TimeoutException:

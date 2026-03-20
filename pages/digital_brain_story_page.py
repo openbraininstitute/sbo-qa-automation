@@ -20,12 +20,14 @@ class DigitalBrainStoryPage(HomePage):
                 self.browser.set_page_load_timeout(60)
                 self.browser.get(page_url)
                 self.wait_for_page_ready(timeout=60)
+                self.element_visibility(DigitalBrainStoryLocators.PAGE_TITLE, timeout=30)
                 self.logger.info("✅ Digital Brain Story page loaded successfully.")
                 return
             except TimeoutException:
                 self.logger.warning(
                     f"⚠️ Digital Brain Story page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                self.wait.sleep(delay)
+                import time
+                time.sleep(delay)
         raise TimeoutException("❌ Failed to load Digital Brain Story page after multiple attempts.")
 
     def get_page_title(self):

@@ -28,13 +28,15 @@ class AboutPage(HomePage):
                 self.browser.set_page_load_timeout(60)
                 self.browser.get(about_url)
                 self.wait_for_page_ready(timeout=60)
+                self.element_visibility(AboutLocators.ABOUT_PAGE_TITLE, timeout=30)
+                self.element_visibility(AboutLocators.TITLE5, timeout=30)
                 self.logger.info("✅ About Page loaded successfully.")
                 return
             except TimeoutException:
                 self.logger.warning(
-                    f"⚠️ Landing Page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
-                self.wait.sleep(delay)
-        raise TimeoutException("❌ Failed to load Landing Page after multiple attempts.")
+                    f"⚠️ About Page load attempt {attempt + 1} failed. Retrying in {delay} seconds...")
+                time.sleep(delay)
+        raise TimeoutException("❌ Failed to load About Page after multiple attempts.")
 
     def find_all_social_images(self):
         return self.find_all_elements(AboutLocators.IMG_VIGNETTE)
