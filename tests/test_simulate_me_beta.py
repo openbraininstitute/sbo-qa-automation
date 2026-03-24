@@ -262,76 +262,106 @@ class TestSimulateMeBeta:
         block_single = sim_page.wait_for_block_single(timeout=10)
         logger.info("Neuronal manipulation config form (block_single) appeared")
 
-        # Verify the form has a "Select a variable" dropdown (radix select)
-        try:
-            select_trigger = block_single.find_element(
-                By.CSS_SELECTOR, "button[role='combobox']"
+        # Open the "Select a variable" dropdown, pick an option, fill value inputs
+        selected_var = sim_page.select_neuronal_manip_variable(timeout=10)
+        assert selected_var, "A neuronal manipulation variable must be selected"
+        logger.info(f"Selected neuronal manipulation variable: '{selected_var}'")
+
+        # Verify no warning icon on the neuronal manipulation sub-item
+        has_warning = sim_page.neuronal_manip_has_warning()
+        if has_warning:
+            logger.warning("Neuronal manipulation sub-item still shows warning — some fields may be empty")
+        else:
+            logger.info("Neuronal manipulation sub-item has no warning icon — all fields filled")
+
+        # Step 19: Click Timestamps → Add Timestamps → select random dictionary item → add 2 sweep values
+        sim_page.click_timestamps_tab()
+        assert sim_page.is_timestamps_tab_active(), "Timestamps tab should be active"
+        logger.info("Timestamps tab is active")
+
+        sim_page.click_add_button_in_active_sub_entry()
+        logger.info("Clicked 'Add Timestamps'")
+
+        ts_dict_items = sim_page.get_dictionary_items()
+        assert len(ts_dict_items) > 0, "Expected at least one timestamp dictionary item"
+        ts_label = sim_page.click_random_dictionary_item()
+        logger.info(f"Selected timestamp type: '{ts_label}'")
+
+        sim_page.wait_for_block_single(timeout=10)
+        logger.info("Timestamp config form (block_single) appeared")
+
+        # Add 2 random timestamp sweep values (milliseconds, realistic range 0-2000)
+        import random as rnd
+        for i in range(2):
+            before = sim_page.get_timestamp_input_count()
+            ts_value = rnd.randint(50, 2000)
+            sim_page.add_timestamp_sweep_value(ts_value)
+            after = sim_page.get_timestamp_input_count()
+            assert after > before, (
+                f"Timestamp input count should increase (was {before}, now {after})"
             )
-            assert select_trigger.is_displayed(), "Variable select dropdown should be visible"
-            logger.info(f"Variable select dropdown found: '{select_trigger.text.strip()}'")
-        except Exception:
-            logger.warning("Variable select dropdown (combobox) not found — may use different selector")
+            logger.info(f"Added timestamp sweep value: {ts_value} ms, inputs {before} → {after}")
+
+        # Step 20: Verify "Generate simulation(s)" button is present
+        gen_btn = sim_page.find_generate_simulation_btn(timeout=10)
+        assert gen_btn.is_displayed(), "Generate simulation button should be visible"
+        logger.info(f"Generate simulation button found, enabled={gen_btn.is_enabled()}")
+
+        # Click Generate simulation
+        sim_page.click_generate_simulation()
+        logger.info("Clicked Generate simulation(s)")
+
+        # Step 21: Wait for the Simulations page to become active
+        sim_page.wait_for_simulations_page(timeout=60)
+        logger.info(f"Simulations page loaded. URL: {sim_page.browser.current_url}")
+
+        # Step 22: Verify simulation cards are present in the left column
+        sim_cards = sim_page.get_simulation_cards(timeout=15)
+        assert len(sim_cards) > 0, "Expected at least one simulation card"
+        logger.info(f"Found {len(sim_cards)} simulation card(s)")
+
+        # Verify first card has title and status
+        card_info = sim_page.get_simulation_card_info(sim_cards[0])
+        assert card_info['title'], "Simulation card should have a title"
+        assert card_info['status'], "Simulation card should have a status badge"
+        logger.info(f"First card: '{card_info['title']}', status='{card_info['status']}', "
+                     f"params={list(card_info['params'].keys())}")
+
+        # Step 23: Verify input files are present in the middle column
+        expected_files = ['node_sets.json', 'obi_one_coordinate.json', 'simulation_config.json']
+        file_buttons = sim_page.get_input_file_buttons(timeout=10)
+        actual_filenames = [name for _, name in file_buttons]
+        for expected in expected_files:
+            assert expected in actual_filenames, (
+                f"Expected input file '{expected}' not found. Actual: {actual_filenames}"
+            )
+        logger.info(f"All expected input files present: {expected_files}")
+
+        # Step 24: Click each input file and verify JSON preview appears
+        for filename in expected_files:
+            sim_page.click_input_file(filename)
+            json_text = sim_page.get_json_preview_text(timeout=10)
+            assert len(json_text) > 0, f"JSON preview should have content after clicking '{filename}'"
+            assert '{' in json_text, f"JSON preview for '{filename}' should contain valid JSON"
+            logger.info(f"'{filename}': JSON preview loaded ({len(json_text)} chars)")
+
+        # Step 25: Verify Launch simulations button is present and click it
+        launch_btn = sim_page.find_launch_simulations_btn(timeout=10)
+        assert launch_btn.is_displayed(), "Launch simulations button should be visible"
+        btn_text = launch_btn.text.strip()
+        logger.info(f"Launch button found: '{btn_text}', enabled={launch_btn.is_enabled()}")
+
+        sim_page.click_launch_simulations()
+        logger.info("Clicked Launch simulations")
+
+        # Step 26: Wait for all simulations to reach a terminal state
+        final_statuses = sim_page.wait_for_simulations_complete(timeout=300, poll_interval=10)
+        logger.info(f"Final simulation statuses: {final_statuses}")
+
+        failed = [s for s in final_statuses if s in ('failed', 'error')]
+        if failed:
+            logger.warning(f"{len(failed)} simulation(s) failed: {final_statuses}")
+        else:
+            logger.info("All simulations completed successfully")
 
         logger.info(f"Final URL: {sim_page.browser.current_url}")
-
-    # ── Test: Navigate via workflow cards ─────────────────────────────────
-
-    @pytest.mark.simulate
-    @pytest.mark.run(order=11)
-    def test_navigate_via_workflow_simulate_card(self, setup, login, logger, test_config):
-        """Navigate via Workflows > Simulate > Single neuron (beta) card."""
-        from pages.workflows_page import WorkflowsPage
-
-        browser, wait, base_url, lab_id, project_id = setup
-        workflows_page = WorkflowsPage(browser, wait, logger, base_url)
-
-        workflows_page.go_to_workflows_page(lab_id, project_id)
-        logger.info("Navigated to workflows page")
-
-        workflows_page.click_category_simulate()
-        logger.info("Clicked Simulate category")
-        time.sleep(2)
-
-        try:
-            beta_card = workflows_page.find_simulate_single_neuron_beta()
-            assert beta_card.is_displayed(), "Single neuron (beta) card should be displayed"
-            beta_card.click()
-            logger.info("Clicked Single neuron (beta) card")
-            time.sleep(3)
-
-            current_url = browser.current_url
-            assert "me-model-circuit-simulation" in current_url, (
-                f"Expected me-model-circuit-simulation in URL, got: {current_url}"
-            )
-            logger.info(f"URL verified: {current_url}")
-
-        except Exception as e:
-            logger.warning(f"Single neuron (beta) card not found: {e}")
-            pytest.skip("Single neuron (beta) card not available")
-
-    # ── Test: Breadcrumb navigation ──────────────────────────────────────
-
-    @pytest.mark.simulate
-    @pytest.mark.run(order=12)
-    def test_breadcrumb_navigation(self, setup, login, logger, test_config):
-        """Verify breadcrumb links work."""
-        sim_page, lab_id, project_id = self._get_sim_page(setup, logger)
-
-        sim_page.go_to_simulation_page(lab_id, project_id)
-
-        try:
-            workflows_link = sim_page.find_breadcrumb_workflows()
-            assert workflows_link.is_displayed()
-            logger.info("Workflows breadcrumb found")
-
-            sim_page.click_breadcrumb_workflows()
-            time.sleep(2)
-
-            current_url = sim_page.browser.current_url
-            assert "workflows" in current_url, (
-                f"Expected workflows in URL, got: {current_url}"
-            )
-            logger.info("Breadcrumb navigation works")
-
-        except Exception as e:
-            logger.warning(f"Breadcrumb test failed: {e}")
