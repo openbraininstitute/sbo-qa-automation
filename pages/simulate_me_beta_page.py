@@ -468,6 +468,133 @@ class SimulateMeBetaPage(HomePage):
         self.logger.info(f"Top nav: {list(results.keys())}")
         return results
 
+    # ── Initialization tab ───────────────────────────────────────────────
+
+    def click_initialization_tab(self):
+        """Click the Initialization tab in the left menu."""
+        btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_INIT_TAB, timeout=10)
+        btn.click()
+        self.logger.info("Clicked Initialization tab")
+        time.sleep(2)
+
+    def is_initialization_tab_active(self):
+        """Check if the Initialization tab has data-active='true'."""
+        try:
+            self.find_element(SimulateMeBetaLocators.CONFIG_INIT_TAB_ACTIVE, timeout=5)
+            self.logger.info("Initialization tab is active")
+            return True
+        except TimeoutException:
+            self.logger.warning("Initialization tab is NOT active")
+            return False
+
+    def get_config_block_labels_and_values(self):
+        """Read all config block labels and their corresponding input values.
+        Returns list of dicts: [{'label': str, 'value': str, 'has_number_input': bool, 'index': int}, ...]
+        """
+        blocks = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_ELEMENTS, timeout=10)
+        results = []
+        for i, block in enumerate(blocks):
+            label = ""
+            value = ""
+            has_number_input = False
+            try:
+                label_el = block.find_element(By.CSS_SELECTOR, ".text-primary-9.text-base.font-semibold")
+                label = label_el.text.strip()
+            except Exception:
+                pass
+            try:
+                input_el = block.find_element(By.CSS_SELECTOR, "input.ant-input-number-input")
+                value = input_el.get_attribute("value") or ""
+                has_number_input = True
+            except Exception:
+                pass
+            if label:
+                results.append({'label': label, 'value': value, 'has_number_input': has_number_input, 'index': i})
+                self.logger.info(f"  Block: '{label}' = '{value}' (number_input={has_number_input})")
+        self.logger.info(f"Found {len(results)} config blocks with labels")
+        return results
+
+    def verify_initialization_data(self):
+        """Verify all labels are present and numeric blocks have values.
+        Returns the list of block dicts.
+        """
+        blocks = self.get_config_block_labels_and_values()
+        assert len(blocks) > 0, "Expected at least one config block on Initialization tab"
+        for b in blocks:
+            assert b['label'], f"Config block has empty label: {b}"
+            if b['has_number_input']:
+                assert b['value'], f"Config block '{b['label']}' has empty value"
+        numeric_blocks = [b for b in blocks if b['has_number_input']]
+        self.logger.info(f"All {len(numeric_blocks)} numeric Initialization blocks have labels and values")
+        return blocks
+
+    def add_parameter_sweep_value(self, block_index, value):
+        """Add a sweep value to a specific config block.
+        1. Click the plus-circle on the block to convert to sweep mode
+        2. Click the inner plus-circle to add a new input row
+        3. Type the value into the new empty input
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+
+        # Find all config blocks that have a plus-circle button
+        blocks = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_ELEMENTS, timeout=10)
+        target_block = blocks[block_index]
+        label = ""
+        try:
+            label = target_block.find_element(By.CSS_SELECTOR, ".text-primary-9.text-base.font-semibold").text.strip()
+        except Exception:
+            pass
+
+        # Step 1: Click the first plus-circle to convert to sweep mode
+        plus_btn = target_block.find_element(By.XPATH, ".//span[@aria-label='plus-circle']")
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", plus_btn)
+        time.sleep(0.5)
+        try:
+            ActionChains(self.browser).move_to_element(plus_btn).click().perform()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", plus_btn)
+        self.logger.info(f"Clicked plus-circle on block [{block_index}] '{label}' to enable sweep")
+        time.sleep(1)
+
+        # Re-find the block after DOM change (it becomes float_parameter_sweep_multiple)
+        blocks = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_ELEMENTS, timeout=10)
+        target_block = blocks[block_index]
+
+        # Step 2: Click the inner plus-circle to add a new input row
+        inner_plus_btns = target_block.find_elements(By.XPATH, ".//span[@aria-label='plus-circle']")
+        if inner_plus_btns:
+            inner_plus = inner_plus_btns[-1]  # last plus-circle in the block
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", inner_plus)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(inner_plus).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", inner_plus)
+            self.logger.info(f"Clicked inner plus-circle to add new sweep input row")
+            time.sleep(1)
+
+        # Step 3: Find the empty input and type the value
+        blocks = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_ELEMENTS, timeout=10)
+        target_block = blocks[block_index]
+        inputs = target_block.find_elements(By.CSS_SELECTOR, "input.ant-input-number-input")
+        # Find the last input (the newly added empty one)
+        if inputs:
+            new_input = inputs[-1]
+            new_input.click()
+            new_input.clear()
+            new_input.send_keys(str(value))
+            self.logger.info(f"Typed sweep value '{value}' into block [{block_index}] '{label}'")
+            time.sleep(0.5)
+
+    def get_sweep_input_count(self, block_index):
+        """Count how many sweep inputs exist in a specific config block."""
+        blocks = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_ELEMENTS, timeout=10)
+        target_block = blocks[block_index]
+        inputs = target_block.find_elements(By.CSS_SELECTOR, "input.ant-input-number-input")
+        count = len(inputs)
+        self.logger.info(f"Block [{block_index}] has {count} input(s)")
+        return count
+
     # ── Debug ────────────────────────────────────────────────────────────
 
     def log_page_structure(self):

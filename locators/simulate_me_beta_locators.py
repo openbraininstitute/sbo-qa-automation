@@ -98,6 +98,39 @@ class SimulateMeBetaLocators:
     NEURON_VISUALIZER = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer']")
     NEURON_VISUALIZER_CANVAS = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer'] canvas")
 
+    # ── Config page: Initialization tab ─────────────────────────────────
+    CONFIG_INIT_TAB = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item']//span[contains(text(),'Initialization')]/ancestor::button"
+    )
+    CONFIG_INIT_TAB_ACTIVE = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item'][@data-active='true']//span[contains(text(),'Initialization')]/ancestor::button"
+    )
+    # Middle column: config block labels and values
+    CONFIG_BLOCK_LABELS = (
+        By.CSS_SELECTOR,
+        "div[data-scan-config-block-element] .text-primary-9.text-base.font-semibold"
+    )
+    CONFIG_BLOCK_ELEMENTS = (
+        By.CSS_SELECTOR,
+        "div[data-scan-config-block-element]"
+    )
+    CONFIG_NUMBER_INPUTS = (
+        By.CSS_SELECTOR,
+        "input.ant-input-number-input"
+    )
+    # Plus button to add parameter sweep values
+    CONFIG_PLUS_CIRCLE_BTNS = (
+        By.XPATH,
+        "//span[@aria-label='plus-circle']"
+    )
+    # Sweep value inputs (inside float_parameter_sweep_multiple blocks)
+    CONFIG_SWEEP_INPUTS = (
+        By.CSS_SELECTOR,
+        "div[data-scan-config-block-element='float_parameter_sweep_multiple'] input.ant-input-number-input"
+    )
+
     # ── Top navigation bar ───────────────────────────────────────────────
     NAV_HOME = (By.CSS_SELECTOR, "#workspace-home")
     NAV_DATA = (By.CSS_SELECTOR, "#workspace-explore-data")
