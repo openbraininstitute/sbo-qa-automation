@@ -634,6 +634,219 @@ class SimulateMeBetaPage(HomePage):
         self.logger.info(f"Block [{block_index}] has {count} input(s)")
         return count
 
+    # ── Stimuli & Recordings ────────────────────────────────────────────
+
+    def click_stimuli_tab(self):
+        """Click the Stimuli tab in the left menu."""
+        btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_STIMULI_TAB, timeout=10)
+        btn.click()
+        self.logger.info("Clicked Stimuli tab")
+        time.sleep(2)
+
+    def is_stimuli_tab_active(self):
+        """Check if the Stimuli tab has data-active='true'."""
+        try:
+            self.find_element(SimulateMeBetaLocators.CONFIG_STIMULI_TAB_ACTIVE, timeout=5)
+            self.logger.info("Stimuli tab is active")
+            return True
+        except TimeoutException:
+            self.logger.warning("Stimuli tab is NOT active")
+            return False
+
+    def click_recordings_tab(self):
+        """Click the Recordings tab in the left menu."""
+        btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_RECORDINGS_TAB, timeout=10)
+        btn.click()
+        self.logger.info("Clicked Recordings tab")
+        time.sleep(2)
+
+    def is_recordings_tab_active(self):
+        """Check if the Recordings tab has data-active='true'."""
+        try:
+            self.find_element(SimulateMeBetaLocators.CONFIG_RECORDINGS_TAB_ACTIVE, timeout=5)
+            self.logger.info("Recordings tab is active")
+            return True
+        except TimeoutException:
+            self.logger.warning("Recordings tab is NOT active")
+            return False
+
+    def get_stimuli_sub_entry(self, timeout=10):
+        """Get the sub-entry container under Stimuli (holds Add button and stimulus items)."""
+        try:
+            return self.find_element(SimulateMeBetaLocators.CONFIG_STIMULI_SUB_ENTRY, timeout=timeout)
+        except TimeoutException:
+            self.logger.warning("Stimuli sub-entry container not found")
+            return None
+
+    def click_add_stimulus(self):
+        """Click the 'Add Stimulus' button."""
+        from selenium.webdriver.common.action_chains import ActionChains
+        btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_STIMULI_ADD_BTN, timeout=10)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
+        time.sleep(0.5)
+        try:
+            ActionChains(self.browser).move_to_element(btn).click().perform()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", btn)
+        self.logger.info("Clicked 'Add Stimulus' button")
+        time.sleep(2)
+
+    def get_stimuli_sub_items(self):
+        """Get all stimulus sub-items in the left menu (e.g. Stimulus 1, Stimulus 2)."""
+        try:
+            items = self.find_all_elements(SimulateMeBetaLocators.CONFIG_STIMULI_SUB_ITEMS, timeout=10)
+            labels = [item.text.strip() for item in items]
+            self.logger.info(f"Stimuli sub-items: {labels}")
+            return items
+        except TimeoutException:
+            self.logger.warning("No stimuli sub-items found")
+            return []
+
+    def click_stimulus_sub_item(self, index=0):
+        """Click a specific stimulus sub-item by index."""
+        from selenium.webdriver.common.action_chains import ActionChains
+        items = self.get_stimuli_sub_items()
+        if index < len(items):
+            item = items[index]
+            label = item.text.strip()
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", item)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(item).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", item)
+            self.logger.info(f"Clicked stimulus sub-item [{index}]: '{label}'")
+            time.sleep(1)
+            return label
+        else:
+            raise IndexError(f"Stimulus sub-item index {index} out of range (have {len(items)})")
+
+    def get_stimuli_config_blocks(self):
+        """Read all config block labels and values on the current Stimuli view.
+        Returns list of dicts: [{'label': str, 'value': str, 'has_number_input': bool,
+                                  'has_select': bool, 'index': int}, ...]
+        """
+        blocks = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_ELEMENTS, timeout=10)
+        results = []
+        for i, block in enumerate(blocks):
+            label = ""
+            value = ""
+            has_number_input = False
+            has_select = False
+            try:
+                label_el = block.find_element(By.CSS_SELECTOR, ".text-primary-9.text-base.font-semibold")
+                label = label_el.text.strip()
+            except Exception:
+                pass
+            try:
+                input_el = block.find_element(By.CSS_SELECTOR, "input.ant-input-number-input")
+                value = input_el.get_attribute("value") or ""
+                has_number_input = True
+            except Exception:
+                pass
+            if not has_number_input:
+                try:
+                    select_el = block.find_element(By.CSS_SELECTOR, ".ant-select-selection-item")
+                    value = select_el.text.strip()
+                    has_select = True
+                except Exception:
+                    pass
+            if not value:
+                try:
+                    string_input = block.find_element(By.CSS_SELECTOR, "input[data-scan-config-block-element='string_input']")
+                    value = string_input.get_attribute("value") or ""
+                except Exception:
+                    pass
+            if label:
+                results.append({
+                    'label': label, 'value': value,
+                    'has_number_input': has_number_input,
+                    'has_select': has_select, 'index': i
+                })
+                self.logger.info(f"  Stimuli block: '{label}' = '{value}' "
+                                 f"(number={has_number_input}, select={has_select})")
+        self.logger.info(f"Found {len(results)} stimuli config blocks")
+        return results
+
+    def verify_stimuli_data(self):
+        """Verify stimuli tab has blocks with labels. Returns the block list."""
+        blocks = self.get_stimuli_config_blocks()
+        assert len(blocks) > 0, "Expected at least one config block on Stimuli tab"
+        for b in blocks:
+            assert b['label'], f"Stimuli block has empty label: {b}"
+        self.logger.info(f"Stimuli tab has {len(blocks)} blocks, all with labels")
+        return blocks
+
+    # ── Neuronal manipulations tab ──────────────────────────────────────
+
+    def click_neuronal_manip_tab(self):
+        """Click the Neuronal manipulations tab in the left menu."""
+        btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_NEURONAL_MANIP_TAB, timeout=10)
+        btn.click()
+        self.logger.info("Clicked Neuronal manipulations tab")
+        time.sleep(2)
+
+    def is_neuronal_manip_tab_active(self):
+        """Check if the Neuronal manipulations tab has data-active='true'."""
+        try:
+            self.find_element(SimulateMeBetaLocators.CONFIG_NEURONAL_MANIP_TAB_ACTIVE, timeout=5)
+            self.logger.info("Neuronal manipulations tab is active")
+            return True
+        except TimeoutException:
+            self.logger.warning("Neuronal manipulations tab is NOT active")
+            return False
+
+    # ── Generic dictionary tab flow ─────────────────────────────────────
+
+    def click_add_button_in_active_sub_entry(self):
+        """Click the 'Add X' button inside the currently active sub-entry."""
+        from selenium.webdriver.common.action_chains import ActionChains
+        btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
+        time.sleep(0.5)
+        try:
+            ActionChains(self.browser).move_to_element(btn).click().perform()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", btn)
+        self.logger.info(f"Clicked 'Add' button: '{btn.text.strip()}'")
+        time.sleep(2)
+
+    def get_dictionary_items(self, timeout=10):
+        """Get all block_dictionary_item buttons in the middle column."""
+        try:
+            items = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_DICTIONARY_ITEMS, timeout=timeout)
+            labels = [item.text.strip() for item in items]
+            self.logger.info(f"Dictionary items: {labels}")
+            return items
+        except TimeoutException:
+            self.logger.warning("No dictionary items found")
+            return []
+
+    def click_random_dictionary_item(self):
+        """Click a random block_dictionary_item from the middle column.
+        Returns the label text of the clicked item.
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+        items = self.get_dictionary_items()
+        assert items, "No dictionary items found to click"
+        item = random.choice(items)
+        label = item.text.strip()
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", item)
+        time.sleep(0.5)
+        try:
+            ActionChains(self.browser).move_to_element(item).click().perform()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", item)
+        self.logger.info(f"Clicked dictionary item: '{label}'")
+        time.sleep(2)
+        return label
+
+    def wait_for_block_single(self, timeout=10):
+        """Wait for a block_single form to appear after selecting a dictionary item."""
+        el = self.find_element(SimulateMeBetaLocators.CONFIG_BLOCK_SINGLE, timeout=timeout)
+        self.logger.info("block_single form appeared")
+        return el
+
     # ── Debug ────────────────────────────────────────────────────────────
 
     def log_page_structure(self):

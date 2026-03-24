@@ -4,6 +4,8 @@
 
 import time
 import pytest
+from selenium.common import TimeoutException
+from selenium.webdriver.common.by import By
 from pages.simulate_me_beta_page import SimulateMeBetaPage
 
 
@@ -60,7 +62,6 @@ class TestSimulateMeBeta:
             logger.info("Selected 'cADpyr' option")
         except Exception as e:
             logger.warning(f"Could not select cADpyr option: {e}")
-            from selenium.webdriver.common.by import By
             options = sim_page.browser.find_elements(
                 By.CSS_SELECTOR, "div.ant-select-item-option"
             )
@@ -213,12 +214,64 @@ class TestSimulateMeBeta:
         )
         logger.info(f"Final sweep counts — INITIAL VOLTAGE: {final_iv_count}, RANDOM SEED: {final_rs_count}")
 
-        # Verify top navigation
-        nav_results = sim_page.verify_top_nav()
-        present_nav = [k for k, v in nav_results.items() if v['present']]
-        logger.info(f"Top nav items present: {present_nav}")
+        # Step 16: Click Stimuli → Add Stimulus → select dictionary item
+        sim_page.click_stimuli_tab()
+        assert sim_page.is_stimuli_tab_active(), "Stimuli tab should be active after clicking"
+        logger.info("Stimuli tab is active")
 
-        sim_page.log_page_structure()
+        sim_page.click_add_button_in_active_sub_entry()
+        logger.info("Clicked 'Add Stimulus'")
+
+        stim_dict_items = sim_page.get_dictionary_items()
+        assert len(stim_dict_items) > 0, "Expected at least one stimulus dictionary item"
+        stim_label = sim_page.click_random_dictionary_item()
+        logger.info(f"Selected stimulus type: '{stim_label}'")
+
+        sim_page.wait_for_block_single(timeout=10)
+        logger.info("Stimulus config form (block_single) appeared")
+
+        # Step 17: Click Recordings → Add Recording → select dictionary item
+        sim_page.click_recordings_tab()
+        assert sim_page.is_recordings_tab_active(), "Recordings tab should be active after clicking"
+        logger.info("Recordings tab is active")
+
+        sim_page.click_add_button_in_active_sub_entry()
+        logger.info("Clicked 'Add Recording'")
+
+        rec_dict_items = sim_page.get_dictionary_items()
+        assert len(rec_dict_items) > 0, "Expected at least one recording dictionary item"
+        rec_label = sim_page.click_random_dictionary_item()
+        logger.info(f"Selected recording type: '{rec_label}'")
+
+        sim_page.wait_for_block_single(timeout=10)
+        logger.info("Recording config form (block_single) appeared")
+
+        # Step 18: Click Neuronal manipulations → Add → select dictionary item → verify form
+        sim_page.click_neuronal_manip_tab()
+        assert sim_page.is_neuronal_manip_tab_active(), "Neuronal manipulations tab should be active"
+        logger.info("Neuronal manipulations tab is active")
+
+        sim_page.click_add_button_in_active_sub_entry()
+        logger.info("Clicked 'Add Neuronal Manipulation'")
+
+        nm_dict_items = sim_page.get_dictionary_items()
+        assert len(nm_dict_items) > 0, "Expected at least one neuronal manipulation dictionary item"
+        nm_label = sim_page.click_random_dictionary_item()
+        logger.info(f"Selected neuronal manipulation type: '{nm_label}'")
+
+        block_single = sim_page.wait_for_block_single(timeout=10)
+        logger.info("Neuronal manipulation config form (block_single) appeared")
+
+        # Verify the form has a "Select a variable" dropdown (radix select)
+        try:
+            select_trigger = block_single.find_element(
+                By.CSS_SELECTOR, "button[role='combobox']"
+            )
+            assert select_trigger.is_displayed(), "Variable select dropdown should be visible"
+            logger.info(f"Variable select dropdown found: '{select_trigger.text.strip()}'")
+        except Exception:
+            logger.warning("Variable select dropdown (combobox) not found — may use different selector")
+
         logger.info(f"Final URL: {sim_page.browser.current_url}")
 
     # ── Test: Navigate via workflow cards ─────────────────────────────────

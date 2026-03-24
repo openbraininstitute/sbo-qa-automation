@@ -131,6 +131,73 @@ class SimulateMeBetaLocators:
         "div[data-scan-config-block-element='float_parameter_sweep_multiple'] input.ant-input-number-input"
     )
 
+    # ── Config page: Stimuli & Recordings section ─────────────────────
+    CONFIG_STIMULI_TAB = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item']//span[contains(text(),'Stimuli')]/ancestor::button"
+    )
+    CONFIG_STIMULI_TAB_ACTIVE = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item'][@data-active='true']//span[contains(text(),'Stimuli')]/ancestor::button"
+    )
+    CONFIG_RECORDINGS_TAB = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item']//span[contains(text(),'Recordings')]/ancestor::button"
+    )
+    CONFIG_RECORDINGS_TAB_ACTIVE = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item'][@data-active='true']//span[contains(text(),'Recordings')]/ancestor::button"
+    )
+    # Sub-entry container under Stimuli (holds "Add Stimulus" and any stimulus items)
+    CONFIG_STIMULI_SUB_ENTRY = (
+        By.CSS_SELECTOR,
+        "div[data-scan-config-menu='menu-block-dictionary-sub-entry']"
+    )
+    # "Add Stimulus" button inside the sub-entry
+    CONFIG_STIMULI_ADD_BTN = (
+        By.XPATH,
+        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']//button[.//span[contains(text(),'Add')]]"
+    )
+    # Individual stimulus sub-items (appear after adding stimuli)
+    CONFIG_STIMULI_SUB_ITEMS = (
+        By.CSS_SELECTOR,
+        "div[data-scan-config-menu='menu-block-dictionary-sub-entry'] button[data-scan-config-menu='left-menu-sub-item']"
+    )
+    CONFIG_STIMULI_SUB_ITEMS_ACTIVE = (
+        By.CSS_SELECTOR,
+        "div[data-scan-config-menu='menu-block-dictionary-sub-entry'] button[data-scan-config-menu='left-menu-sub-item'][data-active='true']"
+    )
+
+    # ── Config page: Neuronal manipulations tab ─────────────────────────
+    CONFIG_NEURONAL_MANIP_TAB = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item']//span[contains(text(),'Neuronal manipulations')]/ancestor::button"
+    )
+    CONFIG_NEURONAL_MANIP_TAB_ACTIVE = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item'][@data-active='true']//span[contains(text(),'Neuronal manipulations')]/ancestor::button"
+    )
+
+    # ── Dictionary block (middle column after clicking "Add X") ─────────
+    CONFIG_BLOCK_DICTIONARY = (
+        By.CSS_SELECTOR,
+        "div[data-scan-config-block='block_dictionary']"
+    )
+    CONFIG_BLOCK_DICTIONARY_ITEMS = (
+        By.CSS_SELECTOR,
+        "button[data-scan-config-block-element-item='block_dictionary_item']"
+    )
+    CONFIG_BLOCK_SINGLE = (
+        By.CSS_SELECTOR,
+        "div[data-scan-config-block='block_single']"
+    )
+
+    # Generic "Add" button inside any active sub-entry
+    CONFIG_ADD_BTN_IN_SUB_ENTRY = (
+        By.XPATH,
+        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry'][@data-active='true']//button[.//span[contains(text(),'Add')]]"
+    )
+
     # ── Top navigation bar ───────────────────────────────────────────────
     NAV_HOME = (By.CSS_SELECTOR, "#workspace-home")
     NAV_DATA = (By.CSS_SELECTOR, "#workspace-explore-data")
