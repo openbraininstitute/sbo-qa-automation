@@ -5,8 +5,7 @@
 import time
 import random
 from selenium.common import TimeoutException
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from pages.home_page import HomePage
 from locators.simulate_me_beta_locators import SimulateMeBetaLocators
 
@@ -45,9 +44,7 @@ class SimulateMeBetaPage(HomePage):
 
     def wait_for_page_ready(self, timeout=30):
         """Wait for the page to be fully loaded."""
-        WebDriverWait(self.browser, timeout).until(
-            lambda d: d.execute_script("return document.readyState") == "complete"
-        )
+        super().wait_for_page_ready(timeout=timeout)
         time.sleep(2)
 
     # ── Tabs ─────────────────────────────────────────────────────────────
@@ -112,9 +109,7 @@ class SimulateMeBetaPage(HomePage):
 
     def get_table_rows(self, timeout=15):
         """Get all visible table rows."""
-        WebDriverWait(self.browser, timeout).until(
-            EC.presence_of_element_located(SimulateMeBetaLocators.TABLE_ROWS)
-        )
+        self.find_element(SimulateMeBetaLocators.TABLE_ROWS, timeout=timeout)
         return self.browser.find_elements(*SimulateMeBetaLocators.TABLE_ROWS)
 
     def get_row_count(self):
@@ -125,34 +120,40 @@ class SimulateMeBetaPage(HomePage):
         return count
 
     def click_random_row(self):
-        """Click a random row in the table, using JS click as fallback."""
+        """Click a random row in the table, using ActionChains for reliable click."""
+        from selenium.webdriver.common.action_chains import ActionChains
         rows = self.get_table_rows()
         if not rows:
             raise RuntimeError("No rows found in the table")
-        row = random.choice(rows)
+        # Pick from first 10 rows to avoid scroll issues
+        visible_rows = rows[:min(10, len(rows))]
+        row = random.choice(visible_rows)
         row_text = row.text.split('\n')[0][:60]
         self.logger.info(f"Clicking random row: '{row_text}...'")
+        # Scroll into view first
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+        time.sleep(1)
+        # Use ActionChains for a real click that triggers event listeners
         try:
-            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
-            time.sleep(1)
-            row.click()
+            ActionChains(self.browser).move_to_element(row).click().perform()
         except Exception:
-            self.logger.info("Native click failed, using JS click")
+            self.logger.info("ActionChains click failed, using JS click")
             self.browser.execute_script("arguments[0].click();", row)
         time.sleep(3)
         return row_text
 
     def click_first_row(self):
         """Click the first row in the table."""
+        from selenium.webdriver.common.action_chains import ActionChains
         row = self.find_element(SimulateMeBetaLocators.TABLE_FIRST_ROW, timeout=15)
         row_text = row.text.split('\n')[0][:60]
         self.logger.info(f"Clicking first row: '{row_text}...'")
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+        time.sleep(1)
         try:
-            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
-            time.sleep(1)
-            row.click()
+            ActionChains(self.browser).move_to_element(row).click().perform()
         except Exception:
-            self.logger.info("Native click failed, using JS click")
+            self.logger.info("ActionChains click failed, using JS click")
             self.browser.execute_script("arguments[0].click();", row)
         time.sleep(3)
         return row_text
@@ -229,12 +230,8 @@ class SimulateMeBetaPage(HomePage):
 
     def select_etype_option(self, option_text):
         """Select an option from the E-type dropdown."""
-        from selenium.webdriver.common.by import By
-        option = WebDriverWait(self.browser, 10).until(
-            EC.element_to_be_clickable(
-                (By.XPATH, f"//div[contains(@class,'ant-select-item-option') and @title='{option_text}']")
-            )
-        )
+        locator = (By.XPATH, f"//div[contains(@class,'ant-select-item-option') and @title='{option_text}']")
+        option = self.element_to_be_clickable(locator, timeout=10)
         option.click()
         self.logger.info(f"Selected E-type option: '{option_text}'")
         time.sleep(1)
@@ -286,6 +283,190 @@ class SimulateMeBetaPage(HomePage):
         link.click()
         self.logger.info("Clicked Workflows breadcrumb")
         time.sleep(2)
+
+    # ── Mini-detail view ────────────────────────────────────────────────
+
+    def wait_for_mini_detail(self, timeout=15):
+        """Wait for the mini-detail view to appear after clicking a row."""
+        self.element_visibility(SimulateMeBetaLocators.MINI_VIEWER, timeout=timeout)
+        self.logger.info("Mini-detail view appeared")
+        time.sleep(1)
+
+    def find_mini_detail_title(self, timeout=10):
+        """Find the title (h1) in the mini-detail view."""
+        return self.find_element(SimulateMeBetaLocators.MINI_DETAIL_TITLE, timeout=timeout)
+
+    def find_mini_detail_description(self, timeout=10):
+        """Find the description paragraph in the mini-detail view."""
+        return self.find_element(SimulateMeBetaLocators.MINI_DETAIL_DESCRIPTION, timeout=timeout)
+
+    def find_mini_detail_images(self, timeout=10):
+        """Find all images in the mini-detail view."""
+        return self.find_all_elements(SimulateMeBetaLocators.MINI_DETAIL_IMAGES, timeout=timeout)
+
+    def get_mini_detail_metadata(self, timeout=10):
+        """Get metadata labels and values from the mini-detail view.
+        Returns dict of label -> value.
+        """
+        labels = self.find_all_elements(SimulateMeBetaLocators.MINI_DETAIL_METADATA_LABELS, timeout=timeout)
+        metadata = {}
+        for label_el in labels:
+            label_text = label_el.text.strip()
+            try:
+                parent = label_el.find_element(By.XPATH, "..")
+                value_el = parent.find_element(By.CSS_SELECTOR, ".font-bold")
+                metadata[label_text] = value_el.text.strip()
+            except Exception:
+                metadata[label_text] = ""
+        self.logger.info(f"Mini-detail metadata: {metadata}")
+        return metadata
+
+    def find_view_details_btn(self, timeout=10):
+        """Find the 'View details' button in the mini-detail view."""
+        return self.find_element(SimulateMeBetaLocators.MINI_DETAIL_VIEW_DETAILS_BTN, timeout=timeout)
+
+    def find_use_model_btn(self, timeout=10):
+        """Find the 'Use model' button in the mini-detail view."""
+        return self.find_element(SimulateMeBetaLocators.MINI_DETAIL_USE_MODEL_BTN, timeout=timeout)
+
+    def click_use_model(self):
+        """Click the 'Use model' button to go to the config page."""
+        btn = self.find_use_model_btn()
+        href = btn.get_attribute("href")
+        self.logger.info(f"Clicking 'Use model', href: {href}")
+        try:
+            btn.click()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", btn)
+        time.sleep(5)
+        return href
+
+    def verify_mini_detail_view(self):
+        """Verify all expected elements in the mini-detail view.
+        Returns dict of element_name -> {present: bool, displayed: bool}.
+        """
+        checks = {
+            'title': SimulateMeBetaLocators.MINI_DETAIL_TITLE,
+            'description': SimulateMeBetaLocators.MINI_DETAIL_DESCRIPTION,
+            'view_details_btn': SimulateMeBetaLocators.MINI_DETAIL_VIEW_DETAILS_BTN,
+            'use_model_btn': SimulateMeBetaLocators.MINI_DETAIL_USE_MODEL_BTN,
+        }
+        results = {}
+        for name, locator in checks.items():
+            try:
+                el = self.find_element(locator, timeout=10)
+                results[name] = {'present': True, 'displayed': el.is_displayed()}
+                self.logger.info(f"Mini-detail '{name}' found")
+            except TimeoutException:
+                results[name] = {'present': False, 'displayed': False}
+                self.logger.warning(f"Mini-detail '{name}' not found")
+
+        # Check images separately (multiple)
+        try:
+            imgs = self.find_mini_detail_images(timeout=10)
+            results['images'] = {'present': True, 'displayed': len(imgs) > 0, 'count': len(imgs)}
+            self.logger.info(f"Mini-detail images: {len(imgs)} found")
+        except TimeoutException:
+            results['images'] = {'present': False, 'displayed': False, 'count': 0}
+            self.logger.warning("Mini-detail images not found")
+
+        # Check metadata
+        try:
+            metadata = self.get_mini_detail_metadata(timeout=10)
+            results['metadata'] = {'present': True, 'displayed': len(metadata) > 0, 'fields': list(metadata.keys())}
+            self.logger.info(f"Mini-detail metadata fields: {list(metadata.keys())}")
+        except TimeoutException:
+            results['metadata'] = {'present': False, 'displayed': False, 'fields': []}
+            self.logger.warning("Mini-detail metadata not found")
+
+        return results
+
+    # ── Config page ──────────────────────────────────────────────────────
+
+    def wait_for_config_page(self, timeout=30):
+        """Wait for the config page layout to appear."""
+        self.find_element(SimulateMeBetaLocators.CONFIG_LAYOUT, timeout=timeout)
+        self.logger.info("Config page layout loaded")
+        time.sleep(2)
+
+    def wait_for_neuron_visualizer(self, timeout=60):
+        """Wait for the 3D morphology viewer canvas to be present."""
+        self.wait_for_long_load(SimulateMeBetaLocators.NEURON_VISUALIZER_CANVAS, timeout=timeout)
+        self.logger.info("Neuron visualizer canvas loaded")
+        time.sleep(2)
+
+    def find_config_tab(self, timeout=10):
+        """Find the Configuration tab button."""
+        return self.find_element(SimulateMeBetaLocators.CONFIG_TAB_CONFIGURATION, timeout=timeout)
+
+    def find_simulations_tab(self, timeout=10):
+        """Find the Simulations tab button."""
+        return self.find_element(SimulateMeBetaLocators.CONFIG_TAB_SIMULATIONS, timeout=timeout)
+
+    def verify_config_tabs(self):
+        """Verify Configuration and Simulations tabs are present.
+        Returns dict of tab_name -> {present: bool, displayed: bool}.
+        """
+        results = {}
+        for name, locator in [
+            ('configuration', SimulateMeBetaLocators.CONFIG_TAB_CONFIGURATION),
+            ('simulations', SimulateMeBetaLocators.CONFIG_TAB_SIMULATIONS),
+        ]:
+            try:
+                el = self.find_element(locator, timeout=10)
+                results[name] = {'present': True, 'displayed': el.is_displayed()}
+                self.logger.info(f"Config tab '{name}' found")
+            except TimeoutException:
+                results[name] = {'present': False, 'displayed': False}
+                self.logger.warning(f"Config tab '{name}' not found")
+        return results
+
+    def is_info_tab_active(self):
+        """Check if the 'Info' menu item is active (blue background)."""
+        try:
+            active_btn = self.find_element(
+                SimulateMeBetaLocators.CONFIG_LEFT_MENU_INFO_ACTIVE, timeout=5
+            )
+            text = active_btn.text.strip()
+            is_info = 'Info' in text
+            self.logger.info(f"Active left menu item: '{text}', is Info: {is_info}")
+            return is_info
+        except TimeoutException:
+            self.logger.warning("No active left menu item found")
+            return False
+
+    def fill_campaign_name(self, name):
+        """Fill in the Campaign Name input."""
+        input_el = self.find_element(SimulateMeBetaLocators.CONFIG_CAMPAIGN_NAME_INPUT, timeout=10)
+        input_el.clear()
+        input_el.send_keys(name)
+        self.logger.info(f"Filled campaign name: '{name}'")
+
+    def fill_campaign_description(self, description):
+        """Fill in the Campaign Description input."""
+        input_el = self.find_element(SimulateMeBetaLocators.CONFIG_CAMPAIGN_DESC_INPUT, timeout=10)
+        input_el.clear()
+        input_el.send_keys(description)
+        self.logger.info(f"Filled campaign description: '{description}'")
+
+    def verify_top_nav(self):
+        """Verify top navigation items are present."""
+        nav_items = {
+            'Home': SimulateMeBetaLocators.NAV_HOME,
+            'Data': SimulateMeBetaLocators.NAV_DATA,
+            'Workflows': SimulateMeBetaLocators.NAV_WORKFLOWS,
+            'Notebooks': SimulateMeBetaLocators.NAV_NOTEBOOKS,
+            'Reports': SimulateMeBetaLocators.NAV_REPORTS,
+        }
+        results = {}
+        for name, locator in nav_items.items():
+            try:
+                el = self.find_element(locator, timeout=5)
+                results[name] = {'present': True, 'displayed': el.is_displayed()}
+            except TimeoutException:
+                results[name] = {'present': False, 'displayed': False}
+        self.logger.info(f"Top nav: {list(results.keys())}")
+        return results
 
     # ── Debug ────────────────────────────────────────────────────────────
 

@@ -58,5 +58,52 @@ class SimulateMeBetaLocators:
     # ── Pagination ───────────────────────────────────────────────────────
     PAGINATION = (By.CSS_SELECTOR, "ul.ant-pagination")
 
+    # ── Mini-detail view (appears after clicking a row) ─────────────────
+    MINI_DETAIL_CONTAINER = (By.CSS_SELECTOR, "#mini-detail-view-container")
+    MINI_VIEWER = (By.CSS_SELECTOR, "[data-testid='mini-viewer']")
+    MINI_DETAIL_TITLE = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] h1")
+    MINI_DETAIL_DESCRIPTION = (By.CSS_SELECTOR, "#record-description")
+    MINI_DETAIL_IMAGES = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] img.ant-image-img")
+    MINI_DETAIL_METADATA_LABELS = (
+        By.CSS_SELECTOR,
+        "[data-testid='mini-viewer'] .text-primary-3.text-base.font-light"
+    )
+    MINI_DETAIL_VIEW_DETAILS_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] a[title='Go to details page']")
+    MINI_DETAIL_USE_MODEL_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] a[title='Start simulation']")
+    MINI_DETAIL_CLOSE_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] button .anticon-close")
+
+    # ── Config page (after clicking "Use model") ─────────────────────────
+    CONFIG_LAYOUT = (By.CSS_SELECTOR, "[data-testid='workflow-simulate-layout']")
+    CONFIG_TAB_CONFIGURATION = (
+        By.XPATH,
+        "//div[@data-testid='workflow-simulate-layout']//button[contains(translate(text(),'CONFIGURATION','configuration'),'configuration')]"
+    )
+    CONFIG_TAB_SIMULATIONS = (
+        By.XPATH,
+        "//div[@data-testid='workflow-simulate-layout']//button[contains(translate(text(),'SIMULATIONS','simulations'),'simulations')]"
+    )
+    CONFIG_LEFT_MENU_ITEMS = (By.CSS_SELECTOR, "button[data-scan-config-menu='left-menu-top-item']")
+    CONFIG_LEFT_MENU_INFO_ACTIVE = (
+        By.CSS_SELECTOR,
+        "button[data-scan-config-menu='left-menu-top-item'][data-active='true']"
+    )
+    CONFIG_CAMPAIGN_NAME_INPUT = (
+        By.XPATH,
+        "(//input[@data-scan-config-block-element='string_input'])[1]"
+    )
+    CONFIG_CAMPAIGN_DESC_INPUT = (
+        By.XPATH,
+        "(//input[@data-scan-config-block-element='string_input'])[2]"
+    )
+    NEURON_VISUALIZER = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer']")
+    NEURON_VISUALIZER_CANVAS = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer'] canvas")
+
+    # ── Top navigation bar ───────────────────────────────────────────────
+    NAV_HOME = (By.CSS_SELECTOR, "#workspace-home")
+    NAV_DATA = (By.CSS_SELECTOR, "#workspace-explore-data")
+    NAV_WORKFLOWS = (By.CSS_SELECTOR, "#workspace-workflows")
+    NAV_NOTEBOOKS = (By.CSS_SELECTOR, "#workspace-notebooks")
+    NAV_REPORTS = (By.CSS_SELECTOR, "#workspace-reports")
+
     # ── Breadcrumbs ──────────────────────────────────────────────────────
     BREADCRUMB_WORKFLOWS = (By.XPATH, "//a[contains(text(), 'Workflows') or contains(@href, 'workflows')]")

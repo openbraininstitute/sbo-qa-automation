@@ -89,9 +89,55 @@ class TestSimulateMeBeta:
         row_text = sim_page.click_random_row()
         logger.info(f"Clicked model row: '{row_text}'")
 
-        # Log the resulting page
+        # Step 7: Verify mini-detail view appears
+        sim_page.wait_for_mini_detail()
+        detail_results = sim_page.verify_mini_detail_view()
+
+        # Verify name, description, images, metadata, and both buttons
+        assert detail_results['title']['present'], "Mini-detail title (name) should be present"
+        assert detail_results['description']['present'], "Mini-detail description should be present"
+        assert detail_results['images']['present'], "Mini-detail should have at least one image"
+        assert detail_results['metadata']['present'], "Mini-detail should have metadata"
+        assert detail_results['view_details_btn']['present'], "'View details' button should be present"
+        assert detail_results['use_model_btn']['present'], "'Use model' button should be present"
+        logger.info("Mini-detail view verified: name, description, images, metadata, buttons")
+
+        # Log the title text
+        title_el = sim_page.find_mini_detail_title()
+        logger.info(f"Mini-detail title: '{title_el.text}'")
+
+        # Step 8: Click "Use model" → redirected to config page
+        sim_page.click_use_model()
+        logger.info(f"After 'Use model', URL: {sim_page.browser.current_url}")
+
+        # Step 9: Wait for config page and 3D morphology viewer
+        sim_page.wait_for_config_page(timeout=30)
+        logger.info("Config page loaded")
+
+        sim_page.wait_for_neuron_visualizer(timeout=60)
+        logger.info("3D morphology viewer loaded")
+
+        # Step 10: Verify Configuration and Simulations tabs
+        tab_results = sim_page.verify_config_tabs()
+        assert tab_results['configuration']['present'], "Configuration tab should be present"
+        assert tab_results['simulations']['present'], "Simulations tab should be present"
+        logger.info("Configuration and Simulations tabs verified")
+
+        # Step 11: If Info tab is active, fill in name and description
+        if sim_page.is_info_tab_active():
+            sim_page.fill_campaign_name("Automated Test Campaign")
+            sim_page.fill_campaign_description("Automated test run for single neuron beta simulation")
+            logger.info("Filled campaign name and description")
+        else:
+            logger.info("Info tab is not active, skipping form fill")
+
+        # Verify top navigation
+        nav_results = sim_page.verify_top_nav()
+        present_nav = [k for k, v in nav_results.items() if v['present']]
+        logger.info(f"Top nav items present: {present_nav}")
+
         sim_page.log_page_structure()
-        logger.info(f"After clicking model, URL: {sim_page.browser.current_url}")
+        logger.info(f"Final URL: {sim_page.browser.current_url}")
 
     # ── Test: Navigate via workflow cards ─────────────────────────────────
 
