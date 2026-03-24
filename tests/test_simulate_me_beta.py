@@ -144,8 +144,23 @@ class TestSimulateMeBeta:
         init_blocks = sim_page.verify_initialization_data()
         logger.info(f"Initialization tab has {len(init_blocks)} blocks, all with labels and values")
 
-        # Step 14: Pick 2 random parameter blocks, add sweep values
+        # Realistic value ranges per parameter
         import random as rnd
+
+        def random_value_for(label):
+            """Return a realistic random value based on the parameter name."""
+            if 'RANDOM SEED' in label:
+                return rnd.randint(1, 5)
+            elif 'INITIAL VOLTAGE' in label:
+                return round(rnd.uniform(-80, 0), 1)
+            elif 'EXTRACELLULAR CALCIUM' in label:
+                return round(rnd.uniform(0.5, 5.0), 1)
+            elif 'DURATION' in label:
+                return rnd.randint(100, 2000)
+            else:
+                return round(rnd.uniform(0.1, 100.0), 2)
+
+        # Step 14: Pick 2 random parameter blocks, add sweep values
         numeric_blocks = [b for b in init_blocks if b['has_number_input']]
         assert len(numeric_blocks) >= 2, f"Need at least 2 numeric config blocks to test sweep, got {len(numeric_blocks)}"
         chosen = rnd.sample(numeric_blocks, 2)
@@ -153,7 +168,7 @@ class TestSimulateMeBeta:
         for block_info in chosen:
             idx = block_info['index']
             original_count = sim_page.get_sweep_input_count(idx)
-            sweep_value = round(rnd.uniform(0.1, 100.0), 2)
+            sweep_value = random_value_for(block_info['label'])
             sim_page.add_parameter_sweep_value(idx, sweep_value)
             new_count = sim_page.get_sweep_input_count(idx)
             assert new_count > original_count, (
@@ -164,6 +179,39 @@ class TestSimulateMeBeta:
                         f"added sweep value {sweep_value}, inputs {original_count} → {new_count}")
 
         logger.info("Parameter sweep values added and verified")
+
+        # Step 15: Add 2 more sweep values to INITIAL VOLTAGE and RANDOM SEED
+        target_labels = ['INITIAL VOLTAGE', 'RANDOM SEED']
+        for label_name in target_labels:
+            block_info = next((b for b in init_blocks if b['label'] == label_name), None)
+            assert block_info, f"Block '{label_name}' not found in Initialization tab"
+            idx = block_info['index']
+
+            # Check if already in sweep mode (>1 input means Step 14 already converted it)
+            current_count = sim_page.get_sweep_input_count(idx)
+            if current_count == 1:
+                sweep_val_1 = random_value_for(label_name)
+                sim_page.add_parameter_sweep_value(idx, sweep_val_1)
+                logger.info(f"Converted '{label_name}' to sweep mode with value {sweep_val_1}")
+
+            # Now add 2 more values
+            for i in range(2):
+                before = sim_page.get_sweep_input_count(idx)
+                extra_val = random_value_for(label_name)
+                sim_page.add_extra_sweep_value(idx, extra_val)
+                after = sim_page.get_sweep_input_count(idx)
+                assert after > before, (
+                    f"'{label_name}' input count should increase (was {before}, now {after})"
+                )
+                logger.info(f"'{label_name}': added extra value {extra_val}, inputs {before} → {after}")
+
+        final_iv_count = sim_page.get_sweep_input_count(
+            next(b for b in init_blocks if b['label'] == 'INITIAL VOLTAGE')['index']
+        )
+        final_rs_count = sim_page.get_sweep_input_count(
+            next(b for b in init_blocks if b['label'] == 'RANDOM SEED')['index']
+        )
+        logger.info(f"Final sweep counts — INITIAL VOLTAGE: {final_iv_count}, RANDOM SEED: {final_rs_count}")
 
         # Verify top navigation
         nav_results = sim_page.verify_top_nav()

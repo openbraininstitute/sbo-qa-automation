@@ -586,6 +586,45 @@ class SimulateMeBetaPage(HomePage):
             self.logger.info(f"Typed sweep value '{value}' into block [{block_index}] '{label}'")
             time.sleep(0.5)
 
+    def add_extra_sweep_value(self, block_index, value):
+        """Add another sweep value to a block already in sweep mode.
+        Clicks the inner plus-circle to add a new row, then types the value.
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+
+        blocks = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_ELEMENTS, timeout=10)
+        target_block = blocks[block_index]
+        label = ""
+        try:
+            label = target_block.find_element(By.CSS_SELECTOR, ".text-primary-9.text-base.font-semibold").text.strip()
+        except Exception:
+            pass
+
+        # Click the last plus-circle in the block to add a new input row
+        plus_btns = target_block.find_elements(By.XPATH, ".//span[@aria-label='plus-circle']")
+        if plus_btns:
+            plus_btn = plus_btns[-1]
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", plus_btn)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(plus_btn).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", plus_btn)
+            self.logger.info(f"Clicked plus-circle to add sweep row in block [{block_index}] '{label}'")
+            time.sleep(1)
+
+        # Type value into the last (newly added) input
+        blocks = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_ELEMENTS, timeout=10)
+        target_block = blocks[block_index]
+        inputs = target_block.find_elements(By.CSS_SELECTOR, "input.ant-input-number-input")
+        if inputs:
+            new_input = inputs[-1]
+            new_input.click()
+            new_input.clear()
+            new_input.send_keys(str(value))
+            self.logger.info(f"Typed extra sweep value '{value}' into block [{block_index}] '{label}'")
+            time.sleep(0.5)
+
     def get_sweep_input_count(self, block_index):
         """Count how many sweep inputs exist in a specific config block."""
         blocks = self.find_all_elements(SimulateMeBetaLocators.CONFIG_BLOCK_ELEMENTS, timeout=10)
