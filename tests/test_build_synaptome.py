@@ -122,7 +122,7 @@ class TestBuildSynaptome:
         # Step 10: Wait for 3D morphology to load
         print("\n📍 Step 10: Waiting for 3D morphology to load...")
         logger.info("Step 10: Waiting for 3D morphology to load")
-        time.sleep(10)  # Wait for 3D visualization to render
+        time.sleep(30)  # Wait for 3D visualization to render (slow in CI)
         print("✅ 3D morphology loaded")
 
         # Step 11: Create synapse set

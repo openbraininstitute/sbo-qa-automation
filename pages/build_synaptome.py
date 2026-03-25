@@ -718,12 +718,12 @@ class BuildSynaptomePage(HomePage):
 
         # Select target from dropdown
         target_dropdown_locator = (By.XPATH, "//input[@id='target']/ancestor::div[contains(@class, 'ant-select')]")
-        self.wait_and_click(target_dropdown_locator, timeout=10)
+        self.wait_and_click(target_dropdown_locator, timeout=20)
         time.sleep(1)
 
         # Wait for dropdown options and select target
         target_option_locator = (By.XPATH, f"//div[@class='ant-select-item-option-content' and text()='{target}']")
-        target_option = self.element_to_be_clickable(target_option_locator, timeout=10)
+        target_option = self.element_to_be_clickable(target_option_locator, timeout=20)
         target_option.click()
         if logger:
             logger.info(f"Selected target: {target}")

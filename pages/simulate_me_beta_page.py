@@ -119,21 +119,47 @@ class SimulateMeBetaPage(HomePage):
         self.logger.info(f"Table has {count} rows")
         return count
 
-    def click_random_row(self):
-        """Click a random row in the table, using ActionChains for reliable click."""
+    def click_random_row(self, exclude_date="10.09.2025", exclude_creator="Gil Barrios"):
+        """Click a random row, skipping rows that match the excluded date and creator."""
         from selenium.webdriver.common.action_chains import ActionChains
         rows = self.get_table_rows()
         if not rows:
             raise RuntimeError("No rows found in the table")
-        # Pick from first 10 rows to avoid scroll issues
+
+        # Find column indices dynamically
+        headers = self.browser.find_elements(*SimulateMeBetaLocators.COLUMN_HEADERS)
+        creator_idx = None
+        date_idx = None
+        for i, h in enumerate(headers):
+            text = h.text.strip()
+            if 'Created by' in text:
+                creator_idx = i
+            if 'Registration date' in text:
+                date_idx = i
+
         visible_rows = rows[:min(10, len(rows))]
-        row = random.choice(visible_rows)
+        eligible = []
+        for row in visible_rows:
+            cells = row.find_elements("tag name", "td")
+            skip = False
+            if creator_idx is not None and date_idx is not None and len(cells) > max(creator_idx, date_idx):
+                creator = cells[creator_idx].text.strip()
+                reg_date = cells[date_idx].text.strip()
+                if exclude_creator in creator and exclude_date in reg_date:
+                    self.logger.info(f"Skipping row: creator='{creator}', date='{reg_date}'")
+                    skip = True
+            if not skip:
+                eligible.append(row)
+
+        if not eligible:
+            self.logger.warning("No eligible rows after filtering, falling back to all visible rows")
+            eligible = visible_rows
+
+        row = random.choice(eligible)
         row_text = row.text.split('\n')[0][:60]
         self.logger.info(f"Clicking random row: '{row_text}...'")
-        # Scroll into view first
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
         time.sleep(1)
-        # Use ActionChains for a real click that triggers event listeners
         try:
             ActionChains(self.browser).move_to_element(row).click().perform()
         except Exception:
