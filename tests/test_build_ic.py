@@ -23,7 +23,7 @@ class TestBuildIc:
         
         # Initialize page object with correct parameters
         build_ic = BuildIcPage(browser, wait, base_url, logger)
-        
+
         # Step 1: Navigate to workflows page
         print("\n📍 Step 1: Navigating to workflows page...")
         logger.info("Step 1: Navigating to workflows page")

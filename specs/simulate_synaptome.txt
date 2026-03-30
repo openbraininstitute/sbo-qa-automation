@@ -1,0 +1,32 @@
+Page: SimulateSynaptome
+Entry: Workflows → Simulate → Synaptome card
+URL: /workflows/simulate/new/synaptome-simulation
+
+Steps:
+1. Navigate to Workflows page with simulate activity filter
+2. Click Simulate category → Synaptome card
+3. Model picker: click Public tab, verify table has rows
+4. Filter button: click to open, click on a random field inside the filter -> verify that it is clickable
+5. Close filter panel.
+6. Click random row (skip excluded rows)
+7. Mini-detail: verify title, description, 2 thumbnails/images, metadata, close (x) button, "View details" button are present, click "Use model"
+8. Config page: wait for layout, verify Configuration + Results tabs
+9. Wait for 3D morphology viewer (non-blocking, 120s timeout)
+10. Info tab: fill datetime as name, description "automated test of synaptome"
+11. Verify Registered by and Registered at are not empty
+12. Click through Experimental setup tab, verify labels present
+13. Click Synaptic input, verify at least 1 synaptic input is displayed
+14. In the synaptic input, click on the eye button, the 3D view should display the synapses, the eye button, should be crossed out.
+15. Stimulation protocol: wait for plot, verify download button clickable
+16. Recording tab: add recordings for available sections (soma, dend, apic, axon)
+17. Click Run experiment
+18. Results tab: verify auto-redirect, left menu has All + recording buttons
+19. Verify Download CSV and Reconfigure disabled while running
+20. Verify IDREST plots and 3D canvas visible during simulation
+21. Wait for simulation completion (Download CSV enabled, 300s timeout)
+22. Verify Download CSV and Reconfigure enabled after completion
+23. Verify success notification with View Simulation link
+
+Recordings: soma, dend, apic, axon (if available in dropdown)
+Timeout: morphology 120s, simulation 300s, plot 60s
+Exclude rows: Gil Barrios 10.09.2025
