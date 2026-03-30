@@ -757,49 +757,72 @@ class BuildIcPage(HomePage):
         return False
 
     def verify_output_files_present(self, logger):
-        """Verify that output files (MOD, PDF, JSON) are present"""
+        """Verify that output files (MOD, PDF) are present in the Outputs section.
+        Returns dict with 'MOD': bool, 'PDF': int (count), 'outputs_section': bool.
+        """
         logger.info("Verifying output files are present...")
         time.sleep(2)
-        
-        files_found = {
+
+        results = {
             'MOD': False,
-            'PDF': False,
-            'JSON': False
+            'PDF': 0,
+            'outputs_section': False,
         }
-        
-        # Check for MOD file
+
+        # Check Outputs section header
         try:
-            mod_file = self.browser.find_element(*BuildIcLocators.OUTPUT_MOD_FILE)
-            if mod_file.is_displayed():
-                files_found['MOD'] = True
-                logger.info("✓ MOD file found")
-        except:
-            logger.info("✗ MOD file not found")
-        
-        # Check for PDF files
-        try:
-            pdf_file = self.browser.find_element(*BuildIcLocators.OUTPUT_PDF_FILE)
-            if pdf_file.is_displayed():
-                files_found['PDF'] = True
-                logger.info("✓ PDF file found")
-        except:
-            logger.info("✗ PDF file not found")
-        
-        # Check for JSON file
-        try:
-            json_file = self.browser.find_element(*BuildIcLocators.OUTPUT_JSON_FILE)
-            if json_file.is_displayed():
-                files_found['JSON'] = True
-                logger.info("✓ JSON file found")
-        except:
-            logger.info("✗ JSON file not found")
-        
-        # Check if Outputs section exists
-        try:
-            outputs_section = self.browser.find_element(*BuildIcLocators.OUTPUT_FILES_SECTION)
-            if outputs_section.is_displayed():
+            section = self.browser.find_element(*BuildIcLocators.OUTPUT_FILES_SECTION)
+            if section.is_displayed():
+                results['outputs_section'] = True
                 logger.info("✓ Outputs section found")
-        except:
+        except Exception:
             logger.info("✗ Outputs section not found")
-        
-        return files_found
+
+        # Check for MOD file button
+        try:
+            mod_btn = self.browser.find_element(*BuildIcLocators.OUTPUT_MOD_FILE)
+            if mod_btn.is_displayed():
+                results['MOD'] = True
+                logger.info(f"✓ MOD file found: '{mod_btn.text.split(chr(10))[0]}'")
+        except Exception:
+            logger.info("✗ MOD file not found")
+
+        # Check for PDF file buttons (there can be multiple)
+        try:
+            pdf_btns = self.browser.find_elements(*BuildIcLocators.OUTPUT_PDF_FILES)
+            visible = [b for b in pdf_btns if b.is_displayed()]
+            results['PDF'] = len(visible)
+            logger.info(f"✓ {len(visible)} PDF file(s) found")
+        except Exception:
+            logger.info("✗ No PDF files found")
+
+        return results
+
+    def click_mod_file_and_verify_preview(self, logger, timeout=10):
+        """Click the MOD output file and verify the code preview shows .mod content."""
+        from selenium.webdriver.common.action_chains import ActionChains
+
+        mod_btn = self.browser.find_element(*BuildIcLocators.OUTPUT_MOD_FILE)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", mod_btn)
+        time.sleep(0.5)
+        try:
+            ActionChains(self.browser).move_to_element(mod_btn).click().perform()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", mod_btn)
+        logger.info("Clicked MOD output file")
+        time.sleep(2)
+
+        # Verify code preview appears with NEURON mod content
+        try:
+            code_el = self.element_visibility(BuildIcLocators.OUTPUT_CODE_PREVIEW, timeout=timeout)
+            preview_text = code_el.text.strip()
+            logger.info(f"Code preview loaded ({len(preview_text)} chars)")
+            has_content = len(preview_text) > 0 and 'NEURON' in preview_text
+            if has_content:
+                logger.info("✓ MOD file preview contains NEURON code")
+            else:
+                logger.warning(f"✗ MOD preview content unexpected: '{preview_text[:100]}...'")
+            return has_content
+        except Exception as e:
+            logger.warning(f"✗ Code preview not found: {e}")
+            return False

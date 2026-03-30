@@ -23,7 +23,7 @@ class TestBuildIc:
         
         # Initialize page object with correct parameters
         build_ic = BuildIcPage(browser, wait, base_url, logger)
-        
+
         # Step 1: Navigate to workflows page
         print("\n📍 Step 1: Navigating to workflows page...")
         logger.info("Step 1: Navigating to workflows page")
@@ -239,35 +239,23 @@ class TestBuildIc:
         print("\n📍 Step 18: Waiting for build to complete...")
         logger.info("Step 18: Waiting for build to complete")
         
-        try:
-            build_completed = build_ic.wait_for_build_completion(logger, timeout=120)
-            if build_completed:
-                print("✅ Build completed successfully (done badge found)")
-            else:
-                print("⚠️ Build did not complete within timeout")
-                logger.info("Build did not complete within timeout")
-        except Exception as e:
-            logger.error(f"Error waiting for build completion: {e}")
-            print(f"⚠️ Build completion check issue: {e}")
+        build_completed = build_ic.wait_for_build_completion(logger, timeout=120)
+        assert build_completed, "Build should complete with 'done' status within timeout"
+        logger.info("Build completed successfully")
 
         # Step 19: Verify output files are present
-        print("\n📍 Step 19: Verifying output files...")
         logger.info("Step 19: Verifying output files")
-        
-        try:
-            files_found = build_ic.verify_output_files_present(logger)
-            print(f"  Output files found:")
-            print(f"    MOD: {'✓' if files_found['MOD'] else '✗'}")
-            print(f"    PDF: {'✓' if files_found['PDF'] else '✗'}")
-            print(f"    JSON: {'✓' if files_found['JSON'] else '✗'}")
-            
-            if any(files_found.values()):
-                print("✅ At least some output files are present")
-            else:
-                print("⚠️ No output files found")
-        except Exception as e:
-            logger.error(f"Error verifying output files: {e}")
-            print(f"⚠️ Output files verification issue: {e}")
+
+        files_found = build_ic.verify_output_files_present(logger)
+        assert files_found['outputs_section'], "Outputs section should be present"
+        assert files_found['MOD'], "MOD output file should be present after build"
+        assert files_found['PDF'] > 0, "At least one PDF output file should be present after build"
+        logger.info(f"Output files — MOD: {files_found['MOD']}, PDFs: {files_found['PDF']}")
+
+        # Step 20: Click MOD file and verify code preview
+        mod_preview_ok = build_ic.click_mod_file_and_verify_preview(logger)
+        assert mod_preview_ok, "MOD file preview should show NEURON code content"
+        logger.info("MOD file preview verified")
 
         print(f"\n✅ Ion channel Info form filled successfully!")
         print(f"   Model Name: {unique_name}")

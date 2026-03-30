@@ -123,10 +123,11 @@ class BuildIcLocators:
     BUILD_STATUS_RUNNING = (By.XPATH, "//div[@data-slot='badge' and contains(text(), 'running')]")
     
     # Output files
-    OUTPUT_MOD_FILE = (By.XPATH, "//button[contains(., '.mod')]//div[contains(text(), 'MOD')]")
-    OUTPUT_PDF_FILE = (By.XPATH, "//button[contains(., 'Parameter')]//div[contains(text(), 'PDF')]")
-    OUTPUT_JSON_FILE = (By.XPATH, "//button[contains(., '.json')]//div[contains(text(), 'JSON')]")
+    OUTPUT_MOD_FILE = (By.XPATH, "//h3[contains(text(),'Outputs')]/following-sibling::div//button[.//div[@data-slot='badge' and contains(text(),'MOD')]]")
+    OUTPUT_PDF_FILES = (By.XPATH, "//h3[contains(text(),'Outputs')]/following-sibling::div//button[.//div[@data-slot='badge' and contains(text(),'PDF')]]")
+    OUTPUT_JSON_FILE = (By.XPATH, "//h3[contains(text(),'Outputs')]/following-sibling::div//button[.//div[@data-slot='badge' and contains(text(),'JSON')]]")
     OUTPUT_FILES_SECTION = (By.XPATH, "//h3[contains(text(), 'Outputs')]")
+    OUTPUT_CODE_PREVIEW = (By.CSS_SELECTOR, "pre.shiki code")
     
     # Debug elements
     CLICKABLE_ELEMENTS = (By.XPATH, "//button | //a | //div[@role='button'] | //tr[@role='button'] | //td[@role='button']")

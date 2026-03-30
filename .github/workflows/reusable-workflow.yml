@@ -39,12 +39,12 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -118,6 +118,9 @@ jobs:
           elif [ "${{ inputs.test-type }}" = "ai-assistant" ]; then
             TEST_FILES="tests/test_ai_assistant_workflow.py"
             echo "Running AI assistant tests only"
+          elif [ "${{ inputs.test-type }}" = "simulate" ]; then
+            TEST_FILES="tests/test_simulate_mem.py tests/test_simulate_me_beta.py tests/test_simulate_synaptome.py"
+            echo "Running simulation tests only"
           else
             TEST_FILES="tests/test_about.py tests/test_mission.py tests/test_news.py tests/test_landing.py tests/test_login.py tests/test_project_home.py tests/test_project_notebooks.py tests/test_explore_page.py tests/test_explore_emodel.py tests/test_ai_assistant_workflow.py tests/test_build_single_neuron.py tests/test_build_synaptome.py tests/test_build_ic.py tests/test_digital_brain_story.py tests/test_team.py tests/test_contact.py tests/test_explore_ephys.py"
             echo "Running full test suite"
