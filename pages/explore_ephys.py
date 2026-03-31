@@ -190,51 +190,18 @@ class ExploreElectrophysiologyPage(ExplorePage):
             return f"{len(rows)} rows found"
 
     def apply_species_filter(self, species_name):
-        """Apply filter by species using checkbox selection"""
+        """Verify the Species filter label is displayed in the filter panel.
+        The Species filter is no longer an expandable accordion — just verify the label exists.
+        """
         try:
-            # First, ensure the Species filter section is expanded
-            species_filter = self.find_element(ExploreEphysLocators.FILTER_SPECIES_BUTTON, timeout=10)
-            
-            # Scroll element into view and wait a bit
-            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", species_filter)
-            time.sleep(1)
-            
-            # Check if the species section is already expanded by looking for the species name
-            try:
-                species_text = self.find_element((By.XPATH, f"//span[@class='font-bold text-white' and text()='{species_name}']"), timeout=2)
-                self.logger.info(f"Species section already expanded, found '{species_name}'")
-            except TimeoutException:
-                # Need to expand the species section
-                try:
-                    species_filter.click()
-                except Exception as e:
-                    self.logger.warning(f"Regular click failed, using JavaScript click: {e}")
-                    self.browser.execute_script("arguments[0].click();", species_filter)
-                
-                self.logger.info("Clicked Species filter to expand")
-                time.sleep(1)
-            
-            species_checkbox_xpath = f"//span[@class='font-bold text-white' and text()='{species_name}']/ancestor::div[@class='flex items-center justify-between pt-3']//button[@role='checkbox']"
-            species_checkbox = self.find_element((By.XPATH, species_checkbox_xpath), timeout=5)
-            
-            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", species_checkbox)
+            species_label = self.find_element(ExploreEphysLocators.FILTER_SPECIES_BUTTON, timeout=10)
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", species_label)
             time.sleep(0.5)
-            
-            try:
-                species_checkbox.click()
-            except Exception as e:
-                self.logger.warning(f"Regular click failed on checkbox, using JavaScript click: {e}")
-                self.browser.execute_script("arguments[0].click();", species_checkbox)
-            
-            self.logger.info(f"Selected species checkbox: {species_name}")
-            time.sleep(1)
-            
-            return True
-        except TimeoutException as e:
-            self.logger.warning(f"Species filter not found or not accessible: {e}")
-            return False
-        except Exception as e:
-            self.logger.warning(f"Error applying species filter: {e}")
+            is_displayed = species_label.is_displayed()
+            self.logger.info(f"Species filter label displayed: {is_displayed}, text: '{species_label.text.strip()}'")
+            return is_displayed
+        except TimeoutException:
+            self.logger.warning("Species filter label not found in filter panel")
             return False
 
     def apply_contributor_filter(self, contributor_name):

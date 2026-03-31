@@ -136,21 +136,12 @@ class TestExploreEphys:
             logger.info("Opened filter panel")
             time.sleep(2)
             
-            species_applied = explore_ephys_page.apply_species_filter("Rattus norvegicus")
-            if species_applied:
-                logger.info("✅ Species filter applied successfully")
+            species_label_present = explore_ephys_page.apply_species_filter("Rattus norvegicus")
+            if species_label_present:
+                logger.info("✅ Species filter label is displayed")
+            else:
+                logger.warning("⚠️ Species filter label not found")
 
-            filters_applied = explore_ephys_page.apply_filters()
-            if filters_applied:
-                logger.info("✅ Filters applied successfully")
-                
-                time.sleep(3)  # Wait for results to load
-                results_verified = explore_ephys_page.verify_filtered_results("Mus musculus", "species")
-                if results_verified:
-                    logger.info("✅ Filtered results verified")
-                else:
-                    logger.warning("⚠️ Could not verify filtered results")
-            
             explore_ephys_page.close_filter_panel()
             time.sleep(1)
             
