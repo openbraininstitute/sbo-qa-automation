@@ -610,6 +610,54 @@ class ExploreElectrophysiologyPage(ExplorePage):
     def lv_row1(self):
         return self.find_element(ExploreEphysLocators.LV_ROW1)
 
+    def click_random_row_with_pagination(self):
+        """Navigate to a random page (if pagination exists) and click a random row.
+        Returns the row text for logging.
+        """
+        import random
+        from selenium.webdriver.common.action_chains import ActionChains
+
+        # Check if pagination exists and pick a random page
+        try:
+            pages = self.browser.find_elements(*ExploreEphysLocators.PAGINATION_PAGES)
+            if len(pages) > 1:
+                target_page = random.choice(pages)
+                page_num = target_page.get_attribute("title") or target_page.text.strip()
+                # Skip if already on this page
+                if 'ant-pagination-item-active' not in (target_page.get_attribute("class") or ""):
+                    self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", target_page)
+                    time.sleep(0.5)
+                    target_page.click()
+                    self.logger.info(f"Navigated to page {page_num}")
+                    time.sleep(3)
+                else:
+                    self.logger.info(f"Already on page {page_num}")
+        except Exception as e:
+            self.logger.info(f"No pagination or single page: {e}")
+
+        # Click a random row from the current page
+        try:
+            rows = self.find_all_elements(ExploreEphysLocators.TABLE_ROWS, timeout=10)
+            if not rows:
+                self.logger.warning("No table rows found, falling back to lv_row1")
+                return self.lv_row1().click()
+
+            row = random.choice(rows[:min(10, len(rows))])
+            row_text = row.text.split('\n')[0][:60]
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(row).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", row)
+            self.logger.info(f"Clicked random row: '{row_text}...'")
+            time.sleep(2)
+            return row_text
+        except Exception as e:
+            self.logger.warning(f"Failed to click random row: {e}, falling back to row 1")
+            self.lv_row1().click()
+            return "row 1 (fallback)"
+
     def lv_total_results(self):
         return self.find_element(ExploreEphysLocators.LV_TOTAL_RESULTS)
 

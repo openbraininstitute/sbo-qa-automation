@@ -232,3 +232,13 @@ class ExploreEphysLocators:
     SEARCH_INPUT_FIELD = (By.XPATH, "button[aria-label='Open search']")
     TABLE = (By.XPATH, "//tbody[@class='ant-table-tbody']")
     # TABLE_CELLS = (By.CSS_SELECTOR, "tbody.ant-table-tbody td.ant-table-cell.text-primary-7.cursor-pointer.ant-table-cell-ellipsis")
+
+    """Pagination."""
+    PAGINATION = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination']")
+    PAGINATION_PAGES = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-item")
+    PAGINATION_ACTIVE_PAGE = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-item-active")
+    PAGINATION_NEXT = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-next button")
+    PAGINATION_PREV = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-prev button")
+
+    """Table rows (clickable cells)."""
+    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")

@@ -242,8 +242,8 @@ class TestExploreEphys:
                 pass
 
         logger.info("🔍 Testing mini-detail view...")
-        lv_row1 = explore_ephys_page.lv_row1().click()
-        logger.info("Clicked on row 1 to open mini-detail view.")
+        row_text = explore_ephys_page.click_random_row_with_pagination()
+        logger.info(f"Clicked random row: '{row_text}'")
         time.sleep(2)  # Wait for mini-detail view to load
         
         try:
