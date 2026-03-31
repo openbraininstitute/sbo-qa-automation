@@ -157,8 +157,8 @@ class ExploreEphysLocators:
     DV_INTERACTIVE_DETAILS_TAB_ACTIVE = (By.XPATH, "//label[contains(@class, 'ant-radio-button-wrapper-checked')]//span[contains(text(), 'Interactive Details')]")
     
     # Overview plots
-    DV_OVERVIEW_PLOTS = (By.XPATH, "//div[@class='plot-container plotly']")
-    DV_OVERVIEW_PLOT_IMAGES = (By.XPATH, "//div[@class='flex flex-col gap-10']//div[contains(@class, 'aspect-4/3')]")
+    DV_OVERVIEW_PLOTS = (By.CSS_SELECTOR, "div.plot-container.plotly")
+    DV_OVERVIEW_PLOT_IMAGES = (By.CSS_SELECTOR, "div.js-plotly-plot")
     
     # Interactive Details plots and controls
     DV_INTERACTIVE_PLOTS = (By.XPATH, "//div[@class='plot-container plotly']")

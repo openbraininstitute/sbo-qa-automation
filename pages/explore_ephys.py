@@ -1080,13 +1080,45 @@ class ExploreElectrophysiologyPage(ExplorePage):
         time.sleep(1)
         return True
 
-    def find_overview_plots(self, timeout=10):
-        """Find all plots in Overview tab"""
+    def find_overview_plots(self, timeout=30):
+        """Find all plots in Overview tab. Scrolls containers to trigger lazy loading."""
+        # Try scrolling various containers to trigger lazy-loaded plots
         try:
+            # Scroll the main content area and any scrollable parent
+            scrollable = self.browser.find_elements(By.CSS_SELECTOR,
+                "div[class*='overflow-y-auto'], div[class*='overflow-auto']")
+            for container in scrollable[:3]:
+                self.browser.execute_script(
+                    "arguments[0].scrollTop = arguments[0].scrollHeight / 3;", container)
+            time.sleep(2)
+            for container in scrollable[:3]:
+                self.browser.execute_script("arguments[0].scrollTop = 0;", container)
+            time.sleep(1)
+        except Exception:
+            pass
+
+        try:
+            # Primary: plotly container
+            plots = self.browser.find_elements(By.CSS_SELECTOR, "div.plot-container.plotly")
+            if plots:
+                visible = [p for p in plots if p.is_displayed()]
+                self.logger.info(f"Found {len(visible)} visible overview plots (plotly)")
+                return visible if visible else plots
+
+            # Fallback: js-plotly-plot
+            plots = self.browser.find_elements(By.CSS_SELECTOR, "div.js-plotly-plot")
+            if plots:
+                self.logger.info(f"Found {len(plots)} overview plots (js-plotly-plot)")
+                return plots
+
+            # Fallback: SVG main-svg (plotly renders SVGs)
+            plots = self.browser.find_elements(By.CSS_SELECTOR, "svg.main-svg")
+            if plots:
+                self.logger.info(f"Found {len(plots)} overview plots (svg.main-svg)")
+                return plots
+
+            # Last resort: wait with explicit wait
             plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOTS, timeout=timeout)
-            if not plots:
-                # Fallback to plot images
-                plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOT_IMAGES, timeout=timeout)
             return plots
         except TimeoutException:
             self.logger.warning("No overview plots found")

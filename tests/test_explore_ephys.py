@@ -314,7 +314,7 @@ class TestExploreEphys:
         logger.info("Verifying main detail view fields...")
         main_field_results = explore_ephys_page.verify_detail_view_main_fields()
         
-        required_fields = ['Name', 'Registered by', 'Registration date', 'Brain Region']
+        required_fields = ['Name', 'Created by', 'Registration date', 'Brain Region']
         for field in required_fields:
             if main_field_results.get(field, {}).get('has_value'):
                 logger.info(f"✅ Required field '{field}' has value")
