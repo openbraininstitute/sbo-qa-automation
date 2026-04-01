@@ -1220,6 +1220,138 @@ class ExploreElectrophysiologyPage(ExplorePage):
         
         return results
 
+
+
+    def click_sweep_color_and_verify(self):
+        """Click a random unselected sweep color checkbox and verify the plot updates.
+        Returns dict: {'clicked': bool, 'sweep_value': str, 'plot_visible': bool}.
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+        results = {'clicked': False, 'sweep_value': '', 'plot_visible': False}
+
+        try:
+            labels = self.browser.find_elements(*ExploreEphysLocators.DV_SWEEP_LABELS)
+            if not labels:
+                self.logger.warning("No sweep color labels found")
+                return results
+
+            # Pick a random unselected one
+            import random
+            unselected = [l for l in labels if 'selected' not in (l.find_element(By.XPATH, "..").get_attribute("class") or "")]
+            target = random.choice(unselected) if unselected else random.choice(labels)
+
+            bg_color = target.get_attribute("style") or ""
+            sweep_input = target.find_element(By.CSS_SELECTOR, "input")
+            results['sweep_value'] = sweep_input.get_attribute("value") or ""
+
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", target)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(target).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", target)
+            results['clicked'] = True
+            self.logger.info(f"Clicked sweep: '{results['sweep_value']}', color: {bg_color[:40]}")
+            time.sleep(2)
+
+            # Verify plot area is still visible
+            try:
+                plot = self.browser.find_element(By.CSS_SELECTOR, "rect.nsewdrag")
+                results['plot_visible'] = plot.is_displayed()
+            except Exception:
+                pass
+
+        except Exception as e:
+            self.logger.warning(f"Error clicking sweep: {e}")
+
+        return results
+
+    def click_reset_and_verify(self):
+        """Click the Reset button and verify Protocol/Repetition/Sweep controls reappear.
+        Returns dict: {'reset_clicked': bool, 'protocol_visible': bool, 'repetition_visible': bool, 'sweep_visible': bool, 'plots_visible': bool}.
+        """
+        results = {'reset_clicked': False, 'protocol_visible': False, 'repetition_visible': False, 'sweep_visible': False, 'plots_visible': False}
+
+        try:
+            reset_btn = self.element_to_be_clickable(ExploreEphysLocators.DV_RESET_BUTTON, timeout=10)
+            reset_btn.click()
+            results['reset_clicked'] = True
+            self.logger.info("Clicked Reset button")
+            time.sleep(3)
+
+            # Verify controls reappear
+            try:
+                self.find_element(ExploreEphysLocators.DV_PROTOCOL_DROPDOWN, timeout=5)
+                results['protocol_visible'] = True
+            except Exception:
+                pass
+            try:
+                self.find_element(ExploreEphysLocators.DV_REPETITION_DROPDOWN, timeout=5)
+                results['repetition_visible'] = True
+            except Exception:
+                pass
+            try:
+                labels = self.browser.find_elements(*ExploreEphysLocators.DV_SWEEP_LABELS)
+                results['sweep_visible'] = len(labels) > 0
+            except Exception:
+                pass
+            try:
+                plots = self.browser.find_elements(By.CSS_SELECTOR, "div.js-plotly-plot")
+                results['plots_visible'] = any(p.is_displayed() for p in plots)
+            except Exception:
+                pass
+
+        except TimeoutException:
+            self.logger.warning("Reset button not found")
+
+        return results
+
+    def toggle_unit_to_na_and_verify(self):
+        """Click the nA unit toggle and verify the Y-axis values change.
+        Returns dict: {'toggled': bool, 'values_changed': bool, 'before': list, 'after': list}.
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+        results = {'toggled': False, 'values_changed': False, 'before': [], 'after': []}
+
+        try:
+            # Capture Y-axis tick values before toggle
+            yticks_before = self.browser.find_elements(*ExploreEphysLocators.DV_PLOT_YTICK_VALUES)
+            results['before'] = [t.text.strip() for t in yticks_before if t.text.strip()]
+            self.logger.info(f"Y-axis values before nA toggle: {results['before']}")
+
+            # Click nA radio button label
+            na_btn = self.find_element(ExploreEphysLocators.DV_UNIT_TOGGLE_NA, timeout=10)
+            # Click the parent label wrapper to trigger the radio change
+            na_label = na_btn.find_element(By.XPATH, "./ancestor::label")
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", na_label)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(na_label).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", na_label)
+            results['toggled'] = True
+            self.logger.info("Clicked nA unit toggle")
+            time.sleep(2)
+
+            # Capture Y-axis tick values after toggle
+            yticks_after = self.browser.find_elements(*ExploreEphysLocators.DV_PLOT_YTICK_VALUES)
+            results['after'] = [t.text.strip() for t in yticks_after if t.text.strip()]
+            self.logger.info(f"Y-axis values after nA toggle: {results['after']}")
+
+            # Values should be different after toggling units
+            results['values_changed'] = results['before'] != results['after']
+            if results['values_changed']:
+                self.logger.info("Y-axis values changed after nA toggle")
+            else:
+                self.logger.warning("Y-axis values did NOT change after nA toggle")
+
+        except TimeoutException:
+            self.logger.warning("nA toggle button not found")
+        except Exception as e:
+            self.logger.warning(f"Error toggling nA unit: {e}")
+
+        return results
+
     def test_stimulus_selector(self):
         """Test stimulus selector functionality"""
         try:
