@@ -136,21 +136,12 @@ class TestExploreEphys:
             logger.info("Opened filter panel")
             time.sleep(2)
             
-            species_applied = explore_ephys_page.apply_species_filter("Rattus norvegicus")
-            if species_applied:
-                logger.info("✅ Species filter applied successfully")
+            species_label_present = explore_ephys_page.apply_species_filter("Rattus norvegicus")
+            if species_label_present:
+                logger.info("✅ Species filter label is displayed")
+            else:
+                logger.warning("⚠️ Species filter label not found")
 
-            filters_applied = explore_ephys_page.apply_filters()
-            if filters_applied:
-                logger.info("✅ Filters applied successfully")
-                
-                time.sleep(3)  # Wait for results to load
-                results_verified = explore_ephys_page.verify_filtered_results("Mus musculus", "species")
-                if results_verified:
-                    logger.info("✅ Filtered results verified")
-                else:
-                    logger.warning("⚠️ Could not verify filtered results")
-            
             explore_ephys_page.close_filter_panel()
             time.sleep(1)
             
@@ -242,8 +233,8 @@ class TestExploreEphys:
                 pass
 
         logger.info("🔍 Testing mini-detail view...")
-        lv_row1 = explore_ephys_page.lv_row1().click()
-        logger.info("Clicked on row 1 to open mini-detail view.")
+        row_text = explore_ephys_page.click_random_row_with_pagination()
+        logger.info(f"Clicked random row: '{row_text}'")
         time.sleep(2)  # Wait for mini-detail view to load
         
         try:
@@ -314,7 +305,7 @@ class TestExploreEphys:
         logger.info("Verifying main detail view fields...")
         main_field_results = explore_ephys_page.verify_detail_view_main_fields()
         
-        required_fields = ['Name', 'Registered by', 'Registration date', 'Brain Region']
+        required_fields = ['Name', 'Created by', 'Registration date', 'Brain Region']
         for field in required_fields:
             if main_field_results.get(field, {}).get('has_value'):
                 logger.info(f"✅ Required field '{field}' has value")
@@ -421,6 +412,34 @@ class TestExploreEphys:
             logger.info("✅ Repetition selector is present")
         if controls.get('sweep_selector'):
             logger.info("✅ Sweep selector is present")
+        
+        logger.info("🔍 Testing sweep selector...")
+        sweep_result = explore_ephys_page.click_sweep_color_and_verify()
+        if sweep_result.get('clicked'):
+            logger.info(f"✅ Clicked sweep: '{sweep_result['sweep_value']}', plot visible: {sweep_result['plot_visible']}")
+        else:
+            logger.warning("⚠️ Could not click sweep color")
+
+        logger.info("🔍 Clicking Reset button...")
+        reset_result = explore_ephys_page.click_reset_and_verify()
+        if reset_result.get('reset_clicked'):
+            logger.info(f"✅ Reset clicked — Protocol: {reset_result['protocol_visible']}, "
+                        f"Repetition: {reset_result['repetition_visible']}, "
+                        f"Sweep: {reset_result['sweep_visible']}, "
+                        f"Plots: {reset_result['plots_visible']}")
+        else:
+            logger.warning("⚠️ Reset button not found")
+
+        logger.info("🔍 Testing nA unit toggle on plot...")
+        na_result = explore_ephys_page.toggle_unit_to_na_and_verify()
+        if na_result.get('toggled'):
+            logger.info("✅ nA toggle button clicked")
+            if na_result.get('values_changed'):
+                logger.info(f"✅ Y-axis values changed: {na_result['before'][:3]} → {na_result['after'][:3]}")
+            else:
+                logger.warning("⚠️ Y-axis values did not change after nA toggle")
+        else:
+            logger.warning("⚠️ nA toggle button not found")
         
         logger.info("🔍 Switching back to Overview tab...")
         explore_ephys_page.click_overview_tab()

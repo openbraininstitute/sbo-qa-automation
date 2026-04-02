@@ -39,10 +39,14 @@ class TestAIAssistantWorkflow:
         print("🤖 Waiting for AI to complete response...")
         logger.info("Waiting for AI to complete response...")
         ai_assistant_page.wait_for_ai_response()
-        print("✅ AI response completed, attempting to clear chat...")
-        logger.info("AI response completed, attempting to clear chat...")
+        print("✅ AI response completed, attempting to delete oldest thread...")
+        logger.info("AI response completed, attempting to delete oldest thread...")
         
-        ai_assistant_page.clear_chat()
+        deleted = ai_assistant_page.delete_oldest_history_thread()
+        if deleted:
+            logger.info("✅ Deleted oldest history thread")
+        else:
+            logger.warning("⚠️ Could not delete history thread, continuing...")
         
         try:
             updated_suggested_questions = ai_assistant_page.find_suggested_questions()

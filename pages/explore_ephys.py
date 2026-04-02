@@ -190,51 +190,18 @@ class ExploreElectrophysiologyPage(ExplorePage):
             return f"{len(rows)} rows found"
 
     def apply_species_filter(self, species_name):
-        """Apply filter by species using checkbox selection"""
+        """Verify the Species filter label is displayed in the filter panel.
+        The Species filter is no longer an expandable accordion — just verify the label exists.
+        """
         try:
-            # First, ensure the Species filter section is expanded
-            species_filter = self.find_element(ExploreEphysLocators.FILTER_SPECIES_BUTTON, timeout=10)
-            
-            # Scroll element into view and wait a bit
-            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", species_filter)
-            time.sleep(1)
-            
-            # Check if the species section is already expanded by looking for the species name
-            try:
-                species_text = self.find_element((By.XPATH, f"//span[@class='font-bold text-white' and text()='{species_name}']"), timeout=2)
-                self.logger.info(f"Species section already expanded, found '{species_name}'")
-            except TimeoutException:
-                # Need to expand the species section
-                try:
-                    species_filter.click()
-                except Exception as e:
-                    self.logger.warning(f"Regular click failed, using JavaScript click: {e}")
-                    self.browser.execute_script("arguments[0].click();", species_filter)
-                
-                self.logger.info("Clicked Species filter to expand")
-                time.sleep(1)
-            
-            species_checkbox_xpath = f"//span[@class='font-bold text-white' and text()='{species_name}']/ancestor::div[@class='flex items-center justify-between pt-3']//button[@role='checkbox']"
-            species_checkbox = self.find_element((By.XPATH, species_checkbox_xpath), timeout=5)
-            
-            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", species_checkbox)
+            species_label = self.find_element(ExploreEphysLocators.FILTER_SPECIES_BUTTON, timeout=10)
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", species_label)
             time.sleep(0.5)
-            
-            try:
-                species_checkbox.click()
-            except Exception as e:
-                self.logger.warning(f"Regular click failed on checkbox, using JavaScript click: {e}")
-                self.browser.execute_script("arguments[0].click();", species_checkbox)
-            
-            self.logger.info(f"Selected species checkbox: {species_name}")
-            time.sleep(1)
-            
-            return True
-        except TimeoutException as e:
-            self.logger.warning(f"Species filter not found or not accessible: {e}")
-            return False
-        except Exception as e:
-            self.logger.warning(f"Error applying species filter: {e}")
+            is_displayed = species_label.is_displayed()
+            self.logger.info(f"Species filter label displayed: {is_displayed}, text: '{species_label.text.strip()}'")
+            return is_displayed
+        except TimeoutException:
+            self.logger.warning("Species filter label not found in filter panel")
             return False
 
     def apply_contributor_filter(self, contributor_name):
@@ -609,6 +576,54 @@ class ExploreElectrophysiologyPage(ExplorePage):
 
     def lv_row1(self):
         return self.find_element(ExploreEphysLocators.LV_ROW1)
+
+    def click_random_row_with_pagination(self):
+        """Navigate to a random page (if pagination exists) and click a random row.
+        Returns the row text for logging.
+        """
+        import random
+        from selenium.webdriver.common.action_chains import ActionChains
+
+        # Check if pagination exists and pick a random page
+        try:
+            pages = self.browser.find_elements(*ExploreEphysLocators.PAGINATION_PAGES)
+            if len(pages) > 1:
+                target_page = random.choice(pages)
+                page_num = target_page.get_attribute("title") or target_page.text.strip()
+                # Skip if already on this page
+                if 'ant-pagination-item-active' not in (target_page.get_attribute("class") or ""):
+                    self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", target_page)
+                    time.sleep(0.5)
+                    target_page.click()
+                    self.logger.info(f"Navigated to page {page_num}")
+                    time.sleep(3)
+                else:
+                    self.logger.info(f"Already on page {page_num}")
+        except Exception as e:
+            self.logger.info(f"No pagination or single page: {e}")
+
+        # Click a random row from the current page
+        try:
+            rows = self.find_all_elements(ExploreEphysLocators.TABLE_ROWS, timeout=10)
+            if not rows:
+                self.logger.warning("No table rows found, falling back to lv_row1")
+                return self.lv_row1().click()
+
+            row = random.choice(rows[:min(10, len(rows))])
+            row_text = row.text.split('\n')[0][:60]
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(row).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", row)
+            self.logger.info(f"Clicked random row: '{row_text}...'")
+            time.sleep(2)
+            return row_text
+        except Exception as e:
+            self.logger.warning(f"Failed to click random row: {e}, falling back to row 1")
+            self.lv_row1().click()
+            return "row 1 (fallback)"
 
     def lv_total_results(self):
         return self.find_element(ExploreEphysLocators.LV_TOTAL_RESULTS)
@@ -1080,13 +1095,45 @@ class ExploreElectrophysiologyPage(ExplorePage):
         time.sleep(1)
         return True
 
-    def find_overview_plots(self, timeout=10):
-        """Find all plots in Overview tab"""
+    def find_overview_plots(self, timeout=30):
+        """Find all plots in Overview tab. Scrolls containers to trigger lazy loading."""
+        # Try scrolling various containers to trigger lazy-loaded plots
         try:
+            # Scroll the main content area and any scrollable parent
+            scrollable = self.browser.find_elements(By.CSS_SELECTOR,
+                "div[class*='overflow-y-auto'], div[class*='overflow-auto']")
+            for container in scrollable[:3]:
+                self.browser.execute_script(
+                    "arguments[0].scrollTop = arguments[0].scrollHeight / 3;", container)
+            time.sleep(2)
+            for container in scrollable[:3]:
+                self.browser.execute_script("arguments[0].scrollTop = 0;", container)
+            time.sleep(1)
+        except Exception:
+            pass
+
+        try:
+            # Primary: plotly container
+            plots = self.browser.find_elements(By.CSS_SELECTOR, "div.plot-container.plotly")
+            if plots:
+                visible = [p for p in plots if p.is_displayed()]
+                self.logger.info(f"Found {len(visible)} visible overview plots (plotly)")
+                return visible if visible else plots
+
+            # Fallback: js-plotly-plot
+            plots = self.browser.find_elements(By.CSS_SELECTOR, "div.js-plotly-plot")
+            if plots:
+                self.logger.info(f"Found {len(plots)} overview plots (js-plotly-plot)")
+                return plots
+
+            # Fallback: SVG main-svg (plotly renders SVGs)
+            plots = self.browser.find_elements(By.CSS_SELECTOR, "svg.main-svg")
+            if plots:
+                self.logger.info(f"Found {len(plots)} overview plots (svg.main-svg)")
+                return plots
+
+            # Last resort: wait with explicit wait
             plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOTS, timeout=timeout)
-            if not plots:
-                # Fallback to plot images
-                plots = self.find_all_elements(ExploreEphysLocators.DV_OVERVIEW_PLOT_IMAGES, timeout=timeout)
             return plots
         except TimeoutException:
             self.logger.warning("No overview plots found")
@@ -1171,6 +1218,138 @@ class ExploreElectrophysiologyPage(ExplorePage):
         except TimeoutException:
             results['sweep_selector'] = False
         
+        return results
+
+
+
+    def click_sweep_color_and_verify(self):
+        """Click a random unselected sweep color checkbox and verify the plot updates.
+        Returns dict: {'clicked': bool, 'sweep_value': str, 'plot_visible': bool}.
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+        results = {'clicked': False, 'sweep_value': '', 'plot_visible': False}
+
+        try:
+            labels = self.browser.find_elements(*ExploreEphysLocators.DV_SWEEP_LABELS)
+            if not labels:
+                self.logger.warning("No sweep color labels found")
+                return results
+
+            # Pick a random unselected one
+            import random
+            unselected = [l for l in labels if 'selected' not in (l.find_element(By.XPATH, "..").get_attribute("class") or "")]
+            target = random.choice(unselected) if unselected else random.choice(labels)
+
+            bg_color = target.get_attribute("style") or ""
+            sweep_input = target.find_element(By.CSS_SELECTOR, "input")
+            results['sweep_value'] = sweep_input.get_attribute("value") or ""
+
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", target)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(target).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", target)
+            results['clicked'] = True
+            self.logger.info(f"Clicked sweep: '{results['sweep_value']}', color: {bg_color[:40]}")
+            time.sleep(2)
+
+            # Verify plot area is still visible
+            try:
+                plot = self.browser.find_element(By.CSS_SELECTOR, "rect.nsewdrag")
+                results['plot_visible'] = plot.is_displayed()
+            except Exception:
+                pass
+
+        except Exception as e:
+            self.logger.warning(f"Error clicking sweep: {e}")
+
+        return results
+
+    def click_reset_and_verify(self):
+        """Click the Reset button and verify Protocol/Repetition/Sweep controls reappear.
+        Returns dict: {'reset_clicked': bool, 'protocol_visible': bool, 'repetition_visible': bool, 'sweep_visible': bool, 'plots_visible': bool}.
+        """
+        results = {'reset_clicked': False, 'protocol_visible': False, 'repetition_visible': False, 'sweep_visible': False, 'plots_visible': False}
+
+        try:
+            reset_btn = self.element_to_be_clickable(ExploreEphysLocators.DV_RESET_BUTTON, timeout=10)
+            reset_btn.click()
+            results['reset_clicked'] = True
+            self.logger.info("Clicked Reset button")
+            time.sleep(3)
+
+            # Verify controls reappear
+            try:
+                self.find_element(ExploreEphysLocators.DV_PROTOCOL_DROPDOWN, timeout=5)
+                results['protocol_visible'] = True
+            except Exception:
+                pass
+            try:
+                self.find_element(ExploreEphysLocators.DV_REPETITION_DROPDOWN, timeout=5)
+                results['repetition_visible'] = True
+            except Exception:
+                pass
+            try:
+                labels = self.browser.find_elements(*ExploreEphysLocators.DV_SWEEP_LABELS)
+                results['sweep_visible'] = len(labels) > 0
+            except Exception:
+                pass
+            try:
+                plots = self.browser.find_elements(By.CSS_SELECTOR, "div.js-plotly-plot")
+                results['plots_visible'] = any(p.is_displayed() for p in plots)
+            except Exception:
+                pass
+
+        except TimeoutException:
+            self.logger.warning("Reset button not found")
+
+        return results
+
+    def toggle_unit_to_na_and_verify(self):
+        """Click the nA unit toggle and verify the Y-axis values change.
+        Returns dict: {'toggled': bool, 'values_changed': bool, 'before': list, 'after': list}.
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+        results = {'toggled': False, 'values_changed': False, 'before': [], 'after': []}
+
+        try:
+            # Capture Y-axis tick values before toggle
+            yticks_before = self.browser.find_elements(*ExploreEphysLocators.DV_PLOT_YTICK_VALUES)
+            results['before'] = [t.text.strip() for t in yticks_before if t.text.strip()]
+            self.logger.info(f"Y-axis values before nA toggle: {results['before']}")
+
+            # Click nA radio button label
+            na_btn = self.find_element(ExploreEphysLocators.DV_UNIT_TOGGLE_NA, timeout=10)
+            # Click the parent label wrapper to trigger the radio change
+            na_label = na_btn.find_element(By.XPATH, "./ancestor::label")
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", na_label)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(na_label).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", na_label)
+            results['toggled'] = True
+            self.logger.info("Clicked nA unit toggle")
+            time.sleep(2)
+
+            # Capture Y-axis tick values after toggle
+            yticks_after = self.browser.find_elements(*ExploreEphysLocators.DV_PLOT_YTICK_VALUES)
+            results['after'] = [t.text.strip() for t in yticks_after if t.text.strip()]
+            self.logger.info(f"Y-axis values after nA toggle: {results['after']}")
+
+            # Values should be different after toggling units
+            results['values_changed'] = results['before'] != results['after']
+            if results['values_changed']:
+                self.logger.info("Y-axis values changed after nA toggle")
+            else:
+                self.logger.warning("Y-axis values did NOT change after nA toggle")
+
+        except TimeoutException:
+            self.logger.warning("nA toggle button not found")
+        except Exception as e:
+            self.logger.warning(f"Error toggling nA unit: {e}")
+
         return results
 
     def test_stimulus_selector(self):

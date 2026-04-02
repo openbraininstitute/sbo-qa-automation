@@ -157,8 +157,8 @@ class ExploreEphysLocators:
     DV_INTERACTIVE_DETAILS_TAB_ACTIVE = (By.XPATH, "//label[contains(@class, 'ant-radio-button-wrapper-checked')]//span[contains(text(), 'Interactive Details')]")
     
     # Overview plots
-    DV_OVERVIEW_PLOTS = (By.XPATH, "//div[@class='plot-container plotly']")
-    DV_OVERVIEW_PLOT_IMAGES = (By.XPATH, "//div[@class='flex flex-col gap-10']//div[contains(@class, 'aspect-4/3')]")
+    DV_OVERVIEW_PLOTS = (By.CSS_SELECTOR, "div.plot-container.plotly")
+    DV_OVERVIEW_PLOT_IMAGES = (By.CSS_SELECTOR, "div.js-plotly-plot")
     
     # Interactive Details plots and controls
     DV_INTERACTIVE_PLOTS = (By.XPATH, "//div[@class='plot-container plotly']")
@@ -173,7 +173,7 @@ class ExploreEphysLocators:
     DV_PLOT_ZOOM_BUTTON = (By.CSS_SELECTOR, "[data-title='Zoom']")
     DV_PLOT_PAN_BUTTON = (By.CSS_SELECTOR, "[data-title='Pan']")
     DV_PLOT_RESET_BUTTON = (By.CSS_SELECTOR, "[data-title='Reset axes']")
-    DV_PLOT_DOWNLOAD_BUTTON = (By.CSS_SELECTOR, "[data-title='Download plot as a png']")
+    DV_PLOT_DOWNLOAD_BUTTON = (By.CSS_SELECTOR, "[data-title='Download plot as a PNG']")
     DV_AGE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Age']")
     DV_BRAIN_REG_TITLE = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Brain Region']")
     DV_BR_REG = (By.XPATH, "//div[@class='text-neutral-4 uppercase' and text()='Brain Region']/following-sibling::div[@class='mt-2 break-words']")
@@ -232,3 +232,29 @@ class ExploreEphysLocators:
     SEARCH_INPUT_FIELD = (By.XPATH, "button[aria-label='Open search']")
     TABLE = (By.XPATH, "//tbody[@class='ant-table-tbody']")
     # TABLE_CELLS = (By.CSS_SELECTOR, "tbody.ant-table-tbody td.ant-table-cell.text-primary-7.cursor-pointer.ant-table-cell-ellipsis")
+
+    """Pagination."""
+    PAGINATION = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination']")
+    PAGINATION_PAGES = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-item")
+    PAGINATION_ACTIVE_PAGE = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-item-active")
+    PAGINATION_NEXT = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-next button")
+    PAGINATION_PREV = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-prev button")
+
+    """Table rows (clickable cells)."""
+    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
+
+    """Unit toggle (nA/pA) radio buttons on interactive detail plots."""
+    DV_UNIT_TOGGLE_NA = (By.XPATH, "//label[contains(@class,'ant-radio-button-wrapper')]//span[text()='nA']")
+    DV_UNIT_TOGGLE_PA = (By.XPATH, "//label[contains(@class,'ant-radio-button-wrapper')]//span[text()='pA']")
+    DV_PLOT_YTITLE = (By.CSS_SELECTOR, "g.g-ytitle text.ytitle")
+    DV_PLOT_YTICK_VALUES = (By.CSS_SELECTOR, "g.yaxislayer-above g.ytick text")
+
+    """Sweep selector: colored checkboxes and Reset button."""
+    DV_SWEEP_CHECKBOXES = (By.CSS_SELECTOR, "input#sweepInput")
+    DV_SWEEP_LABELS = (By.XPATH, "//input[@id='sweepInput']/ancestor::label")
+    DV_SWEEP_SELECTED = (By.XPATH, "//div[contains(@class,'sweep-selector-module') and contains(@class,'selected')]//label")
+    DV_RESET_BUTTON = (By.XPATH, "//button[.//span[text()='Reset']]")
+
+    """Protocol and Repetition dropdowns."""
+    DV_PROTOCOL_DROPDOWN = (By.XPATH, "//label[text()='Protocol' or contains(text(),'Protocol')]/following-sibling::div[contains(@class,'ant-select')]")
+    DV_REPETITION_DROPDOWN = (By.XPATH, "//label[text()='Repetition' or contains(text(),'Repetition')]/following-sibling::div[contains(@class,'ant-select')]")

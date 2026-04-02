@@ -357,6 +357,96 @@ class AIAssistantPage(ProjectHome):
         
         raise NoSuchElementException("Clear chat button not found")
     
+
+    def delete_oldest_history_thread(self, timeout=10):
+        """Navigate to History tab, scroll to bottom, delete the oldest thread, confirm.
+        Returns True if a thread was deleted, False otherwise.
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+
+        # Click History tab button (in the nav bar)
+        self.logger.info("Opening History tab to delete oldest thread...")
+        history_clicked = False
+        for loc in [AIAssistantLocators.HISTORY_BUTTON, AIAssistantLocators.HISTORY_BUTTON_ALT]:
+            try:
+                btn = self.element_to_be_clickable(loc, timeout=5)
+                btn.click()
+                history_clicked = True
+                self.logger.info("Clicked History tab")
+                time.sleep(2)
+                break
+            except TimeoutException:
+                continue
+
+        if not history_clicked:
+            self.logger.warning("History tab not found")
+            return False
+
+        # Scroll the history content to the bottom to find oldest threads
+        try:
+            content_div = self.browser.find_element(By.CSS_SELECTOR, "div[class*='history']")
+            self.browser.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight;", content_div)
+            time.sleep(1)
+        except Exception:
+            pass
+
+        # Click "Load more" if available to reveal older threads
+        try:
+            load_more = self.browser.find_element(*AIAssistantLocators.HISTORY_LOAD_MORE_BTN)
+            if load_more.is_displayed():
+                load_more.click()
+                self.logger.info("Clicked 'Load more' to reveal older threads")
+                time.sleep(2)
+        except Exception:
+            pass
+
+        # Find all delete buttons and click the last one (oldest)
+        try:
+            delete_btns = self.browser.find_elements(*AIAssistantLocators.HISTORY_DELETE_BUTTONS_ALL)
+            if not delete_btns:
+                self.logger.warning("No delete buttons found in history")
+                return False
+
+            oldest_btn = delete_btns[-1]
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", oldest_btn)
+            time.sleep(0.5)
+            try:
+                ActionChains(self.browser).move_to_element(oldest_btn).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", oldest_btn)
+            self.logger.info(f"Clicked delete on oldest thread ({len(delete_btns)} threads total)")
+            time.sleep(1)
+
+            # Confirm the deletion in the dialog
+            try:
+                confirm_btn = self.element_to_be_clickable(AIAssistantLocators.HISTORY_DELETE_CONFIRM_BTN, timeout=5)
+                confirm_btn.click()
+                self.logger.info("Confirmed thread deletion")
+                time.sleep(2)
+            except TimeoutException:
+                self.logger.warning("Delete confirmation dialog not found")
+
+            # Switch back to Chat tab after deleting
+            try:
+                new_chat_btn = self.element_to_be_clickable(AIAssistantLocators.NEW_CHAT_BUTTON, timeout=5)
+                new_chat_btn.click()
+                self.logger.info("Clicked 'New Chat' to return to chat view")
+                time.sleep(2)
+            except TimeoutException:
+                try:
+                    chat_btn = self.element_to_be_clickable(AIAssistantLocators.CHAT_TAB_BUTTON, timeout=5)
+                    chat_btn.click()
+                    self.logger.info("Clicked Chat tab to return to chat view")
+                    time.sleep(2)
+                except TimeoutException:
+                    self.logger.warning("Could not switch back to Chat tab")
+
+            return True
+
+        except Exception as e:
+            self.logger.warning(f"Error deleting history thread: {e}")
+            return False
+
     def clear_chat(self, timeout=15):
         """Clear the chat conversation."""
         self.logger.info("Attempting to clear chat...")
