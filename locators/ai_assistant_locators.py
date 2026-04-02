@@ -8,7 +8,7 @@ class AIAssistantLocators:
     """Locators for AI Assistant panel elements."""
     
     # AI Assistant Panel Button (to open/close panel)
-    AI_PANEL_BUTTON = (By.CSS_SELECTOR, "[data-testid*='ai'], [data-testid*='assistant'], [aria-label*='AI'], [aria-label*='Assistant']")
+    AI_PANEL_BUTTON = (By.CSS_SELECTOR, "#workspace-ai button[aria-label='expand AI assistant']")
     AI_PANEL_BUTTON_ALT = (By.XPATH, "//button[contains(text(), 'AI') or contains(text(), 'Assistant')]")
     AI_PANEL_BUTTON_CLASS = (By.CSS_SELECTOR, "button[class*='ai'], button[class*='assistant'], .ai-button, .assistant-button")
     
@@ -23,13 +23,13 @@ class AIAssistantLocators:
     
     # AI Loading/Spinner Elements
     AI_SPINNER = (By.CSS_SELECTOR, ".spinner-module__ahu-LG__spinner")
-    AI_LOADING_INDICATOR = (By.CSS_SELECTOR, "[class*='spinner'], [class*='loading']")
+    AI_LOADING_INDICATOR = (By.CSS_SELECTOR, "div[class*='waveLoader']")
     
     # Cancel Button (appears during AI response generation)
-    CANCEL_BUTTON = (By.CSS_SELECTOR, ".footer-module__PQmqnW__cancelButton button")
+    CANCEL_BUTTON = (By.XPATH, "//div[contains(@class,'cancelButton')]//button")
     CANCEL_BUTTON_ALT = (By.XPATH, "//div[contains(@class, 'cancelButton')]//button[text()='Cancel']")
     CANCEL_BUTTON_GENERIC = (By.XPATH, "//button[text()='Cancel' or text()='Stop']")
-    CANCEL_BUTTON_CONTAINER = (By.CSS_SELECTOR, ".footer-module__PQmqnW__cancelButton")
+    CANCEL_BUTTON_CONTAINER = (By.XPATH, "//div[contains(@class,'cancelButton')]")
     
     # Clear/Reset Chat Button
     CLEAR_CHAT_BUTTON = (By.CSS_SELECTOR, "button.chat-module__71EZLa__actionButton")
@@ -40,7 +40,7 @@ class AIAssistantLocators:
     CLEAR_CHAT_BUTTON_GENERIC = (By.XPATH, "//button[contains(text(), 'Clear') or contains(text(), 'Reset') or contains(text(), 'New')]")
     
     # History Button
-    HISTORY_BUTTON = (By.XPATH, "//button//svg//title[text()='History']")
+    HISTORY_BUTTON = (By.XPATH, "//nav//button[.//svg//title[text()='History']]")
     HISTORY_BUTTON_ALT = (By.XPATH, "//button//div[text()='History']")
     HISTORY_BUTTON_SVG = (By.XPATH, "//button[contains(@class, '') and .//svg//title[text()='History']]")
     HISTORY_BUTTON_FALLBACK = (By.CSS_SELECTOR, "[data-testid*='history'], [aria-label*='history'], .history-button, .history")
@@ -60,8 +60,13 @@ class AIAssistantLocators:
     HISTORY_THREAD_BUTTON = (By.CSS_SELECTOR, ".history-module__qIgbEa__mainButton")
     HISTORY_THREAD_BUTTON_ALT = (By.XPATH, "//button[contains(@class, 'mainButton')]")
     HISTORY_EDIT_BUTTON = (By.XPATH, "//button//svg//title[text()='Edit']")
+    HISTORY_DELETE_BUTTON = (By.XPATH, "//button[contains(@class,'delete')]//svg//title[text()='Delete']/ancestor::button")
+    HISTORY_DELETE_BUTTONS_ALL = (By.XPATH, "//button[contains(@class,'delete') and .//svg//title[text()='Delete']]")
+    HISTORY_DELETE_CONFIRM_BTN = (By.XPATH, "//dialog[contains(@class,'dialogDelete')]//button[.//span[text()='Confirm']]")
+    HISTORY_DELETE_CANCEL_BTN = (By.XPATH, "//dialog[contains(@class,'dialogDelete')]//button[.//span[text()='Cancel']]")
+    HISTORY_LOAD_MORE_BTN = (By.XPATH, "//button[.//div[text()='Load more']]")
     
     # AI Panel Container
-    AI_PANEL_CONTAINER = (By.CSS_SELECTOR, "[data-testid*='ai-panel'], [data-testid*='assistant-panel'], .ai-panel, .assistant-panel")
-    AI_PANEL_CONTAINER_ALT = (By.XPATH, "//div[contains(@class, 'panel') and (contains(@class, 'ai') or contains(@class, 'assistant'))]")
-    AI_PANEL_OPEN = (By.XPATH, "//div[contains(@class, 'panel') and contains(@class, 'open')]")
+    AI_PANEL_CONTAINER = (By.CSS_SELECTOR, "#workspace-ai")
+    AI_PANEL_CONTAINER_ALT = (By.CSS_SELECTOR, "div[class*='aiPanel']")
+    AI_PANEL_OPEN = (By.XPATH, "//div[@id='workspace-ai' and not(contains(@class,'rounded-full'))]")
