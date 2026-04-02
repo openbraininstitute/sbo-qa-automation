@@ -1,0 +1,41 @@
+Page: ExploreEphys
+Entry: Explore → Data → Electrical Cell Recording
+URL: /data/browse/entity/electrical-cell-recording
+
+Steps:
+1. Navigate to explore electrophysiology page, verify URL contains /data/browse/entity/electrical-cell-recording
+2. Verify data type selector is displayed, Experimental tab is selected by default, "Single cell electrophysiology" text is shown
+3. Verify explore section grid/table view is displayed
+4. Verify column headers present: Preview, Brain region, E-type, Name, Species, Contributors, Registration date
+5. Verify Public tab is selected by default
+6. Search for "0" in the search field, verify results returned, clear search
+7. Verify thumbnails are present and displayed in the table
+8. Open filter panel, verify "Species" label is displayed, close filter panel
+9. Click "Select all" checkbox → all checkboxes ticked, click again → all unchecked
+10. Find individual checkboxes, click any unchecked ones
+11. Open filter panel, expand E-type filter, search "bNAC", apply filter
+12. Verify filtered results contain "bNAC" in E-type column, log total results count
+13. Close filter panel
+14. Navigate to a random page (if pagination exists), click a random row
+15. Verify mini-detail view appears with fields: name, description, image, brain_region, etype, species, license
+16. Verify mini-detail view buttons: copy, download, view_details (present and clickable)
+17. Click "View Details" button → navigate to full detail view
+18. Verify breadcrumbs are present and clickable
+19. Verify tabs: Overview (active by default), Interactive Details
+20. Verify action buttons are present and clickable
+21. Verify main detail view fields (required): Name, Created by, Registration date, Brain Region
+22. Verify optional fields: Description, Contributors, Institutional Contributors, E-Type
+23. Verify License link (present, clickable if available)
+24. Verify Subject section with fields: Name, Description, Species, Strain, Sex, Weight, Age, Age min, Age max, Age period
+25. Verify Overview tab plots are displayed (plotly containers)
+26. Verify plot interaction controls: modebar with zoom, pan, reset, download
+27. Switch to Interactive Details tab, verify it becomes active
+28. Verify interactive plots are displayed
+29. Verify interactive controls: stimulus selector, repetition selector, sweep selector
+30. Test stimulus selector functionality (change selection)
+31. Click a random sweep color checkbox, verify the plot shows that color's trace
+32. Click Reset button, verify Protocol/Repetition/Sweep controls and plots reappear
+33. Click nA unit toggle (radio button), verify Y-axis values change (pA → nA conversion)
+34. Switch back to Overview tab, verify it becomes active again
+
+Timeout: plots 30s, page load 60s

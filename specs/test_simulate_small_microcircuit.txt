@@ -1,0 +1,52 @@
+Page: SimulateSmallMicrocircuit
+Entry: Workflows → Simulate → Small microcircuit (beta) card
+URL: /workflows/simulate/new/small-micro-circuit-simulation
+
+Steps:
+1. Navigate to Workflows page with simulate activity filter
+2. Click Simulate category → Small microcircuit (beta) card
+3. Model picker: click Public tab, verify table has rows
+4. Verify column headers: Name, Description, Brain region, Species, Number of neurons, Number of synapses, Number of connections, Created by, Registration date
+5. Verify pagination is present (2+ pages), navigate to a random page
+6. Click random row
+7. Mini-detail: verify title, description present, click "Use model"
+8. Config page: wait for layout, verify Configuration tab active, Simulations tab greyed out
+9. Verify circuit preview image is displayed (right column, not 3D morphology)
+10. Info tab (active by default): verify warning icon present (fields empty)
+11. Fill Campaign Name with datetime, Campaign Description with "automated test of small microcircuit"
+12. Verify warning icon disappears after filling required fields
+13. Click Initialization tab, verify it becomes active
+14. Verify middle column shows "Initialization" block with all fields:
+    - Circuit (disabled, shows UUID + circuit name)
+    - Duration (1000 ms, has plus-circle for sweep)
+    - Extracellular Calcium Concentration (1.1 mM, has plus-circle)
+    - Initial Voltage (-80 mV, has plus-circle)
+    - Random Seed (1, has plus-circle)
+    - Neuron Set (dropdown, "Default: All Biophysical Neurons")
+15. Click Stimuli tab (under Stimuli & Recordings), verify active
+16. Click "Add Stimulus" button in the sub-entry
+29. Verify dictionary items appear in middle column (14+ enabled, 3 disabled)
+30. Click a random enabled stimulus item (skip disabled: cursor-not-allowed)
+27. Verify block_single form appears with stimulus config fields
+28. Click Recordings tab, verify active
+29. Click Neuron sets tab (under Circuit Components), verify active
+30. Click Synaptic manipulations tab (under Manipulations), verify active
+27. Click Timestamps tab (under Events), verify active
+28. Verify "Generate simulation(s)" button becomes enabled
+29. Click "Generate simulation(s)"
+30. Wait for Simulations tab to become active
+27. Verify simulation cards present (at least 1)
+28. Verify input files in middle column, click each to see preview
+29. Click "Launch simulations"
+30. Poll simulation card statuses until terminal state (300s timeout)
+
+Table columns: Name, Description, Brain region, Species, Number of neurons, Number of synapses, Number of connections, Created by, Registration date
+Config tabs (left menu, beta-style with data-scan-config-menu):
+  Setup: Info (warning when empty), Initialization (green check when valid)
+  Stimuli & Recordings: Stimuli, Recordings
+  Circuit Components: Neuron sets
+  Manipulations: Synaptic manipulations
+  Events: Timestamps
+Layout: beta-style config page, circuit preview image (not 3D morphology)
+Timeout: simulation 300s, page load 60s
+Exclude rows: none
