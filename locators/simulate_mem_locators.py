@@ -90,7 +90,7 @@ class SimulateMemLocators:
     )
     FORM_REGISTERED_BY = (
         By.XPATH,
-        "//span[contains(translate(text(),'CREATED BY','created by'),'created by')]/ancestor::div[1]/following-sibling::div"
+        "//span[contains(translate(text(),'REGISTERED BY','registered by'),'registered by') or contains(translate(text(),'CREATED BY','created by'),'created by')]/ancestor::div[1]/following-sibling::div"
     )
     FORM_REGISTERED_AT = (
         By.XPATH,
