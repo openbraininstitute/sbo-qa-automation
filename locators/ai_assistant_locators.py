@@ -13,9 +13,9 @@ class AIAssistantLocators:
     AI_PANEL_BUTTON_CLASS = (By.CSS_SELECTOR, "button[class*='ai'], button[class*='assistant'], .ai-button, .assistant-button")
     
     # Suggested Questions
-    SUGGESTED_QUESTIONS = (By.CSS_SELECTOR, "[data-testid*='suggestion'], [data-testid*='question'], .suggestion, .suggested-question, .ai-suggestion")
-    SUGGESTED_QUESTIONS_ALT = (By.XPATH, "//button[contains(@class, 'suggestion')] | //div[contains(@class, 'suggestion')]//button")
-    SUGGESTED_QUESTIONS_FALLBACK = (By.XPATH, "//div[contains(@class, 'ai') or contains(@class, 'assistant')]//button[contains(text(), '?') or contains(@class, 'suggestion') or contains(@class, 'question')]")
+    SUGGESTED_QUESTIONS = (By.XPATH, "//div[@id='workspace-ai']//button[.//div[string-length(text()) > 15]]")
+    SUGGESTED_QUESTIONS_ALT = (By.XPATH, "//div[@id='workspace-ai']//button[.//svg and .//div]")
+    SUGGESTED_QUESTIONS_FALLBACK = (By.CSS_SELECTOR, "#workspace-ai div[class*='content'] button")
     
     # AI Response Elements
     AI_RESPONSE = (By.CSS_SELECTOR, "[data-testid*='response'], [data-testid*='message'], .ai-response, .message, .response")
@@ -40,7 +40,9 @@ class AIAssistantLocators:
     CLEAR_CHAT_BUTTON_GENERIC = (By.XPATH, "//button[contains(text(), 'Clear') or contains(text(), 'Reset') or contains(text(), 'New')]")
     
     # History Button
+    CHAT_TAB_BUTTON = (By.XPATH, "//nav//button[.//svg//title[text()='Chat']]")
     HISTORY_BUTTON = (By.XPATH, "//nav//button[.//svg//title[text()='History']]")
+    NEW_CHAT_BUTTON = (By.XPATH, "//nav//button[.//svg//title[text()='New Chat']]")
     HISTORY_BUTTON_ALT = (By.XPATH, "//button//div[text()='History']")
     HISTORY_BUTTON_SVG = (By.XPATH, "//button[contains(@class, '') and .//svg//title[text()='History']]")
     HISTORY_BUTTON_FALLBACK = (By.CSS_SELECTOR, "[data-testid*='history'], [aria-label*='history'], .history-button, .history")

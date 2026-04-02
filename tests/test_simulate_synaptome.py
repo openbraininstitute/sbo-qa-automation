@@ -60,6 +60,11 @@ class TestSimulateSynaptome:
         detail = page.verify_mini_detail_view()
         assert detail['title'], "Mini-detail title should be present"
         assert detail['description'], "Mini-detail description should be present"
+        # Wait for both images to load (second one can be slow)
+        if detail['images_count'] < 2:
+            logger.info("Only 1 image found, waiting for second to load...")
+            time.sleep(10)
+            detail = page.verify_mini_detail_view()
         assert detail['images_count'] >= 2, f"Expected at least 2 images, got {detail['images_count']}"
         assert detail['metadata_count'] > 0, "Mini-detail should have metadata"
         assert detail['close_btn'], "Close (x) button should be present"

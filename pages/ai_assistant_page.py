@@ -426,6 +426,21 @@ class AIAssistantPage(ProjectHome):
             except TimeoutException:
                 self.logger.warning("Delete confirmation dialog not found")
 
+            # Switch back to Chat tab after deleting
+            try:
+                new_chat_btn = self.element_to_be_clickable(AIAssistantLocators.NEW_CHAT_BUTTON, timeout=5)
+                new_chat_btn.click()
+                self.logger.info("Clicked 'New Chat' to return to chat view")
+                time.sleep(2)
+            except TimeoutException:
+                try:
+                    chat_btn = self.element_to_be_clickable(AIAssistantLocators.CHAT_TAB_BUTTON, timeout=5)
+                    chat_btn.click()
+                    self.logger.info("Clicked Chat tab to return to chat view")
+                    time.sleep(2)
+                except TimeoutException:
+                    self.logger.warning("Could not switch back to Chat tab")
+
             return True
 
         except Exception as e:
