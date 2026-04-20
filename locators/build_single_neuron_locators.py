@@ -112,5 +112,5 @@ class BuildSingleNeuronLocators:
     COMPATIBILITY_SPINNER = (By.XPATH, "//div[contains(@class,'ant-spin') or contains(@class,'spinner')]")
     COMPATIBILITY_IN_PROGRESS = (By.XPATH, "//*[contains(text(),'compatibility check in progress') or contains(text(),'Compatibility check')]")
     COMPATIBILITY_SUCCESS = (By.XPATH, "//*[contains(text(),'compatible') and not(contains(text(),'not compatible'))]")
-    COMPATIBILITY_ERROR = (By.XPATH, "//*[contains(text(),'not compatible') or contains(text(),'Please select a different combination')]")
+    COMPATIBILITY_ERROR = (By.XPATH, "//*[contains(text(),'Incompatible') or contains(text(),'not compatible') or contains(text(),'different combination')]")
     COMPATIBILITY_SELECT_ANOTHER = (By.XPATH, "//button[.//div[contains(text(),'Select another model')] or contains(text(),'Select another model')]")

@@ -186,6 +186,28 @@ class BuildSingleNeuronPage(ProjectHome):
         except Exception as e:
             print(f"❌ Error filling model name: {e}")
             return False
+
+    def fill_description(self, description="Automated test", timeout=10):
+        """Fill in the description field."""
+        try:
+            selectors = [
+                self.locators.DESCRIPTION_TEXTAREA,
+                self.locators.DESCRIPTION_TEXTAREA_ALT,
+            ]
+            for selector in selectors:
+                try:
+                    desc_input = self.element_to_be_clickable(selector, timeout)
+                    desc_input.clear()
+                    desc_input.send_keys(description)
+                    self.logger.info(f"Description filled: '{description}'")
+                    return True
+                except TimeoutException:
+                    continue
+            self.logger.warning("Description input not found")
+            return False
+        except Exception as e:
+            self.logger.warning(f"Error filling description: {e}")
+            return False
     
     def click_m_model_button(self, timeout=10):
         """Click the M-model selection button"""

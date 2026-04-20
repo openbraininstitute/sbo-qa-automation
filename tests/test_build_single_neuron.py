@@ -64,6 +64,12 @@ class TestBuildSingleNeuron:
         name_filled = build_page.fill_model_name(model_name)
         assert name_filled, "Failed to fill model name"
         
+        desc_filled = build_page.fill_description("Automated test of single neuron build")
+        if desc_filled:
+            logger.info("Description filled")
+        else:
+            logger.warning("Description field not found, continuing...")
+        
         # Step 6: Select M-model
         print("\n📍 Step 6: Selecting M-model...")
         logger.info("Step 6: Selecting M-model")
