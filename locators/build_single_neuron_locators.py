@@ -80,7 +80,7 @@ class BuildSingleNeuronLocators:
     MODELING_SECTION = (By.XPATH, "//div[text()='Modeling']")
     
     # M-model and E-model table selectors (for when redirected to selection tables)
-    M_MODEL_TABLE = (By.ID, "data-table-with-filters")
+    M_MODEL_TABLE = (By.CSS_SELECTOR, "tbody.ant-table-tbody")
     M_MODEL_RADIO_BUTTON = (By.XPATH, "(//span[@class='ant-radio-inner'])[2]")
     FIRST_M_MODEL_RADIO = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[2]//input[@type='radio']")
     SECOND_M_MODEL_RADIO = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[3]//input[@type='radio']")
@@ -107,3 +107,10 @@ class BuildSingleNeuronLocators:
 
 
 
+
+    """Model compatibility check (appears under E-model tab after both models selected)."""
+    COMPATIBILITY_SPINNER = (By.XPATH, "//div[contains(@class,'ant-spin') or contains(@class,'spinner')]")
+    COMPATIBILITY_IN_PROGRESS = (By.XPATH, "//*[contains(text(),'compatibility check in progress') or contains(text(),'Compatibility check')]")
+    COMPATIBILITY_SUCCESS = (By.XPATH, "//*[contains(text(),'compatible') and not(contains(text(),'not compatible'))]")
+    COMPATIBILITY_ERROR = (By.XPATH, "//*[contains(text(),'Incompatible') or contains(text(),'not compatible') or contains(text(),'different combination')]")
+    COMPATIBILITY_SELECT_ANOTHER = (By.XPATH, "//button[.//div[contains(text(),'Select another model')] or contains(text(),'Select another model')]")

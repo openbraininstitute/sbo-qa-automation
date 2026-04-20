@@ -64,14 +64,20 @@ class TestBuildSingleNeuron:
         name_filled = build_page.fill_model_name(model_name)
         assert name_filled, "Failed to fill model name"
         
+        desc_filled = build_page.fill_description("Automated test of single neuron build")
+        if desc_filled:
+            logger.info("Description filled")
+        else:
+            logger.warning("Description field not found, continuing...")
+        
         # Step 6: Select M-model
         print("\n📍 Step 6: Selecting M-model...")
         logger.info("Step 6: Selecting M-model")
         m_model_clicked = build_page.click_m_model_button()
         assert m_model_clicked, "Failed to click M-model button"
         
-        m_model_selected = build_page.select_first_m_model()
-        assert m_model_selected, "Failed to select M-model"
+        m_model_idx = build_page.select_random_m_model()
+        assert m_model_idx >= 0, "Failed to select M-model"
         
         # Step 7: Select E-model
         print("\n📍 Step 7: Selecting E-model...")
@@ -79,18 +85,25 @@ class TestBuildSingleNeuron:
         e_model_clicked = build_page.click_e_model_button()
         assert e_model_clicked, "Failed to click E-model button"
         
-        e_model_selected = build_page.select_first_e_model()
-        assert e_model_selected, "Failed to select E-model"
+        e_model_idx = build_page.select_random_e_model()
+        assert e_model_idx >= 0, "Failed to select E-model"
         
-        # Step 8: Build model
-        print("\n📍 Step 8: Building model...")
-        logger.info("Step 8: Building model")
+        # Step 8: Wait for compatibility check (retries with different E-model if incompatible)
+        print("\n📍 Step 8: Waiting for model compatibility check...")
+        logger.info("Step 8: Waiting for model compatibility check")
+        compatible = build_page.wait_for_compatibility_check(max_retries=5, timeout=60)
+        assert compatible, "No compatible M-model + E-model combination found after retries"
+        logger.info("Models are compatible")
+        
+        # Step 9: Build model
+        print("\n📍 Step 9: Building model...")
+        logger.info("Step 9: Building model")
         build_model_clicked = build_page.click_build_model_button()
         assert build_model_clicked, "Failed to click Build model button"
         
-        # Step 9: Wait for build completion or initiation
-        print("\n📍 Step 9: Waiting for build process...")
-        logger.info("Step 9: Waiting for build process")
+        # Step 10: Wait for build completion or initiation
+        print("\n📍 Step 10: Waiting for build process...")
+        logger.info("Step 10: Waiting for build process")
         build_completed = build_page.wait_for_build_completion()
         # Note: We don't assert this as the build process might take very long
         # and we just want to verify the workflow can be initiated
