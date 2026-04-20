@@ -449,6 +449,200 @@ class BuildSingleNeuronPage(ProjectHome):
             print(f"❌ Error selecting E-model: {e}")
             return False
     
+
+
+    def select_random_m_model(self, exclude_indices=None, timeout=15):
+        """Select a random M-model from the table, optionally excluding already-tried indices.
+        Returns the index selected, or -1 if failed.
+        """
+        import random
+        exclude_indices = exclude_indices or set()
+        try:
+            self.find_element(self.locators.M_MODEL_TABLE, timeout)
+            time.sleep(2)
+            radios = self.browser.find_elements(
+                By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//span[@class='ant-radio-inner']"
+            )
+            if not radios:
+                radios = self.browser.find_elements(
+                    By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//input[@class='ant-radio-input']"
+                )
+            if not radios:
+                radios = self.browser.find_elements(
+                    By.CSS_SELECTOR, "span.ant-radio-inner"
+                )
+            if not radios:
+                self.logger.warning("No M-model radio buttons found")
+                return -1
+
+            available = [i for i in range(len(radios)) if i not in exclude_indices]
+            if not available:
+                self.logger.warning("All M-models already tried")
+                return -1
+
+            idx = random.choice(available)
+            radio = radios[idx]
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", radio)
+            time.sleep(0.5)
+            self.browser.execute_script("arguments[0].click();", radio)
+            self.logger.info(f"Selected M-model at index {idx} (of {len(radios)})")
+            time.sleep(2)
+            return idx
+        except Exception as e:
+            self.logger.warning(f"Error selecting random M-model: {e}")
+            return -1
+
+    def select_random_e_model(self, exclude_indices=None, timeout=15):
+        """Select a random E-model from the table, optionally excluding already-tried indices.
+        Returns the index selected, or -1 if failed.
+        """
+        import random
+        exclude_indices = exclude_indices or set()
+        try:
+            self.find_element(self.locators.E_MODEL_TABLE, timeout)
+            self.wait_for_spinner_to_disappear()
+            time.sleep(2)
+            radios = self.browser.find_elements(
+                By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//span[@class='ant-radio-inner']"
+            )
+            if not radios:
+                radios = self.browser.find_elements(
+                    By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//input[@class='ant-radio-input']"
+                )
+            if not radios:
+                radios = self.browser.find_elements(By.XPATH, "//span[@class='ant-radio-inner']")
+            if not radios:
+                self.logger.warning("No E-model radio buttons found")
+                return -1
+
+            available = [i for i in range(len(radios)) if i not in exclude_indices]
+            if not available:
+                self.logger.warning("All E-models already tried")
+                return -1
+
+            idx = random.choice(available)
+            radio = radios[idx]
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", radio)
+            time.sleep(0.5)
+            self.browser.execute_script("arguments[0].click();", radio)
+            self.logger.info(f"Selected E-model at index {idx} (of {len(radios)})")
+            time.sleep(2)
+            return idx
+        except Exception as e:
+            self.logger.warning(f"Error selecting random E-model: {e}")
+            return -1
+
+    def _run_compatibility_check(self, timeout=60):
+        """Run a single compatibility check cycle. Returns True if compatible, False if not."""
+        # Wait for spinner / "in progress" text
+        try:
+            self.find_element(self.locators.COMPATIBILITY_IN_PROGRESS, timeout=10)
+            self.logger.info("Model compatibility check in progress...")
+            # Wait for it to complete
+            try:
+                self.wait_for_element_to_disappear(self.locators.COMPATIBILITY_IN_PROGRESS, timeout=timeout)
+                self.logger.info("Compatibility check completed")
+            except Exception:
+                self.logger.warning(f"Compatibility check did not complete within {timeout}s")
+        except TimeoutException:
+            self.logger.info("No compatibility spinner detected, checking result directly")
+
+        time.sleep(2)
+
+        # Check for error
+        try:
+            error_el = self.browser.find_element(*self.locators.COMPATIBILITY_ERROR)
+            if error_el.is_displayed():
+                self.logger.warning(f"Compatibility FAILED: {error_el.text.strip()[:80]}")
+                return False
+        except Exception:
+            pass
+
+        # Check for success
+        try:
+            success_el = self.browser.find_element(*self.locators.COMPATIBILITY_SUCCESS)
+            if success_el.is_displayed():
+                self.logger.info("Compatibility check PASSED")
+                return True
+        except Exception:
+            pass
+
+        # Fallback: check build button
+        if self.is_build_model_button_enabled():
+            self.logger.info("Build button enabled — assuming compatible")
+            return True
+
+        return False
+
+    def wait_for_compatibility_check(self, max_retries=5, timeout=60):
+        """Wait for compatibility check. If incompatible, click 'Select another model'
+        and try a different E-model. Retries up to max_retries times.
+        Returns True if a compatible combination was found.
+        """
+        from selenium.webdriver.common.action_chains import ActionChains
+
+        tried_m = set()
+        last_m_idx = -1
+
+        for attempt in range(max_retries):
+            self.logger.info(f"Compatibility check attempt {attempt + 1}/{max_retries}")
+
+            compatible = self._run_compatibility_check(timeout=timeout)
+            if compatible:
+                self.logger.info(f"Compatible models found on attempt {attempt + 1}")
+                return True
+
+            # Not compatible — click "Select another model" and pick a different M-model
+            if attempt < max_retries - 1:
+                self.logger.info("Clicking 'Select another model' to try a different M-model...")
+                try:
+                    select_another = self.element_to_be_clickable(
+                        self.locators.COMPATIBILITY_SELECT_ANOTHER, timeout=10
+                    )
+                    self.browser.execute_script(
+                        "arguments[0].scrollIntoView({block: 'center'});", select_another
+                    )
+                    time.sleep(0.5)
+                    try:
+                        ActionChains(self.browser).move_to_element(select_another).click().perform()
+                    except Exception:
+                        self.browser.execute_script("arguments[0].click();", select_another)
+                    self.logger.info("Clicked 'Select another model'")
+                    time.sleep(3)
+
+                    # Go back to M-model tab and select a different one
+                    m_clicked = self.click_m_model_button()
+                    if not m_clicked:
+                        self.logger.warning("Could not click M-model button")
+                        return False
+
+                    tried_m.add(last_m_idx)
+                    new_m_idx = self.select_random_m_model(exclude_indices=tried_m)
+                    if new_m_idx == -1:
+                        self.logger.warning("No more M-models to try")
+                        return False
+                    last_m_idx = new_m_idx
+
+                    # Go back to E-model tab to trigger compatibility check
+                    e_clicked = self.click_e_model_button()
+                    if not e_clicked:
+                        self.logger.warning("Could not click E-model button")
+                        return False
+
+                    e_idx = self.select_random_e_model()
+                    if e_idx == -1:
+                        self.logger.warning("Could not select E-model after M-model change")
+                        return False
+
+                    self.logger.info("Selected different M-model + E-model, re-checking...")
+
+                except TimeoutException:
+                    self.logger.warning("'Select another model' button not found")
+                    return False
+
+        self.logger.warning(f"No compatible combination found after {max_retries} attempts")
+        return False
+
     def click_build_model_button(self, timeout=10):
         """Click the final Build model button"""
         try:
