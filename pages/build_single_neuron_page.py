@@ -481,7 +481,15 @@ class BuildSingleNeuronPage(ProjectHome):
         exclude_indices = exclude_indices or set()
         try:
             self.find_element(self.locators.M_MODEL_TABLE, timeout)
-            time.sleep(2)
+            # Wait for radio buttons to appear (table rows loading)
+            for wait_attempt in range(5):
+                time.sleep(2)
+                radios = self.browser.find_elements(
+                    By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//span[@class='ant-radio-inner']"
+                )
+                if radios:
+                    break
+                self.logger.info(f"Waiting for M-model radio buttons... attempt {wait_attempt + 1}")
             radios = self.browser.find_elements(
                 By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//span[@class='ant-radio-inner']"
             )
@@ -603,8 +611,8 @@ class BuildSingleNeuronPage(ProjectHome):
         """
         from selenium.webdriver.common.action_chains import ActionChains
 
-        tried_m = set()
-        last_m_idx = -1
+        tried_e = set()
+        last_e_idx = -1
 
         for attempt in range(max_retries):
             self.logger.info(f"Compatibility check attempt {attempt + 1}/{max_retries}")
@@ -632,31 +640,19 @@ class BuildSingleNeuronPage(ProjectHome):
                     self.logger.info("Clicked 'Select another model'")
                     time.sleep(3)
 
-                    # Go back to M-model tab and select a different one
-                    m_clicked = self.click_m_model_button()
-                    if not m_clicked:
-                        self.logger.warning("Could not click M-model button")
-                        return False
+                    # "Select another model" returns to E-model selection
+                    # M-model is already locked in, just pick a different E-model
+                    time.sleep(5)  # Wait for E-model table to reload
 
-                    tried_m.add(last_m_idx)
-                    new_m_idx = self.select_random_m_model(exclude_indices=tried_m)
-                    if new_m_idx == -1:
-                        self.logger.warning("No more M-models to try")
+                    tried_e.add(last_e_idx)
+                    new_e_idx = self.select_random_e_model(exclude_indices=tried_e)
+                    if new_e_idx == -1:
+                        self.logger.warning("No more E-models to try")
                         return False
-                    last_m_idx = new_m_idx
+                    last_e_idx = new_e_idx
+                    time.sleep(2)
 
-                    # Go back to E-model tab to trigger compatibility check
-                    e_clicked = self.click_e_model_button()
-                    if not e_clicked:
-                        self.logger.warning("Could not click E-model button")
-                        return False
-
-                    e_idx = self.select_random_e_model()
-                    if e_idx == -1:
-                        self.logger.warning("Could not select E-model after M-model change")
-                        return False
-
-                    self.logger.info("Selected different M-model + E-model, re-checking...")
+                    self.logger.info(f"Selected different E-model (index {new_e_idx}), re-checking...")
 
                 except TimeoutException:
                     self.logger.warning("'Select another model' button not found")
