@@ -604,15 +604,18 @@ class BuildSingleNeuronPage(ProjectHome):
 
         return False
 
-    def wait_for_compatibility_check(self, max_retries=5, timeout=60):
-        """Wait for compatibility check. If incompatible, click 'Select another model'
-        and try a different E-model. Retries up to max_retries times.
+    def wait_for_compatibility_check(self, max_retries=10, timeout=60):
+        """Wait for compatibility check. If incompatible, try different E-models.
+        After 3 failed E-models with the same M-model, switch to a different M-model.
         Returns True if a compatible combination was found.
         """
         from selenium.webdriver.common.action_chains import ActionChains
 
         tried_e = set()
+        tried_m = set()
         last_e_idx = -1
+        e_fails_this_m = 0
+        max_e_per_m = 3
 
         for attempt in range(max_retries):
             self.logger.info(f"Compatibility check attempt {attempt + 1}/{max_retries}")
@@ -622,41 +625,77 @@ class BuildSingleNeuronPage(ProjectHome):
                 self.logger.info(f"Compatible models found on attempt {attempt + 1}")
                 return True
 
-            # Not compatible — click "Select another model" and pick a different M-model
-            if attempt < max_retries - 1:
-                self.logger.info("Clicking 'Select another model' to try a different M-model...")
+            if attempt >= max_retries - 1:
+                break
+
+            e_fails_this_m += 1
+
+            def _click_select_another(self_ref):
                 try:
-                    select_another = self.element_to_be_clickable(
-                        self.locators.COMPATIBILITY_SELECT_ANOTHER, timeout=10
+                    btn = self_ref.element_to_be_clickable(
+                        self_ref.locators.COMPATIBILITY_SELECT_ANOTHER, timeout=10
                     )
-                    self.browser.execute_script(
-                        "arguments[0].scrollIntoView({block: 'center'});", select_another
-                    )
-                    time.sleep(0.5)
-                    try:
-                        ActionChains(self.browser).move_to_element(select_another).click().perform()
-                    except Exception:
-                        self.browser.execute_script("arguments[0].click();", select_another)
-                    self.logger.info("Clicked 'Select another model'")
+                    self_ref.browser.execute_script("arguments[0].click();", btn)
+                    self_ref.logger.info("Clicked 'Select another model'")
                     time.sleep(3)
-
-                    # "Select another model" returns to E-model selection
-                    # M-model is already locked in, just pick a different E-model
-                    time.sleep(5)  # Wait for E-model table to reload
-
-                    tried_e.add(last_e_idx)
-                    new_e_idx = self.select_random_e_model(exclude_indices=tried_e)
-                    if new_e_idx == -1:
-                        self.logger.warning("No more E-models to try")
-                        return False
-                    last_e_idx = new_e_idx
-                    time.sleep(2)
-
-                    self.logger.info(f"Selected different E-model (index {new_e_idx}), re-checking...")
-
+                    return True
                 except TimeoutException:
-                    self.logger.warning("'Select another model' button not found")
+                    self_ref.logger.warning("'Select another model' button not found")
                     return False
+
+            if e_fails_this_m >= max_e_per_m:
+                # Switch M-model after too many E-model failures
+                self.logger.info(f"Tried {e_fails_this_m} E-models, switching M-model...")
+                if not _click_select_another(self):
+                    return False
+
+                m_clicked = self.click_m_model_button()
+                if not m_clicked:
+                    self.logger.warning("Could not click M-model button")
+                    return False
+                time.sleep(5)
+
+                new_m_idx = self.select_random_m_model(exclude_indices=tried_m)
+                if new_m_idx == -1:
+                    self.logger.warning("No more M-models to try")
+                    return False
+                tried_m.add(new_m_idx)
+                self.logger.info(f"Switched to M-model index {new_m_idx}")
+                time.sleep(2)
+
+                e_clicked = self.click_e_model_button()
+                if not e_clicked:
+                    self.logger.warning("Could not click E-model button")
+                    return False
+                time.sleep(5)
+
+                tried_e.clear()
+                e_fails_this_m = 0
+                new_e_idx = self.select_random_e_model()
+                if new_e_idx == -1:
+                    self.logger.warning("Could not select E-model")
+                    return False
+                last_e_idx = new_e_idx
+                tried_e.add(new_e_idx)
+                time.sleep(2)
+                self.logger.info(f"Selected E-model index {new_e_idx} with new M-model")
+            else:
+                # Try a different E-model with the same M-model
+                self.logger.info("Trying a different E-model...")
+                if not _click_select_another(self):
+                    return False
+                time.sleep(5)
+
+                tried_e.add(last_e_idx)
+                new_e_idx = self.select_random_e_model(exclude_indices=tried_e)
+                if new_e_idx == -1:
+                    self.logger.warning("No more E-models, will switch M-model next")
+                    e_fails_this_m = max_e_per_m
+                    continue
+                last_e_idx = new_e_idx
+                tried_e.add(new_e_idx)
+                time.sleep(2)
+                self.logger.info(f"Selected different E-model (index {new_e_idx})")
 
         self.logger.warning(f"No compatible combination found after {max_retries} attempts")
         return False
