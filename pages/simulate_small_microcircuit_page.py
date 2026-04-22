@@ -271,6 +271,22 @@ class SimulateSmallMicrocircuitPage(HomePage):
 
     # ── Info form ────────────────────────────────────────────────────────
 
+    def is_info_warning_icon_visible(self, timeout=5):
+        """Check if the warning icon is visible on the Info menu button."""
+        try:
+            el = self.find_element(Loc.INFO_BTN_WARNING_ICON, timeout=timeout)
+            return el.is_displayed()
+        except TimeoutException:
+            return False
+
+    def is_info_check_icon_visible(self, timeout=5):
+        """Check if the check icon is visible on the Info menu button."""
+        try:
+            el = self.find_element(Loc.INFO_BTN_CHECK_ICON, timeout=timeout)
+            return el.is_displayed()
+        except TimeoutException:
+            return False
+
     def fill_name(self, name):
         inp = self.find_element(Loc.FORM_NAME_INPUT, timeout=10)
         inp.click()
@@ -412,13 +428,13 @@ class SimulateSmallMicrocircuitPage(HomePage):
 
 
     def click_neuron_sets_tab(self):
-        self._click_menu(Loc.LEFT_MENU_NEURON_SETS_BTN, "Neuron sets")
+        self._click_left_menu_btn(Loc.LEFT_MENU_NEURON_SETS_BTN, "Neuron sets")
 
     def click_synaptic_manip_tab(self):
-        self._click_menu(Loc.LEFT_MENU_SYNAPTIC_MANIP_BTN, "Synaptic manipulations")
+        self._click_left_menu_btn(Loc.LEFT_MENU_SYNAPTIC_MANIP_BTN, "Synaptic manipulations")
 
     def click_timestamps_tab(self):
-        self._click_menu(Loc.LEFT_MENU_TIMESTAMPS_BTN, "Timestamps")
+        self._click_left_menu_btn(Loc.LEFT_MENU_TIMESTAMPS_BTN, "Timestamps")
 
     def get_config_block_labels_and_values(self):
         """Read all config block labels and values in the middle column."""
@@ -443,6 +459,17 @@ class SimulateSmallMicrocircuitPage(HomePage):
                 results.append({"label": label, "value": value, "has_number_input": has_number_input, "index": i})
                 self.logger.info(f"  Block: '{label}' = '{value}'")
         return results
+
+    def get_initialization_labels(self):
+        """Return the list of label texts visible in the Initialization tab."""
+        try:
+            elements = self.find_all_elements(Loc.INIT_BLOCK_LABELS, timeout=10)
+            labels = [el.text.strip() for el in elements if el.text.strip()]
+            self.logger.info(f"Initialization labels ({len(labels)}): {labels}")
+            return labels
+        except TimeoutException:
+            self.logger.warning("No initialization labels found")
+            return []
 
     def click_add_button_in_active_sub_entry(self):
         """Click the Add button inside the currently active sub-entry."""
@@ -489,6 +516,24 @@ class SimulateSmallMicrocircuitPage(HomePage):
         time.sleep(2)
         return label
 
+    def click_dictionary_item_by_label(self, target_label):
+        """Click a specific dictionary item by its label text. Returns the label or raises."""
+        items = self.get_dictionary_items()
+        assert items, "No dictionary items found"
+        for item in items:
+            text = item.text.strip().split(chr(10))[0].strip()
+            if text == target_label:
+                self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", item)
+                time.sleep(0.5)
+                try:
+                    ActionChains(self.browser).move_to_element(item).click().perform()
+                except Exception:
+                    self.browser.execute_script("arguments[0].click();", item)
+                self.logger.info(f"Clicked dictionary item: '{target_label}'")
+                time.sleep(2)
+                return target_label
+        raise AssertionError(f"Dictionary item '{target_label}' not found")
+
     def wait_for_block_single(self, timeout=10):
         """Wait for a block_single form to appear after selecting a dictionary item."""
         el = self.find_element(Loc.CONFIG_BLOCK_SINGLE, timeout=timeout)
@@ -511,15 +556,146 @@ class SimulateSmallMicrocircuitPage(HomePage):
     def click_results_tab(self):
         tab = self.element_to_be_clickable(Loc.CONFIG_TAB_SIMULATIONS, timeout=10)
         tab.click()
-        self.logger.info("Clicked Results tab")
+        self.logger.info("Clicked Simulations tab")
         time.sleep(3)
 
     def is_results_tab_active(self):
         try:
             tab = self.find_element(Loc.CONFIG_TAB_SIMULATIONS, timeout=5)
-            return tab.get_attribute("data-state") == "active"
+            # Beta-style tabs use data-state or gradient background for active
+            data_state = tab.get_attribute("data-state")
+            if data_state == "active":
+                return True
+            # Fallback: check for active styling (gradient bg + white text)
+            classes = tab.get_attribute("class") or ""
+            if "text-white" in classes and ("bg-linear" in classes or "from-[#003A8C]" in classes):
+                return True
+            return False
         except TimeoutException:
             return False
+
+    # ── Simulations tab: cards, input files, launch ──────────────────────
+
+    def get_simulation_cards(self, timeout=10):
+        """Return all simulation card buttons (Simulation 0, Simulation 1, …)."""
+        try:
+            cards = self.find_all_elements(Loc.SIM_CARD_BUTTONS, timeout=timeout)
+            labels = [c.get_attribute("title") or c.text.strip().split('\n')[0] for c in cards]
+            self.logger.info(f"Simulation cards ({len(cards)}): {labels}")
+            return cards
+        except TimeoutException:
+            self.logger.warning("No simulation cards found")
+            return []
+
+    def get_simulation_card_statuses(self):
+        """Return list of {'title': str, 'status': str} for each simulation card."""
+        cards = self.get_simulation_cards()
+        results = []
+        for card in cards:
+            title = card.get_attribute("title") or ""
+            status = ""
+            try:
+                badge = card.find_element(*Loc.SIM_CARD_STATUS_BADGE)
+                status = badge.text.strip().lower()
+            except Exception:
+                pass
+            results.append({"title": title, "status": status})
+        self.logger.info(f"Simulation statuses: {results}")
+        return results
+
+    def get_input_file_buttons(self, timeout=10):
+        """Return all input file buttons in the middle column."""
+        try:
+            buttons = self.find_all_elements(Loc.INPUT_FILE_BUTTONS, timeout=timeout)
+            names = [b.get_attribute("title") or b.text.strip().split('\n')[0] for b in buttons]
+            self.logger.info(f"Input files ({len(buttons)}): {names}")
+            return buttons
+        except TimeoutException:
+            self.logger.warning("No input file buttons found")
+            return []
+
+    def click_input_file(self, filename):
+        """Click a specific input file button by its title. Returns True if found."""
+        buttons = self.get_input_file_buttons()
+        for btn in buttons:
+            title = btn.get_attribute("title") or ""
+            if title == filename:
+                self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
+                time.sleep(0.5)
+                try:
+                    ActionChains(self.browser).move_to_element(btn).click().perform()
+                except Exception:
+                    self.browser.execute_script("arguments[0].click();", btn)
+                self.logger.info(f"Clicked input file: '{filename}'")
+                time.sleep(2)
+                return True
+        self.logger.warning(f"Input file '{filename}' not found")
+        return False
+
+    def get_json_preview_text(self, timeout=10):
+        """Return the text content of the JSON preview code block."""
+        try:
+            code = self.find_element(Loc.JSON_PREVIEW_CODE, timeout=timeout)
+            text = code.text.strip()
+            self.logger.info(f"JSON preview: {len(text)} chars")
+            return text
+        except TimeoutException:
+            self.logger.warning("JSON preview not found")
+            return ""
+
+    def is_launch_simulations_enabled(self, timeout=5):
+        """Check if the Launch simulations button is enabled."""
+        try:
+            btn = self.find_element(Loc.LAUNCH_SIMULATIONS_BTN, timeout=timeout)
+            disabled = btn.get_attribute("disabled")
+            enabled = disabled is None
+            self.logger.info(f"Launch simulations enabled: {enabled}")
+            return enabled
+        except TimeoutException:
+            return False
+
+    def get_launch_simulations_count(self, timeout=5):
+        """Parse the number from 'Launch simulations (N)' button text."""
+        try:
+            el = self.find_element(Loc.LAUNCH_SIMULATIONS_BTN_TEXT, timeout=timeout)
+            text = el.text.strip()
+            # Extract number from "Launch simulations (1)"
+            import re
+            match = re.search(r'\((\d+)\)', text)
+            count = int(match.group(1)) if match else 0
+            self.logger.info(f"Launch simulations count: {count}")
+            return count
+        except TimeoutException:
+            return 0
+
+    def click_launch_simulations(self):
+        """Click the Launch simulations button."""
+        btn = self.element_to_be_clickable(Loc.LAUNCH_SIMULATIONS_BTN, timeout=10)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
+        time.sleep(0.5)
+        try:
+            ActionChains(self.browser).move_to_element(btn).click().perform()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", btn)
+        self.logger.info("Clicked 'Launch simulations'")
+        time.sleep(3)
+
+    def wait_for_simulation_terminal_state(self, timeout=300, poll_interval=10):
+        """Poll simulation card statuses until all reach a terminal state (done/failed/error)."""
+        import time as _time
+        terminal = {'done', 'failed', 'error', 'completed', 'success'}
+        start = _time.time()
+        while _time.time() - start < timeout:
+            statuses = self.get_simulation_card_statuses()
+            if statuses and all(s['status'] in terminal for s in statuses):
+                elapsed = int(_time.time() - start)
+                self.logger.info(f"All simulations reached terminal state after {elapsed}s: {statuses}")
+                return True
+            elapsed = int(_time.time() - start)
+            self.logger.info(f"Simulations still running after {elapsed}s: {[s['status'] for s in statuses]}")
+            _time.sleep(poll_interval)
+        self.logger.warning(f"Simulations did not complete within {timeout}s")
+        return False
 
     def get_results_left_menu_buttons(self):
         try:

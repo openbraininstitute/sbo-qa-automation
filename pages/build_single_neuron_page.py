@@ -480,19 +480,17 @@ class BuildSingleNeuronPage(ProjectHome):
         import random
         exclude_indices = exclude_indices or set()
         try:
-            self.find_element(self.locators.M_MODEL_TABLE, timeout)
-            # Wait for radio buttons to appear (table rows loading)
-            for wait_attempt in range(5):
+            # Wait for radio buttons to appear (poll up to 30s)
+            radios = []
+            for wait_attempt in range(15):
                 time.sleep(2)
                 radios = self.browser.find_elements(
                     By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//span[@class='ant-radio-inner']"
                 )
                 if radios:
+                    self.logger.info(f"Found {len(radios)} M-model radio buttons after {(wait_attempt+1)*2}s")
                     break
-                self.logger.info(f"Waiting for M-model radio buttons... attempt {wait_attempt + 1}")
-            radios = self.browser.find_elements(
-                By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//span[@class='ant-radio-inner']"
-            )
+                self.logger.info(f"Waiting for M-model radio buttons... attempt {wait_attempt + 1}/15")
             if not radios:
                 radios = self.browser.find_elements(
                     By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//input[@class='ant-radio-input']"
@@ -523,7 +521,7 @@ class BuildSingleNeuronPage(ProjectHome):
             return -1
 
     def select_random_e_model(self, exclude_indices=None, timeout=15):
-        """Select a random E-model from the table, optionally excluding already-tried indices.
+        """Select a random E-model from the table, optionally navigating to a random page.
         Returns the index selected, or -1 if failed.
         """
         import random
@@ -532,6 +530,24 @@ class BuildSingleNeuronPage(ProjectHome):
             self.find_element(self.locators.E_MODEL_TABLE, timeout)
             self.wait_for_spinner_to_disappear()
             time.sleep(2)
+
+            # Navigate to a random pagination page if available
+            try:
+                pages = self.browser.find_elements(
+                    By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-item"
+                )
+                if len(pages) > 1:
+                    # Pick a random page that isn't the current active one
+                    non_active = [p for p in pages if 'ant-pagination-item-active' not in (p.get_attribute('class') or '')]
+                    if non_active:
+                        target_page = random.choice(non_active)
+                        page_num = target_page.get_attribute('title') or target_page.text.strip()
+                        target_page.click()
+                        self.logger.info(f"Navigated to E-model page {page_num}")
+                        self.wait_for_spinner_to_disappear()
+                        time.sleep(3)
+            except Exception:
+                pass
             radios = self.browser.find_elements(
                 By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//span[@class='ant-radio-inner']"
             )
@@ -646,15 +662,23 @@ class BuildSingleNeuronPage(ProjectHome):
             if e_fails_this_m >= max_e_per_m:
                 # Switch M-model after too many E-model failures
                 self.logger.info(f"Tried {e_fails_this_m} E-models, switching M-model...")
-                if not _click_select_another(self):
-                    return False
 
+                # Step 1: Click M-model button in left menu → goes to M-model detail
                 m_clicked = self.click_m_model_button()
                 if not m_clicked:
                     self.logger.warning("Could not click M-model button")
                     return False
+                time.sleep(3)
+
+                # Step 2: Click "Select another model" on M-model detail → goes to M-model table
+                self.logger.info("On M-model detail, clicking 'Select another model'...")
+                time.sleep(3)
+                if not _click_select_another(self):
+                    self.logger.warning("Could not find 'Select another model' on M-model detail")
+                    return False
                 time.sleep(5)
 
+                # Step 3: Select a different M-model from the table
                 new_m_idx = self.select_random_m_model(exclude_indices=tried_m)
                 if new_m_idx == -1:
                     self.logger.warning("No more M-models to try")
@@ -663,10 +687,16 @@ class BuildSingleNeuronPage(ProjectHome):
                 self.logger.info(f"Switched to M-model index {new_m_idx}")
                 time.sleep(2)
 
+                # Step 4: Click E-model button → may show detail or table
                 e_clicked = self.click_e_model_button()
                 if not e_clicked:
                     self.logger.warning("Could not click E-model button")
                     return False
+                time.sleep(3)
+
+                # If E-model was previously selected, we're on detail page
+                # Click "Select another model" to get to the table
+                _click_select_another(self)
                 time.sleep(5)
 
                 tried_e.clear()
@@ -684,6 +714,9 @@ class BuildSingleNeuronPage(ProjectHome):
                 self.logger.info("Trying a different E-model...")
                 if not _click_select_another(self):
                     return False
+                time.sleep(3)
+                # May land on E-model detail — click "Select another model" again if needed
+                _click_select_another(self)
                 time.sleep(5)
 
                 tried_e.add(last_e_idx)
