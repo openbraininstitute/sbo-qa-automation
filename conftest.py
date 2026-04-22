@@ -556,7 +556,8 @@ def pytest_runtest_makereport(item):
             os.makedirs(error_logs_dir, exist_ok=True)
 
             test_name = report.nodeid.replace("::", "_").split("/")[-1]
-            file_name = os.path.join(error_logs_dir, test_name + ".png")
+            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            file_name = os.path.join(error_logs_dir, f"{test_name}_{timestamp}.png")
             print(f"Intended screenshot path: {file_name}")
 
             browser = None
