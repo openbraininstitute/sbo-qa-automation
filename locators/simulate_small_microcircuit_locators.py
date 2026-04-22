@@ -173,6 +173,49 @@ class SimulateSmallMicrocircuitLocators:
         "//div[contains(@class,'ant-notification-notice-success')]//a[contains(text(),'View Simulation')]"
     )
 
+    """Simulations tab: simulation cards, statuses, Launch button."""
+    SIM_CARD_BUTTONS = (
+        By.XPATH,
+        "//button[@title[starts-with(.,'Simulation ')]]"
+    )
+    SIM_CARD_STATUS_BADGE = (
+        By.XPATH,
+        ".//span[contains(@class,'rounded-xl')]"
+    )
+    SIM_SELECT_ALL_CHECKBOX = (
+        By.XPATH,
+        "//label[contains(@class,'ant-checkbox-wrapper')]//span[contains(text(),'Select all')]"
+    )
+    LAUNCH_SIMULATIONS_BTN = (
+        By.XPATH,
+        "//button[.//span[contains(text(),'Launch simulations')]]"
+    )
+    LAUNCH_SIMULATIONS_BTN_TEXT = (
+        By.XPATH,
+        "//button[.//span[contains(text(),'Launch simulations')]]//span[contains(text(),'Launch simulations')]"
+    )
+
+    """Simulations tab: input files (middle column)."""
+    INPUT_FILES_HEADING = (
+        By.XPATH,
+        "//h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]"
+    )
+    INPUT_FILE_BUTTONS = (
+        By.XPATH,
+        "//h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]/following-sibling::div//button[@title]"
+    )
+    INPUT_FILE_ACTIVE = (
+        By.XPATH,
+        "//h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]/following-sibling::div//button[contains(@class,'bg-[linear-gradient')]"
+    )
+
+    """Simulations tab: JSON preview (right column)."""
+    JSON_PREVIEW_CODE = (By.CSS_SELECTOR, "pre.shiki code")
+    JSON_PREVIEW_COPY_BTN = (
+        By.XPATH,
+        "//button[.//span[@aria-label='copy']]"
+    )
+
     """Beta config: additional left menu tabs (Circuit Components, Manipulations, Events)."""
     LEFT_MENU_NEURON_SETS_BTN = (
         By.XPATH,
@@ -194,6 +237,22 @@ class SimulateSmallMicrocircuitLocators:
     CONFIG_BLOCK_SINGLE = (By.CSS_SELECTOR, "div[data-scan-config-block='block_single']")
     WARNING_ICON = (By.CSS_SELECTOR, ".anticon-warning")
     CHECK_ICON = (By.CSS_SELECTOR, ".anticon-check-circle")
+
+    """Warning / check icons scoped to a specific left-menu button."""
+    INFO_BTN_WARNING_ICON = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item'][.//span[contains(text(),'Info')]]//span[contains(@class,'anticon-warning')]"
+    )
+    INFO_BTN_CHECK_ICON = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item'][.//span[contains(text(),'Info')]]//span[contains(@class,'anticon-check')]"
+    )
+
+    """Initialization block: expected field labels."""
+    INIT_BLOCK_LABELS = (
+        By.XPATH,
+        "//div[@data-scan-config-block-element]//div[contains(@class,'text-primary-9') and contains(@class,'font-semibold')]"
+    )
 
     """Dictionary items (for Stimuli/Recordings)."""
     CONFIG_BLOCK_DICTIONARY_ITEMS = (

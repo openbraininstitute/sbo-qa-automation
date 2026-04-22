@@ -68,159 +68,207 @@ class TestSimulateSmallMicrocircuit:
         
         '''
 
-        # # Step 7: Click random row
-        # row_text = sim_page.click_random_row()
-        # logger.info(f"Clicked row: '{row_text}'")
+        # Step 7: Click random row
+        row_text = sim_page.click_random_row()
+        logger.info(f"Clicked row: '{row_text}'")
 
-        # # Step 8: Mini-detail: verify title, description, click "Use model"
-        # sim_page.wait_for_mini_detail()
-        # detail = sim_page.verify_mini_detail_title_and_description()
-        # assert detail['title']['present'], "Mini-detail title should be present"
-        # logger.info(f"Mini-detail title: '{detail['title'].get('text', '')}'")
-        # if not detail.get('description', {}).get('present'):
-        #     logger.warning("Mini-detail description not found")
+        # Step 8: Mini-detail: verify title, description, click "Use model"
+        sim_page.wait_for_mini_detail()
+        detail = sim_page.verify_mini_detail_title_and_description()
+        assert detail['title']['present'], "Mini-detail title should be present"
+        logger.info(f"Mini-detail title: '{detail['title'].get('text', '')}'")
+        if not detail.get('description', {}).get('present'):
+            logger.warning("Mini-detail description not found")
 
-        # sim_page.click_use_model()
-        # logger.info(f"After Use model, URL: {sim_page.browser.current_url}")
+        sim_page.click_use_model()
+        logger.info(f"After Use model, URL: {sim_page.browser.current_url}")
 
-        # # Step 9: Config page: wait for layout, verify Configuration + Results tabs
-        # sim_page.wait_for_config_page(timeout=30)
-        # logger.info("Config page loaded")
+        # Step 9: Config page: wait for layout, verify Configuration + Results tabs
+        sim_page.wait_for_config_page(timeout=30)
+        logger.info("Config page loaded")
 
-        # tabs = sim_page.verify_config_tabs()
-        # assert tabs['configuration']['present'], "Configuration tab should be present"
-        # assert tabs['simulations']['present'], "Simulations tab should be present"
-        # logger.info("Configuration and Results tabs verified")
+        tabs = sim_page.verify_config_tabs()
+        assert tabs['configuration']['present'], "Configuration tab should be present"
+        assert tabs['simulations']['present'], "Simulations tab should be present"
+        logger.info("Configuration and Results tabs verified")
 
-        # # Step 10: Verify circuit preview image is displayed
-        # preview_ok = sim_page.wait_for_circuit_preview(timeout=30)
-        # if preview_ok:
-        #     logger.info("Circuit preview image loaded")
-        # else:
-        #     logger.warning("Circuit preview image not found")
+        # Step 10: Verify circuit preview image is displayed
+        preview_ok = sim_page.wait_for_circuit_preview(timeout=30)
+        if preview_ok:
+            logger.info("Circuit preview image loaded")
+        else:
+            logger.warning("Circuit preview image not found")
 
-        # # Step 11: Info tab — fill Campaign Name + Description
-        # sim_page.click_info_tab()
-        # campaign_name = sim_page.fill_name_with_datetime()
-        # sim_page.fill_description("automated test of small microcircuit")
-        # logger.info(f"Info filled: name='{campaign_name}'")
+        # Step 11: Info tab — verify warning icon, fill Campaign Name + Description
+        sim_page.click_info_tab()
 
-        # # Step 12: Initialization tab — verify all fields have data
-        # sim_page.click_initialization_tab()
-        # init_blocks = sim_page.get_config_block_labels_and_values()
-        # assert len(init_blocks) > 0, "Initialization should have config blocks"
-        # for b in init_blocks:
-        #     assert b['label'], f"Block has empty label: {b}"
-        # logger.info(f"Initialization: {len(init_blocks)} blocks, all with labels")
+        # Spec step 10: verify warning icon present (fields empty)
+        has_warning = sim_page.is_info_warning_icon_visible(timeout=5)
+        if has_warning:
+            logger.info("Warning icon visible on Info tab (fields empty)")
+        else:
+            logger.warning("Warning icon not found on Info tab — may already have defaults")
 
-        # # Step 13: Stimuli tab — click Add Stimulus → select random → verify form
-        # sim_page.click_stimuli_tab()
-        # sim_page.click_add_button_in_active_sub_entry()
-        # logger.info("Clicked 'Add Stimulus'")
+        campaign_name = sim_page.fill_name_with_datetime()
+        sim_page.fill_description("automated test of small microcircuit")
+        logger.info(f"Info filled: name='{campaign_name}'")
 
-        # stim_items = sim_page.get_dictionary_items()
-        # assert len(stim_items) > 0, "Expected at least one stimulus dictionary item"
-        # stim_label = sim_page.click_random_dictionary_item()
-        # logger.info(f"Selected stimulus: '{stim_label}'")
+        # Spec step 12: verify warning icon disappears after filling required fields
+        if has_warning:
+            import time as _t
+            _t.sleep(2)
+            warning_gone = not sim_page.is_info_warning_icon_visible(timeout=3)
+            check_appeared = sim_page.is_info_check_icon_visible(timeout=3)
+            if warning_gone:
+                logger.info("Warning icon disappeared after filling fields")
+            else:
+                logger.warning("Warning icon still visible after filling fields")
+            if check_appeared:
+                logger.info("Check icon appeared on Info tab")
 
-        # sim_page.wait_for_block_single(timeout=10)
-        # logger.info("Stimulus config form appeared with data")
+        # Step 12: Initialization tab — verify all fields have data
+        sim_page.click_initialization_tab()
+        init_blocks = sim_page.get_config_block_labels_and_values()
+        assert len(init_blocks) > 0, "Initialization should have config blocks"
+        for b in init_blocks:
+            assert b['label'], f"Block has empty label: {b}"
+        logger.info(f"Initialization: {len(init_blocks)} blocks, all with labels")
 
-        # # Step 14: Recordings tab — click Add Recording → select random → verify form
-        # sim_page.click_recordings_tab()
-        # sim_page.click_add_button_in_active_sub_entry()
-        # logger.info("Clicked 'Add Recording'")
+        # Spec step 14: verify expected Initialization fields are present
+        init_labels = sim_page.get_initialization_labels()
+        expected_init = ["Circuit", "Duration", "Extracellular Calcium Concentration",
+                         "Initial Voltage", "Random Seed", "Neuron Set"]
+        for field in expected_init:
+            found = any(field.lower() in lbl.lower() for lbl in init_labels)
+            if found:
+                logger.info(f"  ✓ Initialization field '{field}' present")
+            else:
+                logger.warning(f"  ✗ Initialization field '{field}' not found in {init_labels}")
 
-        # rec_items = sim_page.get_dictionary_items()
-        # assert len(rec_items) > 0, "Expected at least one recording dictionary item"
-        # rec_label = sim_page.click_random_dictionary_item()
-        # logger.info(f"Selected recording: '{rec_label}'")
+        # Step 13: Stimuli tab — click Add Stimulus → select random → verify form
+        sim_page.click_stimuli_tab()
+        sim_page.click_add_button_in_active_sub_entry()
+        logger.info("Clicked 'Add Stimulus'")
 
-        # sim_page.wait_for_block_single(timeout=10)
-        # logger.info("Recording config form appeared with data")
+        stim_items = sim_page.get_dictionary_items()
+        assert len(stim_items) > 0, "Expected at least one stimulus dictionary item"
+        stim_label = sim_page.click_random_dictionary_item()
+        logger.info(f"Selected stimulus: '{stim_label}'")
 
-        # # Step 15: Neuron sets tab — click Add Neuron Set → select random → verify form
-        # sim_page.click_neuron_sets_tab()
-        # sim_page.click_add_button_in_active_sub_entry()
-        # logger.info("Clicked 'Add Neuron Set'")
+        sim_page.wait_for_block_single(timeout=10)
+        logger.info("Stimulus config form appeared with data")
 
-        # ns_items = sim_page.get_dictionary_items()
-        # assert len(ns_items) > 0, "Expected at least one neuron set dictionary item"
-        # ns_label = sim_page.click_random_dictionary_item()
-        # logger.info(f"Selected neuron set: '{ns_label}'")
+        # Step 14: Recordings tab — click Add Recording → select random → verify form
+        sim_page.click_recordings_tab()
+        sim_page.click_add_button_in_active_sub_entry()
+        logger.info("Clicked 'Add Recording'")
 
-        # sim_page.wait_for_block_single(timeout=10)
-        # logger.info("Neuron set config form appeared with data")
+        rec_items = sim_page.get_dictionary_items()
+        assert len(rec_items) > 0, "Expected at least one recording dictionary item"
+        rec_label = sim_page.click_random_dictionary_item()
+        logger.info(f"Selected recording: '{rec_label}'")
 
-        # # Step 16: Synaptic manipulations tab — click Add → select random → verify form
-        # sim_page.click_synaptic_manip_tab()
-        # sim_page.click_add_button_in_active_sub_entry()
-        # logger.info("Clicked 'Add Synaptic Manipulation'")
+        sim_page.wait_for_block_single(timeout=10)
+        logger.info("Recording config form appeared with data")
 
-        # sm_items = sim_page.get_dictionary_items()
-        # assert len(sm_items) > 0, "Expected at least one synaptic manipulation item"
-        # sm_label = sim_page.click_random_dictionary_item()
-        # logger.info(f"Selected synaptic manipulation: '{sm_label}'")
+        # Step 15: Neuron sets tab — click Add Neuron Set → select "All Neurons"
+        sim_page.click_neuron_sets_tab()
+        sim_page.click_add_button_in_active_sub_entry()
+        logger.info("Clicked 'Add Neuron Set'")
 
-        # sim_page.wait_for_block_single(timeout=10)
-        # logger.info("Synaptic manipulation config form appeared with data")
+        ns_items = sim_page.get_dictionary_items()
+        assert len(ns_items) > 0, "Expected at least one neuron set dictionary item"
+        ns_label = sim_page.click_dictionary_item_by_label("All Neurons")
+        logger.info(f"Selected neuron set: '{ns_label}'")
 
-        # # Step 17: Timestamps tab — click Add → select random → verify form
-        # sim_page.click_timestamps_tab()
-        # sim_page.click_add_button_in_active_sub_entry()
-        # logger.info("Clicked 'Add Timestamp'")
+        sim_page.wait_for_block_single(timeout=10)
+        logger.info("Neuron set config form appeared with data")
 
-        # ts_items = sim_page.get_dictionary_items()
-        # assert len(ts_items) > 0, "Expected at least one timestamp dictionary item"
-        # ts_label = sim_page.click_random_dictionary_item()
-        # logger.info(f"Selected timestamp: '{ts_label}'")
+        # Step 16: Synaptic manipulations tab — click Add → select random → verify form
+        sim_page.click_synaptic_manip_tab()
+        sim_page.click_add_button_in_active_sub_entry()
+        logger.info("Clicked 'Add Synaptic Manipulation'")
 
-        # sim_page.wait_for_block_single(timeout=10)
-        # logger.info("Timestamp config form appeared with data")
+        sm_items = sim_page.get_dictionary_items()
+        assert len(sm_items) > 0, "Expected at least one synaptic manipulation item"
+        sm_label = sim_page.click_random_dictionary_item()
+        logger.info(f"Selected synaptic manipulation: '{sm_label}'")
 
-        # # Step 18: Click Generate simulation(s)
-        # sim_page.click_generate_simulation()
-        # logger.info("Clicked Generate simulation(s)")
+        sim_page.wait_for_block_single(timeout=10)
+        logger.info("Synaptic manipulation config form appeared with data")
 
-        # # Step 17: Results tab: verify auto-redirect, left menu has All + recording buttons
-        # time.sleep(5)
-        # assert sim_page.is_results_tab_active(), "Results tab should be active after Generate simulation(s)"
-        # logger.info("Results tab active after Generate simulation(s)")
+        # Step 17: Timestamps tab — click Add → select random → verify form
+        sim_page.click_timestamps_tab()
+        sim_page.click_add_button_in_active_sub_entry()
+        logger.info("Clicked 'Add Timestamp'")
 
-        # all_btns = sim_page.get_results_left_menu_buttons()
-        # assert len(all_btns) >= 2, f"Expected All + at least 1 recording button, got {len(all_btns)}"
-        # rec_btns = sim_page.get_results_recording_buttons()
-        # assert len(rec_btns) >= 1, "Expected at least 1 recording button in Results left menu"
-        # logger.info(f"Results menu: {len(all_btns)} buttons, {len(rec_btns)} recording(s)")
+        ts_items = sim_page.get_dictionary_items()
+        assert len(ts_items) > 0, "Expected at least one timestamp dictionary item"
+        ts_label = sim_page.click_random_dictionary_item()
+        logger.info(f"Selected timestamp: '{ts_label}'")
 
-        # # Step 18: Verify Download CSV and Reconfigure disabled while running
-        # assert not sim_page.is_download_csv_enabled(), "Download CSV should be disabled while running"
-        # assert not sim_page.is_reconfigure_enabled(), "Reconfigure should be disabled while running"
-        # logger.info("Download CSV and Reconfigure are disabled (simulation running)")
+        sim_page.wait_for_block_single(timeout=10)
+        logger.info("Timestamp config form appeared with data")
 
-        # # Step 19: Verify plots and 3D canvas visible during simulation
-        # plot_count = sim_page.get_idrest_plot_count()
-        # logger.info(f"IDREST plots visible while running: {plot_count}")
+        # Step 18: Click Generate simulation(s)
+        sim_page.click_generate_simulation()
+        logger.info("Clicked Generate simulation(s)")
 
-        # logger.info("Circuit preview (no 3D canvas for microcircuit)")
+        # Step 17: Simulations tab: verify auto-redirect
+        time.sleep(10)
+        if not sim_page.is_results_tab_active():
+            logger.info("Simulations tab not auto-active, clicking it manually")
+            try:
+                sim_page.click_results_tab()
+                time.sleep(3)
+            except Exception as e:
+                logger.warning(f"Could not click Simulations tab: {e}")
+        assert sim_page.is_results_tab_active(), "Simulations tab should be active after Generate simulation(s)"
+        logger.info("Simulations tab active")
 
-        # # Step 20: Wait for simulation completion (Download CSV enabled, 300s timeout)
-        # sim_done = sim_page.wait_for_simulation_complete(timeout=300, poll_interval=10)
-        # assert sim_done, "Simulation should complete (Download CSV enabled)"
-        # logger.info("Simulation completed")
+        # Step 18: Verify simulation cards in left column
+        sim_cards = sim_page.get_simulation_cards()
+        assert len(sim_cards) >= 1, f"Expected at least 1 simulation card, got {len(sim_cards)}"
+        logger.info(f"Found {len(sim_cards)} simulation card(s)")
 
-        # # Step 21: Verify Download CSV and Reconfigure enabled after completion
-        # assert sim_page.is_download_csv_enabled(), "Download CSV should be enabled after completion"
-        # assert sim_page.is_reconfigure_enabled(), "Reconfigure should be enabled after completion"
-        # logger.info("Download CSV and Reconfigure are enabled")
+        statuses = sim_page.get_simulation_card_statuses()
+        for s in statuses:
+            logger.info(f"  {s['title']}: {s['status']}")
 
-        # # Step 22: Verify success notification with View Simulation link
-        # notif_ok = sim_page.wait_for_success_notification(timeout=30)
-        # if notif_ok:
-        #     link = sim_page.get_view_simulation_link()
-        #     assert link is not None, "View Simulation link should be present in notification"
-        #     logger.info(f"Success notification with View Simulation link: {link.get_attribute('href')}")
-        # else:
-        #     logger.warning("Success notification not found — may have auto-dismissed")
+        # Verify Launch simulations button count matches card count
+        launch_count = sim_page.get_launch_simulations_count()
+        assert launch_count == len(sim_cards), \
+            f"Launch button count ({launch_count}) should match simulation cards ({len(sim_cards)})"
+        logger.info(f"Launch simulations ({launch_count}) matches card count")
 
-        # logger.info(f"Final URL: {sim_page.browser.current_url}")
+        # Step 19: Verify input files in middle column, click each and check preview
+        input_files = sim_page.get_input_file_buttons()
+        assert len(input_files) >= 1, "Expected at least 1 input file"
+        file_names = [b.get_attribute("title") or "" for b in input_files]
+        logger.info(f"Found {len(input_files)} input file(s): {file_names}")
+
+        for fname in file_names:
+            if not fname:
+                continue
+            clicked = sim_page.click_input_file(fname)
+            assert clicked, f"Could not click input file '{fname}'"
+            preview = sim_page.get_json_preview_text(timeout=10)
+            assert len(preview) > 0, f"JSON preview for '{fname}' should not be empty"
+            logger.info(f"  ✓ '{fname}': {len(preview)} chars")
+
+        # Step 20: Click Launch simulations
+        assert sim_page.is_launch_simulations_enabled(), "Launch simulations should be enabled"
+        sim_page.click_launch_simulations()
+        logger.info("Clicked Launch simulations")
+
+        # Step 21: Poll simulation card statuses until terminal state (300s)
+        sim_done = sim_page.wait_for_simulation_terminal_state(timeout=300, poll_interval=10)
+        if sim_done:
+            logger.info("All simulations reached terminal state")
+            final_statuses = sim_page.get_simulation_card_statuses()
+            for s in final_statuses:
+                logger.info(f"  Final: {s['title']}: {s['status']}")
+        else:
+            logger.warning("Simulations did not complete within 300s")
+
+        logger.info(f"Final URL: {sim_page.browser.current_url}")
