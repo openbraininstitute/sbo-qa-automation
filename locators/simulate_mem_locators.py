@@ -48,7 +48,7 @@ class SimulateMemLocators:
         By.XPATH,
         "//button[@role='tab' and contains(text(),'Results')]"
     )
-    NEURON_VISUALIZER_CANVAS = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer'] canvas")
+    NEURON_VISUALIZER_CANVAS = (By.CSS_SELECTOR, "div[class*='morpho-viewer-simul-module'] canvas")
 
     """Left menu buttons (Setup and Experiment sections)."""
     LEFT_MENU_INFO_BTN = (
@@ -180,7 +180,7 @@ class SimulateMemLocators:
         By.XPATH,
         "//div[contains(@id,'root-container-')]"
     )
-    RESULTS_NEURON_CANVAS = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer'] canvas")
+    RESULTS_NEURON_CANVAS = (By.CSS_SELECTOR, "div[class*='morpho-viewer-simul-module'] canvas")
     RESULTS_SUCCESS_NOTIFICATION = (
         By.CSS_SELECTOR,
         "div.ant-notification-notice-success"

@@ -56,7 +56,7 @@ class SimulateSynaptomeLocators:
     CONFIG_LAYOUT = (By.CSS_SELECTOR, "[data-testid='workflow-simulate-layout']")
     CONFIG_TAB_CONFIGURATION = (By.XPATH, "//button[@role='tab' and contains(text(),'Configuration')]")
     CONFIG_TAB_RESULTS = (By.XPATH, "//button[@role='tab' and contains(text(),'Results')]")
-    NEURON_VISUALIZER_CANVAS = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer'] canvas")
+    NEURON_VISUALIZER_CANVAS = (By.CSS_SELECTOR, "div[class*='morpho-viewer-simul-module'] canvas, div[class*='responsive-side-viewer-module'] canvas")
 
     """Left menu buttons."""
     LEFT_MENU_INFO_BTN = (By.XPATH, "//div[@id='menu']//button[.//div[contains(text(),'Info')]]")
@@ -113,11 +113,11 @@ class SimulateSynaptomeLocators:
     """Recording section."""
     RECORDING_ADD_BTN = (
         By.XPATH,
-        "//div[@id='synaptome-simulation-panel']//button[contains(text(),'Add') or .//span[contains(text(),'Add')]]"
+        "//div[@id='recording-container']//button[contains(text(),'Add recording') or contains(text(),'Add')]"
     )
     RECORDING_SECTION_DROPDOWN = (
         By.XPATH,
-        "//div[contains(@id,'record_from')]//div[contains(@class,'ant-select')]"
+        "//div[@id='recording-container']//div[contains(@class,'ant-select') and contains(@class,'ant-select-single')]"
     )
     RECORDING_DROPDOWN_OPTIONS = (By.CSS_SELECTOR, "div.ant-select-item.ant-select-item-option")
 
@@ -129,7 +129,7 @@ class SimulateSynaptomeLocators:
     RESULTS_RECONFIGURE_BTN = (By.XPATH, "//div[@id='menu']//button[.//div[contains(text(),'Reconfigure')]]")
     RESULTS_IDREST_PLOTS = (By.CSS_SELECTOR, "div.js-plotly-plot")
     RESULTS_PLOT_CONTAINERS = (By.XPATH, "//div[contains(@id,'root-container-')]")
-    RESULTS_NEURON_CANVAS = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer'] canvas")
+    RESULTS_NEURON_CANVAS = (By.CSS_SELECTOR, "div[class*='morpho-viewer-simul-module'] canvas, div[class*='responsive-side-viewer-module'] canvas")
     RESULTS_SUCCESS_NOTIFICATION = (By.CSS_SELECTOR, "div.ant-notification-notice-success")
     RESULTS_VIEW_SIMULATION_LINK = (
         By.XPATH,

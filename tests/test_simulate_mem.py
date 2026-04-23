@@ -58,7 +58,7 @@ class TestSimulateMem:
         # Measure 3D morphology load time
         morph_start = time.time()
         try:
-            sim_page.wait_for_neuron_visualizer(timeout=120)
+            sim_page.wait_for_neuron_visualizer(timeout=30)
             morph_elapsed = round(time.time() - morph_start, 2)
             logger.info(f"3D morphology viewer loaded in {morph_elapsed}s")
         except Exception as e:
