@@ -384,7 +384,12 @@ class SimulateSynaptomePage(HomePage):
         for opt in options:
             title = opt.get_attribute("title") or opt.text.strip()
             if title.startswith(section_prefix):
-                opt.click()
+                try:
+                    self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", opt)
+                    time.sleep(0.3)
+                    self.browser.execute_script("arguments[0].click();", opt)
+                except Exception:
+                    opt.click()
                 self.logger.info(f"Selected recording: '{title}'")
                 time.sleep(1)
                 return title
