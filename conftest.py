@@ -43,11 +43,12 @@ def create_browser(pytestconfig):
             options.add_argument("--window-size=1400,900")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--enable-webgl")
-            options.add_argument("--use-gl=swiftshader")
-            options.add_argument("--enable-accelerated-2d-canvas")
-            options.add_argument("--disable-software-rasterizer")
-            options.add_argument("--window-size=1400,900")
+            options.add_argument("--ignore-gpu-blocklist")
+            options.add_argument("--use-gl=egl")
+            options.add_argument("--enable-gpu-rasterization")
+            options.add_argument("--enable-zero-copy")
+            options.add_argument("--enable-unsafe-swiftshader")
+            options.add_argument("--enable-features=Vulkan")
             options.add_argument("--ignore-certificate-errors")
             options.add_argument('--blink-settings=imagesEnabled=true')
         
@@ -68,6 +69,19 @@ def create_browser(pytestconfig):
             options.set_preference("browser.startup.homepage", "about:blank")
             options.set_preference("startup.homepage_welcome_url", "about:blank")
             options.set_preference("startup.homepage_welcome_url.additional", "about:blank")
+            # WebGL2 support in headless Firefox
+            options.set_preference("webgl.force-enabled", True)
+            options.set_preference("webgl.disabled", False)
+            options.set_preference("webgl.enable-webgl2", True)
+
+        # Enable WebGL/WebGL2 in Firefox (headless and headed)
+        options.set_preference("webgl.disabled", False)
+        options.set_preference("webgl.force-enabled", True)
+        options.set_preference("webgl.enable-webgl2", True)
+        options.set_preference("webgl.msaa-force", True)
+        options.set_preference("layers.acceleration.force-enabled", True)
+        options.set_preference("gfx.canvas.accelerated", True)
+        options.set_preference("gfx.webrender.all", True)
 
         browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
 

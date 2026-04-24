@@ -328,9 +328,16 @@ class SimulateSynaptomePage(HomePage):
         self.logger.info(f"Clicked eye toggle button [{index}]")
         time.sleep(2)
 
-    def is_eye_crossed_out(self):
+    def is_eye_crossed_out(self, timeout=30):
+        """Check if eye button shows crossed-out state. Waits for spinner to finish first."""
+        # Wait for any loading spinner on the eye button to disappear
         try:
-            self.find_element(Loc.SYNAPTIC_INPUT_EYE_CROSSED, timeout=5)
+            spinner_loc = (By.CSS_SELECTOR, ".anticon-loading, .ant-spin")
+            self.wait_for_element_to_disappear(spinner_loc, timeout=timeout)
+        except Exception:
+            pass
+        try:
+            self.find_element(Loc.SYNAPTIC_INPUT_EYE_CROSSED, timeout=10)
             self.logger.info("Eye button is crossed out (eye-invisible)")
             return True
         except TimeoutException:
