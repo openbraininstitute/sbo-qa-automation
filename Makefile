@@ -1,10 +1,15 @@
-# Common test command template
-TEST_CMD = uv run pytest $(TEST) --env=$(ENV) --env_url=$(ENV_URL) --browser-name=firefox $(HEADLESS) -sv
-
 # Default variables
 ENV ?= production
 ENV_URL ?= production
 HEADLESS ?=
+BROWSER ?= firefox
+
+# Common test command template — uses chrome for headless, firefox for headed
+ifeq ($(HEADLESS),--headless)
+TEST_CMD = uv run pytest $(TEST) --env=$(ENV) --env_url=$(ENV_URL) --browser-name=chrome --headless -sv
+else
+TEST_CMD = uv run pytest $(TEST) --env=$(ENV) --env_url=$(ENV_URL) --browser-name=$(BROWSER) $(HEADLESS) -sv
+endif
 
 
 setup:
@@ -32,7 +37,7 @@ smoke:
 			tests/test_ai_assistant_workflow.py \
 			tests/test_build_single_neuron.py \
 			tests/test_digital_brain_story.py \
-			gtests/test_team.py \
+			tests/test_team.py \
 			tests/test_contact.py \
 			tests/test_explore_ephys.py \
             -sv \
@@ -81,7 +86,7 @@ regression:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py --html=report.html --self-contained-html"
 
 feature:
-	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_simulate_synaptome.py -vs --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_simulate_me_beta.py -vs --html=report.html --self-contained-html"
 
 feature-staging:
 	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_simulate_small_microcircuit.py --html=report.html --self-contained-html"
