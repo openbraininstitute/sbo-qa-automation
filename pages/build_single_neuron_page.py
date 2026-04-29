@@ -61,27 +61,56 @@ class BuildSingleNeuronPage(ProjectHome):
             return False
     
     def select_single_neuron_type(self, timeout=10):
-        """Select Single neuron build type"""
+        """Select Single neuron build type, scrolling the carousel if needed."""
         try:
-            # Try multiple selectors for single neuron option
+            # Try to find the card directly first
             selectors = [
                 self.locators.SINGLE_NEURON_TYPE,
-                self.locators.SINGLE_NEURON_CARD
+                self.locators.SINGLE_NEURON_CARD,
             ]
-            
+
             for selector in selectors:
                 try:
-                    single_neuron = self.element_to_be_clickable(selector, timeout)
-                    self.browser.execute_script("arguments[0].scrollIntoView(true);", single_neuron)
-                    time.sleep(1)
-                    single_neuron.click()
-                    print("✅ Single neuron type selected successfully")
-                    self.wait_for_page_load()
-                    return True
+                    single_neuron = self.element_to_be_clickable(selector, timeout=5)
+                    if single_neuron.is_displayed():
+                        self.browser.execute_script(
+                            "arguments[0].scrollIntoView(true);", single_neuron
+                        )
+                        time.sleep(1)
+                        single_neuron.click()
+                        print("✅ Single neuron type selected successfully")
+                        self.wait_for_page_load()
+                        return True
                 except TimeoutException:
                     continue
-            
-            print("❌ Single neuron option not found")
+
+            # Card not visible — scroll carousel right until it appears
+            for _ in range(5):
+                try:
+                    next_btn = self.element_to_be_clickable(
+                        self.locators.TYPE_CAROUSEL_NEXT_BTN, timeout=3
+                    )
+                    next_btn.click()
+                    print("  → Scrolled carousel right")
+                    time.sleep(1)
+                    for selector in selectors:
+                        try:
+                            single_neuron = self.element_to_be_clickable(selector, timeout=3)
+                            if single_neuron.is_displayed():
+                                self.browser.execute_script(
+                                    "arguments[0].scrollIntoView(true);", single_neuron
+                                )
+                                time.sleep(1)
+                                single_neuron.click()
+                                print("✅ Single neuron type selected (after scrolling)")
+                                self.wait_for_page_load()
+                                return True
+                        except TimeoutException:
+                            continue
+                except TimeoutException:
+                    break
+
+            print("❌ Single neuron option not found after scrolling carousel")
             return False
         except Exception as e:
             print(f"❌ Error selecting single neuron type: {e}")
