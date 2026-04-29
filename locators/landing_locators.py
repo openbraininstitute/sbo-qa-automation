@@ -29,13 +29,65 @@ class LandingLocators:
     HERO_BACKGROUND_IMG = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__background")
     HERO_BACKGROUND_VIDEO = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__show")
     LOGIN_BUTTON = (By.XPATH, "//a[@href='/app/virtual-lab']")
-    NAV_ABOUT = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/about']")
-    NAV_MISSION = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/mission']")
-    NAV_NEWS = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/news']")
-    NAV_PRICING = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/pricing']")
-    NAV_TEAM = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/team']")
-    NAV_RESOURCES = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/resources']")
-    NAV_CONTACT = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']/a[@href='/contact']")
+    # --- Top-level dropdown menu buttons (the <button> elements) ---
+    NAV_ABOUT_BUTTON = (
+        By.XPATH,
+        "//button[@class='Menu-module__CnaVha__menuButton']"
+        "[.//span[@class='Menu-module__CnaVha__menuButtonContent'][starts-with(normalize-space(),'About')]]",
+    )
+    NAV_PLATFORM_BUTTON = (
+        By.XPATH,
+        "//button[@class='Menu-module__CnaVha__menuButton']"
+        "[.//span[@class='Menu-module__CnaVha__menuButtonContent'][starts-with(normalize-space(),'The Platform')]]",
+    )
+
+    # --- Wrapper div that contains button + submenu (for scoping submenu items) ---
+    NAV_ABOUT_DROPDOWN = (
+        By.XPATH,
+        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "[.//span[@class='Menu-module__CnaVha__menuButtonContent'][starts-with(normalize-space(),'About')]]",
+    )
+    NAV_PLATFORM_DROPDOWN = (
+        By.XPATH,
+        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "[.//span[@class='Menu-module__CnaVha__menuButtonContent'][starts-with(normalize-space(),'The Platform')]]",
+    )
+
+    # --- About submenu items (scoped inside the About dropdown wrapper) ---
+    NAV_ABOUT_OBI = (By.XPATH,
+        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "[.//span[starts-with(normalize-space(),'About')]]"
+        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/about']")
+    NAV_OUR_STORY = (By.XPATH,
+        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "[.//span[starts-with(normalize-space(),'About')]]"
+        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/the-real-digital-brain-story']")
+    NAV_MISSION = (By.XPATH,
+        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "[.//span[starts-with(normalize-space(),'About')]]"
+        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/mission']")
+    NAV_TEAM = (By.XPATH,
+        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "[.//span[starts-with(normalize-space(),'About')]]"
+        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/team']")
+
+    # --- The Platform submenu items (scoped inside the Platform dropdown wrapper) ---
+    NAV_FEATURES = (By.XPATH,
+        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "[.//span[starts-with(normalize-space(),'The Platform')]]"
+        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/features']")
+    NAV_SHOWCASES = (By.XPATH,
+        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "[.//span[starts-with(normalize-space(),'The Platform')]]"
+        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/showcases']")
+    NAV_PRICING = (By.XPATH,
+        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "[.//span[starts-with(normalize-space(),'The Platform')]]"
+        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/pricing']")
+
+    # --- Direct top-level nav links ---
+    NAV_NEWS = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']//a[contains(@class,'Menu-module__CnaVha__menuLink') and @href='/news']")
+    NAV_CONTACT = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']//a[contains(@class,'Menu-module__CnaVha__menuLink') and @href='/contact']")
     OBI_LOGO = (By.XPATH, "(//h2[contains(text(),'Open Brain Institute')])[1]")
     PARA_TEXT = (By.XPATH, "//div[contains(@class, 'Text-module__KTJYiG__text')]")
     P_TEXT1 = (By.XPATH, "(//div[@class='SanityContentPreview-module__hsTF2G__text'])[1]")
@@ -68,13 +120,17 @@ class LandingLocators:
     TITLE_WHO = (By.XPATH, "//h1[normalize-space()='Who is behind the Open Brain Institute']")
     TITLE_NEWS = (By.XPATH, "//h1[normalize-space()='News and events']")
     TOP_MENU = (By.CSS_SELECTOR, "(div[id='LandingPage/menu'])")
-    TOP_ABOUT = (By.XPATH, "(//a[@href='/about'])[1]")
-    TOP_MISSION = (By.XPATH, "(//a[@href='/mission'])[1]")
-    TOP_NEWS = (By.XPATH, "(//a[@href='/news'])[1]")
-    TOP_PRICING = (By.XPATH, "(//a[@href='/pricing'])[1]")
-    TOP_TEAM = (By.XPATH, "(//a[@href='/team'])[1]")
-    TOP_RESOURCES = (By.XPATH, "(//a[@href='/resources'])[1]")
-    TOP_CONTACT = (By.XPATH, "(//a[@href='/contact'])[1]")
+    TOP_ABOUT_DROPDOWN = NAV_ABOUT_DROPDOWN
+    TOP_ABOUT_OBI = NAV_ABOUT_OBI
+    TOP_OUR_STORY = NAV_OUR_STORY
+    TOP_MISSION = NAV_MISSION
+    TOP_TEAM = NAV_TEAM
+    TOP_PLATFORM_DROPDOWN = NAV_PLATFORM_DROPDOWN
+    TOP_FEATURES = NAV_FEATURES
+    TOP_SHOWCASES = NAV_SHOWCASES
+    TOP_PRICING = NAV_PRICING
+    TOP_NEWS = NAV_NEWS
+    TOP_CONTACT = NAV_CONTACT
     TOP_MENU_LOGO = (By.XPATH, "//a[starts-with(@class,'Menu_logo')]")
     VIDEO_TITLE1 = (By.XPATH, "//h3[normalize-space()='01. Fill with Neurons']")
     VIDEO_CONTAINER = (By.XPATH, "(//div[starts-with(@class,'sanity-content-video-module')])[1]")
