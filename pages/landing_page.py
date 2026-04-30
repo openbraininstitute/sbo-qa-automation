@@ -261,26 +261,81 @@ class LandingPage(HomePage):
     def find_top_menu(self):
         return self.find_element(LandingLocators.TOP_MENU)
 
-    def find_top_about(self):
-        return self.find_element(LandingLocators.TOP_ABOUT)
+    # --- About dropdown ---
+    def find_about_dropdown(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_ABOUT_DROPDOWN, timeout=timeout)
 
-    def find_top_mission(self):
-        return self.find_element(LandingLocators.TOP_MISSION)
+    def find_about_button(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_ABOUT_BUTTON, timeout=timeout)
 
-    def find_top_news(self):
-        return self.find_element(LandingLocators.TOP_NEWS)
+    def click_about_dropdown(self, timeout=10):
+        """Click the About button to open its submenu."""
+        btn = self.element_to_be_clickable(LandingLocators.NAV_ABOUT_BUTTON, timeout=timeout)
+        btn.click()
+        import time
+        time.sleep(0.5)
+        return btn
 
-    def find_top_pricing(self):
-        return self.find_element(LandingLocators.TOP_PRICING)
+    def hover_about_dropdown(self, timeout=10):
+        """Hover over the About dropdown to reveal submenu items."""
+        from selenium.webdriver.common.action_chains import ActionChains
+        dropdown = self.find_about_dropdown(timeout=timeout)
+        ActionChains(self.browser).move_to_element(dropdown).perform()
+        import time
+        time.sleep(0.5)
+        return dropdown
 
-    def find_top_team(self):
-        return self.find_element(LandingLocators.TOP_TEAM)
+    def find_about_obi(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_ABOUT_OBI, timeout=timeout)
 
-    def find_top_resources(self):
-        return self.find_element(LandingLocators.TOP_RESOURCES)
+    def find_our_story(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_OUR_STORY, timeout=timeout)
 
-    def find_top_contact(self):
-        return self.find_element(LandingLocators.TOP_CONTACT)
+    def find_top_mission(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_MISSION, timeout=timeout)
+
+    def find_top_team(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_TEAM, timeout=timeout)
+
+    # --- The Platform dropdown ---
+    def find_platform_dropdown(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_PLATFORM_DROPDOWN, timeout=timeout)
+
+    def find_platform_button(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_PLATFORM_BUTTON, timeout=timeout)
+
+    def click_platform_dropdown(self, timeout=10):
+        """Click The Platform button to open its submenu."""
+        btn = self.element_to_be_clickable(LandingLocators.NAV_PLATFORM_BUTTON, timeout=timeout)
+        btn.click()
+        import time
+        time.sleep(0.5)
+        return btn
+
+    def hover_platform_dropdown(self, timeout=10):
+        """Hover over The Platform dropdown to reveal submenu items."""
+        from selenium.webdriver.common.action_chains import ActionChains
+        dropdown = self.find_platform_dropdown(timeout=timeout)
+        ActionChains(self.browser).move_to_element(dropdown).perform()
+        import time
+        time.sleep(0.5)
+        return dropdown
+
+    def find_top_features(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_FEATURES, timeout=timeout)
+
+    def find_top_showcases(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_SHOWCASES, timeout=timeout)
+
+    def find_top_pricing(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_PRICING, timeout=timeout)
+
+    # --- Direct nav links ---
+    def find_top_news(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_NEWS, timeout=timeout)
+
+    def find_top_contact(self, timeout=10):
+        return self.find_element(LandingLocators.NAV_CONTACT, timeout=timeout)
 
     def find_menu_logo(self):
         return self.find_element(LandingLocators.TOP_MENU_LOGO)

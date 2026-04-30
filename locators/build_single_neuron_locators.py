@@ -42,13 +42,30 @@ class BuildSingleNeuronLocators:
     TICK_SEARCHED_M_RECORD = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[2]//span[@class='ant-radio-inner']")
     TICK_SEARCHED_E_RECORD = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[2]//span[@class='ant-radio-inner']")
 
-    # Workflow Build Locators - moved from workflow_build_locators.py
-    # Main workflow page - Build button to access workflow options
-    BUILD_BUTTON = (By.XPATH, "//div[normalize-space()='Build']")
-    
-    # Build type selection
-    SINGLE_NEURON_TYPE = (By.XPATH, "//div[contains(@class, 'build-type') or contains(@class, 'type-selection')]//button[contains(text(), 'Single neuron') or contains(text(), 'single neuron')]")
-    SINGLE_NEURON_CARD = (By.XPATH, "//div[contains(@class, 'card') or contains(@class, 'option')]//h3[contains(text(), 'Single neuron')] | //div[contains(@class, 'card') or contains(@class, 'option')][.//text()[contains(., 'Single neuron')]]")
+    # Workflow Build Locators
+    # Main workflow page - Build category card (first card in the category carousel)
+    BUILD_BUTTON = (By.XPATH, "(//div[@data-slot='card'])[1]")
+
+    # Build type selection - carousel inside workflow-types-menu-build
+    SINGLE_NEURON_TYPE = (
+        By.XPATH,
+        "//div[@id='workflow-types-menu-build']"
+        "//div[@data-slot='card'][@aria-disabled='false']"
+        "[.//div[@data-slot='card-title'][contains(.,'Single neuron') and not(contains(.,'beta'))]]",
+    )
+    SINGLE_NEURON_CARD = (
+        By.XPATH,
+        "//div[@id='workflow-types-menu-build']"
+        "//div[@data-slot='card-title'][contains(.,'Single neuron') and not(contains(.,'beta'))]",
+    )
+    TYPE_CAROUSEL_NEXT_BTN = (
+        By.XPATH,
+        "//div[@id='workflow-types-menu-build']//button[.//span[@aria-label='right']]",
+    )
+    TYPE_CAROUSEL_PREV_BTN = (
+        By.XPATH,
+        "//div[@id='workflow-types-menu-build']//button[.//span[@aria-label='left']]",
+    )
     
     # Configuration page elements - based on actual HTML
     MODEL_NAME_INPUT = (By.ID, "single-model-configuration-form_name")
