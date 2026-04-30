@@ -171,7 +171,117 @@ class SimulateIonChannelPage(HomePage):
                 results[name] = {'present': False, 'displayed': False}
         return results
 
-    # ── Right-hand column: Model Traces and Parameters ───────────────────
+    # ── Right-hand column: Model Traces and Activation dropdowns ────────
+
+    def is_model_traces_dropdown_visible(self, timeout=10):
+        """Check if the Model traces dropdown is visible in the right column."""
+        try:
+            el = self.find_element(Loc.MODEL_TRACES_DROPDOWN, timeout=timeout)
+            return el.is_displayed()
+        except TimeoutException:
+            return False
+
+    def is_activation_dropdown_visible(self, timeout=10):
+        """Check if the Activation/Inactivation dropdown is visible."""
+        try:
+            el = self.find_element(Loc.ACTIVATION_DROPDOWN, timeout=timeout)
+            return el.is_displayed()
+        except TimeoutException:
+            return False
+
+    def click_model_traces_dropdown(self, timeout=10):
+        """Click the Model traces dropdown and return the items."""
+        dd = self.element_to_be_clickable(Loc.MODEL_TRACES_DROPDOWN, timeout=timeout)
+        dd.click()
+        self.logger.info("Clicked Model traces dropdown")
+        time.sleep(1)
+        return self._get_select_dropdown_items()
+
+    def click_activation_dropdown(self, timeout=10):
+        """Click the Activation dropdown and return the items."""
+        dd = self.element_to_be_clickable(Loc.ACTIVATION_DROPDOWN, timeout=timeout)
+        dd.click()
+        self.logger.info("Clicked Activation dropdown")
+        time.sleep(1)
+        return self._get_select_dropdown_items()
+
+    def _get_select_dropdown_items(self, timeout=5):
+        """Return the list of items in the currently open select dropdown."""
+        try:
+            items = self.find_all_elements(Loc.SELECT_DROPDOWN_ITEMS, timeout=timeout)
+            labels = [it.text.strip() for it in items if it.text.strip()]
+            self.logger.info(f"Dropdown items ({len(labels)}): {labels}")
+            return items
+        except TimeoutException:
+            self.logger.warning("No dropdown items found")
+            return []
+
+    def select_dropdown_item(self, items, index=0):
+        """Click a specific item from an open dropdown by index."""
+        if index < len(items):
+            item = items[index]
+            label = item.text.strip()
+            item.click()
+            self.logger.info(f"Selected dropdown item [{index}]: '{label}'")
+            time.sleep(1)
+            return label
+        self.logger.warning(f"Dropdown item index {index} out of range ({len(items)})")
+        return None
+
+    def get_right_column_plot_count(self, timeout=5):
+        """Return the number of plot canvases visible in the right column."""
+        try:
+            canvases = self.find_all_elements(Loc.RIGHT_COLUMN_PLOT_CANVAS, timeout=timeout)
+            visible = [c for c in canvases if c.is_displayed()]
+            self.logger.info(f"Right column plots visible: {len(visible)}")
+            return len(visible)
+        except TimeoutException:
+            return 0
+
+    def verify_right_column_after_model_selection(self):
+        """Verify Model traces dropdown, Activation dropdown, and plots
+        are present in the right column after selecting an ion channel model.
+        Returns a dict with results."""
+        results = {}
+
+        # Model traces dropdown
+        results['model_traces_visible'] = self.is_model_traces_dropdown_visible(timeout=10)
+        if results['model_traces_visible']:
+            items = self.click_model_traces_dropdown()
+            results['model_traces_items'] = len(items)
+            self.logger.info(f"Model traces dropdown has {len(items)} item(s)")
+            # Close dropdown by pressing Escape
+            try:
+                ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+                time.sleep(0.5)
+            except Exception:
+                pass
+        else:
+            results['model_traces_items'] = 0
+
+        # Activation dropdown
+        results['activation_visible'] = self.is_activation_dropdown_visible(timeout=5)
+        if results['activation_visible']:
+            items = self.click_activation_dropdown()
+            results['activation_items'] = len(items)
+            self.logger.info(f"Activation dropdown has {len(items)} item(s)")
+            # Select first item to verify plot updates
+            if items:
+                selected = self.select_dropdown_item(items, index=0)
+                results['activation_selected'] = selected
+            else:
+                try:
+                    ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+                    time.sleep(0.5)
+                except Exception:
+                    pass
+        else:
+            results['activation_items'] = 0
+
+        # Plots
+        results['plot_count'] = self.get_right_column_plot_count(timeout=5)
+
+        return results
 
     def is_model_traces_visible(self, timeout=15):
         """Check if the Model Traces plot is visible in the right column."""
@@ -238,8 +348,236 @@ class SimulateIonChannelPage(HomePage):
     def click_stimuli_tab(self):
         self._click_left_menu_btn(Loc.LEFT_MENU_STIMULI_BTN, "Stimuli")
 
+    def collapse_stimuli_tab(self):
+        """Click the Stimuli button to collapse its sub-entry if open."""
+        self._collapse_left_menu_section(Loc.LEFT_MENU_STIMULI_BTN, "Stimuli")
+
     def click_recordings_tab(self):
         self._click_left_menu_btn(Loc.LEFT_MENU_RECORDINGS_BTN, "Recordings")
+
+    # ── Ion channel models tab ───────────────────────────────────────────
+
+    def click_ion_channel_models_tab(self):
+        self._click_left_menu_btn(Loc.LEFT_MENU_ION_CHANNEL_MODELS_BTN, "Ion channel models")
+
+    def collapse_ion_channel_models_tab(self):
+        """Click the Ion channel models button to collapse its sub-entry if open."""
+        self._collapse_left_menu_section(Loc.LEFT_MENU_ION_CHANNEL_MODELS_BTN, "Ion channel models")
+
+    def _collapse_left_menu_section(self, locator, label):
+        """Collapse a left-menu section if its sub-entry is expanded."""
+        try:
+            btn = self.find_element(locator, timeout=5)
+            self.browser.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", btn
+            )
+            time.sleep(0.3)
+
+            # Check if the sub-entry is open by looking for an active sub-entry
+            # sibling within the same parent container
+            parent = btn.find_element(By.XPATH, "./ancestor::div[contains(@class,'flex-col')][1]")
+            try:
+                sub_entry = parent.find_element(
+                    By.CSS_SELECTOR,
+                    "div[data-scan-config-menu='menu-block-dictionary-sub-entry'][data-active='true']"
+                )
+                if sub_entry.is_displayed():
+                    btn.click()
+                    self.logger.info(f"Collapsed {label} sub-entry")
+                    time.sleep(1)
+                    return
+            except Exception:
+                pass
+
+            self.logger.info(f"{label} sub-entry already collapsed")
+        except Exception as e:
+            self.logger.warning(f"Could not collapse {label}: {e}")
+
+    def click_add_ion_channel_model(self):
+        """Click the + / Add button inside the Ion channel models sub-entry."""
+        btn = self.element_to_be_clickable(Loc.ION_CHANNEL_MODELS_ADD_BTN, timeout=10)
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", btn
+        )
+        time.sleep(0.5)
+        try:
+            ActionChains(self.browser).move_to_element(btn).click().perform()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", btn)
+        self.logger.info("Clicked 'Add' ion channel model")
+        time.sleep(2)
+
+    def get_ion_channel_model_type_items(self, timeout=10):
+        """Get all model type items in the middle column after clicking Add."""
+        try:
+            items = self.find_all_elements(
+                Loc.ION_CHANNEL_MODEL_TYPE_ITEMS, timeout=timeout
+            )
+            labels = [it.text.strip().split(chr(10))[0][:60] for it in items]
+            self.logger.info(f"Ion channel model type items ({len(items)}): {labels}")
+            return items
+        except TimeoutException:
+            self.logger.warning("No ion channel model type items found")
+            return []
+
+    def click_ion_channel_model_type(self, index=0):
+        """Click a model type item by index. Returns the label text."""
+        items = self.get_ion_channel_model_type_items()
+        assert len(items) > index, (
+            f"Expected at least {index + 1} model type items, got {len(items)}"
+        )
+        item = items[index]
+        label = item.text.strip().split(chr(10))[0][:60]
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", item
+        )
+        time.sleep(0.5)
+        try:
+            ActionChains(self.browser).move_to_element(item).click().perform()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", item)
+        self.logger.info(f"Clicked model type item [{index}]: '{label}'")
+        time.sleep(2)
+        return label
+
+    def click_ion_channel_model_field(self, timeout=10):
+        """Click the ion channel model selection field to open the model list."""
+        field = self.element_to_be_clickable(Loc.ION_CHANNEL_MODEL_FIELD, timeout=timeout)
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", field
+        )
+        time.sleep(0.5)
+        field.click()
+        self.logger.info("Clicked ion channel model selection field")
+        time.sleep(3)
+
+    def select_ion_channel_model_from_list(self, row_index=None, exclude_prefix="Test_DONT_USE_", timeout=15):
+        """Select a model from the list view by clicking its radio button.
+
+        By default picks a random row, skipping the first two rows and any row
+        whose name starts with *exclude_prefix*.  If *row_index* is explicitly
+        provided, that specific row is selected instead (legacy behaviour).
+        """
+        rows = self.find_all_elements(Loc.ION_CHANNEL_MODEL_LIST_ROWS, timeout=timeout)
+        assert len(rows) > 0, "No model rows found in the list"
+
+        if row_index is not None:
+            # Legacy explicit index selection
+            assert len(rows) > row_index, (
+                f"Expected at least {row_index + 1} model rows, got {len(rows)}"
+            )
+            row = rows[row_index]
+        else:
+            # Skip first 2 rows and any row matching exclude_prefix
+            eligible = []
+            for i, r in enumerate(rows):
+                if i < 2:
+                    row_name = r.text.split('\n')[0].strip()
+                    self.logger.info(f"Skipping row [{i}]: '{row_name[:60]}' (first two)")
+                    continue
+                row_name = r.text.split('\n')[0].strip()
+                if exclude_prefix and row_name.startswith(exclude_prefix):
+                    self.logger.info(f"Skipping row [{i}]: '{row_name[:60]}' (matches exclude prefix)")
+                    continue
+                eligible.append(r)
+
+            if not eligible:
+                self.logger.warning(
+                    "No eligible rows after filtering, falling back to all rows except first two"
+                )
+                eligible = rows[2:] if len(rows) > 2 else rows
+
+            row = random.choice(eligible)
+
+        row_text = row.text.split('\n')[0][:60]
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", row
+        )
+        time.sleep(0.5)
+
+        # Try clicking the radio button inside the row
+        try:
+            radio = row.find_element(
+                By.XPATH, ".//input[@type='radio'] | .//span[contains(@class,'ant-radio-inner')]"
+            )
+            radio.click()
+        except Exception:
+            # Fallback: click the row itself
+            try:
+                ActionChains(self.browser).move_to_element(row).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", row)
+
+        self.logger.info(f"Selected model row: '{row_text}'")
+        time.sleep(1)
+
+        # Click the Select button if present (modal footer)
+        try:
+            select_btn = self.element_to_be_clickable(
+                Loc.ION_CHANNEL_MODEL_SELECT_BTN, timeout=5
+            )
+            select_btn.click()
+            self.logger.info("Clicked 'Select' button in modal")
+            time.sleep(2)
+        except TimeoutException:
+            self.logger.info("No modal Select button found — selection may be inline")
+
+        return row_text
+
+    def fill_conductance_value(self, value, timeout=10):
+        """Fill in the conductance value input."""
+        inp = self.find_element(Loc.ION_CHANNEL_CONDUCTANCE_INPUT, timeout=timeout)
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", inp
+        )
+        time.sleep(0.3)
+        inp.click()
+        inp.send_keys(Keys.COMMAND + "a")
+        inp.send_keys(Keys.BACKSPACE)
+        inp.send_keys(str(value))
+        self.logger.info(f"Filled conductance value: {value}")
+        time.sleep(0.5)
+
+    def add_and_configure_ion_channel_model(self, type_index, model_row_index=None,
+                                             conductance=0.1, permeability=None):
+        """Full flow: click model type → select model from list → fill conductance or permeability.
+
+        Args:
+            type_index: Index of the model type item to click in the middle column.
+            model_row_index: Which row to select from the model list.
+                None (default) = random selection, skipping first two rows and
+                rows named "Test_DONT_USE_*".
+            conductance: Conductance value to fill in (S/cm²).
+                None = skip conductance (model has no conductance field).
+            permeability: Max permeability value to fill in (ms/s).
+                None = skip. Takes precedence over conductance when set.
+        """
+        label = self.click_ion_channel_model_type(index=type_index)
+        self.logger.info(f"Configuring ion channel model type: '{label}'")
+
+        self.wait_for_block_single(timeout=10)
+
+        self.click_ion_channel_model_field()
+        model_name = self.select_ion_channel_model_from_list(row_index=model_row_index)
+        self.logger.info(f"Selected model: '{model_name}'")
+
+        if permeability is not None:
+            self.fill_conductance_value(permeability)
+            self.logger.info(
+                f"Ion channel model configured: type='{label}', "
+                f"model='{model_name}', permeability={permeability} ms/s"
+            )
+        elif conductance is not None:
+            self.fill_conductance_value(conductance)
+            self.logger.info(
+                f"Ion channel model configured: type='{label}', "
+                f"model='{model_name}', conductance={conductance}"
+            )
+        else:
+            self.logger.info(
+                f"Ion channel model configured (no conductance/permeability): "
+                f"type='{label}', model='{model_name}'"
+            )
 
     # ── Info form ────────────────────────────────────────────────────────
 
@@ -330,17 +668,21 @@ class SimulateIonChannelPage(HomePage):
         return None
 
     def _click_sweep_add_in_block(self, block_element):
-        """Click the plus-circle (add sweep) button inside a config block."""
+        """Click the plus-circle (add sweep) icon inside a config block."""
         try:
-            add_btn = block_element.find_element(
+            # The plus-circle is a <span class="anticon anticon-plus-circle">, not a button
+            add_icon = block_element.find_element(
                 By.XPATH,
-                ".//button[.//*[contains(@class,'anticon-plus-circle')] or @aria-label='add sweep']"
+                ".//*[contains(@class,'anticon-plus-circle')]"
             )
             self.browser.execute_script(
-                "arguments[0].scrollIntoView({block: 'center'});", add_btn
+                "arguments[0].scrollIntoView({block: 'center'});", add_icon
             )
             time.sleep(0.3)
-            add_btn.click()
+            try:
+                add_icon.click()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", add_icon)
             self.logger.info("Clicked sweep add button")
             time.sleep(1)
         except Exception as e:
@@ -423,13 +765,23 @@ class SimulateIonChannelPage(HomePage):
             self.logger.warning("No dictionary items found")
             return []
 
-    def click_dictionary_item_by_label(self, target_label):
-        """Click a specific dictionary item by its label text."""
+    def click_dictionary_item_by_label(self, target_label, exclude_labels=None):
+        """Click a specific dictionary item by its label text.
+
+        Args:
+            target_label: Substring to match (case-insensitive).
+            exclude_labels: List of substrings to skip even if they match target_label.
+        """
         items = self.get_dictionary_items()
         assert items, "No dictionary items found"
+        exclude_labels = [e.lower() for e in (exclude_labels or [])]
         for item in items:
             text = item.text.strip().split(chr(10))[0].strip()
             if target_label.lower() in text.lower():
+                # Skip if it matches an exclusion
+                if any(excl in text.lower() for excl in exclude_labels):
+                    self.logger.info(f"Skipping excluded match: '{text}'")
+                    continue
                 self.browser.execute_script(
                     "arguments[0].scrollIntoView({block: 'center'});", item
                 )
@@ -443,16 +795,27 @@ class SimulateIonChannelPage(HomePage):
                 return text
         raise AssertionError(f"Dictionary item '{target_label}' not found")
 
-    def click_random_enabled_dictionary_item(self):
-        """Click a random enabled dictionary item. Returns the label text."""
+    def click_random_enabled_dictionary_item(self, exclude_labels=None):
+        """Click a random enabled dictionary item. Returns the label text.
+
+        Args:
+            exclude_labels: List of label substrings to skip (case-insensitive).
+        """
         items = self.get_dictionary_items()
         assert items, "No dictionary items found"
-        enabled = [
-            it for it in items
-            if not it.get_attribute("disabled")
-            and "cursor-not-allowed" not in (it.get_attribute("class") or "")
-        ]
-        assert enabled, "No enabled dictionary items"
+        exclude_labels = [e.lower() for e in (exclude_labels or [])]
+        enabled = []
+        for it in items:
+            if it.get_attribute("disabled"):
+                continue
+            if "cursor-not-allowed" in (it.get_attribute("class") or ""):
+                continue
+            label = it.text.strip().split(chr(10))[0][:60]
+            if any(excl in label.lower() for excl in exclude_labels):
+                self.logger.info(f"Skipping excluded stimulus: '{label}'")
+                continue
+            enabled.append(it)
+        assert enabled, "No enabled dictionary items after exclusions"
         item = random.choice(enabled)
         label = item.text.strip().split(chr(10))[0][:60]
         self.browser.execute_script(
@@ -473,42 +836,199 @@ class SimulateIonChannelPage(HomePage):
         self.logger.info("block_single form appeared")
         return el
 
-    # ── Recordings ───────────────────────────────────────────────────────
+    # ── Recordings (dictionary-based, same pattern as Ion channel models) ─
 
-    def get_recording_checkboxes(self, timeout=10):
-        """Return all recording checkbox/toggle elements."""
+    def click_add_recording(self):
+        """Click the Add Recording button inside the Recordings sub-entry."""
         try:
-            return self.find_all_elements(Loc.RECORDING_CHECKBOXES, timeout=timeout)
-        except TimeoutException:
-            return []
-
-    def enable_all_recordings(self):
-        """Enable all available recording options. Returns count enabled."""
-        checkboxes = self.get_recording_checkboxes()
-        enabled_count = 0
-        for cb in checkboxes:
+            btn = self.element_to_be_clickable(Loc.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
+            self.browser.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", btn
+            )
+            time.sleep(0.5)
             try:
-                self.browser.execute_script(
-                    "arguments[0].scrollIntoView({block: 'center'});", cb
-                )
-                time.sleep(0.3)
-                # Check if already checked/active
-                is_checked = (
-                    cb.get_attribute("checked") is not None
-                    or "ant-switch-checked" in (cb.get_attribute("class") or "")
-                    or "ant-checkbox-checked" in (
-                        cb.find_element(By.XPATH, "./ancestor::label").get_attribute("class")
-                        if cb.tag_name == "input" else ""
+                btn.click()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", btn)
+            self.logger.info("Clicked 'Add Recording'")
+            time.sleep(2)
+        except TimeoutException:
+            self.logger.warning("Add Recording button not found")
+
+    def get_recording_entry_count(self, timeout=5):
+        """Return the number of recording entry buttons currently visible."""
+        try:
+            entries = self.find_all_elements(
+                Loc.RECORDING_ENTRY_BUTTONS, timeout=timeout
+            )
+            count = len(entries)
+            self.logger.info(f"Recording entries: {count}")
+            return count
+        except TimeoutException:
+            return 0
+
+    def click_recording_entry(self, index=0, timeout=10):
+        """Click a recording entry by index, re-fetching from DOM to avoid stale refs."""
+        entries = self.find_all_elements(
+            Loc.RECORDING_ENTRY_BUTTONS, timeout=timeout
+        )
+        if index >= len(entries):
+            self.logger.warning(
+                f"Recording entry index {index} out of range ({len(entries)})"
+            )
+            return False
+        entry = entries[index]
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", entry
+        )
+        time.sleep(0.5)
+        try:
+            entry.click()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", entry)
+        label = entry.text.strip().split(chr(10))[0][:40]
+        self.logger.info(f"Clicked recording entry [{index}]: '{label}'")
+        time.sleep(2)
+        return True
+
+    def select_recording_variable(self, item_index=0, timeout=10):
+        """Open the Ion Channel Variable Name dropdown and select an item.
+
+        This must be called after clicking a recording entry so the form is visible.
+        Only the 1st recording type has this dropdown; returns None if not found.
+        """
+        try:
+            dd = self.find_element(Loc.RECORDING_VARIABLE_DROPDOWN, timeout=timeout)
+            self.browser.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", dd
+            )
+            time.sleep(1)
+
+            # Check current state
+            placeholder = dd.get_attribute("data-placeholder")
+            value_spans = dd.find_elements(
+                By.CSS_SELECTOR, "span[data-slot='select-value']"
+            )
+            value_text = value_spans[0].text.strip() if value_spans else ""
+            self.logger.info(
+                f"Recording variable dropdown state: "
+                f"placeholder attr exists={placeholder is not None}, "
+                f"value='{value_text[:50]}'"
+            )
+
+            # If already filled (no placeholder and has real value), skip
+            if placeholder is None and value_text and "select" not in value_text.lower():
+                self.logger.info(f"Variable already selected: '{value_text[:50]}'")
+                return value_text
+
+            # Click the dropdown to open it
+            self.logger.info("Attempting to click the variable dropdown...")
+            try:
+                ActionChains(self.browser).move_to_element(dd).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", dd)
+            self.logger.info("Clicked Ion Channel Variable Name dropdown")
+            time.sleep(3)  # Radix portals can be slow
+
+            # Log the page source around the dropdown for debugging
+            expanded = dd.get_attribute("aria-expanded")
+            self.logger.info(f"Dropdown aria-expanded after click: {expanded}")
+
+            # After opening the dropdown, try to select by clicking at offsets
+            # The Radix portal items are not reliably findable in DOM
+            # Strategy: click at increasing Y offsets below the trigger until
+            # the placeholder attribute disappears (meaning a value was selected)
+            self.logger.info("Attempting to select variable via offset clicks...")
+
+            for y_offset in [45, 90, 135, 45, 90]:
+                try:
+                    ActionChains(self.browser).move_to_element_with_offset(
+                        dd, 0, y_offset
+                    ).click().perform()
+                    self.logger.info(f"  Clicked at offset y={y_offset}")
+                    time.sleep(2)
+
+                    # Check if selection is complete
+                    dd_check = self.find_element(
+                        Loc.RECORDING_VARIABLE_DROPDOWN, timeout=2
                     )
-                )
-                if not is_checked:
-                    cb.click()
-                    time.sleep(0.5)
-                enabled_count += 1
-            except Exception as e:
-                self.logger.warning(f"Could not enable recording checkbox: {e}")
-        self.logger.info(f"Enabled {enabled_count} recording(s)")
-        return enabled_count
+                    if dd_check.get_attribute("data-placeholder") is None:
+                        self.logger.info("Variable selection confirmed!")
+                        return "selected via offset click"
+                except Exception as e:
+                    self.logger.info(f"  Offset y={y_offset} click: {e}")
+                    continue
+
+            self.logger.warning("Could not select variable after all offset attempts")
+            # Close any open dropdown
+            try:
+                ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+                time.sleep(0.5)
+            except Exception:
+                pass
+            return None
+        except TimeoutException:
+            # Dropdown not present — this recording type doesn't have it
+            return None
+
+    def add_recordings(self, total=3):
+        """Add recordings by selecting recording types from the dictionary items.
+
+        Flow per recording:
+        1. Click "Add Recording" → middle column shows recording type options
+        2. Click a recording type → it gets added and form appears
+        3. For the 1st recording only: select Ion Channel Variable Name
+
+        Returns the final count of recording entries.
+        """
+        for i in range(total):
+            self.logger.info(f"Adding recording {i}...")
+
+            # Click Add to show recording type options in middle column
+            self.click_add_recording()
+
+            # Get the available recording types (dictionary items in middle column)
+            items = self.get_dictionary_items(timeout=10)
+            if not items:
+                self.logger.warning(f"No recording type items found for recording {i}")
+                break
+
+            # Pick a recording type — use index i (mod available items)
+            type_index = i % len(items)
+            item = items[type_index]
+            label = item.text.strip().split(chr(10))[0][:60]
+            self.browser.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", item
+            )
+            time.sleep(0.5)
+            try:
+                item.click()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", item)
+            self.logger.info(f"Selected recording type [{type_index}]: '{label}'")
+            time.sleep(2)
+
+            # Wait for the form to appear
+            try:
+                self.wait_for_block_single(timeout=5)
+            except Exception:
+                self.logger.warning(f"Recording {i} form did not appear")
+                continue
+
+            # Only the 1st recording type needs Ion Channel Variable Name
+            if i == 0:
+                selected = self.select_recording_variable(item_index=0, timeout=5)
+                if selected:
+                    self.logger.info(f"Recording {i}: variable = '{selected}'")
+                else:
+                    self.logger.warning(f"Recording {i}: could not select variable")
+            else:
+                self.logger.info(f"Recording {i}: no variable needed for this type")
+
+        # Return final count
+        final_count = self.get_recording_entry_count()
+        self.logger.info(f"Final recording count: {final_count}")
+        return final_count
 
     # ── Generate simulation(s) ───────────────────────────────────────────
 

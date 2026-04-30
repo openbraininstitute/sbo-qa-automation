@@ -55,9 +55,47 @@ class SimulateIonChannelLocators:
     )
 
     # ── Right-hand column: Model Traces and Parameters ───────────────────
+    MODEL_TRACES_DROPDOWN = (
+        By.XPATH,
+        "//button[@data-slot='select-trigger']"
+        "[.//span[@data-slot='select-value'][contains(text(),'Model traces')]]",
+    )
+    ACTIVATION_DROPDOWN = (
+        By.XPATH,
+        "//button[@data-slot='select-trigger']"
+        "[.//span[@data-slot='select-value']"
+        "[contains(text(),'Activation') or contains(text(),'Inactivation')]]",
+    )
+    RIGHT_COLUMN_SELECT_TRIGGERS = (
+        By.XPATH,
+        "//button[@data-slot='select-trigger']"
+        "[.//span[@data-slot='select-value']]",
+    )
+    # Dropdown list items (appear after clicking a select-trigger)
+    SELECT_DROPDOWN_ITEMS = (
+        By.XPATH,
+        "//div[@data-slot='select-content']//div[@data-slot='select-item']"
+        " | //div[@role='option']"
+        " | //div[@data-radix-collection-item]"
+        " | //div[contains(@class,'SelectItem')]"
+        " | //div[@data-slot='select-item']",
+    )
+    # Plot canvases in the right column (PDF-rendered plots)
+    RIGHT_COLUMN_PLOT_CANVAS = (
+        By.CSS_SELECTOR,
+        "canvas.react-pdf__Page__canvas",
+    )
+    # Plot section labels (Stimuli, Traces)
+    RIGHT_COLUMN_PLOT_LABELS = (
+        By.XPATH,
+        "//div[contains(@class,'text-label') and contains(@class,'uppercase')]",
+    )
     MODEL_TRACES_PLOT = (
         By.XPATH,
-        "//div[contains(@class,'js-plotly-plot')] | //div[contains(@class,'plot')] | //*[name()='svg'][.//*[name()='g']]",
+        "//div[contains(@class,'js-plotly-plot')]"
+        " | //div[contains(@class,'plot')]"
+        " | //canvas[contains(@class,'react-pdf__Page__canvas')]"
+        " | //*[name()='svg'][.//*[name()='g']]",
     )
     PARAMETERS_SECTION = (
         By.XPATH,
@@ -90,6 +128,50 @@ class SimulateIonChannelLocators:
         By.XPATH,
         "//button[@data-scan-config-menu='left-menu-top-item']"
         "//span[contains(text(),'Recordings')]/ancestor::button",
+    )
+
+    # ── Ion channel models: left menu button and sub-entry ───────────────
+    LEFT_MENU_ION_CHANNEL_MODELS_BTN = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item']"
+        "//span[contains(text(),'Ion channel model')]/ancestor::button",
+    )
+    ION_CHANNEL_MODELS_ADD_BTN = (
+        By.XPATH,
+        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "[@data-active='true']//button[.//span[contains(text(),'Add')]]",
+    )
+    ION_CHANNEL_MODEL_TYPE_ITEMS = (
+        By.CSS_SELECTOR,
+        "button[data-scan-config-block-element-item='block_dictionary_item']",
+    )
+    ION_CHANNEL_MODEL_FIELD = (
+        By.XPATH,
+        "//div[@data-scan-config-block='block_single']"
+        "//button[contains(@class,'ant-select') or contains(@class,'placeholder')]"
+        " | //div[@data-scan-config-block='block_single']"
+        "//div[contains(@class,'ant-select-selector')]"
+        " | //div[@data-scan-config-block='block_single']"
+        "//button[contains(text(),'Click to select') or contains(text(),'select')]",
+    )
+    ION_CHANNEL_MODEL_LIST_ROWS = (
+        By.CSS_SELECTOR,
+        "tbody.ant-table-tbody tr.ant-table-row",
+    )
+    ION_CHANNEL_MODEL_RADIO_BTN = (
+        By.XPATH,
+        "//table//input[@type='radio']"
+        " | //table//span[contains(@class,'ant-radio-inner')]",
+    )
+    ION_CHANNEL_MODEL_SELECT_BTN = (
+        By.XPATH,
+        "//div[@id='modal-footer']//button[contains(.,'Select')]"
+        " | //button[text()='Select']",
+    )
+    ION_CHANNEL_CONDUCTANCE_INPUT = (
+        By.XPATH,
+        "//div[@data-scan-config-block='block_single']"
+        "//input[contains(@class,'ant-input-number-input')]",
     )
 
     # ── Warning / check icons on Info button ─────────────────────────────
@@ -154,12 +236,34 @@ class SimulateIonChannelLocators:
         "div[data-scan-config-block='block_single']",
     )
 
-    # ── Recordings: checkbox / toggle options ────────────────────────────
-    RECORDING_CHECKBOXES = (
+    # ── Recordings use the same dictionary pattern as Ion channel models ──
+    # (CONFIG_ADD_BTN_IN_SUB_ENTRY and CONFIG_BLOCK_DICTIONARY_ITEMS)
+
+    # Recording form: Ion Channel Variable Name dropdown
+    RECORDING_VARIABLE_DROPDOWN = (
         By.XPATH,
-        "//div[@data-scan-config-block-element]//label[contains(@class,'ant-checkbox-wrapper')]"
-        " | //div[@data-scan-config-block-element]//button[contains(@class,'ant-switch')]"
-        " | //div[@data-scan-config-block-element]//input[@type='checkbox']",
+        "//div[@data-scan-config-block='block_single']"
+        "//div[@data-scan-config-block-element='select_recordable_ion_channel_variable']"
+        "//button[@data-slot='select-trigger']",
+    )
+
+    # Recording entry buttons in the left-column sub-entry
+    RECORDING_ENTRY_BUTTONS = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item']"
+        "[.//span[contains(text(),'Recordings')]]"
+        "/ancestor::div[contains(@class,'flex-col')][1]"
+        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "//div[contains(@class,'entryButton') and @role='button']",
+    )
+
+    # Add Recording button (scoped to the Recordings sub-entry)
+    RECORDING_ADD_BTN = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item']"
+        "[.//span[contains(text(),'Recordings')]]"
+        "/ancestor::div[contains(@class,'flex-col')][1]"
+        "//button[.//span[contains(text(),'Add')]]",
     )
 
     # ── Generate simulation(s) button ────────────────────────────────────
