@@ -179,15 +179,27 @@ class TestSimulateIonChannel:
 
         # Step 24: Add 2nd Temperature value via sweep: 34
         page.add_sweep_value("Temperature", 34)
-        logger.info("Added Temperature sweep value")
+        logger.info("Added Temperature sweep value (34)")
+
+        # Add 3rd Temperature value: 37
+        page.add_sweep_value("Temperature", 37)
+        logger.info("Added Temperature sweep value (37)")
 
         # Step 25: Add 2nd Initial Voltage value via sweep: -70
         page.add_sweep_value("Initial Voltage", -70)
-        logger.info("Added Initial Voltage sweep value")
+        logger.info("Added Initial Voltage sweep value (-70)")
+
+        # Add 3rd Initial Voltage value: -65
+        page.add_sweep_value("Initial Voltage", -65)
+        logger.info("Added Initial Voltage sweep value (-65)")
 
         # Step 26: Add 2nd Random Seed value via sweep: 42
         page.add_sweep_value("Random Seed", 42)
-        logger.info("Added Random Seed sweep value")
+        logger.info("Added Random Seed sweep value (42)")
+
+        # Add 3rd Random Seed value: 100
+        page.add_sweep_value("Random Seed", 100)
+        logger.info("Added Random Seed sweep value (100)")
 
         # Steps 27-28: Set Duration to 1000ms, add sweep with 500ms
         page.set_parameter_value("Duration", 1000, input_index=0)

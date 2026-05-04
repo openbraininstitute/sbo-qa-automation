@@ -668,22 +668,27 @@ class SimulateIonChannelPage(HomePage):
         return None
 
     def _click_sweep_add_in_block(self, block_element):
-        """Click the plus-circle (add sweep) icon inside a config block."""
+        """Click the plus-circle (add sweep) icon inside a config block.
+        
+        The plus-circle is always on the last input row — after adding a sweep,
+        it moves to the newly created row.
+        """
         try:
-            # The plus-circle is a <span class="anticon anticon-plus-circle">, not a button
-            add_icon = block_element.find_element(
+            # Find ALL plus-circle icons and click the LAST one
+            icons = block_element.find_elements(
                 By.XPATH,
                 ".//*[contains(@class,'anticon-plus-circle')]"
             )
+            if not icons:
+                self.logger.warning("No plus-circle icons found in block")
+                return
+            add_icon = icons[-1]  # Always the last one
             self.browser.execute_script(
                 "arguments[0].scrollIntoView({block: 'center'});", add_icon
             )
             time.sleep(0.3)
-            try:
-                add_icon.click()
-            except Exception:
-                self.browser.execute_script("arguments[0].click();", add_icon)
-            self.logger.info("Clicked sweep add button")
+            self.browser.execute_script("arguments[0].click();", add_icon)
+            self.logger.info(f"Clicked sweep add button (icon {len(icons)} of {len(icons)})")
             time.sleep(1)
         except Exception as e:
             self.logger.warning(f"Could not click sweep add button: {e}")
@@ -712,21 +717,43 @@ class SimulateIonChannelPage(HomePage):
         """Add a sweep value to a parameter block identified by label substring.
 
         Clicks the plus-circle button, then fills the new input with *value*.
+        Always re-fetches the block element fresh to avoid stale references.
         """
+        # Fresh find of the block
         block = self._find_block_by_label(label_substring)
         if not block:
             self.logger.warning(f"Block '{label_substring}' not found")
             return
+
         element = block['element']
-        # Count existing inputs before adding
         inputs_before = len(element.find_elements(*Loc.BLOCK_NUMBER_INPUT))
-        self._click_sweep_add_in_block(element)
-        # Re-fetch to get the new input
-        time.sleep(1)
-        # Re-find the block since DOM may have changed
+        self.logger.info(
+            f"Adding sweep to '{label_substring}': {inputs_before} inputs before"
+        )
+
+        # Click the plus-circle — re-find block right before to avoid stale
+        block = self._find_block_by_label(label_substring)
+        if not block:
+            self.logger.warning(f"Block '{label_substring}' not found on re-fetch")
+            return
+        self._click_sweep_add_in_block(block['element'])
+        time.sleep(2)
+
+        # Re-find the block again since DOM changed after adding a row
         block = self._find_block_by_label(label_substring)
         if block:
-            self._set_number_input_value(block['element'], value, input_index=inputs_before)
+            new_inputs = len(block['element'].find_elements(*Loc.BLOCK_NUMBER_INPUT))
+            self.logger.info(
+                f"After click: {new_inputs} inputs (was {inputs_before})"
+            )
+            if new_inputs > inputs_before:
+                self._set_number_input_value(
+                    block['element'], value, input_index=new_inputs - 1
+                )
+            else:
+                self.logger.warning("No new input appeared after clicking plus-circle")
+        else:
+            self.logger.warning(f"Block '{label_substring}' not found after sweep click")
 
     def set_parameter_value(self, label_substring, value, input_index=0):
         """Set a parameter value in a block identified by label substring."""
