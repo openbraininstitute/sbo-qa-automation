@@ -45,13 +45,25 @@ class ProjectNotebooks(HomePage):
         return self.find_all_elements(ProjectNotebooksLocators.COLUMN_HEADER)
     
     def get_column_header_texts(self):
-        """Get the text content of all column headers using the specific column title class."""
+        """Get the text content of all column headers."""
         try:
-            column_title_elements = self.find_all_elements(
-                (By.CSS_SELECTOR, "th[data-testid='column-header'] .table-module__1pe1kq__columnTitle"),
+            # Use data-testid which is stable, then get the text from the inner div
+            headers = self.find_all_elements(
+                (By.CSS_SELECTOR, "th[data-testid='column-header']"),
                 timeout=10
             )
-            return [header.text.strip() for header in column_title_elements]
+            texts = []
+            for header in headers:
+                # Try to get text from the columnTitle div (class name may vary)
+                try:
+                    title_div = header.find_element(
+                        By.CSS_SELECTOR, "div[class*='columnTitle']"
+                    )
+                    texts.append(title_div.text.strip())
+                except Exception:
+                    # Fallback: get the header's own text (first line, strip sort icons)
+                    texts.append(header.text.strip().split("\n")[0])
+            return texts
         except Exception as e:
             self.logger.error(f"Failed to get column header texts: {str(e)}")
             return []

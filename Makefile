@@ -86,10 +86,10 @@ regression:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py --html=report.html --self-contained-html"
 
 feature:
-	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_simulate_synaptome_beta.py -vs --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_simulate_ion_channel.py -vs --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_simulate_synaptome_beta.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_project_notebooks.py tests/test_simulate_ion_channel.py --html=report.html --self-contained-html"
 
 # Workflow tests
 workflow:

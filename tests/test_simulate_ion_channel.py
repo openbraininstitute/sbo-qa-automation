@@ -46,7 +46,6 @@ class TestSimulateIonChannel:
         # ── Step 3: Config page loads directly — verify tabs ─────────────
         page.wait_for_config_page(timeout=30)
         logger.info("Config page loaded")
-
         tabs = page.verify_config_tabs()
         assert tabs['configuration']['present'], "Configuration tab should be present"
         assert tabs['simulations']['present'], "Simulations tab should be present"
@@ -247,16 +246,20 @@ class TestSimulateIonChannel:
         page.wait_for_block_single(timeout=10)
         logger.info("Stimulus config form appeared")
 
-        # Add a second stimulus
+        # Add a second stimulus — must be a Poisson spike (has frequency parameter)
         page.click_add_stimulus()
-        second_stim_items = page.get_dictionary_items()
-        if len(second_stim_items) > 1:
-            second_label = page.click_random_enabled_dictionary_item(
+        try:
+            poisson_label = page.click_dictionary_item_by_label(
+                "Poisson",
+                exclude_labels=EXCLUDED_STIMULI,
+            )
+            logger.info(f"Selected second stimulus (Poisson): '{poisson_label}'")
+        except Exception as e:
+            logger.warning(f"Could not find Poisson stimulus: {e}")
+            poisson_label = page.click_random_enabled_dictionary_item(
                 exclude_labels=EXCLUDED_STIMULI
             )
-            logger.info(f"Selected second stimulus: '{second_label}'")
-        else:
-            logger.info("Only one stimulus type available, skipping second")
+            logger.info(f"Selected second stimulus (fallback): '{poisson_label}'")
 
         # Verify stimuli appear in middle column
         final_stim_items = page.get_dictionary_items()
@@ -282,6 +285,23 @@ class TestSimulateIonChannel:
         )
 
         # ── Step 36: Generate simulation(s) ─────────────────────────────
+        # Verify the button is enabled (all required fields filled)
+        from locators.simulate_ion_channel_locators import SimulateIonChannelLocators as Loc
+        try:
+            gen_btn = page.find_element(Loc.GENERATE_SIMULATION_BTN, timeout=5)
+            is_disabled = gen_btn.get_attribute("disabled")
+            if is_disabled:
+                logger.warning(
+                    "Generate button is DISABLED — Initialization may be incomplete. "
+                    "Check sweep values were added correctly."
+                )
+                try:
+                    page.browser.save_screenshot("generate_btn_disabled.png")
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
         page.click_generate_simulation()
         logger.info("Clicked Generate simulation(s)")
 

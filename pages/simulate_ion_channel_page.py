@@ -674,6 +674,12 @@ class SimulateIonChannelPage(HomePage):
         it moves to the newly created row.
         """
         try:
+            # Scroll the block into view first
+            self.browser.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", block_element
+            )
+            time.sleep(1)
+
             # Find ALL plus-circle icons and click the LAST one
             icons = block_element.find_elements(
                 By.XPATH,
@@ -681,17 +687,19 @@ class SimulateIonChannelPage(HomePage):
             )
             if not icons:
                 self.logger.warning("No plus-circle icons found in block")
-                return
+                return False
             add_icon = icons[-1]  # Always the last one
             self.browser.execute_script(
                 "arguments[0].scrollIntoView({block: 'center'});", add_icon
             )
-            time.sleep(0.3)
+            time.sleep(0.5)
             self.browser.execute_script("arguments[0].click();", add_icon)
             self.logger.info(f"Clicked sweep add button (icon {len(icons)} of {len(icons)})")
-            time.sleep(1)
+            time.sleep(2)
+            return True
         except Exception as e:
             self.logger.warning(f"Could not click sweep add button: {e}")
+            return False
 
     def _set_number_input_value(self, block_element, value, input_index=0):
         """Set a number input value inside a config block."""
