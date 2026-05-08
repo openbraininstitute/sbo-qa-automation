@@ -279,7 +279,7 @@ class SimulateIonChannelLocators:
     )
     SIM_CARD_STATUS_BADGE = (
         By.XPATH,
-        ".//span[contains(@class,'rounded-xl')]",
+        ".//span[contains(@class,'rounded-xl') or contains(@class,'rounded-full')][contains(@class,'border') and contains(@class,'px-4')]",
     )
     LAUNCH_SIMULATIONS_BTN = (
         By.XPATH,
@@ -293,8 +293,9 @@ class SimulateIonChannelLocators:
     )
     INPUT_FILE_BUTTONS = (
         By.XPATH,
-        "//h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]"
-        "/following-sibling::div//button[@title]",
+        "//button[@data-testid[starts-with(.,'task-io-file-item')]]"
+        " | //h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]"
+        "/ancestor::div[contains(@class,'ant-collapse-item')]//button[@title]",
     )
     JSON_PREVIEW_CODE = (By.CSS_SELECTOR, "pre.shiki code")
 
