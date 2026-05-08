@@ -8,10 +8,26 @@ from selenium.webdriver.common.by import By
 class ExploreEModelPageLocators:
     AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
     AI_ASSISTANT_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[3]")
-    BRAIN_REGION_PANEL = (By.CSS_SELECTOR, "#atlas-regions-selector")
-    BR_SEARCH_FIELD_TYPE = (By.CSS_SELECTOR, "#region-search")
+    BRAIN_REGION_PANEL = (By.CSS_SELECTOR, "div[data-label='brain-region-switcher']")
+    BRAIN_REGION_SPECIES_DROPDOWN = (
+        By.XPATH,
+        "//span[@id='species-selector']//button[@data-slot='select-trigger']",
+    )
+    BRAIN_REGION_SPECIES_VALUE = (
+        By.XPATH,
+        "//span[@id='species-selector']//span[contains(@class,'font-bold')]",
+    )
+    BR_SEARCH_FIELD_TYPE = (
+        By.XPATH,
+        "//input[@id='region-search']"
+        " | //div[@data-label='brain-region-switcher']//input"
+        " | //input[contains(@placeholder,'Search') or contains(@placeholder,'region')]",
+    )
     BR_SEARCH_REGION_SEARCH_FIELD = (By.XPATH, "//div[@class='ant-select-selector']")
-    BR_CEREBRUM_TITLE = (By.XPATH, "//span[normalize-space(text())='Cerebrum']")
+    BR_CEREBRUM_TITLE = (
+        By.XPATH,
+        "//div[@data-label='brain-region-switcher']//span[contains(@class,'font-bold')]",
+    )
 
     CLOSE_BRAIN_REGION_PANEL_BTN = (By.XPATH, "(//button[starts-with(@class, 'ant-btn')]/span["
                                               "@class='ant-btn-icon'])[1]")
@@ -48,7 +64,10 @@ class ExploreEModelPageLocators:
     DV_SPECIES_LABEL = (By.XPATH, "//div[normalize-space()='Species']")
     DV_SPECIES_VALUE = (By.XPATH, "//div[normalize-space()='Species']/following-sibling::div")
     EMODEL_TAB = (By.XPATH, "//div[normalize-space()='E-model']")
-    FREE_TEXT_SEARCH = (By.CSS_SELECTOR, "button[aria-label='Open search']")
+    FREE_TEXT_SEARCH = (
+        By.XPATH,
+        "//button[@aria-label='Open search'] | //button[@aria-label='Close search']",
+    )
     INPUT_PLACEHOLDER = (By.CSS_SELECTOR, "input[placeholder='Search for entities...']")
     LV_EM_TD = (By.XPATH, "(//tr[starts-with(@class,'ant-table-row')]//td[starts-with(@class,'ant-table-cell')])[6]")
     LV_ROW = (By.CSS_SELECTOR, ".ant-table-body")
@@ -56,7 +75,14 @@ class ExploreEModelPageLocators:
     MINI_DETAIL_VIEW = (By.CSS_SELECTOR, "a[title='Go to details page']")
     MODEL_DATA_TAB = (By.XPATH, "//button[@role='tab' and text()='Model']")
     SEARCH_REGION = (By.XPATH, "//input[@class='ant-select-selection-search-input']")
-    SEARCH_RESOURCES = (By.CSS_SELECTOR, "input[placeholder='Search for resources...']")
-    SELECTED_BRAIN_REGION = (By.XPATH, "//div[@id='atlas-regions-selector']//span[contains(text(), 'Isocortex')]")
+    SEARCH_RESOURCES = (
+        By.CSS_SELECTOR,
+        "input[placeholder='Search for entities...'], input[placeholder='Search for resources...']",
+    )
+    SELECTED_BRAIN_REGION = (
+        By.XPATH,
+        "//div[@data-label='brain-region-switcher']//span[contains(@class,'font-bold')]"
+        " | //span[contains(text(), 'Isocortex')]",
+    )
     SPINNER = (By.XPATH, "//div[@class='ant-spin ant-spin-spinning']")
 

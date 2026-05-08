@@ -23,7 +23,8 @@ class TestExploreNeuronDensity:
 
         cerebrum_brp = explore_ndensity.find_cerebrum_brp(timeout=30)
         assert cerebrum_brp.is_displayed()
-        logger.info("Cerebrum is found in brain region banner")
+        region_text = cerebrum_brp.text.strip()
+        logger.info(f"Brain region banner shows: '{region_text}'")
 
         explore_ndensity.click_brain_region_banner()
         logger.info("Clicked brain region banner")

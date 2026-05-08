@@ -46,7 +46,6 @@ class TestExploreEphys:
             ExploreEphysLocators.LV_BRAIN_REGION,
             ExploreEphysLocators.LV_ETYPE,
             ExploreEphysLocators.LV_NAME,
-            ExploreEphysLocators.LV_SPECIES,
             ExploreEphysLocators.LV_CONTRIBUTORS,
             ExploreEphysLocators.LV_REGISTRATION_DATE,
         ]

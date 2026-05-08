@@ -37,9 +37,11 @@ class TestExploreModelPage:
         emodel_tab.click()
         logger.info("E-model data tab is clicked")
 
+        # Verify brain region panel shows a value
         cerebrum_title = explore_emodel.find_br_cerebrum_title(timeout=25)
         cerebrum_text = cerebrum_title.text
-        logger.info(f"Found text: {cerebrum_text}")
+        logger.info(f"Found brain region: {cerebrum_text}")
+        assert cerebrum_text.strip(), "Brain region text should not be empty"
 
         brain_region_panel = explore_emodel.find_brain_region_panel(timeout=20)
         logger.info("Found Brain Region Panel")
@@ -65,22 +67,13 @@ class TestExploreModelPage:
         selected_brain_region = explore_emodel.find_selected_brain_region_title(timeout=10)
         assert selected_brain_region.is_displayed(), "Selected brain region is not found"
         logger.info("Selected brain region is found")
-
-        # brain_region_panel_close_btn = explore_emodel.brain_region_panel_close_btn()
-        # assert brain_region_panel_close_btn.is_displayed(), ("Brain region panel close button is "
-        #                                                      "found")
-        # brain_region_panel_close_btn.click()
-        # logger.info("Brain region panel is toggled close")
-
         searched_emodel = "cadpyr"
-        search_for_resources = explore_emodel.find_search_for_resources()
-        assert search_for_resources.is_displayed(), "Search resources field is not found"
-        search_for_resources.click()
-        logger.info("Search resources field is clicked")
 
+        # Search field is open by default — find the input directly
         input_placeholder = explore_emodel.input_placeholder(timeout=10)
+        assert input_placeholder.is_displayed(), "Search input is not found"
         input_placeholder.click()
-        logger.info("Input placeholder is clicked")
+        logger.info("Search input is clicked")
 
         for char in searched_emodel:
             input_placeholder.send_keys(char)
@@ -104,7 +97,17 @@ class TestExploreModelPage:
                 if attempt > 0:
                     lv_searched_emodel = explore_emodel.find_lv_selected_resource(timeout=10)
                 
-                lv_searched_emodel.click()
+                # Wait for any loading overlay to disappear
+                time.sleep(2)
+                
+                # Try regular click first, then JS click
+                try:
+                    lv_searched_emodel.click()
+                except ElementClickInterceptedException:
+                    browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", lv_searched_emodel)
+                    time.sleep(1)
+                    browser.execute_script("arguments[0].click();", lv_searched_emodel)
+                
                 logger.info(f"Successfully clicked on attempt {attempt + 1}")
                 break
                 
@@ -113,7 +116,7 @@ class TestExploreModelPage:
                 if attempt == max_attempts - 1:
                     logger.error("All click attempts failed")
                     raise
-                time.sleep(1)
+                time.sleep(2)
 
         old_url = browser.current_url
         explore_emodel.wait_for_spinner_to_disappear(timeout=25)

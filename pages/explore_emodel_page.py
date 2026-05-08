@@ -24,6 +24,7 @@ class ExploreEModelDataPage(ExplorePage):
                 self.browser.set_page_load_timeout(90)
                 self.go_to_page(path)
                 self.wait_for_page_ready(timeout=60)
+                return self.browser.current_url
             except TimeoutException:
                 print(f"Attempt {attempt + 1} failed. Retrying in {delay} seconds...")
                 time.sleep(delay)
