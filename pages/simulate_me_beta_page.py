@@ -954,14 +954,29 @@ class SimulateMeBetaPage(HomePage):
                     *SimulateMeBetaLocators.BLOCK_VALUE_INPUT
                 )
                 for inp in value_inputs:
-                    manip_value = round(random.uniform(0.1, 5.0), 2)
+                    # Read min/max from the input's HTML attributes
+                    min_attr = inp.get_attribute("min")
+                    max_attr = inp.get_attribute("max")
+                    
+                    # Calculate a safe value within [min, max]
+                    min_val = float(min_attr) if min_attr else 0
+                    max_val = float(max_attr) if max_attr else 100
+                    
+                    # Use midpoint or min if range is tiny
+                    if max_val > min_val:
+                        manip_value = round((min_val + max_val) / 2, 2)
+                    else:
+                        manip_value = min_val
+                    
                     inp.click()
-                    # Use select-all + backspace for React controlled inputs
                     inp.send_keys(Keys.COMMAND + "a")
                     inp.send_keys(Keys.BACKSPACE)
                     time.sleep(0.2)
                     inp.send_keys(str(manip_value))
                     time.sleep(0.3)
+                    self.logger.info(
+                        f"Filled input (min={min_attr}, max={max_attr}) with {manip_value}"
+                    )
                 self.logger.info(
                     f"Filled {len(value_inputs)} neuronal manipulation value input(s)"
                 )
