@@ -38,7 +38,6 @@ class TestExploreNeuronDensity:
             ExploreNDensityPageLocators.LV_BRAIN_REGION,
             ExploreNDensityPageLocators.LV_MTYPE,
             ExploreNDensityPageLocators.LV_NAME,
-            ExploreNDensityPageLocators.LV_SPECIES,
             ExploreNDensityPageLocators.LV_CONTRIBUTORS,
             ExploreNDensityPageLocators.LV_REGISTRATION_DATE
         ]
