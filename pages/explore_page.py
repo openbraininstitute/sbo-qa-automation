@@ -70,17 +70,44 @@ class ExplorePage(HomePage):
         )
         return self.is_visible(ExplorePageLocators.BRAIN_REGION_PANEL, timeout=timeout)
 
+    def find_species_dropdown(self, timeout=10):
+        return self.find_element(ExplorePageLocators.BRAIN_REGION_SPECIES_DROPDOWN, timeout=timeout)
+
+    def get_species_value(self, timeout=10):
+        el = self.find_element(ExplorePageLocators.BRAIN_REGION_SPECIES_VALUE, timeout=timeout)
+        return el.text.strip()
+
+    def click_species_dropdown(self, timeout=10):
+        dd = self.element_to_be_clickable(ExplorePageLocators.BRAIN_REGION_SPECIES_DROPDOWN, timeout=timeout)
+        dd.click()
+        import time
+        time.sleep(1)
+        return dd
+
     def find_brain_region_search_field(self, timeout=20):
         return self.find_element(ExplorePageLocators.SEARCH_REGION, timeout=timeout)
 
     def find_cerebrum_brp(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_BRAIN_REGION_PANEL, timeout=timeout)
 
-    def find_cerebral_cortex_brp(self, timeout=15):
-        return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE, timeout=timeout)
+    def click_basic_cell_groups_arrow(self, timeout=15):
+        """Click the expand arrow on 'Basic cell groups and regions' to reveal children."""
+        arrow = self.element_to_be_clickable(ExplorePageLocators.BASIC_CELL_GROUPS_ARROW, timeout=timeout)
+        arrow.click()
+        import time
+        time.sleep(1)
+        return arrow
+
+    def find_cerebrum_in_tree(self, timeout=15):
+        """Find the Cerebrum button in the brain region tree."""
+        return self.find_element(ExplorePageLocators.CEREBRUM_BTN, timeout=timeout)
 
     def find_cerebrum_arrow_btn(self, timeout=20):
-        return self.find_element(ExplorePageLocators.CEREBRUM_BTN_VLAB, timeout=timeout)
+        """Find the expand arrow on the Cerebrum node."""
+        return self.find_element(ExplorePageLocators.CEREBRUM_ARROW_BTN, timeout=timeout)
+
+    def find_cerebral_cortex_brp(self, timeout=15):
+        return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE, timeout=timeout)
 
     def find_cerebrum_title_main_page(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)

@@ -200,10 +200,7 @@ class TestSimulateIonChannel:
         page.add_sweep_value("Random Seed", 100)
         logger.info("Added Random Seed sweep value (100)")
 
-        # Steps 27-28: Set Duration to 1000ms, add sweep with 500ms
-        page.set_parameter_value("Duration", 1000, input_index=0)
-        logger.info("Set Duration to 1000 ms")
-
+        # Steps 27-28: Duration already defaults to 1000ms, just add sweep with 500ms
         page.add_sweep_value("Duration", 500)
         logger.info("Added Duration sweep value of 500 ms")
 

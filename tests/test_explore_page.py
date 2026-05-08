@@ -181,11 +181,42 @@ class TestExplorePage:
         brain_region_panel = explore_page.find_brain_region_panel(timeout=20)
         logger.info("Found Brain Region Panel")
 
+        # Verify and click the Species dropdown
+        species_value = explore_page.get_species_value(timeout=10)
+        logger.info(f"Current species: '{species_value}'")
+        assert species_value, "Species value should not be empty"
+
+        explore_page.click_species_dropdown()
+        logger.info("Clicked Species dropdown")
+        time.sleep(2)
+
+        # Close the dropdown by pressing Escape
+        from selenium.webdriver.common.keys import Keys
+        from selenium.webdriver.common.action_chains import ActionChains
+        ActionChains(browser).send_keys(Keys.ESCAPE).perform()
+        time.sleep(1)
+        logger.info("Species dropdown closed")
+
         cerebrum_in_brpanel = explore_page.find_cerebrum_brp()
-        logger.info("Found Cerebrum in the brain region panel")
+        region_text = cerebrum_in_brpanel.text.strip()
+        logger.info(f"Found brain region in panel: '{region_text}'")
+        assert region_text, "Brain region text should not be empty"
 
         cerebrum_in_brpanel.click()
-        logger.info("Clicked on the Cerebrum in the brain region panel")
+        logger.info(f"Clicked on '{region_text}' in the brain region panel")
+
+        # Expand "Basic cell groups and regions" to find Cerebrum
+        time.sleep(2)
+        explore_page.click_basic_cell_groups_arrow(timeout=15)
+        logger.info("Expanded 'Basic cell groups and regions'")
+
+        # Find and click Cerebrum in the tree
+        cerebrum_node = explore_page.find_cerebrum_in_tree(timeout=15)
+        assert cerebrum_node.is_displayed(), "Cerebrum node should be visible in the tree"
+        logger.info("Found Cerebrum in the brain region tree")
+
+        cerebrum_node.click()
+        logger.info("Clicked on Cerebrum in the tree")
 
         cerebrum_arrow_btn = explore_page.find_cerebrum_arrow_btn(timeout=15)
         assert cerebrum_arrow_btn, "The toggle arrow for Cerebrum is not found"

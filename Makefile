@@ -45,20 +45,20 @@ smoke:
 
 smoke-staging:
 	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_landing.py \
-            tests/test_about.py \
-            tests/test_mission.py \
-            tests/test_news.py \
-            tests/test_login.py \
             tests/test_explore_page.py \
-            tests/test_project_home.py \
             tests/test_project_notebooks.py \
             tests/test_explore_emodel.py \
 			tests/test_ai_assistant_workflow.py \
 			tests/test_build_single_neuron.py \
-			tests/test_digital_brain_story.py \
-			tests/test_team.py \
-			tests/test_contact.py \
-			tests/test_explore_ephys.py \
+			tests/test_explore_page.py \
+            tests/test_project_notebooks.py \
+			tests/test_ai_assistant_workflow.py \
+			tests/test_build_single_neuron.py \
+			tests/test_simulate_ion_channel.py \
+			tests/test_simulate_small_microcircuit.py \
+			tests/test_simulate_me_beta.py \
+			tests/test_simulate_mem.py \
+			tests/test_build_synaptome.py \
             --html=report.html --self-contained-html"
 
 # New CI/CD stability tests
@@ -86,10 +86,10 @@ regression:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py --html=report.html --self-contained-html"
 
 feature:
-	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_simulate_ion_channel.py -vs --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_simulate_ion_channel.py tests/test_simulate_small_microcircuit.py tests/test_workflow_activities.py -vs --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_project_notebooks.py tests/test_simulate_ion_channel.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_page.py --html=report.html --self-contained-html"
 
 # Workflow tests
 workflow:

@@ -15,11 +15,39 @@ class ExplorePageLocators:
     ATLAS = (By.CSS_SELECTOR, "#three-d-area")
     ATLAS_FULLSCREEN = (By.XPATH, "//span[@class='anticon anticon-fullscreen text-xl']")
     BOUTON_DENSITY_NRECORDS = (By.CSS_SELECTOR, "a[data-testid='dataset-experimental_bouton_density'] span[class='mr-2 font-light']")
-    BRAIN_REGION_PANEL = (By.CSS_SELECTOR, "#atlas-regions-selector")
+    BRAIN_REGION_PANEL = (By.CSS_SELECTOR, "div[data-label='brain-region-switcher']")
+    BRAIN_REGION_SPECIES_DROPDOWN = (
+        By.XPATH,
+        "//span[@id='species-selector']//button[@data-slot='select-trigger']",
+    )
+    BRAIN_REGION_SPECIES_VALUE = (
+        By.XPATH,
+        "//span[@id='species-selector']//span[contains(@class,'font-bold')]",
+    )
     CEREBRAL_CORTEX_TITLE = (By.XPATH, "//span[normalize-space()='Cerebral cortex']")
-    CEREBRUM_BTN = (By.XPATH, "//div[@title='Cerebrum' and @aria-label='Cerebrum']//button[@type='button' and starts-with(@class,'ml-auto flex flex-shrink-0 items-center')]")
+    CEREBRUM_BTN = (
+        By.XPATH,
+        "//button[@title='Cerebrum' and @aria-label='Cerebrum']",
+    )
+    CEREBRUM_ARROW_BTN = (
+        By.XPATH,
+        "//button[@title='Cerebrum']//div[@role='button']"
+        " | //button[@title='Cerebrum']//span[contains(@class,'anticon-caret-right')]",
+    )
+    BASIC_CELL_GROUPS_BTN = (
+        By.XPATH,
+        "//button[@title='Basic cell groups and regions']",
+    )
+    BASIC_CELL_GROUPS_ARROW = (
+        By.XPATH,
+        "//button[@title='Basic cell groups and regions']//div[@role='button']"
+        " | //button[@title='Basic cell groups and regions']//span[contains(@class,'anticon-caret-right')]",
+    )
     CEREBRUM_BTN_VLAB = (By.XPATH, "(//div[@tabindex='0'])[7]")
-    CEREBRUM_TITLE_BRAIN_REGION_PANEL = (By.XPATH, "(//span[text()='Cerebrum'])[1]")
+    CEREBRUM_TITLE_BRAIN_REGION_PANEL = (
+        By.XPATH,
+        "//div[@data-label='brain-region-switcher']//span[contains(@class,'font-bold')]",
+    )
     CEREBRUM_TITLE_MAIN_PAGE = (By.CSS_SELECTOR, ".line-clamp-2")
     CLOSE_BTN = (By.CSS_SELECTOR, "span[aria-label='close']")
     COUNT_SWITCH = (By.CSS_SELECTOR, "button[title='density or count']")
@@ -68,8 +96,16 @@ class ExplorePageLocators:
     PROJECT_TAB = (By.XPATH, "//button[contains(.,'Project')]c")
     REPORTS_BTN = (By.CSS_SELECTOR, "#workspace-reports")
     SELECTED_BRAIN_REGION = (By.XPATH, "(//span[text()='Isocortex'])[1]")
-    SEARCH_REGION = (By.CSS_SELECTOR, "#atlas-regions-selector")
-    SEARCH_REGION_INPUT = (By.CSS_SELECTOR, "#region-search")
+    SEARCH_REGION = (
+        By.CSS_SELECTOR,
+        "div[data-label='brain-region-switcher']",
+    )
+    SEARCH_REGION_INPUT = (
+        By.XPATH,
+        "//input[@id='region-search']"
+        " | //div[@data-label='brain-region-switcher']//input"
+        " | //input[contains(@placeholder,'Search') or contains(@placeholder,'region')]",
+    )
     SIMULATIONS_BTN = (By.XPATH, "//button[text()='Simulations']")
     SKIP_ONBOARDING_BTN = (By.XPATH, "//button[normalize-space()='Skip']")
     SYNAPSE_PER_CONNECTION_NRECORDS = (By.CSS_SELECTOR, "a[data-testid='dataset-experimental_synapses_per_connection'] span[class='mr-2 font-light']")
