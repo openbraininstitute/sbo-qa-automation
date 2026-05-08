@@ -972,16 +972,25 @@ class SimulateMeBetaPage(HomePage):
 
     # ── Generic dictionary tab flow ─────────────────────────────────────
 
-    def click_add_button_in_active_sub_entry(self):
-        """Click the 'Add X' button inside the currently active sub-entry."""
-        from selenium.webdriver.common.action_chains import ActionChains
-        btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
+    def click_add_button_in_active_sub_entry(self, add_text=None):
+        """Click the 'Add X' button inside the currently active sub-entry.
+        
+        If add_text is provided (e.g., 'Recording', 'Neuronal Manipulation', 'Timestamp'),
+        finds the specific Add button by its text content.
+        """
+        from selenium.webdriver.common.by import By as ByLocal
+        if add_text:
+            locator = (
+                ByLocal.XPATH,
+                f"//button[.//span[contains(text(),'{add_text}')]]"
+                f"[.//span[contains(@class,'anticon-plus-circle')]]"
+            )
+            btn = self.element_to_be_clickable(locator, timeout=10)
+        else:
+            btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
         time.sleep(0.5)
-        try:
-            ActionChains(self.browser).move_to_element(btn).click().perform()
-        except Exception:
-            self.browser.execute_script("arguments[0].click();", btn)
+        self.browser.execute_script("arguments[0].click();", btn)
         self.logger.info(f"Clicked 'Add' button: '{btn.text.strip()}'")
         time.sleep(2)
 
