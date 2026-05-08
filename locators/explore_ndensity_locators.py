@@ -17,9 +17,8 @@ class ExploreNDensityPageLocators:
     BR_REGION_CLOSE_BTN = (By.XPATH, "//div[@aria-label='brain-region-banner']//span[@aria-label='close']")
     BR_REGION_SEARCH_INPUT = (
         By.XPATH,
-        "//input[@id='region-search']"
-        " | //div[@data-label='brain-region-switcher']//input"
-        " | //input[contains(@placeholder,'Search') or contains(@placeholder,'region')]",
+        "//div[@id='brain-region-hierarchy']//input[@id='region-search']"
+        " | //input[@id='region-search']",
     )
     BR_REGION_ROOT_OPTION = (By.XPATH, "//button[@title='Root']")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
