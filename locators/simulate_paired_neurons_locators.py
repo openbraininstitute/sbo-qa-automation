@@ -30,7 +30,7 @@ class SimulatePairedNeuronsLocators:
     )
 
     """Model picker: Public/Project tabs."""
-    PUBLIC_TAB = (By.XPATH, "//button[@role='tab' and text()='Public']")
+    PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
 
     """Column headers in the model picker table."""
     COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")

@@ -430,6 +430,9 @@ class SimulateSmallMicrocircuitPage(HomePage):
     def click_neuron_sets_tab(self):
         self._click_left_menu_btn(Loc.LEFT_MENU_NEURON_SETS_BTN, "Neuron sets")
 
+    def click_distributions_tab(self):
+        self._click_left_menu_btn(Loc.LEFT_MENU_DISTRIBUTIONS_BTN, "Distributions")
+
     def click_synaptic_manip_tab(self):
         self._click_left_menu_btn(Loc.LEFT_MENU_SYNAPTIC_MANIP_BTN, "Synaptic manipulations")
 
@@ -471,15 +474,25 @@ class SimulateSmallMicrocircuitPage(HomePage):
             self.logger.warning("No initialization labels found")
             return []
 
-    def click_add_button_in_active_sub_entry(self):
-        """Click the Add button inside the currently active sub-entry."""
-        btn = self.element_to_be_clickable(Loc.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
+    def click_add_button_in_active_sub_entry(self, add_text=None):
+        """Click the Add button inside the currently active sub-entry.
+        
+        If add_text is provided (e.g., 'Recording', 'Distribution', 'Neuron Set'),
+        finds the specific Add button by its span text content (case-sensitive, use
+        the capitalized form as it appears in the HTML source).
+        """
+        if add_text:
+            locator = (
+                By.XPATH,
+                f"//button[.//span[contains(text(),'{add_text}')]]"
+                f"[.//span[contains(@class,'anticon-plus-circle')]]"
+            )
+            btn = self.element_to_be_clickable(locator, timeout=10)
+        else:
+            btn = self.element_to_be_clickable(Loc.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
         time.sleep(0.5)
-        try:
-            ActionChains(self.browser).move_to_element(btn).click().perform()
-        except Exception:
-            self.browser.execute_script("arguments[0].click();", btn)
+        self.browser.execute_script("arguments[0].click();", btn)
         self.logger.info(f"Clicked Add button: '{btn.text.strip()}'")
         time.sleep(2)
 

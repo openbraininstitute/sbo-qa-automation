@@ -160,7 +160,7 @@ class TestSimulateSmallMicrocircuit:
 
         # Step 14: Recordings tab — click Add Recording → select random → verify form
         sim_page.click_recordings_tab()
-        sim_page.click_add_button_in_active_sub_entry()
+        sim_page.click_add_button_in_active_sub_entry("Recording")
         logger.info("Clicked 'Add Recording'")
 
         rec_items = sim_page.get_dictionary_items()
@@ -171,9 +171,22 @@ class TestSimulateSmallMicrocircuit:
         sim_page.wait_for_block_single(timeout=10)
         logger.info("Recording config form appeared with data")
 
+        # Step 14b: Distributions tab — add 2 random distributions
+        sim_page.click_distributions_tab()
+        time.sleep(2)
+        for dist_i in range(2):
+            sim_page.click_add_button_in_active_sub_entry("Distribution")
+            logger.info(f"Clicked 'Add Distribution' ({dist_i + 1}/2)")
+            dist_items = sim_page.get_dictionary_items()
+            assert len(dist_items) > 0, f"Expected distribution items for #{dist_i + 1}"
+            dist_label = sim_page.click_random_dictionary_item()
+            logger.info(f"Selected distribution {dist_i + 1}: '{dist_label}'")
+            sim_page.wait_for_block_single(timeout=10)
+            logger.info(f"Distribution {dist_i + 1} config form appeared")
+
         # Step 15: Neuron sets tab — click Add Neuron Set → select "All Neurons"
         sim_page.click_neuron_sets_tab()
-        sim_page.click_add_button_in_active_sub_entry()
+        sim_page.click_add_button_in_active_sub_entry("Neuron Set")
         logger.info("Clicked 'Add Neuron Set'")
 
         ns_items = sim_page.get_dictionary_items()
@@ -186,7 +199,7 @@ class TestSimulateSmallMicrocircuit:
 
         # Step 16: Synaptic manipulations tab — click Add → select random → verify form
         sim_page.click_synaptic_manip_tab()
-        sim_page.click_add_button_in_active_sub_entry()
+        sim_page.click_add_button_in_active_sub_entry("Synaptic Manipulation")
         logger.info("Clicked 'Add Synaptic Manipulation'")
 
         sm_items = sim_page.get_dictionary_items()
@@ -199,7 +212,7 @@ class TestSimulateSmallMicrocircuit:
 
         # Step 17: Timestamps tab — click Add → select random → verify form
         sim_page.click_timestamps_tab()
-        sim_page.click_add_button_in_active_sub_entry()
+        sim_page.click_add_button_in_active_sub_entry("Timestamp")
         logger.info("Clicked 'Add Timestamp'")
 
         ts_items = sim_page.get_dictionary_items()

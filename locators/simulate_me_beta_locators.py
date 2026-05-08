@@ -13,8 +13,8 @@ class SimulateMeBetaLocators:
     """
 
     """Public / Project tabs on the model picker page."""
-    PUBLIC_TAB = (By.XPATH, "//button[@role='tab' and text()='Public']")
-    PROJECT_TAB = (By.XPATH, "//button[@role='tab' and text()='Project']")
+    PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
+    PROJECT_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Project')] or text()='Project']")
 
     """Data table container wrappers."""
     DATA_TABLE_WITH_FILTERS = (By.CSS_SELECTOR, "#data-table-with-filters")

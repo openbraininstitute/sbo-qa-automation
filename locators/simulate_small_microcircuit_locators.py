@@ -28,8 +28,8 @@ class SimulateSmallMicrocircuitLocators:
     )
 
     """Model picker: Public/Project tabs."""
-    PUBLIC_TAB = (By.XPATH, "//button[@role='tab' and text()='Public']")
-    PROJECT_TAB = (By.XPATH, "//button[@role='tab' and text()='Project']")
+    PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
+    PROJECT_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Project')] or text()='Project']")
 
     """Column headers in the model picker table."""
     COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")
@@ -221,6 +221,10 @@ class SimulateSmallMicrocircuitLocators:
         By.XPATH,
         "//button[@data-scan-config-menu='left-menu-top-item']//span[contains(text(),'Neuron sets')]/ancestor::button"
     )
+    LEFT_MENU_DISTRIBUTIONS_BTN = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item']//span[contains(text(),'Distributions')]/ancestor::button"
+    )
     LEFT_MENU_SYNAPTIC_MANIP_BTN = (
         By.XPATH,
         "//button[@data-scan-config-menu='left-menu-top-item']//span[contains(text(),'Synaptic manipulations')]/ancestor::button"
@@ -261,5 +265,8 @@ class SimulateSmallMicrocircuitLocators:
     )
     CONFIG_ADD_BTN_IN_SUB_ENTRY = (
         By.XPATH,
-        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry'][@data-active='true']//button[.//span[contains(text(),'Add')]]"
+        "//button[@data-scan-config-menu='left-menu-top-item'][@data-active='true']"
+        "/ancestor::div[contains(@class,'flex-col')][1]"
+        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "//button[.//span[contains(text(),'Add')]]"
     )

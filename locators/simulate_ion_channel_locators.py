@@ -28,7 +28,7 @@ class SimulateIonChannelLocators:
     )
 
     # ── Model picker ─────────────────────────────────────────────────────
-    PUBLIC_TAB = (By.XPATH, "//button[@role='tab' and text()='Public']")
+    PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
     TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
 
     # ── Mini-detail view ─────────────────────────────────────────────────
