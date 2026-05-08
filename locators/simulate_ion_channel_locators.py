@@ -307,7 +307,9 @@ class SimulateIonChannelLocators:
     OUTPUT_FILE_BUTTONS = (
         By.XPATH,
         "//h4[contains(translate(text(),'OUTPUT FILES','output files'),'output files')]"
-        "/following-sibling::div//button[@title]",
+        "/ancestor::div[contains(@class,'ant-collapse-item')]//button[@data-testid[starts-with(.,'task-io-file-item')]]"
+        " | //h4[contains(translate(text(),'OUTPUT FILES','output files'),'output files')]"
+        "/ancestor::div[contains(@class,'ant-collapse-item')]//button[@title]",
     )
     OUTPUT_CONTENT_AREA = (
         By.XPATH,
