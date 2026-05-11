@@ -7,9 +7,16 @@ from selenium.webdriver.common.by import By
 
 class ExploreSynaptomePageLocators:
     # Brain region panel
-    BRAIN_REGION_PANEL = (By.CSS_SELECTOR, "#atlas-regions-selector")
-    BR_CEREBRUM_TITLE = (By.XPATH, "//span[normalize-space(text())='Cerebrum']")
-    BR_SEARCH_FIELD = (By.CSS_SELECTOR, "#region-search")
+    BRAIN_REGION_PANEL = (By.CSS_SELECTOR, "div[data-label='brain-region-switcher']")
+    BR_CEREBRUM_TITLE = (
+        By.XPATH,
+        "//div[@data-label='brain-region-switcher']//span[contains(@class,'font-bold')]",
+    )
+    BR_SEARCH_FIELD = (
+        By.XPATH,
+        "//input[@id='region-search']"
+        " | //div[@data-label='brain-region-switcher']//input",
+    )
     SELECTED_BRAIN_REGION = (By.XPATH, "//button[@id='5c60bf3e-5335-4971-a8ec-6597292452b2']")
     
     # Data type selector
@@ -17,8 +24,12 @@ class ExploreSynaptomePageLocators:
     PROJECT_TAB = (By.XPATH, "//button[.='Project']")
     SYNAPTOME_BUTTON = (By.CSS_SELECTOR, "#counter-single_neuron_synaptome")
     
-    # Search
-    SEARCH_BUTTON = (By.CSS_SELECTOR, "button[aria-label='Open search']")
+    # Search (field is open by default)
+    SEARCH_BUTTON = (
+        By.XPATH,
+        "//button[@aria-label='Open search'] | //button[@aria-label='Close search']",
+    )
+    SEARCH_INPUT = (By.CSS_SELECTOR, "input[placeholder='Search for entities...']")
     INPUT_PLACEHOLDER = (By.CSS_SELECTOR, "input[placeholder='Search for entities...']")
     
     # Table

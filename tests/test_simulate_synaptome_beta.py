@@ -4,43 +4,43 @@
 
 import time
 import pytest
-from pages.simulate_paired_neurons_page import SimulatePairedNeuronsPage
+from pages.simulate_synaptome_beta_page import SimulateSynaptomeBetaPage
 
 
-class TestSimulatePairedNeurons:
-    """End-to-end test for Paired neurons (beta) simulation.
+class TestSimulateSynaptomeBeta:
+    """End-to-end test for Synaptome (beta) simulation.
 
-    Flow (spec steps 1-52):
-    1-2.   Workflows → Simulate → Paired neurons card → model picker
+    Flow (spec steps 1-50):
+    1-2.   Workflows → Simulate → Synaptome (beta) card → model picker
     3-6.   Public tab → verify columns → pagination → click random row
     7.     Mini-detail → Use model
     8-9.   Config page → verify tabs + circuit preview image
     10-12. Info tab: warning icon → fill name/description → warning disappears
     13-14. Initialization: verify all fields present
     15-23. Stimuli: add random + "Poisson Spikes (Efferent)" with Frequency=50
-    24-26. Recordings: add random recording type
-    27-31. Distributions: add 3 random parameters
+    24-27. Recordings: add random recording type
+    28-31. Distributions: add 3 random parameters
     32-34. Neuron sets: add "All Neurons"
     35-37. Synaptic manipulations: add random
     38-40. Timestamps: add random
     41-43. Generate simulation(s) → Simulations tab
-    44-49. Verify cards, input files, JSON previews
-    50-52. Launch → poll until terminal state
+    44-47. Verify cards, input files
+    48-50. Launch → poll until terminal state
     """
 
     def _get_page(self, setup, logger):
         browser, wait, base_url, lab_id, project_id = setup
-        return SimulatePairedNeuronsPage(browser, wait, logger, base_url), lab_id, project_id
+        return SimulateSynaptomeBetaPage(browser, wait, logger, base_url), lab_id, project_id
 
     @pytest.mark.simulate
-    @pytest.mark.run(order=23)
-    def test_paired_neurons_full_flow(self, setup, login, logger, test_config):
+    @pytest.mark.run(order=24)
+    def test_synaptome_beta_full_flow(self, setup, login, logger, test_config):
         page, lab_id, project_id = self._get_page(setup, logger)
 
-        # ── Steps 1-2: Navigate → Simulate → Paired neurons ─────────────
+        # ── Steps 1-2: Navigate → Simulate → Synaptome (beta) ───────────
         page.go_to_workflows_simulate(lab_id, project_id)
         page.click_simulate_category()
-        page.click_paired_neurons_card()
+        page.click_synaptome_beta_card()
         logger.info(f"On model picker. URL: {page.browser.current_url}")
 
         # ── Step 3: Public tab → verify rows ─────────────────────────────
@@ -102,7 +102,7 @@ class TestSimulatePairedNeurons:
 
         # ── Step 11: Fill Campaign Name + Description ────────────────────
         campaign_name = page.fill_name_with_datetime()
-        page.fill_description("automated test of paired neurons")
+        page.fill_description("automated test of synaptome beta")
         logger.info(f"Info filled: name='{campaign_name}'")
 
         # ── Step 12: Verify warning icon disappears ──────────────────────
@@ -127,7 +127,7 @@ class TestSimulatePairedNeurons:
             if found:
                 logger.info(f"  ✓ '{field}' present")
             else:
-                logger.warning(f"  ✗ '{field}' not found in {init_labels}")
+                logger.warning(f"  ✗ '{field}' not found")
 
         # ── Steps 15-19: Stimuli — 1st random stimulus ───────────────────
         page.click_stimuli_tab()
@@ -145,7 +145,7 @@ class TestSimulatePairedNeurons:
         page.wait_for_block_single(timeout=10)
         logger.info("1st stimulus config form appeared")
 
-        # ── Steps 20-23: Stimuli — 2nd stimulus "Poisson Spikes (Efferent)" ──
+        # ── Steps 20-23: Stimuli — 2nd "Poisson Spikes (Efferent)" ───────
         page.click_add_button_in_active_sub_entry()
         logger.info("Clicked 'Add Stimulus' for 2nd")
 
@@ -157,14 +157,13 @@ class TestSimulatePairedNeurons:
         page.wait_for_block_single(timeout=10)
         logger.info("2nd stimulus config form appeared")
 
-        # Set Frequency minimum to 50
         freq_set = page.set_block_number_input("Frequency", 50)
         if freq_set:
             logger.info("Set Frequency minimum to 50")
         else:
             logger.warning("Could not set Frequency — field not found")
 
-        # ── Steps 24-26: Recordings — add random recording type ──────────
+        # ── Steps 24-27: Recordings — add random recording type ──────────
         page.click_recordings_tab()
         logger.info("On Recordings tab")
 
@@ -172,14 +171,14 @@ class TestSimulatePairedNeurons:
         logger.info("Clicked 'Add Recording'")
 
         rec_items = page.get_dictionary_items()
-        assert len(rec_items) > 0, "Expected at least one recording dictionary item"
+        assert len(rec_items) > 0, "Expected at least one recording item"
         rec_label = page.click_random_dictionary_item()
         logger.info(f"Selected recording: '{rec_label}'")
 
         page.wait_for_block_single(timeout=10)
         logger.info("Recording config form appeared")
 
-        # ── Steps 27-31: Distributions — add 3 random parameters ────────
+        # ── Steps 28-31: Distributions — add 3 random parameters ────────
         # NOTE: Distributions tab is not yet live in production
         is_staging = "staging" in test_config.get("base_url", "")
         if is_staging:
@@ -276,7 +275,7 @@ class TestSimulatePairedNeurons:
             if s['status'] and s['status'] != 'created':
                 logger.warning(f"Unexpected status '{s['status']}' for {s['title']}")
 
-        # ── Steps 46-49: Verify input files ─────────────────────────────────
+        # ── Steps 46-47: Verify input files ──────────────────────────────
         input_files = page.get_input_file_buttons()
         assert len(input_files) >= 1, "Expected at least 1 input file"
         file_names = [b.get_attribute("title") or "" for b in input_files]
@@ -289,12 +288,10 @@ class TestSimulatePairedNeurons:
             assert clicked, f"Could not click input file '{fname}'"
 
             if fname.endswith('.json'):
-                # JSON files: verify JSON preview text
                 preview = page.get_json_preview_text(timeout=10)
                 assert len(preview) > 0, f"JSON preview for '{fname}' should not be empty"
                 logger.info(f"  ✓ '{fname}': JSON preview {len(preview)} chars")
             elif fname.endswith('.h5'):
-                # HDF5 files: verify plot/canvas is displayed
                 has_plot = page.is_plot_or_content_visible(timeout=10)
                 if has_plot:
                     logger.info(f"  ✓ '{fname}': plot/content visible")
@@ -303,7 +300,7 @@ class TestSimulatePairedNeurons:
             else:
                 logger.info(f"  ℹ '{fname}': unknown type, skipping content check")
 
-        # ── Steps 50-52: Launch simulations → poll until terminal ────────
+        # ── Steps 48-50: Launch simulations → poll until terminal ────────
         assert page.is_launch_simulations_enabled(), "Launch simulations should be enabled"
         page.click_launch_simulations()
         logger.info("Clicked Launch simulations")
@@ -317,4 +314,4 @@ class TestSimulatePairedNeurons:
         else:
             logger.warning("Simulations did not complete within 300s")
 
-        logger.info(f"✅ Paired neurons test complete. URL: {page.browser.current_url}")
+        logger.info(f"✅ Synaptome (beta) test complete. URL: {page.browser.current_url}")

@@ -24,8 +24,8 @@ class SimulateSynaptomeLocators:
     )
 
     """Model picker: Public/Project tabs."""
-    PUBLIC_TAB = (By.XPATH, "//button[@role='tab' and text()='Public']")
-    PROJECT_TAB = (By.XPATH, "//button[@role='tab' and text()='Project']")
+    PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
+    PROJECT_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Project')] or text()='Project']")
 
     """Column headers and table rows."""
     COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")

@@ -954,14 +954,29 @@ class SimulateMeBetaPage(HomePage):
                     *SimulateMeBetaLocators.BLOCK_VALUE_INPUT
                 )
                 for inp in value_inputs:
-                    manip_value = round(random.uniform(0.1, 5.0), 2)
+                    # Read min/max from the input's HTML attributes
+                    min_attr = inp.get_attribute("min")
+                    max_attr = inp.get_attribute("max")
+                    
+                    # Calculate a safe value within [min, max]
+                    min_val = float(min_attr) if min_attr else 0
+                    max_val = float(max_attr) if max_attr else 100
+                    
+                    # Use midpoint or min if range is tiny
+                    if max_val > min_val:
+                        manip_value = round((min_val + max_val) / 2, 2)
+                    else:
+                        manip_value = min_val
+                    
                     inp.click()
-                    # Use select-all + backspace for React controlled inputs
                     inp.send_keys(Keys.COMMAND + "a")
                     inp.send_keys(Keys.BACKSPACE)
                     time.sleep(0.2)
                     inp.send_keys(str(manip_value))
                     time.sleep(0.3)
+                    self.logger.info(
+                        f"Filled input (min={min_attr}, max={max_attr}) with {manip_value}"
+                    )
                 self.logger.info(
                     f"Filled {len(value_inputs)} neuronal manipulation value input(s)"
                 )
@@ -972,16 +987,25 @@ class SimulateMeBetaPage(HomePage):
 
     # ── Generic dictionary tab flow ─────────────────────────────────────
 
-    def click_add_button_in_active_sub_entry(self):
-        """Click the 'Add X' button inside the currently active sub-entry."""
-        from selenium.webdriver.common.action_chains import ActionChains
-        btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
+    def click_add_button_in_active_sub_entry(self, add_text=None):
+        """Click the 'Add X' button inside the currently active sub-entry.
+        
+        If add_text is provided (e.g., 'Recording', 'Neuronal Manipulation', 'Timestamp'),
+        finds the specific Add button by its text content.
+        """
+        from selenium.webdriver.common.by import By as ByLocal
+        if add_text:
+            locator = (
+                ByLocal.XPATH,
+                f"//button[.//span[contains(text(),'{add_text}')]]"
+                f"[.//span[contains(@class,'anticon-plus-circle')]]"
+            )
+            btn = self.element_to_be_clickable(locator, timeout=10)
+        else:
+            btn = self.element_to_be_clickable(SimulateMeBetaLocators.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
         time.sleep(0.5)
-        try:
-            ActionChains(self.browser).move_to_element(btn).click().perform()
-        except Exception:
-            self.browser.execute_script("arguments[0].click();", btn)
+        self.browser.execute_script("arguments[0].click();", btn)
         self.logger.info(f"Clicked 'Add' button: '{btn.text.strip()}'")
         time.sleep(2)
 

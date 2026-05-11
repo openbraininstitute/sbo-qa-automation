@@ -674,6 +674,12 @@ class SimulateIonChannelPage(HomePage):
         it moves to the newly created row.
         """
         try:
+            # Scroll the block into view first
+            self.browser.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", block_element
+            )
+            time.sleep(1)
+
             # Find ALL plus-circle icons and click the LAST one
             icons = block_element.find_elements(
                 By.XPATH,
@@ -681,17 +687,19 @@ class SimulateIonChannelPage(HomePage):
             )
             if not icons:
                 self.logger.warning("No plus-circle icons found in block")
-                return
+                return False
             add_icon = icons[-1]  # Always the last one
             self.browser.execute_script(
                 "arguments[0].scrollIntoView({block: 'center'});", add_icon
             )
-            time.sleep(0.3)
+            time.sleep(0.5)
             self.browser.execute_script("arguments[0].click();", add_icon)
             self.logger.info(f"Clicked sweep add button (icon {len(icons)} of {len(icons)})")
-            time.sleep(1)
+            time.sleep(2)
+            return True
         except Exception as e:
             self.logger.warning(f"Could not click sweep add button: {e}")
+            return False
 
     def _set_number_input_value(self, block_element, value, input_index=0):
         """Set a number input value inside a config block."""
@@ -737,23 +745,25 @@ class SimulateIonChannelPage(HomePage):
             self.logger.warning(f"Block '{label_substring}' not found on re-fetch")
             return
         self._click_sweep_add_in_block(block['element'])
-        time.sleep(2)
+        time.sleep(3)
 
         # Re-find the block again since DOM changed after adding a row
-        block = self._find_block_by_label(label_substring)
-        if block:
-            new_inputs = len(block['element'].find_elements(*Loc.BLOCK_NUMBER_INPUT))
-            self.logger.info(
-                f"After click: {new_inputs} inputs (was {inputs_before})"
-            )
-            if new_inputs > inputs_before:
-                self._set_number_input_value(
-                    block['element'], value, input_index=new_inputs - 1
+        # Retry up to 3 times with increasing wait
+        for attempt in range(3):
+            block = self._find_block_by_label(label_substring)
+            if block:
+                new_inputs = len(block['element'].find_elements(*Loc.BLOCK_NUMBER_INPUT))
+                self.logger.info(
+                    f"After click (attempt {attempt + 1}): {new_inputs} inputs (was {inputs_before})"
                 )
-            else:
-                self.logger.warning("No new input appeared after clicking plus-circle")
-        else:
-            self.logger.warning(f"Block '{label_substring}' not found after sweep click")
+                if new_inputs > inputs_before:
+                    self._set_number_input_value(
+                        block['element'], value, input_index=new_inputs - 1
+                    )
+                    return
+            time.sleep(2)
+
+        self.logger.warning("No new input appeared after clicking plus-circle (all retries exhausted)")
 
     def set_parameter_value(self, label_substring, value, input_index=0):
         """Set a parameter value in a block identified by label substring."""

@@ -13,8 +13,8 @@ class SimulateMeBetaLocators:
     """
 
     """Public / Project tabs on the model picker page."""
-    PUBLIC_TAB = (By.XPATH, "//button[@role='tab' and text()='Public']")
-    PROJECT_TAB = (By.XPATH, "//button[@role='tab' and text()='Project']")
+    PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
+    PROJECT_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Project')] or text()='Project']")
 
     """Data table container wrappers."""
     DATA_TABLE_WITH_FILTERS = (By.CSS_SELECTOR, "#data-table-with-filters")
@@ -71,14 +71,19 @@ class SimulateMeBetaLocators:
 
     """Config page layout, top-level tabs (Configuration / Simulations),
     left menu items, campaign name/description inputs, and 3D neuron visualizer."""
-    CONFIG_LAYOUT = (By.CSS_SELECTOR, "[data-testid='workflow-simulate-layout']")
+    CONFIG_LAYOUT = (
+        By.CSS_SELECTOR,
+        "button[data-scan-config-menu='left-menu-top-item'], [data-testid='workflow-simulate-layout']"
+    )
     CONFIG_TAB_CONFIGURATION = (
         By.XPATH,
-        "//div[@data-testid='workflow-simulate-layout']//button[contains(translate(text(),'CONFIGURATION','configuration'),'configuration')]"
+        "//button[@id='tab-configuration' or @aria-label='configuration']"
+        " | //button[contains(translate(text(),'CONFIGURATION','configuration'),'configuration')]"
     )
     CONFIG_TAB_SIMULATIONS = (
         By.XPATH,
-        "//div[@data-testid='workflow-simulate-layout']//button[contains(translate(text(),'SIMULATIONS','simulations'),'simulations')]"
+        "//button[@id='tab-simulations' or @aria-label='simulations']"
+        " | //button[contains(translate(text(),'SIMULATIONS','simulations'),'simulations')]"
     )
     CONFIG_LEFT_MENU_ITEMS = (By.CSS_SELECTOR, "button[data-scan-config-menu='left-menu-top-item']")
     CONFIG_LEFT_MENU_INFO_ACTIVE = (
@@ -93,8 +98,14 @@ class SimulateMeBetaLocators:
         By.XPATH,
         "(//input[@data-scan-config-block-element='string_input'])[2]"
     )
-    NEURON_VISUALIZER = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer']")
-    NEURON_VISUALIZER_CANVAS = (By.CSS_SELECTOR, "[data-testid='neuron-visualizer'] canvas")
+    NEURON_VISUALIZER = (
+        By.CSS_SELECTOR,
+        "div[class*='morpho-viewer-simul-module'], [data-testid='neuron-visualizer']"
+    )
+    NEURON_VISUALIZER_CANVAS = (
+        By.CSS_SELECTOR,
+        "div[class*='morpho-viewer-simul-module'] canvas, [data-testid='neuron-visualizer'] canvas"
+    )
 
     """Initialization tab and its config block elements (labels, number inputs,
     plus-circle buttons for parameter sweep, sweep value inputs)."""
@@ -245,9 +256,14 @@ class SimulateMeBetaLocators:
     )
     SIM_CARDS = (
         By.XPATH,
-        "//div[contains(@class,'rounded-lg')][.//button[contains(@title,'Simulation')]]"
+        "//button[@title[starts-with(.,'Simulation ')]]"
+        " | //div[contains(@class,'rounded-lg')][.//button[contains(@title,'Simulation')]]"
     )
-    SIM_CARD_STATUS_BADGE = (By.XPATH, ".//span[contains(@class,'rounded-xl')]")
+    SIM_CARD_STATUS_BADGE = (
+        By.XPATH,
+        ".//span[contains(@class,'rounded-xl') or contains(@class,'rounded-full')]"
+        "[contains(@class,'border') and contains(@class,'px-4')]"
+    )
     SIM_CARD_PARAM_LABELS = (By.XPATH, ".//div[contains(@class,'text-gray-400')]")
     SIM_CARD_PARAM_VALUES = (By.XPATH, ".//div[contains(@class,'font-bold') and contains(@class,'truncate')]")
     SIM_LAUNCH_BTN = (
@@ -261,7 +277,9 @@ class SimulateMeBetaLocators:
     SIM_INPUT_FILES_HEADER = (By.XPATH, "//h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]")
     SIM_INPUT_FILE_BUTTONS = (
         By.XPATH,
-        "//h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]/following-sibling::div//button[@title]"
+        "//button[@data-testid[starts-with(.,'task-io-file-item')]]"
+        " | //h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]"
+        "/ancestor::div[contains(@class,'ant-collapse-item')]//button[@title]"
     )
     SIM_JSON_PREVIEW_CODE = (By.CSS_SELECTOR, "pre.shiki code")
     SIM_JSON_PREVIEW_COPY_BTN = (

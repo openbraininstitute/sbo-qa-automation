@@ -5,23 +5,23 @@
 from selenium.webdriver.common.by import By
 
 
-class SimulatePairedNeuronsLocators:
-    """Locators for the Paired neurons (beta) simulation page.
+class SimulateSynaptomeBetaLocators:
+    """Locators for the Synaptome (beta) simulation page.
 
-    Entry point: Workflows page → Simulate category → Paired neurons (beta) card
+    Entry point: Workflows page → Simulate category → Synaptome (beta) card
     URL pattern:
-    /app/virtual-lab/{lab_id}/{project_id}/workflows/simulate/new/paired-neurons-simulation
+    /app/virtual-lab/{lab_id}/{project_id}/workflows/simulate/new/synaptome-beta-simulation
     """
 
-    """Workflows page: Simulate category card and Paired neurons type card."""
+    """Workflows page: Simulate category card and Synaptome (beta) type card."""
     SIMULATE_CATEGORY_CARD = (
         By.XPATH,
         "(//div[@data-slot='card'])[2]",
     )
-    PAIRED_NEURONS_CARD = (
+    SYNAPTOME_BETA_CARD = (
         By.XPATH,
         "//div[@data-slot='card']//div[@data-slot='card-title']"
-        "[contains(., 'Paired neurons')]",
+        "[contains(., 'Synaptome') and contains(., 'beta')]",
     )
     TYPE_CAROUSEL_NEXT_BTN = (
         By.XPATH,
@@ -29,7 +29,7 @@ class SimulatePairedNeuronsLocators:
         "//button[.//span[@aria-label='right']]",
     )
 
-    """Model picker: Public/Project tabs."""
+    """Model picker: Public tab."""
     PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
 
     """Column headers in the model picker table."""
@@ -169,7 +169,7 @@ class SimulatePairedNeuronsLocators:
         "div[data-scan-config-block='block_single']",
     )
 
-    """Middle column scrollable area (for scrolling to find items)."""
+    """Middle column scrollable area."""
     MIDDLE_COLUMN_SCROLLABLE = (
         By.CSS_SELECTOR,
         "div[class*='scrollable']",

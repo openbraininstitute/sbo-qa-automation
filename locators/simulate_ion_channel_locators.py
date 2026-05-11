@@ -28,7 +28,7 @@ class SimulateIonChannelLocators:
     )
 
     # ── Model picker ─────────────────────────────────────────────────────
-    PUBLIC_TAB = (By.XPATH, "//button[@role='tab' and text()='Public']")
+    PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
     TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
 
     # ── Mini-detail view ─────────────────────────────────────────────────
@@ -279,7 +279,7 @@ class SimulateIonChannelLocators:
     )
     SIM_CARD_STATUS_BADGE = (
         By.XPATH,
-        ".//span[contains(@class,'rounded-xl')]",
+        ".//span[contains(@class,'rounded-xl') or contains(@class,'rounded-full')][contains(@class,'border') and contains(@class,'px-4')]",
     )
     LAUNCH_SIMULATIONS_BTN = (
         By.XPATH,
@@ -293,8 +293,9 @@ class SimulateIonChannelLocators:
     )
     INPUT_FILE_BUTTONS = (
         By.XPATH,
-        "//h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]"
-        "/following-sibling::div//button[@title]",
+        "//button[@data-testid[starts-with(.,'task-io-file-item')]]"
+        " | //h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]"
+        "/ancestor::div[contains(@class,'ant-collapse-item')]//button[@title]",
     )
     JSON_PREVIEW_CODE = (By.CSS_SELECTOR, "pre.shiki code")
 
@@ -306,7 +307,9 @@ class SimulateIonChannelLocators:
     OUTPUT_FILE_BUTTONS = (
         By.XPATH,
         "//h4[contains(translate(text(),'OUTPUT FILES','output files'),'output files')]"
-        "/following-sibling::div//button[@title]",
+        "/ancestor::div[contains(@class,'ant-collapse-item')]//button[@data-testid[starts-with(.,'task-io-file-item')]]"
+        " | //h4[contains(translate(text(),'OUTPUT FILES','output files'),'output files')]"
+        "/ancestor::div[contains(@class,'ant-collapse-item')]//button[@title]",
     )
     OUTPUT_CONTENT_AREA = (
         By.XPATH,

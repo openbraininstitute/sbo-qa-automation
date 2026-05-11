@@ -266,6 +266,4 @@ class TestBuildIc:
         logger.info(f"Model Name: {unique_name}")
         logger.info(f"Current URL: {browser.current_url}")
         
-        # Note: The remaining workflow (ion channel recording, M-model, E-model selection)
-        # appears to be different from single neuron/synaptome workflows and requires
-        # further investigation of the actual UI flow
+        time.sleep(500)

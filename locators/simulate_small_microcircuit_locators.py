@@ -28,8 +28,8 @@ class SimulateSmallMicrocircuitLocators:
     )
 
     """Model picker: Public/Project tabs."""
-    PUBLIC_TAB = (By.XPATH, "//button[@role='tab' and text()='Public']")
-    PROJECT_TAB = (By.XPATH, "//button[@role='tab' and text()='Project']")
+    PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
+    PROJECT_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Project')] or text()='Project']")
 
     """Column headers in the model picker table."""
     COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")
@@ -180,7 +180,8 @@ class SimulateSmallMicrocircuitLocators:
     )
     SIM_CARD_STATUS_BADGE = (
         By.XPATH,
-        ".//span[contains(@class,'rounded-xl')]"
+        ".//span[contains(@class,'rounded-xl') or contains(@class,'rounded-full')]"
+        "[contains(@class,'border') and contains(@class,'px-4')]"
     )
     SIM_SELECT_ALL_CHECKBOX = (
         By.XPATH,
@@ -202,7 +203,9 @@ class SimulateSmallMicrocircuitLocators:
     )
     INPUT_FILE_BUTTONS = (
         By.XPATH,
-        "//h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]/following-sibling::div//button[@title]"
+        "//button[@data-testid[starts-with(.,'task-io-file-item')]]"
+        " | //h4[contains(translate(text(),'INPUT FILES','input files'),'input files')]"
+        "/ancestor::div[contains(@class,'ant-collapse-item')]//button[@title]"
     )
     INPUT_FILE_ACTIVE = (
         By.XPATH,
@@ -220,6 +223,10 @@ class SimulateSmallMicrocircuitLocators:
     LEFT_MENU_NEURON_SETS_BTN = (
         By.XPATH,
         "//button[@data-scan-config-menu='left-menu-top-item']//span[contains(text(),'Neuron sets')]/ancestor::button"
+    )
+    LEFT_MENU_DISTRIBUTIONS_BTN = (
+        By.XPATH,
+        "//button[@data-scan-config-menu='left-menu-top-item']//span[contains(text(),'Distributions')]/ancestor::button"
     )
     LEFT_MENU_SYNAPTIC_MANIP_BTN = (
         By.XPATH,
@@ -261,5 +268,8 @@ class SimulateSmallMicrocircuitLocators:
     )
     CONFIG_ADD_BTN_IN_SUB_ENTRY = (
         By.XPATH,
-        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry'][@data-active='true']//button[.//span[contains(text(),'Add')]]"
+        "//button[@data-scan-config-menu='left-menu-top-item'][@data-active='true']"
+        "/ancestor::div[contains(@class,'flex-col')][1]"
+        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "//button[.//span[contains(text(),'Add')]]"
     )

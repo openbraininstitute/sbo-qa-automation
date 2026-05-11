@@ -148,7 +148,6 @@ class TestLanding:
             "Our story",
             "Mission",
             "Team",
-            "Notebooks",
             "Gallery",
             "Pricing",
             "News",

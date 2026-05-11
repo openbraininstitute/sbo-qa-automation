@@ -9,12 +9,24 @@ class ExploreNDensityPageLocators:
     AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
     AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     BRAIN_REGIONS_PANEL_BTN = (By.CSS_SELECTOR, ".ant-btn-icon")
-    BR_REGION_BANNER = (By.CSS_SELECTOR, "div[aria-label='brain-region-banner']")
+    BR_REGION_BANNER = (
+        By.XPATH,
+        "//div[@data-label='brain-region-switcher']"
+        " | //div[@aria-label='brain-region-banner']",
+    )
     BR_REGION_CLOSE_BTN = (By.XPATH, "//div[@aria-label='brain-region-banner']//span[@aria-label='close']")
-    BR_REGION_SEARCH_INPUT = (By.CSS_SELECTOR, "input#region-search")
+    BR_REGION_SEARCH_INPUT = (
+        By.XPATH,
+        "//div[@id='brain-region-hierarchy']//input[@id='region-search']"
+        " | //input[@id='region-search']",
+    )
     BR_REGION_ROOT_OPTION = (By.XPATH, "//button[@title='Root']")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
-    BR_VERTICAL_PANEL_CEREBRUM = (By.XPATH, "//div[@aria-label='brain-region-banner']//span[contains(@class, 'font-bold') and text()='Cerebrum']")
+    BR_VERTICAL_PANEL_CEREBRUM = (
+        By.XPATH,
+        "//div[@data-label='brain-region-switcher']//span[contains(@class,'font-bold')]"
+        " | //div[@aria-label='brain-region-banner']//span[contains(@class, 'font-bold')]",
+    )
     TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
     TABLE_CELLS = (
         By.CSS_SELECTOR,
