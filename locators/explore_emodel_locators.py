@@ -19,9 +19,8 @@ class ExploreEModelPageLocators:
     )
     BR_SEARCH_FIELD_TYPE = (
         By.XPATH,
-        "//input[@id='region-search']"
-        " | //div[@data-label='brain-region-switcher']//input"
-        " | //input[contains(@placeholder,'Search') or contains(@placeholder,'region')]",
+        "//div[@id='brain-region-hierarchy']//input[@id='region-search']"
+        " | //input[@id='region-search']",
     )
     BR_SEARCH_REGION_SEARCH_FIELD = (By.XPATH, "//div[@class='ant-select-selector']")
     BR_CEREBRUM_TITLE = (
@@ -69,7 +68,10 @@ class ExploreEModelPageLocators:
         "//button[@aria-label='Open search'] | //button[@aria-label='Close search']",
     )
     INPUT_PLACEHOLDER = (By.CSS_SELECTOR, "input[placeholder='Search for entities...']")
-    LV_EM_TD = (By.XPATH, "(//tr[starts-with(@class,'ant-table-row')]//td[starts-with(@class,'ant-table-cell')])[6]")
+    LV_EM_TD = (
+        By.XPATH,
+        "//tbody[contains(@class,'ant-table-tbody')]//tr[contains(@class,'ant-table-row')][1]"
+    )
     LV_ROW = (By.CSS_SELECTOR, ".ant-table-body")
     ME_MODEL_TAB = (By.XPATH, "//li[@title='ME-model']")
     MINI_DETAIL_VIEW = (By.CSS_SELECTOR, "a[title='Go to details page']")
