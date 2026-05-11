@@ -227,47 +227,74 @@ class BuildIcPage(HomePage):
         return True
 
     def select_model_via_radio_button(self, logger):
-        """Select a model by clicking radio button"""
-        # Wait for models table to load and select a model by ticking a radio button
+        """Select a random model by navigating to a random page and clicking a random radio button."""
+        import random
         logger.info("Waiting for models table to load...")
-        time.sleep(5)  # Give more time for table to load
-        
-        # Try to find and click radio button
-        radio_btn = None
+        time.sleep(5)
+
+        # Navigate to a random pagination page if pagination exists
+        try:
+            pagination_items = self.browser.find_elements(
+                By.CSS_SELECTOR, "li.ant-pagination-item"
+            )
+            if len(pagination_items) > 1:
+                # Pick a random page (not the currently active one)
+                try:
+                    active = self.browser.find_element(
+                        By.CSS_SELECTOR, "li.ant-pagination-item-active"
+                    )
+                    active_num = active.text.strip()
+                except Exception:
+                    active_num = ""
+                candidates = [p for p in pagination_items if p.text.strip() != active_num]
+                if candidates:
+                    target_page = random.choice(candidates)
+                    self.browser.execute_script(
+                        "arguments[0].scrollIntoView({block: 'center'});", target_page
+                    )
+                    time.sleep(0.5)
+                    target_page.click()
+                    logger.info(f"Navigated to page {target_page.text.strip()}")
+                    time.sleep(3)
+        except Exception as e:
+            logger.info(f"No pagination or could not navigate: {e}")
+
+        # Find all radio buttons and pick a random one
+        radio_btns = []
         radio_selectors = [
             BuildIcLocators.RADIO_BUTTON_ANT_INPUT,
-            BuildIcLocators.RADIO_BUTTON_INPUT_CLASS,
-            BuildIcLocators.RADIO_BUTTON_SPAN_TARGET,
-            BuildIcLocators.RADIO_BUTTON_SPAN_WRAPPER,
-            BuildIcLocators.RADIO_BUTTON_TABLE_FIRST,
             BuildIcLocators.RADIO_BUTTON_ANY,
         ]
-        
-        for i, selector in enumerate(radio_selectors):
+
+        for selector in radio_selectors:
             try:
-                radio_btn = self.element_to_be_clickable(selector, timeout=10)
-                logger.info(f"Found clickable radio button with selector {i+1}: {selector}")
-                break
-            except:
-                logger.info(f"Radio button selector {i+1} failed: {selector}")
+                radio_btns = self.browser.find_elements(*selector)
+                if radio_btns:
+                    logger.info(f"Found {len(radio_btns)} radio buttons")
+                    break
+            except Exception:
                 continue
-        
-        if not radio_btn:
-            logger.error("Cannot find radio button")
-            raise Exception("Cannot find radio button or selectable model element")
-            
+
+        if not radio_btns:
+            logger.error("Cannot find any radio buttons")
+            raise Exception("Cannot find radio buttons in the recordings table")
+
+        # Pick a random radio button (skip first 2 to avoid test data)
+        eligible = radio_btns[2:] if len(radio_btns) > 2 else radio_btns
+        radio_btn = random.choice(eligible)
+
         # Click the radio button
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", radio_btn
+        )
+        time.sleep(0.5)
         try:
             radio_btn.click()
-            logger.info("Clicked on radio button to select model")
-        except:
-            # Try JavaScript click if regular click fails
+        except Exception:
             self.browser.execute_script("arguments[0].click();", radio_btn)
-            logger.info("Clicked on radio button using JavaScript")
-        
-        # Wait for selection to register
+
+        logger.info("Clicked random radio button to select model")
         time.sleep(2)
-        logger.info("Model selected via radio button")
         return True
 
     def click_e_model_button(self, logger):
