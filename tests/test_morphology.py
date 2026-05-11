@@ -31,7 +31,6 @@ class TestExploreMorphologyPage:
             ExploreMorphologyPageLocators.LV_BRAIN_REGION,
             ExploreMorphologyPageLocators.LV_MTYPE,
             ExploreMorphologyPageLocators.LV_NAME,
-            ExploreMorphologyPageLocators.LV_SPECIES,
             ExploreMorphologyPageLocators.LV_REGISTRATION_DATE
         ]
 

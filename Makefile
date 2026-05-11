@@ -86,10 +86,10 @@ regression:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_*.py --html=report.html --self-contained-html"
 
 feature:
-	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_simulate_ion_channel.py tests/test_simulate_small_microcircuit.py tests/test_workflow_activities.py -vs --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_simulate_mem.py tests/test_simulate_me_beta.py -vs --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_page.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_me_model.py tests/test_morphology.py --html=report.html --self-contained-html"
 
 # Workflow tests
 workflow:
@@ -97,13 +97,6 @@ workflow:
 
 workflow-activities:
 	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_workflow_activities.py --html=report.html --self-contained-html"
-
-# Simulate ME-model beta tests
-simulate-me-beta:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_simulate_me_beta.py -vs --html=report.html --self-contained-html"
-
-simulate-me-beta-headless:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_simulate_me_beta.py -vs --html=report.html --self-contained-html" HEADLESS="--headless"
 
 workflow-production:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_workflow_home.py tests/test_workflow_activities.py --html=report.html --self-contained-html"
