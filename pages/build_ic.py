@@ -283,15 +283,13 @@ class BuildIcPage(HomePage):
         eligible = radio_btns[2:] if len(radio_btns) > 2 else radio_btns
         radio_btn = random.choice(eligible)
 
-        # Click the radio button
+        # Click the radio button — re-find to avoid stale reference
         self.browser.execute_script(
             "arguments[0].scrollIntoView({block: 'center'});", radio_btn
         )
-        time.sleep(0.5)
-        try:
-            radio_btn.click()
-        except Exception:
-            self.browser.execute_script("arguments[0].click();", radio_btn)
+        time.sleep(1)
+        # Use JS click to avoid stale element issues
+        self.browser.execute_script("arguments[0].click();", radio_btn)
 
         logger.info("Clicked random radio button to select model")
         time.sleep(2)
