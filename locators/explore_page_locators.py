@@ -11,7 +11,7 @@ class ExplorePageLocators:
     AI_ASSISTANT_PANEL_BTN = (By.XPATH, "//span[@class='anticon anticon-minus']")
     # AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     AI_ASSISTANT_PANEL_CLOSE = (By.CSS_SELECTOR, "button[aria-label='Collapse']")
-    AI_ASSISTANT_PANEL_BTN_OPEN = (By.CSS_SELECTOR, "span[aria-label='plus']")
+    AI_ASSISTANT_PANEL_BTN_OPEN = (By.CSS_SELECTOR, "button[aria-label='expand AI assistant']")
     ATLAS = (By.CSS_SELECTOR, "#three-d-area")
     ATLAS_FULLSCREEN = (By.XPATH, "//span[@class='anticon anticon-fullscreen text-xl']")
     BOUTON_DENSITY_NRECORDS = (By.CSS_SELECTOR, "a[data-testid='dataset-experimental_bouton_density'] span[class='mr-2 font-light']")

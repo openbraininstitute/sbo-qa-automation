@@ -283,15 +283,22 @@ class BuildIcPage(HomePage):
         eligible = radio_btns[2:] if len(radio_btns) > 2 else radio_btns
         radio_btn = random.choice(eligible)
 
-        # Click the radio button
+        # Try to extract the recording name from the row containing this radio button
+        try:
+            row = radio_btn.find_element(By.XPATH, "./ancestor::tr")
+            cells = row.find_elements(By.TAG_NAME, "td")
+            row_text = " | ".join(cell.text.strip() for cell in cells if cell.text.strip())
+            logger.info(f"Selected ephys recording: {row_text}")
+        except Exception as e:
+            logger.info(f"Could not extract recording details from row: {e}")
+
+        # Click the radio button — re-find to avoid stale reference
         self.browser.execute_script(
             "arguments[0].scrollIntoView({block: 'center'});", radio_btn
         )
-        time.sleep(0.5)
-        try:
-            radio_btn.click()
-        except Exception:
-            self.browser.execute_script("arguments[0].click();", radio_btn)
+        time.sleep(1)
+        # Use JS click to avoid stale element issues
+        self.browser.execute_script("arguments[0].click();", radio_btn)
 
         logger.info("Clicked random radio button to select model")
         time.sleep(2)

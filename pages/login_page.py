@@ -4,6 +4,7 @@
 import time
 
 from selenium.common import TimeoutException
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -148,7 +149,17 @@ class LoginPage(CustomBasePage):
         username_field.send_keys(username)
         password_field.send_keys(password)
         password_field.send_keys(Keys.ENTER)
-        self.wait.until(EC.url_contains("app/virtual-lab"))
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                self.wait.until(EC.url_contains("app/virtual-lab"))
+                break
+            except (TimeoutException, WebDriverException) as e:
+                if "no such execution context" in str(e) and attempt < max_retries - 1:
+                    print(f"DEBUG: Login redirect lost execution context (attempt {attempt + 1}), retrying...")
+                    time.sleep(2)
+                    continue
+                raise
         print("DEBUG: Login completed successfully.")
 
     def make_form_visible(self):

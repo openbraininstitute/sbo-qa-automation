@@ -89,7 +89,7 @@ feature:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_simulate_mem.py tests/test_simulate_me_beta.py -vs --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_me_model.py tests/test_morphology.py --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_explore_page.py --html=report.html --self-contained-html"
 
 # Workflow tests
 workflow:
