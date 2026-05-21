@@ -91,7 +91,7 @@ class TestBuildSingleNeuron:
         # Step 8: Wait for compatibility check (retries with different E-model if incompatible)
         print("\n📍 Step 8: Waiting for model compatibility check...")
         logger.info("Step 8: Waiting for model compatibility check")
-        compatible = build_page.wait_for_compatibility_check(max_retries=5, timeout=60)
+        compatible = build_page.wait_for_compatibility_check(max_retries=10, timeout=60)
         assert compatible, "No compatible M-model + E-model combination found after retries"
         logger.info("Models are compatible")
         

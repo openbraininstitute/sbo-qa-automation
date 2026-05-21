@@ -281,26 +281,39 @@ class BuildIcPage(HomePage):
 
         # Pick a random radio button (skip first 2 to avoid test data)
         eligible = radio_btns[2:] if len(radio_btns) > 2 else radio_btns
-        radio_btn = random.choice(eligible)
+        chosen_index = radio_btns.index(random.choice(eligible))
 
         # Try to extract the recording name from the row containing this radio button
         try:
-            row = radio_btn.find_element(By.XPATH, "./ancestor::tr")
+            row = radio_btns[chosen_index].find_element(By.XPATH, "./ancestor::tr")
             cells = row.find_elements(By.TAG_NAME, "td")
             row_text = " | ".join(cell.text.strip() for cell in cells if cell.text.strip())
             logger.info(f"Selected ephys recording: {row_text}")
         except Exception as e:
             logger.info(f"Could not extract recording details from row: {e}")
 
-        # Click the radio button — re-find to avoid stale reference
-        self.browser.execute_script(
-            "arguments[0].scrollIntoView({block: 'center'});", radio_btn
-        )
-        time.sleep(1)
-        # Use JS click to avoid stale element issues
-        self.browser.execute_script("arguments[0].click();", radio_btn)
+        # Re-find and click the radio button to avoid stale element reference
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                fresh_radios = self.browser.find_elements(*radio_selectors[0])
+                if not fresh_radios:
+                    fresh_radios = self.browser.find_elements(*radio_selectors[-1])
+                target = fresh_radios[chosen_index]
+                self.browser.execute_script(
+                    "arguments[0].scrollIntoView({block: 'center'});", target
+                )
+                time.sleep(0.5)
+                self.browser.execute_script("arguments[0].click();", target)
+                logger.info("Clicked radio button to select model")
+                break
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    logger.info(f"Stale element on attempt {attempt + 1}, retrying...")
+                    time.sleep(2)
+                    continue
+                raise
 
-        logger.info("Clicked random radio button to select model")
         time.sleep(2)
         return True
 
