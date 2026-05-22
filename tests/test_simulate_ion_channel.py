@@ -259,6 +259,7 @@ class TestSimulateIonChannel:
             )
             logger.info(f"Selected second stimulus (fallback): '{poisson_label}'")
 
+        page.wait_for_block_single(timeout=10)
         page.fill_stimulus_parameters(default_value=1)
 
         # Verify stimuli appear in middle column

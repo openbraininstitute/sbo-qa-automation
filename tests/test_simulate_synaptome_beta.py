@@ -251,7 +251,17 @@ class TestSimulateSynaptomeBeta:
         page.click_generate_simulation()
         logger.info("Clicked Generate simulation(s)")
 
-        time.sleep(10)
+        # Wait for generation to complete and Simulations tab to become active
+        max_wait = 60
+        wait_interval = 5
+        waited = 0
+        while waited < max_wait:
+            time.sleep(wait_interval)
+            waited += wait_interval
+            if page.is_simulations_tab_active():
+                break
+            logger.info(f"Waiting for Simulations tab to become active... ({waited}s)")
+
         if not page.is_simulations_tab_active():
             logger.info("Simulations tab not auto-active, clicking manually")
             try:
