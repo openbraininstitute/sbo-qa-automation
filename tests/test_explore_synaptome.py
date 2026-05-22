@@ -187,6 +187,7 @@ class TestExploreSynaptomePage:
         logger.info("Detail view overview tab is found")
 
         # Click on Configuration tab
+        dv_config_tab = explore_synaptome.find_dv_configuration_tab()
         dv_config_tab.click()
         logger.info("Configuration tab is clicked")
         time.sleep(2)
