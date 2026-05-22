@@ -86,6 +86,10 @@ class BuildIcLocators:
     CLICK_TO_SELECT_RECORDING_DIV = (By.XPATH, "//div[contains(text(), 'Click to select recording')]")
     CLICK_TO_SELECT_RECORDING_ANY = (By.XPATH, "//*[contains(text(), 'Click to select recording')]")
     CLICK_TO_SELECT_RECORDING_PLACEHOLDER = (By.XPATH, "//button[contains(@class, 'placeholder') or contains(., 'select recording')]")
+    # After a recording is already selected: the X button to clear it
+    RECORDING_BADGE_CLOSE_BTN = (By.CSS_SELECTOR, "div[data-slot='badge'] span[data-slot='badge-button']")
+    # Fallback: the badge itself (clicking anywhere in the field area)
+    RECORDING_FIELD_WITH_SELECTION = (By.CSS_SELECTOR, "div[data-slot='badge']")
     
     # Public tab selectors (for ion channel recordings list)
     PUBLIC_TAB_PRIMARY = (By.XPATH, "//button[@role='tab' and text()='Public']")
@@ -118,9 +122,13 @@ class BuildIcLocators:
     OUTPUT_TAB = (By.XPATH, "//button[@role='tab' and contains(text(), 'Output')]")
     OUTPUT_TAB_ACTIVE = (By.XPATH, "//button[@role='tab' and @data-state='active' and contains(text(), 'Output')]")
     
+    # Configuration tab (top-level, sibling of Output tab)
+    CONFIGURATION_TAB = (By.XPATH, "//button[@role='tab' and contains(text(), 'Configuration')]")
+    
     # Build status badge
     BUILD_STATUS_DONE = (By.XPATH, "//div[@data-slot='badge' and contains(text(), 'done')]")
     BUILD_STATUS_RUNNING = (By.XPATH, "//div[@data-slot='badge' and contains(text(), 'running')]")
+    BUILD_STATUS_FAILED = (By.XPATH, "//div[@data-slot='badge' and (contains(text(), 'failed') or contains(text(), 'error'))]")
     
     # Output files
     OUTPUT_MOD_FILE = (By.XPATH, "//h3[contains(text(),'Outputs')]/following-sibling::div//button[.//div[@data-slot='badge' and contains(text(),'MOD')]]")
