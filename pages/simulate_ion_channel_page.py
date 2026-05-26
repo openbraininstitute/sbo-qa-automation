@@ -873,6 +873,46 @@ class SimulateIonChannelPage(HomePage):
         self.logger.info("block_single form appeared")
         return el
 
+    def fill_stimulus_parameters(self, default_value=1):
+        """Fill all empty or zero-value number inputs in the active block_single form.
+
+        After selecting a stimulus from the dictionary, the form may have required
+        number fields (amplitude, delay, duration, frequency, etc.) that must be
+        filled before the Generate button becomes enabled.
+        """
+        import platform
+        select_all = Keys.COMMAND + "a" if platform.system() == "Darwin" else Keys.CONTROL + "a"
+
+        # Wait for the block_single form to be present
+        try:
+            block = self.find_element(Loc.CONFIG_BLOCK_SINGLE, timeout=10)
+        except Exception as e:
+            self.logger.warning(f"Could not find block_single for stimulus parameters: {e}")
+            return
+
+        time.sleep(1)  # Let form inputs render
+        inputs = block.find_elements(*Loc.BLOCK_NUMBER_INPUT)
+        filled_count = 0
+        for inp in inputs:
+            try:
+                current_value = (inp.get_attribute("value") or "").strip()
+                # Fill if empty or zero (some fields default to 0 but need a real value)
+                if not current_value or current_value == "0":
+                    self.browser.execute_script(
+                        "arguments[0].scrollIntoView({block: 'center'});", inp
+                    )
+                    time.sleep(0.3)
+                    inp.click()
+                    inp.send_keys(select_all)
+                    inp.send_keys(Keys.BACKSPACE)
+                    inp.send_keys(str(default_value))
+                    inp.send_keys(Keys.TAB)
+                    filled_count += 1
+                    time.sleep(0.3)
+            except Exception as e:
+                self.logger.warning(f"Could not fill stimulus input: {e}")
+        self.logger.info(f"Filled {filled_count} empty/zero stimulus parameter(s) with value {default_value}")
+
     # ── Recordings (dictionary-based, same pattern as Ion channel models) ─
 
     def click_add_recording(self):

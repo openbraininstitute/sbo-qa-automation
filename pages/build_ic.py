@@ -281,26 +281,39 @@ class BuildIcPage(HomePage):
 
         # Pick a random radio button (skip first 2 to avoid test data)
         eligible = radio_btns[2:] if len(radio_btns) > 2 else radio_btns
-        radio_btn = random.choice(eligible)
+        chosen_index = radio_btns.index(random.choice(eligible))
 
         # Try to extract the recording name from the row containing this radio button
         try:
-            row = radio_btn.find_element(By.XPATH, "./ancestor::tr")
+            row = radio_btns[chosen_index].find_element(By.XPATH, "./ancestor::tr")
             cells = row.find_elements(By.TAG_NAME, "td")
             row_text = " | ".join(cell.text.strip() for cell in cells if cell.text.strip())
             logger.info(f"Selected ephys recording: {row_text}")
         except Exception as e:
             logger.info(f"Could not extract recording details from row: {e}")
 
-        # Click the radio button — re-find to avoid stale reference
-        self.browser.execute_script(
-            "arguments[0].scrollIntoView({block: 'center'});", radio_btn
-        )
-        time.sleep(1)
-        # Use JS click to avoid stale element issues
-        self.browser.execute_script("arguments[0].click();", radio_btn)
+        # Re-find and click the radio button to avoid stale element reference
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                fresh_radios = self.browser.find_elements(*radio_selectors[0])
+                if not fresh_radios:
+                    fresh_radios = self.browser.find_elements(*radio_selectors[-1])
+                target = fresh_radios[chosen_index]
+                self.browser.execute_script(
+                    "arguments[0].scrollIntoView({block: 'center'});", target
+                )
+                time.sleep(0.5)
+                self.browser.execute_script("arguments[0].click();", target)
+                logger.info("Clicked radio button to select model")
+                break
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    logger.info(f"Stale element on attempt {attempt + 1}, retrying...")
+                    time.sleep(2)
+                    continue
+                raise
 
-        logger.info("Clicked random radio button to select model")
         time.sleep(2)
         return True
 
@@ -412,47 +425,63 @@ class BuildIcPage(HomePage):
         return self.fill_configuration_form(unique_name, dynamic_description, logger)
 
     def click_ion_channel_recording_button(self, logger):
-        """Click on 'Click to select recording' button to open recordings list"""
-        logger.info("Looking for 'Click to select recording' button...")
-        time.sleep(3)
-        
-        # Try multiple selectors for the select recording button
+        """Click the Ion channel recording field to open the recordings list.
+        Works both when no recording is selected (placeholder) and when one is
+        already selected (shows recording name with search icon).
+        """
+        logger.info("Looking for Ion channel recording field...")
+        time.sleep(5)
+
+        # First check if a recording is already selected — clear it by clicking the X
+        try:
+            close_btn = self.browser.find_element(*BuildIcLocators.RECORDING_BADGE_CLOSE_BTN)
+            if close_btn.is_displayed():
+                logger.info("Found previously selected recording, clearing it...")
+                self.browser.execute_script("arguments[0].click();", close_btn)
+                time.sleep(2)
+                logger.info("Cleared previous recording selection")
+        except:
+            pass  # No previous selection, continue normally
+
+        # Now find and click the recording field (should show placeholder or be clickable)
         select_recording_btn = None
         select_recording_selectors = [
             BuildIcLocators.CLICK_TO_SELECT_RECORDING_PRIMARY,
             BuildIcLocators.CLICK_TO_SELECT_RECORDING_DIV,
             BuildIcLocators.CLICK_TO_SELECT_RECORDING_ANY,
             BuildIcLocators.CLICK_TO_SELECT_RECORDING_PLACEHOLDER,
+            BuildIcLocators.RECORDING_FIELD_WITH_SELECTION,
         ]
         
         for i, selector in enumerate(select_recording_selectors):
             try:
                 select_recording_btn = self.browser.find_element(*selector)
-                logger.info(f"Found 'Click to select recording' button with selector {i+1}: {selector}")
-                break
+                if select_recording_btn.is_displayed():
+                    logger.info(f"Found recording field with selector {i+1}: {selector}")
+                    break
+                else:
+                    select_recording_btn = None
             except:
-                logger.info(f"Select recording selector {i+1} failed: {selector}")
+                logger.info(f"Recording field selector {i+1} failed: {selector}")
                 continue
         
         if not select_recording_btn:
-            raise Exception("Cannot find 'Click to select recording' button")
+            raise Exception("Cannot find Ion channel recording field")
         
-        # Scroll into view and wait for it to be visible
-        self.browser.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", select_recording_btn)
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
+            select_recording_btn
+        )
         time.sleep(2)
         
-        # Try to click - use JavaScript if regular click fails
         try:
             select_recording_btn.click()
-            logger.info("Clicked on 'Click to select recording' button")
+            logger.info("Clicked Ion channel recording field")
         except:
-            logger.info("Regular click failed, trying JavaScript click")
             self.browser.execute_script("arguments[0].click();", select_recording_btn)
-            logger.info("Clicked on 'Click to select recording' button using JavaScript")
+            logger.info("Clicked Ion channel recording field using JavaScript")
         
-        # Wait for recordings list to load
         time.sleep(3)
-        logger.info(f"URL after clicking select recording: {self.browser.current_url}")
         return True
 
     def click_public_tab(self, logger):
@@ -721,6 +750,20 @@ class BuildIcPage(HomePage):
         logger.info("Build model initiated")
         return True
 
+    def click_configuration_tab(self, logger):
+        """Click on the Configuration tab (top-level, sibling of Output tab)."""
+        logger.info("Looking for Configuration tab...")
+        time.sleep(2)
+        try:
+            config_tab = self.element_to_be_clickable(BuildIcLocators.CONFIGURATION_TAB, timeout=10)
+            config_tab.click()
+            logger.info("Clicked Configuration tab")
+            time.sleep(2)
+            return True
+        except Exception as e:
+            logger.warning(f"Configuration tab not found: {e}")
+            return False
+
     def click_output_tab(self, logger):
         """Click on the Output tab to view build results"""
         logger.info("Looking for Output tab...")
@@ -762,7 +805,9 @@ class BuildIcPage(HomePage):
         return True
 
     def wait_for_build_completion(self, logger, timeout=120):
-        """Wait for the build to complete (done badge appears)"""
+        """Wait for the build to complete (done badge appears).
+        Returns 'done' if successful, 'failed' if build failed, or None if timeout.
+        """
         logger.info(f"Waiting for build to complete (timeout: {timeout}s)...")
         
         start_time = time.time()
@@ -772,7 +817,16 @@ class BuildIcPage(HomePage):
                 done_badge = self.browser.find_element(*BuildIcLocators.BUILD_STATUS_DONE)
                 if done_badge.is_displayed():
                     logger.info("Build completed successfully - 'done' badge found")
-                    return True
+                    return 'done'
+            except:
+                pass
+            
+            # Check if build failed
+            try:
+                failed_badge = self.browser.find_element(*BuildIcLocators.BUILD_STATUS_FAILED)
+                if failed_badge.is_displayed():
+                    logger.warning(f"Build FAILED - '{failed_badge.text.strip()}' badge found")
+                    return 'failed'
             except:
                 pass
             
@@ -788,7 +842,7 @@ class BuildIcPage(HomePage):
             time.sleep(5)
         
         logger.info(f"Build did not complete within {timeout}s timeout")
-        return False
+        return None
 
     def verify_output_files_present(self, logger):
         """Verify that output files (MOD, PDF) are present in the Outputs section.

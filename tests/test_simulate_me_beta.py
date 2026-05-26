@@ -345,6 +345,20 @@ class TestSimulateMeBeta:
         # Verify first card has title and status
         card_info = sim_page.get_simulation_card_info(sim_cards[0])
         assert card_info['title'], "Simulation card should have a title"
+
+        # Status badge may load asynchronously — use explicit wait
+        if not card_info['status']:
+            from selenium.webdriver.support.ui import WebDriverWait
+            from locators.simulate_me_beta_locators import SimulateMeBetaLocators
+            try:
+                WebDriverWait(sim_cards[0], 30).until(
+                    lambda card: card.find_element(*SimulateMeBetaLocators.SIM_CARD_STATUS_BADGE).text.strip()
+                )
+                sim_cards = sim_page.get_simulation_cards(timeout=5)
+                card_info = sim_page.get_simulation_card_info(sim_cards[0])
+            except Exception:
+                pass
+
         assert card_info['status'], "Simulation card should have a status badge"
         logger.info(f"First card: '{card_info['title']}', status='{card_info['status']}', "
                      f"params={list(card_info['params'].keys())}")

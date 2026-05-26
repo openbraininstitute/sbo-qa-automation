@@ -251,14 +251,20 @@ class TestSimulateSynaptomeBeta:
         page.click_generate_simulation()
         logger.info("Clicked Generate simulation(s)")
 
-        time.sleep(10)
-        if not page.is_simulations_tab_active():
-            logger.info("Simulations tab not auto-active, clicking manually")
+        # Wait for Simulations tab to become active (explicit wait)
+        from selenium.webdriver.support.ui import WebDriverWait
+        try:
+            WebDriverWait(page.browser, 60).until(
+                lambda d: page.is_simulations_tab_active()
+            )
+        except Exception:
+            logger.info("Simulations tab not auto-active after 60s, clicking manually")
             try:
                 page.click_simulations_tab()
                 time.sleep(3)
             except Exception as e:
                 logger.warning(f"Could not click Simulations tab: {e}")
+
         assert page.is_simulations_tab_active(), (
             "Simulations tab should be active after Generate simulation(s)"
         )

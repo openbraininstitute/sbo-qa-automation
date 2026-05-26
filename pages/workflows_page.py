@@ -582,21 +582,32 @@ class WorkflowsPage(HomePage):
         except:
             return []
     
-    def click_radio_button_by_index(self, index=0):
-        """Click a radio button by index (0-based)"""
-        try:
-            radio_buttons = self.get_all_radio_buttons()
-            if index < len(radio_buttons):
-                radio_buttons[index].click()
-                self.logger.info(f"✅ Clicked radio button at index {index}")
-                time.sleep(1)
-                return True
-            else:
-                self.logger.warning(f"⚠️ Radio button index {index} out of range (total: {len(radio_buttons)})")
+    def click_radio_button_by_index(self, index=0, max_retries=3):
+        """Click a radio button by index (0-based), with retry for stale elements"""
+        for attempt in range(max_retries):
+            try:
+                radio_buttons = self.get_all_radio_buttons()
+                if index < len(radio_buttons):
+                    radio = radio_buttons[index]
+                    self.browser.execute_script(
+                        "arguments[0].scrollIntoView({block: 'center'});", radio
+                    )
+                    time.sleep(0.5)
+                    self.browser.execute_script("arguments[0].click();", radio)
+                    self.logger.info(f"✅ Clicked radio button at index {index}")
+                    time.sleep(1)
+                    return True
+                else:
+                    self.logger.warning(f"⚠️ Radio button index {index} out of range (total: {len(radio_buttons)})")
+                    return False
+            except Exception as e:
+                if "stale element" in str(e).lower() and attempt < max_retries - 1:
+                    self.logger.info(f"Stale element on attempt {attempt + 1}, re-finding radio buttons...")
+                    time.sleep(2)
+                    continue
+                self.logger.warning(f"Error clicking radio button: {e}")
                 return False
-        except Exception as e:
-            self.logger.warning(f"Error clicking radio button: {e}")
-            return False
+        return False
     
     def click_first_radio_button(self):
         """Click the first radio button in the table"""
@@ -649,17 +660,27 @@ class WorkflowsPage(HomePage):
         """Find Duplicate button"""
         return self.find_element(WorkflowLocators.DUPLICATE_BUTTON, timeout=timeout)
     
-    def click_view_configuration_button(self):
+    def click_view_configuration_button(self, max_retries=3):
         """Click View Configuration button (it's an <a> tag with role='button')"""
-        try:
-            button = self.find_view_configuration_button()
-            button.click()
-            self.logger.info("✅ Clicked View Configuration button")
-            time.sleep(2)
-            return True
-        except Exception as e:
-            self.logger.warning(f"Could not click View Configuration button: {e}")
-            return False
+        for attempt in range(max_retries):
+            try:
+                button = self.find_view_configuration_button(timeout=10)
+                self.browser.execute_script(
+                    "arguments[0].scrollIntoView({block: 'center'});", button
+                )
+                time.sleep(0.5)
+                self.browser.execute_script("arguments[0].click();", button)
+                self.logger.info("✅ Clicked View Configuration button")
+                time.sleep(2)
+                return True
+            except Exception as e:
+                if ("stale element" in str(e).lower() or "no such element" in str(e).lower()) and attempt < max_retries - 1:
+                    self.logger.info(f"View Configuration button stale/missing on attempt {attempt + 1}, retrying...")
+                    time.sleep(2)
+                    continue
+                self.logger.warning(f"Could not click View Configuration button: {e}")
+                return False
+        return False
     
     def click_view_results_button(self):
         """Click View Results button"""

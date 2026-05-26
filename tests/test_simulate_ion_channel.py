@@ -242,6 +242,7 @@ class TestSimulateIonChannel:
 
         page.wait_for_block_single(timeout=10)
         logger.info("Stimulus config form appeared")
+        page.fill_stimulus_parameters(default_value=1)
 
         # Add a second stimulus — must be a Poisson spike (has frequency parameter)
         page.click_add_stimulus()
@@ -257,6 +258,9 @@ class TestSimulateIonChannel:
                 exclude_labels=EXCLUDED_STIMULI
             )
             logger.info(f"Selected second stimulus (fallback): '{poisson_label}'")
+
+        page.wait_for_block_single(timeout=10)
+        page.fill_stimulus_parameters(default_value=1)
 
         # Verify stimuli appear in middle column
         final_stim_items = page.get_dictionary_items()

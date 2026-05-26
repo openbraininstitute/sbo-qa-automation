@@ -155,9 +155,15 @@ class LoginPage(CustomBasePage):
                 self.wait.until(EC.url_contains("app/virtual-lab"))
                 break
             except (TimeoutException, WebDriverException) as e:
-                if "no such execution context" in str(e) and attempt < max_retries - 1:
-                    print(f"DEBUG: Login redirect lost execution context (attempt {attempt + 1}), retrying...")
-                    time.sleep(2)
+                error_msg = str(e).lower()
+                is_transient = (
+                    "no such execution context" in error_msg
+                    or "aborted by navigation" in error_msg
+                    or "loader has changed" in error_msg
+                )
+                if is_transient and attempt < max_retries - 1:
+                    print(f"DEBUG: Login redirect transient error (attempt {attempt + 1}), retrying...")
+                    time.sleep(3)
                     continue
                 raise
         print("DEBUG: Login completed successfully.")
