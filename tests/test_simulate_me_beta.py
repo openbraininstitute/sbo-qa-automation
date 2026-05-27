@@ -69,13 +69,21 @@ class TestSimulateMeBeta:
                 logger.info(f"  Available option: '{opt.text}'")
 
         sim_page.click_filter_apply()
-        time.sleep(3)
 
         try:
             sim_page.close_filter_panel()
         except Exception:
             pass
-        time.sleep(2)
+
+        # Wait for table to refresh after filter — explicit wait for E-type values to change
+        from selenium.webdriver.support.ui import WebDriverWait
+        try:
+            WebDriverWait(sim_page.browser, 15).until(
+                lambda d: all('cADpyr' in v for v in sim_page.get_etype_column_values()[:3])
+                if sim_page.get_etype_column_values() else False
+            )
+        except Exception:
+            pass  # Will be caught by the assertion below
 
         # Step 5: Verify E-type column values contain 'cADpyr'
         etype_values = sim_page.get_etype_column_values()

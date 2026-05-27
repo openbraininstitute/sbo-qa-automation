@@ -64,8 +64,8 @@ class ExploreMorphologyPage(ExplorePage):
     def find_morphology_tab(self):
         return self.find_element(ExploreMorphologyPageLocators.MORPHOLOGY_TAB)
 
-    def find_thumbnails(self):
-        return self.find_all_elements(ExploreMorphologyPageLocators.LV_THUMBNAIL)
+    def find_thumbnails(self, timeout=30):
+        return self.find_all_elements(ExploreMorphologyPageLocators.LV_THUMBNAIL, timeout=timeout)
 
     def find_results(self):
         return self.find_element(ExploreMorphologyPageLocators.RECORDS)

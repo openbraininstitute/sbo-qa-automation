@@ -347,9 +347,12 @@ class WorkflowsPage(HomePage):
         
         return results
 
-    def get_table_rows(self):
-        """Get all table rows"""
-        return self.find_all_elements(WorkflowLocators.TABLE_ROWS)
+    def get_table_rows(self, timeout=5):
+        """Get all table rows. Returns empty list if no rows found."""
+        try:
+            return self.find_all_elements(WorkflowLocators.TABLE_ROWS, timeout=timeout)
+        except Exception:
+            return []
 
     def get_table_row_count(self):
         """Get the number of rows in the table"""
