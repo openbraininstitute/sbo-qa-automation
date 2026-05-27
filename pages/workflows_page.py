@@ -721,6 +721,21 @@ class WorkflowsPage(HomePage):
         except Exception as e:
             self.logger.warning(f"Could not click Duplicate button: {e}")
             return False
+
+    def is_duplicate_button_disabled(self):
+        """Check if the Duplicate button is displayed but disabled."""
+        try:
+            button = self.find_duplicate_button()
+            if not button.is_displayed():
+                return False
+            is_disabled = (
+                button.get_attribute("disabled") is not None
+                or "disabled" in (button.get_attribute("class") or "")
+                or button.get_attribute("aria-disabled") == "true"
+            )
+            return is_disabled
+        except Exception:
+            return False
     
     def verify_action_buttons_appear(self):
         """Verify that action buttons appear after selecting a radio button"""

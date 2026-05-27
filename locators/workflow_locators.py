@@ -74,8 +74,8 @@ class WorkflowLocators:
     ACTION_BUTTONS_CONTAINER = (By.CSS_SELECTOR, "#workflow-activity-actions, [data-testid='workflow-activity-actions']")
     # View Configuration is an <a> tag with role="button"
     VIEW_CONFIGURATION_BUTTON = (By.XPATH, "//a[@role='button' and contains(., 'View configuration')]")
-    # View Results is inside a button (may be disabled)
-    VIEW_RESULTS_BUTTON = (By.XPATH, "//button[@role='button' and .//span[contains(text(), 'View results')]]")
+    # View Results is an <a> tag with role="button" (same as View Configuration)
+    VIEW_RESULTS_BUTTON = (By.XPATH, "//a[@role='button' and contains(., 'View results')]")
     # Duplicate is a button
     DUPLICATE_BUTTON = (By.XPATH, "//button[@role='button' and contains(., 'Duplicate')]")
     
