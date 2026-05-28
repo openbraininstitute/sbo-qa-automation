@@ -302,13 +302,13 @@ class AIAssistantPage(ProjectHome):
         
         self.logger.info("✅ AI response generation started")
     
-    def find_cancel_button(self, timeout=10):
+    def find_cancel_button(self, timeout=5):
         """Find and return the cancel button that appears during AI response generation."""
         self.logger.info("Looking for cancel button...")
         
         selectors = [
-            AIAssistantLocators.CANCEL_BUTTON,
-            AIAssistantLocators.CANCEL_BUTTON_ALT,
+            AIAssistantLocators.CANCEL_BUTTON_ALT,  # class-based, most reliable
+            AIAssistantLocators.CANCEL_BUTTON,       # aria-label
             AIAssistantLocators.CANCEL_BUTTON_GENERIC
         ]
         
@@ -402,6 +402,11 @@ class AIAssistantPage(ProjectHome):
 
         # Find all delete buttons and click the last one (oldest)
         try:
+            # Wait for delete buttons to appear (history cards need time to load)
+            try:
+                self.find_all_elements(AIAssistantLocators.HISTORY_DELETE_BUTTONS_ALL, timeout=timeout)
+            except Exception:
+                pass
             delete_btns = self.browser.find_elements(*AIAssistantLocators.HISTORY_DELETE_BUTTONS_ALL)
             if not delete_btns:
                 self.logger.warning("No delete buttons found in history")

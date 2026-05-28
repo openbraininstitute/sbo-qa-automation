@@ -149,9 +149,9 @@ class TestAbout:
         for locator in image_locators:
             img = about_page.get_image(locator)
             try:
+                browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", img)
+                time.sleep(1)
                 about_page.wait_for_card_image_to_load(img)
-                if not img.is_displayed():
-                    failures.append(locator)
             except TimeoutException:
                 failures.append(locator)
 

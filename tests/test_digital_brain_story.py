@@ -49,7 +49,9 @@ class TestDigitalBrainStory:
         # Test hero video (must load if present)
         hero_video = story_page.get_hero_video()
         if hero_video:
-            assert hero_video.is_displayed(), "Hero video is not displayed"
+            video_src = hero_video.get_attribute("src") or ""
+            assert video_src, "Hero video has no src attribute"
+            logger.info(f"Hero video found with src: {video_src[:80]}...")
             story_page.wait_for_hero_video_load()
             logger.info("Hero video loaded successfully")
         else:

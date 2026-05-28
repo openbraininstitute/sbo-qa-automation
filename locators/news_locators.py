@@ -7,15 +7,19 @@
 from selenium.webdriver.common.by import By
 
 class NewsLocators:
-    CARD_MAIN_TITLE = (By.XPATH, "//div[starts-with(@class,'Card-module__cjArhG__card')]/h1")
-    CARD_SUBTITLE = (By.XPATH, "Card-module__cjArhG__subtitle")
-    CARD_TEXT = (By.XPATH, "//div[starts-with(@class, 'Card-module__cjArhG__text')]")
-    CARD_IMG = (By.XPATH, "//div[starts-with(@class, 'Card-module__cjArhG__image')]")
-    CARD_READ_MORE_BTN = (By.XPATH, "//button[@type='button']/div[contains(text(), 'Read more')]")
-    LOAD_MORE_BTN = (By.XPATH, "//button[contains(text(), 'Load')]")
+    # Hero section
     HERO_IMG = (By.CSS_SELECTOR, "img[alt='Hero image']")
-    HERO_VIDEO = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__show")
-    HERO_TEXT = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__content")
-    HERO_MAIN_TITLE = (By.XPATH, "//h1[normalize-space()='News']")
-    PAGE_CARDS = (By.XPATH, "//div[starts-with(@class, 'Card-module__cjArhG__card')]")
-    TITLE = (By.LINK_TEXT, "")
+    HERO_VIDEO = (By.XPATH, "//div[contains(@class,'__hero')]//video")
+    HERO_TEXT = (By.XPATH, "//div[contains(@class,'__hero')]//div[contains(@class,'__content')]")
+    HERO_MAIN_TITLE = (By.XPATH, "//div[contains(@class,'__hero')]//h1[text()='News']")
+
+    # News cards
+    PAGE_CARDS = (By.XPATH, "//div[contains(@class,'card-module') and contains(@class,'__card')]")
+    CARD_MAIN_TITLE = (By.XPATH, "//div[contains(@class,'card-module') and contains(@class,'__card')]//h1")
+    CARD_SUBTITLE = (By.XPATH, "//div[contains(@class,'card-module') and contains(@class,'__subtitle')]")
+    CARD_TEXT = (By.XPATH, "//div[contains(@class,'card-module') and contains(@class,'__text')]")
+    CARD_IMG = (By.XPATH, "//div[contains(@class,'card-module') and contains(@class,'__image')]")
+    CARD_READ_MORE_BTN = (By.XPATH, "//a[contains(@class,'card-module') and contains(@class,'__button')]")
+
+    # Load more button
+    LOAD_MORE_BTN = (By.XPATH, "//button[contains(text(), 'Load')]")

@@ -13,9 +13,9 @@ class AIAssistantLocators:
     AI_PANEL_BUTTON_CLASS = (By.CSS_SELECTOR, "button[class*='ai'], button[class*='assistant'], .ai-button, .assistant-button")
     
     # Suggested Questions
-    SUGGESTED_QUESTIONS = (By.XPATH, "//div[@id='workspace-ai']//button[.//div[string-length(text()) > 15]]")
-    SUGGESTED_QUESTIONS_ALT = (By.XPATH, "//div[@id='workspace-ai']//button[.//svg and .//div]")
-    SUGGESTED_QUESTIONS_FALLBACK = (By.CSS_SELECTOR, "#workspace-ai div[class*='content'] button")
+    SUGGESTED_QUESTIONS = (By.XPATH, "//div[contains(@class,'suggested-questions-module') and contains(@class,'__suggestions')]//button")
+    SUGGESTED_QUESTIONS_ALT = (By.XPATH, "//div[contains(@class,'__suggestedQuestionsContainer')]//button")
+    SUGGESTED_QUESTIONS_FALLBACK = (By.XPATH, "//div[contains(@class,'suggested-questions')]//button[.//svg and .//div]")
     
     # AI Response Elements
     AI_RESPONSE = (By.CSS_SELECTOR, "[data-testid*='response'], [data-testid*='message'], .ai-response, .message, .response")
@@ -26,44 +26,44 @@ class AIAssistantLocators:
     AI_LOADING_INDICATOR = (By.CSS_SELECTOR, "div[class*='waveLoader']")
     
     # Cancel Button (appears during AI response generation)
-    CANCEL_BUTTON = (By.XPATH, "//div[contains(@class,'cancelButton')]//button")
-    CANCEL_BUTTON_ALT = (By.XPATH, "//div[contains(@class, 'cancelButton')]//button[text()='Cancel']")
-    CANCEL_BUTTON_GENERIC = (By.XPATH, "//button[text()='Cancel' or text()='Stop']")
-    CANCEL_BUTTON_CONTAINER = (By.XPATH, "//div[contains(@class,'cancelButton')]")
+    CANCEL_BUTTON = (By.XPATH, "//button[@aria-label='Cancel']")
+    CANCEL_BUTTON_ALT = (By.XPATH, "//button[contains(@class,'__stopButton')]")
+    CANCEL_BUTTON_GENERIC = (By.XPATH, "//button[@aria-label='Cancel' or text()='Cancel' or text()='Stop']")
+    CANCEL_BUTTON_CONTAINER = (By.XPATH, "//button[contains(@class,'stopButton')]")
     
     # Clear/Reset Chat Button
-    CLEAR_CHAT_BUTTON = (By.CSS_SELECTOR, "button.chat-module__71EZLa__actionButton")
-    CLEAR_CHAT_BUTTON_ALT = (By.XPATH, "//button[contains(@class, 'actionButton')]//div[text()='New Chat']")
-    CLEAR_CHAT_BUTTON_TITLE = (By.XPATH, "//button//svg//title[text()='Clear']")
+    CLEAR_CHAT_BUTTON = (By.XPATH, "//button[@aria-label='New Chat' or @title='New Chat']")
+    CLEAR_CHAT_BUTTON_ALT = (By.XPATH, "//button[contains(@class,'__newChatBtn')]")
+    CLEAR_CHAT_BUTTON_TITLE = (By.XPATH, "//button[.//svg//title[text()='New Chat']]")
     CLEAR_CHAT_BUTTON_TEXT = (By.XPATH, "//button//div[text()='New Chat']")
-    CLEAR_CHAT_BUTTON_FALLBACK = (By.CSS_SELECTOR, "[data-testid*='clear'], [data-testid*='reset'], [aria-label*='clear'], [aria-label*='reset']")
+    CLEAR_CHAT_BUTTON_FALLBACK = (By.CSS_SELECTOR, "[aria-label='New Chat']")
     CLEAR_CHAT_BUTTON_GENERIC = (By.XPATH, "//button[contains(text(), 'Clear') or contains(text(), 'Reset') or contains(text(), 'New')]")
     
     # History Button
-    CHAT_TAB_BUTTON = (By.XPATH, "//nav//button[.//svg//title[text()='Chat']]")
-    HISTORY_BUTTON = (By.XPATH, "//nav//button[.//svg//title[text()='History']]")
-    NEW_CHAT_BUTTON = (By.XPATH, "//nav//button[.//svg//title[text()='New Chat']]")
-    HISTORY_BUTTON_ALT = (By.XPATH, "//button//div[text()='History']")
-    HISTORY_BUTTON_SVG = (By.XPATH, "//button[contains(@class, '') and .//svg//title[text()='History']]")
-    HISTORY_BUTTON_FALLBACK = (By.CSS_SELECTOR, "[data-testid*='history'], [aria-label*='history'], .history-button, .history")
-    HISTORY_BUTTON_GENERIC = (By.XPATH, "//button[contains(text(), 'History') or contains(text(), 'Previous') or contains(text(), 'Past')]")
+    CHAT_TAB_BUTTON = (By.XPATH, "//button[@aria-label='New Chat' or @title='New Chat']")
+    HISTORY_BUTTON = (By.XPATH, "//button[@aria-label='History' or @title='History']")
+    NEW_CHAT_BUTTON = (By.XPATH, "//button[@aria-label='New Chat' or @title='New Chat']")
+    HISTORY_BUTTON_ALT = (By.XPATH, "//button[.//svg//title[text()='History']]")
+    HISTORY_BUTTON_SVG = (By.XPATH, "//button[contains(@class,'__historyBtn')]")
+    HISTORY_BUTTON_FALLBACK = (By.CSS_SELECTOR, "[aria-label='History']")
+    HISTORY_BUTTON_GENERIC = (By.XPATH, "//button[contains(text(), 'History')]")
     
     # History Items
-    HISTORY_ITEMS = (By.CSS_SELECTOR, "[data-testid*='history-item'], [data-testid*='chat-item'], .history-item, .chat-item, .conversation")
+    HISTORY_ITEMS = (By.CSS_SELECTOR, "[data-testid*='history-item'], [data-testid*='chat-item']")
     HISTORY_ITEMS_ALT = (By.XPATH, "//div[contains(@class, 'history')]//div[contains(@class, 'item')]")
     
     # Today's History Section
     TODAY_HISTORY_SECTION = (By.XPATH, "//h1[text()='Today']")
     TODAY_HISTORY_CARDS = (By.XPATH, "//h1[text()='Today']/following-sibling::div[contains(@class, 'card')]")
-    TODAY_HISTORY_THREADS = (By.CSS_SELECTOR, ".history-module__qIgbEa__card")
-    TODAY_CURRENT_THREAD = (By.CSS_SELECTOR, ".history-module__qIgbEa__currentThread")
+    TODAY_HISTORY_THREADS = (By.XPATH, "//div[contains(@class,'__card')]")
+    TODAY_CURRENT_THREAD = (By.XPATH, "//div[contains(@class,'__currentThread')]")
     
     # History Thread Buttons
-    HISTORY_THREAD_BUTTON = (By.CSS_SELECTOR, ".history-module__qIgbEa__mainButton")
+    HISTORY_THREAD_BUTTON = (By.XPATH, "//button[contains(@class,'__mainButton')]")
     HISTORY_THREAD_BUTTON_ALT = (By.XPATH, "//button[contains(@class, 'mainButton')]")
-    HISTORY_EDIT_BUTTON = (By.XPATH, "//button//svg//title[text()='Edit']")
-    HISTORY_DELETE_BUTTON = (By.XPATH, "//button[contains(@class,'delete')]//svg//title[text()='Delete']/ancestor::button")
-    HISTORY_DELETE_BUTTONS_ALL = (By.XPATH, "//button[contains(@class,'delete') and .//svg//title[text()='Delete']]")
+    HISTORY_EDIT_BUTTON = (By.XPATH, "//button[contains(@class,'__edit')]")
+    HISTORY_DELETE_BUTTON = (By.XPATH, "//button[contains(@class,'__delete')]")
+    HISTORY_DELETE_BUTTONS_ALL = (By.XPATH, "//button[contains(@class,'__delete')]")
     HISTORY_DELETE_CONFIRM_BTN = (By.XPATH, "//dialog[contains(@class,'dialogDelete')]//button[.//span[text()='Confirm']]")
     HISTORY_DELETE_CANCEL_BTN = (By.XPATH, "//dialog[contains(@class,'dialogDelete')]//button[.//span[text()='Cancel']]")
     HISTORY_LOAD_MORE_BTN = (By.XPATH, "//button[.//div[text()='Load more']]")

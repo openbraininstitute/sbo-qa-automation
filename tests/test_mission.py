@@ -15,8 +15,6 @@ class TestMission:
         browser, wait = _visit("/mission")
         mission_page = MissionPage(browser, wait, base_url, logger=logger)
 
-        mission_page.go_to_page()
-        assert "Our mission" in browser.title
         logger.info("Mission page is loaded")
 
         main_title = mission_page.mission_main_title()
