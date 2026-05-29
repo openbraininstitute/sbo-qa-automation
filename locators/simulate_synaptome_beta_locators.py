@@ -161,7 +161,7 @@ class SimulateSynaptomeBetaLocators:
     )
     CONFIG_ADD_BTN_IN_SUB_ENTRY = (
         By.XPATH,
-        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "//div[contains(@data-scan-config-menu,'menu-block-dictionary-sub-entry')]"
         "[@data-active='true']//button[.//span[contains(text(),'Add')]]",
     )
     CONFIG_BLOCK_SINGLE = (

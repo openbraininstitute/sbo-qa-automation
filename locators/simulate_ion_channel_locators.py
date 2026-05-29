@@ -138,7 +138,7 @@ class SimulateIonChannelLocators:
     )
     ION_CHANNEL_MODELS_ADD_BTN = (
         By.XPATH,
-        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "//div[contains(@data-scan-config-menu,'menu-block-dictionary-sub-entry')]"
         "[@data-active='true']//button[.//span[contains(text(),'Add')]]",
     )
     ION_CHANNEL_MODEL_TYPE_ITEMS = (
@@ -224,7 +224,7 @@ class SimulateIonChannelLocators:
     # ── Stimuli: dictionary items and Add button ─────────────────────────
     CONFIG_ADD_BTN_IN_SUB_ENTRY = (
         By.XPATH,
-        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "//div[contains(@data-scan-config-menu,'menu-block-dictionary-sub-entry')]"
         "[@data-active='true']//button[.//span[contains(text(),'Add')]]",
     )
     CONFIG_BLOCK_DICTIONARY_ITEMS = (
@@ -253,7 +253,7 @@ class SimulateIonChannelLocators:
         "//button[@data-scan-config-menu='left-menu-top-item']"
         "[.//span[contains(text(),'Recordings')]]"
         "/ancestor::div[contains(@class,'flex-col')][1]"
-        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "//div[contains(@data-scan-config-menu,'menu-block-dictionary-sub-entry')]"
         "//div[contains(@class,'entryButton') and @role='button']",
     )
 

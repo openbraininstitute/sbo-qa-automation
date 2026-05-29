@@ -157,19 +157,19 @@ class SimulateMeBetaLocators:
     )
     CONFIG_STIMULI_SUB_ENTRY = (
         By.CSS_SELECTOR,
-        "div[data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "div[data-scan-config-menu*='menu-block-dictionary-sub-entry']"
     )
     CONFIG_STIMULI_ADD_BTN = (
         By.XPATH,
-        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']//button[.//span[contains(text(),'Add')]]"
+        "//div[contains(@data-scan-config-menu,'menu-block-dictionary-sub-entry')][@data-active='true']//button[.//span[contains(text(),'Add')]]"
     )
     CONFIG_STIMULI_SUB_ITEMS = (
         By.CSS_SELECTOR,
-        "div[data-scan-config-menu='menu-block-dictionary-sub-entry'] button[data-scan-config-menu='left-menu-sub-item']"
+        "div[data-scan-config-menu*='menu-block-dictionary-sub-entry'] button[data-scan-config-menu='left-menu-sub-item']"
     )
     CONFIG_STIMULI_SUB_ITEMS_ACTIVE = (
         By.CSS_SELECTOR,
-        "div[data-scan-config-menu='menu-block-dictionary-sub-entry'] button[data-scan-config-menu='left-menu-sub-item'][data-active='true']"
+        "div[data-scan-config-menu*='menu-block-dictionary-sub-entry'] button[data-scan-config-menu='left-menu-sub-item'][data-active='true']"
     )
 
     """Neuronal manipulations tab."""
@@ -198,7 +198,7 @@ class SimulateMeBetaLocators:
     )
     CONFIG_ADD_BTN_IN_SUB_ENTRY = (
         By.XPATH,
-        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry'][@data-active='true']//button[.//span[contains(text(),'Add')]]"
+        "//div[contains(@data-scan-config-menu,'menu-block-dictionary-sub-entry')][@data-active='true']//button[.//span[contains(text(),'Add')]]"
     )
 
     """Timestamps tab."""
