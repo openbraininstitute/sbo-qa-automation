@@ -9,21 +9,20 @@ from selenium.webdriver.common.by import By
 class PricingLocators:
     # Top nav / header
     OBI_HOMEPAGE_MAIN_NAV = (By.CSS_SELECTOR, "div[id='LandingPage/menu']")
-    OBI_HOMEPAGE_LOGO_BTN = (By.CSS_SELECTOR, ".Menu-module__CnaVha__logo")
-    OBI_MENU = (By.CSS_SELECTOR, ".Menu-module__CnaVha__items")
-    VLAB_LOGIN_BTN = (By.CSS_SELECTOR, ".Menu-module__CnaVha__loginButton")
+    OBI_HOMEPAGE_LOGO_BTN = (By.XPATH, "//a[contains(@class,'__logo')]")
+    OBI_MENU = (By.XPATH, "//div[contains(@class,'__items')]")
+    VLAB_LOGIN_BTN = (By.XPATH, "//a[@href='/app/virtual-lab' and contains(@class,'menuLink')]")
 
     # Hero section
-    PRICING_TITLE = (By.XPATH, "//h1[normalize-space()='Pricing']")
+    PRICING_TITLE = (By.XPATH, "//div[contains(@class,'__hero')]//h1[normalize-space()='Pricing']")
     HERO_IMG = (By.CSS_SELECTOR, "img[alt='Hero image']")
-    HERO_VIDEO = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__show")
-    PRICING_SUBTEXT = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__content")
+    HERO_VIDEO = (By.XPATH, "//div[contains(@class,'__hero')]//video")
+    PRICING_SUBTEXT = (By.XPATH, "//div[contains(@class,'__hero')]//div[contains(@class,'__content')]")
 
     # "Discover our plans" button (below hero)
     DISCOVER_PLANS = (By.CSS_SELECTOR, "button[aria-label='Discover our plans']")
 
     # Plan cards grid container (4-column grid with Free, Pro, Enterprise, Education)
-    # The xl:grid container is hidden on smaller viewports; use presence not visibility
     PLAN_CARDS_CONTAINER = (By.XPATH, "//div[contains(@class, 'grid-cols-4')]")
 
     # Individual plan cards by title text
@@ -47,7 +46,4 @@ class PricingLocators:
     PRO_SUBSCRIPTION_TOGGLE = (By.XPATH, "//button[@aria-label='Switch to year subscription']")
 
     # Footer
-    FOOTER = (By.CSS_SELECTOR, ".FooterPanel-module__YUozGG__footerPanel")
-
-    # Temporary go-to-vlab button (if still present)
-    TEMP_GOTO_VLAB_BTN = (By.CSS_SELECTOR, ".TemporaryGoToLabButton-module___26Z8G__image.ProgressiveImage-module__p7HpFa__progressiveImage")
+    FOOTER = (By.XPATH, "//div[contains(@class,'footer-panel-module') and contains(@class,'__footerPanel')]")
