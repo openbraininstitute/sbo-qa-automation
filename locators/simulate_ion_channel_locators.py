@@ -138,8 +138,8 @@ class SimulateIonChannelLocators:
     )
     ION_CHANNEL_MODELS_ADD_BTN = (
         By.XPATH,
-        "//div[contains(@data-scan-config-menu,'menu-block-dictionary-sub-entry')]"
-        "[@data-active='true']//button[.//span[contains(text(),'Add')]]",
+        "//div[contains(@data-scan-config-menu,'ion_channel_models-menu-block-dictionary-sub-entry')]"
+        "//button[.//span[contains(text(),'Add')]]",
     )
     ION_CHANNEL_MODEL_TYPE_ITEMS = (
         By.CSS_SELECTOR,
@@ -224,8 +224,9 @@ class SimulateIonChannelLocators:
     # ── Stimuli: dictionary items and Add button ─────────────────────────
     CONFIG_ADD_BTN_IN_SUB_ENTRY = (
         By.XPATH,
-        "//div[contains(@data-scan-config-menu,'menu-block-dictionary-sub-entry')]"
-        "[@data-active='true']//button[.//span[contains(text(),'Add')]]",
+        "//button[.//span[contains(text(),'Add') and contains(translate(text(),'STIMULUS','stimulus'),'stimulus')]]"
+        " | //div[contains(@data-scan-config-menu,'stimuli-menu-block-dictionary-sub-entry')]"
+        "//button[.//span[contains(text(),'Add')]]",
     )
     CONFIG_BLOCK_DICTIONARY_ITEMS = (
         By.CSS_SELECTOR,

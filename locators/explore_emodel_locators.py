@@ -70,7 +70,7 @@ class ExploreEModelPageLocators:
     INPUT_PLACEHOLDER = (By.CSS_SELECTOR, "input[placeholder='Search for entities...']")
     LV_EM_TD = (
         By.XPATH,
-        "//tbody[contains(@class,'ant-table-tbody')]//tr[contains(@class,'ant-table-row')][1]"
+        "//tbody[contains(@class,'ant-table-tbody')]//tr[contains(@class,'ant-table-row') and not(contains(@class,'ant-table-measure-row'))][1]"
     )
     LV_ROW = (By.CSS_SELECTOR, ".ant-table-body")
     ME_MODEL_TAB = (By.XPATH, "//li[@title='ME-model']")

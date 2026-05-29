@@ -354,6 +354,7 @@ class SimulateIonChannelPage(HomePage):
 
     def click_recordings_tab(self):
         self._click_left_menu_btn(Loc.LEFT_MENU_RECORDINGS_BTN, "Recordings")
+        time.sleep(2)  # Wait for middle column content to switch
 
     # ── Ion channel models tab ───────────────────────────────────────────
 
@@ -823,10 +824,7 @@ class SimulateIonChannelPage(HomePage):
                     "arguments[0].scrollIntoView({block: 'center'});", item
                 )
                 time.sleep(0.5)
-                try:
-                    ActionChains(self.browser).move_to_element(item).click().perform()
-                except Exception:
-                    self.browser.execute_script("arguments[0].click();", item)
+                self.browser.execute_script("arguments[0].click();", item)
                 self.logger.info(f"Clicked dictionary item: '{text}'")
                 time.sleep(2)
                 return text
@@ -859,10 +857,7 @@ class SimulateIonChannelPage(HomePage):
             "arguments[0].scrollIntoView({block: 'center'});", item
         )
         time.sleep(0.5)
-        try:
-            ActionChains(self.browser).move_to_element(item).click().perform()
-        except Exception:
-            self.browser.execute_script("arguments[0].click();", item)
+        self.browser.execute_script("arguments[0].click();", item)
         self.logger.info(f"Clicked dictionary item: '{label}'")
         time.sleep(2)
         return label
@@ -913,20 +908,46 @@ class SimulateIonChannelPage(HomePage):
                 self.logger.warning(f"Could not fill stimulus input: {e}")
         self.logger.info(f"Filled {filled_count} empty/zero stimulus parameter(s) with value {default_value}")
 
+        # Handle "Add level" button for SEClamp-type stimuli (Voltage Levels and Durations)
+        try:
+            add_level_btn = self.browser.find_element(
+                By.XPATH, "//button[contains(text(),'Add level')]"
+            )
+            if add_level_btn.is_displayed():
+                self.browser.execute_script("arguments[0].click();", add_level_btn)
+                self.logger.info("Clicked 'Add level' for voltage clamp stimulus")
+                time.sleep(1)
+                # Fill the new Voltage and Duration inputs
+                block = self.browser.find_element(*Loc.CONFIG_BLOCK_SINGLE)
+                inputs = block.find_elements(*Loc.BLOCK_NUMBER_INPUT)
+                for inp in inputs:
+                    current_value = (inp.get_attribute("value") or "").strip()
+                    if not current_value or current_value == "0":
+                        self.browser.execute_script(
+                            "arguments[0].scrollIntoView({block: 'center'});", inp
+                        )
+                        time.sleep(0.3)
+                        inp.click()
+                        inp.send_keys(select_all)
+                        inp.send_keys(Keys.BACKSPACE)
+                        inp.send_keys(str(default_value))
+                        inp.send_keys(Keys.TAB)
+                        time.sleep(0.3)
+                self.logger.info("Filled voltage level fields")
+        except Exception:
+            pass  # No "Add level" button — normal stimulus type
+
     # ── Recordings (dictionary-based, same pattern as Ion channel models) ─
 
     def click_add_recording(self):
         """Click the Add Recording button inside the Recordings sub-entry."""
         try:
-            btn = self.element_to_be_clickable(Loc.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
+            btn = self.element_to_be_clickable(Loc.RECORDING_ADD_BTN, timeout=10)
             self.browser.execute_script(
                 "arguments[0].scrollIntoView({block: 'center'});", btn
             )
             time.sleep(0.5)
-            try:
-                btn.click()
-            except Exception:
-                self.browser.execute_script("arguments[0].click();", btn)
+            self.browser.execute_script("arguments[0].click();", btn)
             self.logger.info("Clicked 'Add Recording'")
             time.sleep(2)
         except TimeoutException:
