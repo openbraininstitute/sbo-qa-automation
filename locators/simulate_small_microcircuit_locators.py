@@ -270,6 +270,6 @@ class SimulateSmallMicrocircuitLocators:
         By.XPATH,
         "//button[@data-scan-config-menu='left-menu-top-item'][@data-active='true']"
         "/ancestor::div[contains(@class,'flex-col')][1]"
-        "//div[@data-scan-config-menu='menu-block-dictionary-sub-entry']"
+        "//div[contains(@data-scan-config-menu,'menu-block-dictionary-sub-entry')]"
         "//button[.//span[contains(text(),'Add')]]"
     )

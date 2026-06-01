@@ -92,6 +92,14 @@ class ExploreNeuronDensityPage(ExplorePage):
 
                 time.sleep(0.3)  # Allow layout to settle
 
+                # If element is not visible, try clicking the right arrow to scroll table horizontally
+                try:
+                    self.element_visibility(locator, timeout=5)
+                except TimeoutException:
+                    self.logger.info(f"Column not visible after scrollIntoView, clicking right arrow...")
+                    self._click_table_scroll_right()
+                    time.sleep(1)
+
                 # Check visibility **after** scroll
                 self.element_visibility(locator, timeout=timeout)
 
@@ -108,6 +116,21 @@ class ExploreNeuronDensityPage(ExplorePage):
 
         self.logger.info(f"Found {len(column_headers)} column headers")
         return column_headers
+
+    def _click_table_scroll_right(self, clicks=3):
+        """Click the right arrow button to scroll the table horizontally."""
+        from selenium.webdriver.common.by import By
+        try:
+            # The right arrow is the last button in the ml-auto div
+            arrow_btn = self.browser.find_element(
+                By.XPATH, "//div[contains(@class, 'ml-auto')]//button[contains(@class, 'ant-btn-circle')]"
+            )
+            for _ in range(clicks):
+                arrow_btn.click()
+                time.sleep(0.5)
+            self.logger.info(f"Clicked right arrow {clicks} times to scroll table")
+        except Exception as e:
+            self.logger.warning(f"Could not click table scroll arrow: {e}")
 
 
 

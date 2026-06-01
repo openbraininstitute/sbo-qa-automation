@@ -213,7 +213,15 @@ def test_config(pytestconfig):
 
 @pytest.fixture(scope="function", autouse=True)
 def setup(request, pytestconfig, test_config):
-    """Fixture to set up the browser/webdriver"""
+    """Fixture to set up the browser/webdriver.
+    Skips browser creation if the test uses visit_public_pages or public_browsing.
+    """
+    # Skip browser creation for tests that use their own browser via public_browsing
+    fixture_names = request.fixturenames
+    if 'visit_public_pages' in fixture_names or 'public_browsing' in fixture_names:
+        yield None, None, test_config["base_url"], test_config["lab_id"], test_config["project_id"]
+        return
+
     environment = pytestconfig.getoption("env")
     base_url = test_config["base_url"]
     lab_id = test_config["lab_id"]

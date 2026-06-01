@@ -131,9 +131,13 @@ class SimulateSynaptomePage(HomePage):
         self.logger.info("Closed filter panel")
         time.sleep(1)
 
-    def click_random_filter_accordion(self):
+    def click_random_filter_accordion(self, timeout=15):
         """Click a random filter accordion trigger to verify it's clickable."""
-        triggers = self.browser.find_elements(*Loc.FILTER_ACCORDION_TRIGGERS)
+        try:
+            triggers = self.find_all_elements(Loc.FILTER_ACCORDION_TRIGGERS, timeout=timeout)
+        except Exception:
+            self.logger.warning("No filter accordion triggers found")
+            return None
         if not triggers:
             self.logger.warning("No filter accordion triggers found")
             return None

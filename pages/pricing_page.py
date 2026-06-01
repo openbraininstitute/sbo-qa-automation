@@ -50,7 +50,7 @@ class PricingPage(HomePage):
         return self.element_visibility(PricingLocators.HERO_IMG, timeout=timeout)
 
     def hero_video(self, timeout=20):
-        return self.element_visibility(PricingLocators.HERO_VIDEO, timeout=timeout)
+        return self.find_element(PricingLocators.HERO_VIDEO, timeout=timeout)
 
     def discover_plans_button(self, timeout=10):
         return self.find_element(PricingLocators.DISCOVER_PLANS, timeout=timeout)

@@ -4,6 +4,7 @@
 
 import time
 import pytest
+from selenium.webdriver.common.action_chains import ActionChains
 from pages.simulate_ion_channel_page import SimulateIonChannelPage
 
 
@@ -214,9 +215,10 @@ class TestSimulateIonChannel:
         stim_items = page.get_dictionary_items()
         assert len(stim_items) > 0, "Expected at least one stimulus dictionary item"
 
-        # Stimuli to exclude from random selection
+        # Stimuli to exclude from random selection (SEClamp types conflict if multiple selected)
         EXCLUDED_STIMULI = [
             "Single Electrode Voltage Clamp Multiple Levels Somatic Stimulus",
+            "Single Electrode Voltage Clamp 3 Levels Somatic Stimulus",
         ]
 
         # Select "Constant Somatic Current Clamp (Absolute)" first
@@ -244,22 +246,25 @@ class TestSimulateIonChannel:
         logger.info("Stimulus config form appeared")
         page.fill_stimulus_parameters(default_value=1)
 
-        # Add a second stimulus — must be a Poisson spike (has frequency parameter)
+        # Add a second stimulus — SEClamp type to test "Add level" functionality
+        ActionChains(page.browser).move_by_offset(0, 0).perform()
+        time.sleep(1)
+
         page.click_add_stimulus()
         try:
-            poisson_label = page.click_dictionary_item_by_label(
-                "Poisson",
+            seclamp_label = page.click_dictionary_item_by_label(
+                "Single Electrode Voltage Clamp 3 Levels",
                 exclude_labels=EXCLUDED_STIMULI,
             )
-            logger.info(f"Selected second stimulus (Poisson): '{poisson_label}'")
+            logger.info(f"Selected SEClamp stimulus: '{seclamp_label}'")
         except Exception as e:
-            logger.warning(f"Could not find Poisson stimulus: {e}")
-            poisson_label = page.click_random_enabled_dictionary_item(
+            logger.warning(f"Could not find SEClamp stimulus: {e}")
+            seclamp_label = page.click_random_enabled_dictionary_item(
                 exclude_labels=EXCLUDED_STIMULI
             )
-            logger.info(f"Selected second stimulus (fallback): '{poisson_label}'")
+            logger.info(f"Selected second stimulus (fallback): '{seclamp_label}'")
 
-        page.wait_for_block_single(timeout=10)
+        page.wait_for_block_single(timeout=15)
         page.fill_stimulus_parameters(default_value=1)
 
         # Verify stimuli appear in middle column

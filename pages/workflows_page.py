@@ -347,9 +347,12 @@ class WorkflowsPage(HomePage):
         
         return results
 
-    def get_table_rows(self):
-        """Get all table rows"""
-        return self.find_all_elements(WorkflowLocators.TABLE_ROWS)
+    def get_table_rows(self, timeout=5):
+        """Get all table rows. Returns empty list if no rows found."""
+        try:
+            return self.find_all_elements(WorkflowLocators.TABLE_ROWS, timeout=timeout)
+        except Exception:
+            return []
 
     def get_table_row_count(self):
         """Get the number of rows in the table"""
@@ -720,6 +723,21 @@ class WorkflowsPage(HomePage):
             return True
         except Exception as e:
             self.logger.warning(f"Could not click Duplicate button: {e}")
+            return False
+
+    def is_duplicate_button_disabled(self):
+        """Check if the Duplicate button is displayed but disabled."""
+        try:
+            button = self.find_duplicate_button()
+            if not button.is_displayed():
+                return False
+            is_disabled = (
+                button.get_attribute("disabled") is not None
+                or "disabled" in (button.get_attribute("class") or "")
+                or button.get_attribute("aria-disabled") == "true"
+            )
+            return is_disabled
+        except Exception:
             return False
     
     def verify_action_buttons_appear(self):

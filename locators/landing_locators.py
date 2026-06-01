@@ -9,97 +9,95 @@ from selenium.webdriver.common.by import By
 
 class LandingLocators:
     BANNER_TITLE = (By.XPATH, "//h1[contains(text(),'Create your Virtual Lab')]")
-    BIG_IMG1 = (By.XPATH, "(//div[starts-with(@class,'SanityContentPreview-module__hsTF2G__vignette')])[1]")
-    BIG_IMG2 = (By.XPATH, "(//div[starts-with(@class,'SanityContentPreview-module__hsTF2G__vignette')])[2]")
-    BIG_IMG3 = (By.XPATH, "(//div[starts-with(@class,'SanityContentPreview-module__hsTF2G__vignette')])[3]")
-    DIGITAL_BRAINS_VIDEO = (By.XPATH, "//div[@class='sanity-content-video-module__8kGZUG__sanityContentVideo "
-                                  "styles-module__5IYxQa__blockMedium']")
+    BIG_IMG1 = (By.XPATH, "(//div[contains(@class,'__vignette')])[1]")
+    BIG_IMG2 = (By.XPATH, "(//div[contains(@class,'__vignette')])[2]")
+    BIG_IMG3 = (By.XPATH, "(//div[contains(@class,'__vignette')])[3]")
+    DIGITAL_BRAINS_VIDEO = (By.XPATH, "//div[contains(@class,'sanity-content-video-module') and contains(@class,'__sanityContentVideo')]")
     DIGITAL_BRAINS_PLAY_BTN = (By.CSS_SELECTOR, "button[aria-label='play video']")
     DIGITAL_BRAINS_PAUSE_BTN = (By.CSS_SELECTOR, "button[aria-label='pause video']")
-    DIGITAL_BRAINS_VIDEO_CURRENT_STEP = (By.CSS_SELECTOR, ".sanity-content-video-module__8kGZUG__currentStep")
-    DIGITAL_BRAINS_VIDEO_STEP = (By.XPATH, "//button[@class='sanity-content-video-module__8kGZUG__step']")
+    DIGITAL_BRAINS_VIDEO_CURRENT_STEP = (By.CSS_SELECTOR, "div[class*='__currentStep']")
+    DIGITAL_BRAINS_VIDEO_STEP = (By.XPATH, "//button[contains(@class,'__step')]")
     DIGITAL_BRAINS_SCALES = (By.XPATH, "//h1[normalize-space()='Digital brain models at different scales']")
-    FOOTER_OBI_LOGO = (By.CSS_SELECTOR, "div[class='FooterPanel-module__YUozGG__title'] h2")
-    FOOTER_OBI_COPYRIGHT = (By.CSS_SELECTOR, ".FooterPanel-module__YUozGG__copyright")
-    FOOTER_LINK_TITLES = (By.CSS_SELECTOR,"div.FooterPanel-module__YUozGG__links a")
-    FOOTER_SUBSCRIBE_BLOCK = (By.XPATH, "//div[@class='FooterPanel-module__YUozGG__subscribe "
-                                        "NewsLetterSubscription-module__C5psVq__newsLetterSubscription']")
-    FOOTER_SOCIAL_MEDIA_LINKS = (By.XPATH, "//div[contains(@class,'socialMediaLinks')]//a[@href]")
+    FOOTER_OBI_LOGO = (By.XPATH, "//div[contains(@class,'footer-panel-module') and contains(@class,'__title')]//h2")
+    FOOTER_OBI_COPYRIGHT = (By.XPATH, "//div[contains(@class,'footer-panel-module') and contains(@class,'__copyright')]")
+    FOOTER_LINK_TITLES = (By.XPATH, "//div[contains(@class,'footer-panel-module') and contains(@class,'__links')]//a")
+    FOOTER_SUBSCRIBE_BLOCK = (By.XPATH, "//div[contains(@class,'footer-panel-module') and contains(@class,'__subscribe')]")
+    FOOTER_SOCIAL_MEDIA_LINKS = (By.XPATH, "//div[contains(@class,'social-media-links-module') and contains(@class,'__socialMediaLinks')]//a[@href]")
     GOTO_LAB = (By.XPATH, "//a[@href='/app/virtual-lab/sync']")
-    HERO_BACKGROUND_IMG = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__background")
-    HERO_BACKGROUND_VIDEO = (By.CSS_SELECTOR, ".Hero-module__E0OG9W__show")
+    HERO_BACKGROUND_IMG = (By.CSS_SELECTOR, "div[class*='__background']")
+    HERO_BACKGROUND_VIDEO = (By.CSS_SELECTOR, "video[class*='__show']")
     LOGIN_BUTTON = (By.XPATH, "//a[@href='/app/virtual-lab']")
     # --- Top-level dropdown menu buttons (the <button> elements) ---
     NAV_ABOUT_BUTTON = (
         By.XPATH,
-        "//button[@class='Menu-module__CnaVha__menuButton']"
-        "[.//span[@class='Menu-module__CnaVha__menuButtonContent'][starts-with(normalize-space(),'About')]]",
+        "//button[contains(@class,'menuButton')]"
+        "[.//span[contains(@class,'menuButtonContent')][starts-with(normalize-space(),'About')]]",
     )
     NAV_PLATFORM_BUTTON = (
         By.XPATH,
-        "//button[@class='Menu-module__CnaVha__menuButton']"
-        "[.//span[@class='Menu-module__CnaVha__menuButtonContent'][starts-with(normalize-space(),'The Platform')]]",
+        "//button[contains(@class,'menuButton')]"
+        "[.//span[contains(@class,'menuButtonContent')][starts-with(normalize-space(),'The Platform')]]",
     )
 
     # --- Wrapper div that contains button + submenu (for scoping submenu items) ---
     NAV_ABOUT_DROPDOWN = (
         By.XPATH,
-        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
-        "[.//span[@class='Menu-module__CnaVha__menuButtonContent'][starts-with(normalize-space(),'About')]]",
+        "//div[contains(@class,'menuItemWithSubmenu')]"
+        "[.//span[contains(@class,'menuButtonContent')][starts-with(normalize-space(),'About')]]",
     )
     NAV_PLATFORM_DROPDOWN = (
         By.XPATH,
-        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
-        "[.//span[@class='Menu-module__CnaVha__menuButtonContent'][starts-with(normalize-space(),'The Platform')]]",
+        "//div[contains(@class,'menuItemWithSubmenu')]"
+        "[.//span[contains(@class,'menuButtonContent')][starts-with(normalize-space(),'The Platform')]]",
     )
 
     # --- About submenu items (scoped inside the About dropdown wrapper) ---
     NAV_ABOUT_OBI = (By.XPATH,
-        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "//div[contains(@class,'menuItemWithSubmenu')]"
         "[.//span[starts-with(normalize-space(),'About')]]"
-        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/about']")
+        "//a[contains(@class,'submenuItem')][@href='/about']")
     NAV_OUR_STORY = (By.XPATH,
-        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "//div[contains(@class,'menuItemWithSubmenu')]"
         "[.//span[starts-with(normalize-space(),'About')]]"
-        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/the-real-digital-brain-story']")
+        "//a[contains(@class,'submenuItem')][@href='/the-real-digital-brain-story']")
     NAV_MISSION = (By.XPATH,
-        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "//div[contains(@class,'menuItemWithSubmenu')]"
         "[.//span[starts-with(normalize-space(),'About')]]"
-        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/mission']")
+        "//a[contains(@class,'submenuItem')][@href='/mission']")
     NAV_TEAM = (By.XPATH,
-        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "//div[contains(@class,'menuItemWithSubmenu')]"
         "[.//span[starts-with(normalize-space(),'About')]]"
-        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/team']")
+        "//a[contains(@class,'submenuItem')][@href='/team']")
 
     # --- The Platform submenu items (scoped inside the Platform dropdown wrapper) ---
     NAV_FEATURES = (By.XPATH,
-        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "//div[contains(@class,'menuItemWithSubmenu')]"
         "[.//span[starts-with(normalize-space(),'The Platform')]]"
-        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/features']")
+        "//a[contains(@class,'submenuItem')][@href='/features']")
     NAV_SHOWCASES = (By.XPATH,
-        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "//div[contains(@class,'menuItemWithSubmenu')]"
         "[.//span[starts-with(normalize-space(),'The Platform')]]"
-        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/showcases']")
+        "//a[contains(@class,'submenuItem')][@href='/showcases']")
     NAV_PRICING = (By.XPATH,
-        "//div[contains(@class,'Menu-module__CnaVha__menuItemWithSubmenu')]"
+        "//div[contains(@class,'menuItemWithSubmenu')]"
         "[.//span[starts-with(normalize-space(),'The Platform')]]"
-        "//a[@class='Menu-module__CnaVha__submenuItem'][@href='/pricing']")
+        "//a[contains(@class,'submenuItem')][@href='/pricing']")
 
     # --- Direct top-level nav links ---
-    NAV_NEWS = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']//a[contains(@class,'Menu-module__CnaVha__menuLink') and @href='/news']")
-    NAV_CONTACT = (By.XPATH, "//div[@class='Menu-module__CnaVha__items']//a[contains(@class,'Menu-module__CnaVha__menuLink') and @href='/contact']")
+    NAV_NEWS = (By.XPATH, "//div[contains(@class,'items')]//a[contains(@class,'menuLink') and @href='/news']")
+    NAV_CONTACT = (By.XPATH, "//div[contains(@class,'items')]//a[contains(@class,'menuLink') and @href='/contact']")
     OBI_LOGO = (By.XPATH, "(//h2[contains(text(),'Open Brain Institute')])[1]")
-    PARA_TEXT = (By.XPATH, "//div[contains(@class, 'Text-module__KTJYiG__text')]")
-    P_TEXT1 = (By.XPATH, "(//div[@class='SanityContentPreview-module__hsTF2G__text'])[1]")
-    P_TEXT2 = (By.XPATH, "(//div[@class='SanityContentPreview-module__hsTF2G__text'])[2]")
-    P_TEXT3 = (By.XPATH, "(//div[@class='SanityContentPreview-module__hsTF2G__text'])[3]")
-    P_TEXT4 = (By.XPATH, "(//div[@class='SanityContentPreview-module__hsTF2G__text'])[4]")
-    P_TEXT5 = (By.XPATH, "//div[@class='Text-module__KTJYiG__text']/p[contains(text(), 'Digital brains are advanced')]")
-    SECTION_BTN1 = (By.XPATH, "(//button[starts-with(@class,'SanityContentPreview-module__hsTF2G__button')])[1]")
-    SECTION_BTN2 = (By.XPATH, "(//button[starts-with(@class,'SanityContentPreview-module__hsTF2G__button')])[2]")
-    SECTION_BTN3 = (By.XPATH, "(//button[starts-with(@class,'SanityContentPreview-module__hsTF2G__button')])[3]")
-    SECTION_BTN4 = (By.XPATH, "(//button[starts-with(@class,'SanityContentPreview-module__hsTF2G__button')])[4]")
-    SECTION_BTN5 = (By.XPATH, "(//button[starts-with(@class,'SanityContentPreview-module__hsTF2G__button')])[5]")
+    PARA_TEXT = (By.XPATH, "//div[contains(@class, 'text-module') and contains(@class, '__text')]")
+    P_TEXT1 = (By.XPATH, "(//div[contains(@class,'sanity-content-preview-module') and contains(@class,'__text')])[1]")
+    P_TEXT2 = (By.XPATH, "(//div[contains(@class,'sanity-content-preview-module') and contains(@class,'__text')])[2]")
+    P_TEXT3 = (By.XPATH, "(//div[contains(@class,'sanity-content-preview-module') and contains(@class,'__text')])[3]")
+    P_TEXT4 = (By.XPATH, "(//div[contains(@class,'sanity-content-preview-module') and contains(@class,'__text')])[4]")
+    P_TEXT5 = (By.XPATH, "//div[contains(@class,'text-module') and contains(@class,'__text')]/p[contains(text(), 'Digital brains are advanced')]")
+    SECTION_BTN1 = (By.XPATH, "(//a[contains(@class,'sanity-content-preview-module') and contains(@class,'__button')])[1]")
+    SECTION_BTN2 = (By.XPATH, "(//a[contains(@class,'sanity-content-preview-module') and contains(@class,'__button')])[2]")
+    SECTION_BTN3 = (By.XPATH, "(//a[contains(@class,'sanity-content-preview-module') and contains(@class,'__button')])[3]")
+    SECTION_BTN4 = (By.XPATH, "(//a[contains(@class,'sanity-content-preview-module') and contains(@class,'__button')])[4]")
+    SECTION_BTN5 = (By.XPATH, "(//a[contains(@class,'sanity-content-preview-module') and contains(@class,'__button')])[5]")
     HORIZONTAL_CARDS_SECTION1 = (By.XPATH, "(//div[starts-with(@class,'swipeable-cards-list')])[1]")
     HORIZONTAL_CARDS_SECTION2 = (By.XPATH, "(//div[starts-with(@class,'swipeable-cards-list')])[2]")
     HORIZONTAL_CARDS_SECTION3 = (By.XPATH, "(//div[starts-with(@class,'swipeable-cards-list')])[3]")
@@ -133,7 +131,7 @@ class LandingLocators:
     TOP_CONTACT = NAV_CONTACT
     TOP_MENU_LOGO = (By.XPATH, "//a[starts-with(@class,'Menu_logo')]")
     VIDEO_TITLE1 = (By.XPATH, "//h3[normalize-space()='01. Fill with Neurons']")
-    VIDEO_CONTAINER = (By.XPATH, "(//div[starts-with(@class,'sanity-content-video-module')])[1]")
-    VIDEO_POINTER = (By.CSS_SELECTOR, ".Video-module__ZeAqaq__pointer")
+    VIDEO_CONTAINER = (By.XPATH, "(//div[contains(@class,'sanity-content-video-module')])[1]")
+    VIDEO_POINTER = (By.CSS_SELECTOR, "div[class*='__pointer']")
 
 

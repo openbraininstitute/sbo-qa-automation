@@ -100,13 +100,11 @@ class TestExploreModelPage:
                 # Wait for any loading overlay to disappear
                 time.sleep(2)
                 
-                # Try regular click first, then JS click
-                try:
-                    lv_searched_emodel.click()
-                except ElementClickInterceptedException:
-                    browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", lv_searched_emodel)
-                    time.sleep(1)
-                    browser.execute_script("arguments[0].click();", lv_searched_emodel)
+                # Scroll into view and click using ActionChains (simulates real user click)
+                browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", lv_searched_emodel)
+                time.sleep(1)
+                from selenium.webdriver.common.action_chains import ActionChains
+                ActionChains(browser).move_to_element(lv_searched_emodel).click().perform()
                 
                 logger.info(f"Successfully clicked on attempt {attempt + 1}")
                 break

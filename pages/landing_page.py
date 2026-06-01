@@ -139,7 +139,9 @@ class LandingPage(HomePage):
             
             # Take screenshot for debugging
             try:
-                screenshot_path = f"login_click_failed_{int(time.time())}.png"
+                import os
+                os.makedirs("latest_logs/errors", exist_ok=True)
+                screenshot_path = f"latest_logs/errors/login_click_failed_{int(time.time())}.png"
                 self.browser.save_screenshot(screenshot_path)
                 self.logger.info(f"Screenshot saved: {screenshot_path}")
             except:
