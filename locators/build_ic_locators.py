@@ -86,10 +86,10 @@ class BuildIcLocators:
     CLICK_TO_SELECT_RECORDING_DIV = (By.XPATH, "//div[contains(text(), 'Click to select recording')]")
     CLICK_TO_SELECT_RECORDING_ANY = (By.XPATH, "//*[contains(text(), 'Click to select recording')]")
     CLICK_TO_SELECT_RECORDING_PLACEHOLDER = (By.XPATH, "//button[contains(@class, 'placeholder') or contains(., 'select recording')]")
-    # After a recording is already selected: the X button to clear it
-    RECORDING_BADGE_CLOSE_BTN = (By.CSS_SELECTOR, "div[data-slot='badge'] span[data-slot='badge-button']")
-    # Fallback: the badge itself (clicking anywhere in the field area)
-    RECORDING_FIELD_WITH_SELECTION = (By.CSS_SELECTOR, "div[data-slot='badge']")
+    # After a recording is already selected: the X button to clear it (scoped to border-label button)
+    RECORDING_BADGE_CLOSE_BTN = (By.XPATH, "//button[contains(@class,'border-label')]//div[@data-slot='badge']//span[@data-slot='badge-button']")
+    # Fallback: the badge itself inside the recording field
+    RECORDING_FIELD_WITH_SELECTION = (By.XPATH, "//button[contains(@class,'border-label')]//div[@data-slot='badge']")
     
     # Public tab selectors (for ion channel recordings list)
     PUBLIC_TAB_PRIMARY = (By.XPATH, "//button[@role='tab' and text()='Public']")

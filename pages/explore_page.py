@@ -189,8 +189,8 @@ class ExplorePage(HomePage):
     def find_panel_mtype(self):
         return self.find_element(ExplorePageLocators.NEURONS_PANEL_MTYPE)
 
-    def find_total_count_density(self):
-        return self.find_element(ExplorePageLocators.TOTAL_COUNT_DENSITY)
+    def find_total_count_density(self, timeout=30):
+        return self.find_element(ExplorePageLocators.TOTAL_COUNT_DENSITY, timeout=timeout)
 
     def find_total_count_n(self):
         return self.find_element(ExplorePageLocators.TOTAL_COUNT_N)

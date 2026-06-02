@@ -82,9 +82,36 @@ class TestExplorePage:
         logger.info("Fullscreen exit button is found")
         fulscreen_exit.click()
         logger.info("Fullscreen exit button is clicked, atlas is minimized")
-        total_count_density_title = explore_page.find_total_count_density()
+        density_start = time.time()
+        total_count_density_title = explore_page.find_total_count_density(timeout=45)
+        density_load_time = round(time.time() - density_start, 2)
         assert total_count_density_title, "The total neurons count title is not found"
-        logger.info("Title for the total count of neurons is found")
+        logger.info(f"Title for the total count of neurons is found (loaded in {density_load_time}s)")
+
+        # Log slow network requests for performance debugging
+        try:
+            perf_entries = browser.execute_script("""
+                return performance.getEntriesByType('resource')
+                    .filter(e => e.duration > 2000)
+                    .map(e => ({ name: e.name.split('/').pop().split('?')[0], duration: Math.round(e.duration), type: e.initiatorType }))
+                    .sort((a, b) => b.duration - a.duration)
+                    .slice(0, 10);
+            """)
+            if perf_entries:
+                logger.info("🐌 Slow resources (>2s):")
+                for entry in perf_entries:
+                    logger.info(f"  {entry['duration']}ms | {entry['type']} | {entry['name']}")
+        except Exception:
+            pass
+
+        # Performance thresholds: CI runs from US-East with higher latency
+        warn_threshold = 10 if test_config.get("env") != "production" else 15
+        fail_threshold = 15 if test_config.get("env") != "production" else 25
+        if density_load_time > warn_threshold:
+            logger.warning(f"⚠️ PERFORMANCE: Density count took {density_load_time}s (warn: {warn_threshold}s)")
+        assert density_load_time < fail_threshold, (
+            f"Performance issue: density count took {density_load_time}s (max {fail_threshold}s)"
+        )
 
         total_count_number = explore_page.find_total_count_n()
         neuron_count = total_count_number.text
