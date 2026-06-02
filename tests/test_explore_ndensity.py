@@ -33,7 +33,6 @@ class TestExploreNeuronDensity:
         logger.info("Selected Root as brain region")
 
         explore_ndensity.wait_for_page_ready(timeout=40)
-        time.sleep(5)  # Wait for table data to reload after region change
 
         column_locators = [
             ExploreNDensityPageLocators.LV_BRAIN_REGION,

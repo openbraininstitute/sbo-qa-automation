@@ -98,7 +98,7 @@ class TestExplorePage:
                     .slice(0, 10);
             """)
             if perf_entries:
-                logger.info("🐌 Slow resources (>2s):")
+                logger.info("Slow resources (>2s):")
                 for entry in perf_entries:
                     logger.info(f"  {entry['duration']}ms | {entry['type']} | {entry['name']}")
         except Exception:
