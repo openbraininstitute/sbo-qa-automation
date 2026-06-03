@@ -93,7 +93,11 @@ class TestExplorePage:
             perf_entries = browser.execute_script("""
                 return performance.getEntriesByType('resource')
                     .filter(e => e.duration > 2000)
-                    .map(e => ({ name: e.name.split('/').pop().split('?')[0], duration: Math.round(e.duration), type: e.initiatorType }))
+                    .map(e => {
+                        const url = new URL(e.name);
+                        const path = url.pathname.length > 60 ? '...' + url.pathname.slice(-60) : url.pathname;
+                        return { name: path, duration: Math.round(e.duration), type: e.initiatorType };
+                    })
                     .sort((a, b) => b.duration - a.duration)
                     .slice(0, 10);
             """)
@@ -124,7 +128,6 @@ class TestExplorePage:
         current_state = count_switch_button.get_attribute('aria-checked')
         logger.info(f"Current state of the total count switch: {current_state}")
 
-        # Temporarily adding time.sleep()
         time.sleep(2)
         if current_state == "false":
             count_switch_button.click()
@@ -232,25 +235,28 @@ class TestExplorePage:
         cerebrum_in_brpanel.click()
         logger.info(f"Clicked on '{region_text}' in the brain region panel")
 
-        # Try to navigate the tree: Basic cell groups → Cerebrum
-        # This may fail if the tree is already at a deeper level (e.g., Isocortex selected)
+        # Try to navigate the tree: search for Cerebrum in the region search field
         time.sleep(2)
         try:
-            explore_page.click_basic_cell_groups_arrow(timeout=10)
-            logger.info("Expanded 'Basic cell groups and regions'")
+            from selenium.webdriver.common.by import By
+            from selenium.webdriver.support.ui import WebDriverWait
+            from selenium.webdriver.support import expected_conditions as EC
 
-            cerebrum_node = explore_page.find_cerebrum_in_tree(timeout=10)
-            assert cerebrum_node.is_displayed(), "Cerebrum node should be visible"
-            logger.info("Found Cerebrum in the brain region tree")
+            region_input = browser.find_element(By.ID, "region-search")
+            region_input.click()
+            region_input.send_keys("Cerebrum")
+            logger.info("Typed 'Cerebrum' in region search")
+            time.sleep(2)
 
-            cerebrum_node.click()
-            logger.info("Clicked on Cerebrum in the tree")
-
-            cerebrum_arrow_btn = explore_page.find_cerebrum_arrow_btn(timeout=10)
-            assert cerebrum_arrow_btn, "The toggle arrow for Cerebrum is not found"
-            logger.info("Cerebrum arrow button is found")
+            # Select Cerebrum from the dropdown
+            cerebrum_option = WebDriverWait(browser, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'ant-select-item')]//div[text()='Cerebrum']"))
+            )
+            cerebrum_option.click()
+            logger.info("Selected Cerebrum from dropdown")
+            time.sleep(2)
         except Exception as tree_err:
-            logger.warning(f"Tree navigation to Cerebrum failed (tree may be at different level): {tree_err}")
+            logger.warning(f"Region search for Cerebrum failed: {tree_err}")
 
         try:
             cerebral_cortex_title = explore_page.find_cerebral_cortex_brp(timeout=15)
