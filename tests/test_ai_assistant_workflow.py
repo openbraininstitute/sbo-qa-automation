@@ -25,22 +25,28 @@ class TestAIAssistantWorkflow:
         """
         browser, wait, base_url, lab_id, project_id = login_direct_complete
         
+        import time as perf_time
         ai_assistant_page = AIAssistantPage(browser, wait, logger, base_url)
         ai_assistant_page.navigate_to_project_home(lab_id, project_id)
         ai_assistant_page.open_ai_panel()
+
+        # Measure time for suggested questions to load
+        sq_start = perf_time.time()
         suggested_questions = ai_assistant_page.find_suggested_questions()
+        sq_load_time = round(perf_time.time() - sq_start, 2)
+        logger.info(f"Suggested questions loaded in {sq_load_time}s ({len(suggested_questions)} questions)")
         assert len(suggested_questions) >= 2, f"Need at least 2 suggested questions, found {len(suggested_questions)}"
         
         first_question = suggested_questions[0]
         first_question_text = first_question.get_attribute("textContent") or "First Question"
         ai_assistant_page.click_suggested_question(first_question, first_question_text)
         
-        # Enhanced waiting for AI response with debugging
-        print("🤖 Waiting for AI to complete response...")
+        # Measure time for AI response
+        ai_start = perf_time.time()
         logger.info("Waiting for AI to complete response...")
         ai_assistant_page.wait_for_ai_response()
-        print("✅ AI response completed, attempting to delete oldest thread...")
-        logger.info("AI response completed, attempting to delete oldest thread...")
+        ai_response_time = round(perf_time.time() - ai_start, 2)
+        logger.info(f"AI response completed in {ai_response_time}s")
         
         deleted = ai_assistant_page.delete_oldest_history_thread()
         if deleted:

@@ -227,10 +227,15 @@ class TestExplorePage:
         time.sleep(1)
         logger.info("Species dropdown closed")
 
-        cerebrum_in_brpanel = explore_page.find_cerebrum_brp()
+        # Wait for brain region to load — measure time for performance reporting
+        br_start = time.time()
+        cerebrum_in_brpanel = explore_page.find_cerebrum_brp(timeout=60)
+        br_load_time = round(time.time() - br_start, 2)
         region_text = cerebrum_in_brpanel.text.strip()
-        logger.info(f"Found brain region in panel: '{region_text}'")
+        logger.info(f"Found brain region in panel: '{region_text}' (loaded in {br_load_time}s)")
         assert region_text, "Brain region text should not be empty"
+        if br_load_time > 10:
+            logger.warning(f"PERFORMANCE: Brain region panel took {br_load_time}s to load")
 
         cerebrum_in_brpanel.click()
         logger.info(f"Clicked on '{region_text}' in the brain region panel")
