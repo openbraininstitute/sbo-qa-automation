@@ -92,9 +92,12 @@ class ExplorePage(HomePage):
 
     def click_basic_cell_groups_arrow(self, timeout=15):
         """Click the expand arrow on 'Basic cell groups and regions' to reveal children."""
+        from selenium.webdriver.common.action_chains import ActionChains
         arrow = self.element_to_be_clickable(ExplorePageLocators.BASIC_CELL_GROUPS_ARROW, timeout=timeout)
-        arrow.click()
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", arrow)
         import time
+        time.sleep(0.5)
+        ActionChains(self.browser).move_to_element(arrow).click().perform()
         time.sleep(1)
         return arrow
 
@@ -189,8 +192,8 @@ class ExplorePage(HomePage):
     def find_panel_mtype(self):
         return self.find_element(ExplorePageLocators.NEURONS_PANEL_MTYPE)
 
-    def find_total_count_density(self):
-        return self.find_element(ExplorePageLocators.TOTAL_COUNT_DENSITY)
+    def find_total_count_density(self, timeout=30):
+        return self.find_element(ExplorePageLocators.TOTAL_COUNT_DENSITY, timeout=timeout)
 
     def find_total_count_n(self):
         return self.find_element(ExplorePageLocators.TOTAL_COUNT_N)

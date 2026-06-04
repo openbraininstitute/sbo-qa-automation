@@ -70,12 +70,40 @@ class TestPerformanceTracking:
         wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
         perf_tracker.capture_metrics("Notebooks Page")
         
+        # Measure workflows page
+        workflows_url = f"{base_url}/app/virtual-lab/{lab_id}/{project_id}/workflows"
+        logger.info(f"Navigating to: {workflows_url}")
+        browser.get(workflows_url)
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+        perf_tracker.capture_metrics("Workflows Page")
+        
         # Measure data page
         data_url = f"{base_url}/app/virtual-lab/{lab_id}/{project_id}/data"
         logger.info(f"Navigating to: {data_url}")
         browser.get(data_url)
         wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
         perf_tracker.capture_metrics("Data Page")
+        
+        # Measure explore/browse page (loads all entity counts)
+        explore_url = f"{base_url}/app/virtual-lab/{lab_id}/{project_id}/data/browse/entity/cell-morphology"
+        logger.info(f"Navigating to: {explore_url}")
+        browser.get(explore_url)
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+        perf_tracker.capture_metrics("Explore Data - Experimental")
+        
+        # Measure Model tab
+        model_url = f"{base_url}/app/virtual-lab/{lab_id}/{project_id}/data/browse/model/e-model"
+        logger.info(f"Navigating to: {model_url}")
+        browser.get(model_url)
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+        perf_tracker.capture_metrics("Explore Data - Model")
+        
+        # Measure Simulations tab
+        simulations_url = f"{base_url}/app/virtual-lab/{lab_id}/{project_id}/data/browse/simulation/single-neuron-simulation"
+        logger.info(f"Navigating to: {simulations_url}")
+        browser.get(simulations_url)
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+        perf_tracker.capture_metrics("Explore Data - Simulations")
         
         # Save report
         perf_tracker.save_report("performance_authenticated_pages.json")

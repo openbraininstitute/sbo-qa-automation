@@ -87,7 +87,7 @@ class LandingLocators:
     NAV_NEWS = (By.XPATH, "//div[contains(@class,'items')]//a[contains(@class,'menuLink') and @href='/news']")
     NAV_CONTACT = (By.XPATH, "//div[contains(@class,'items')]//a[contains(@class,'menuLink') and @href='/contact']")
     OBI_LOGO = (By.XPATH, "(//h2[contains(text(),'Open Brain Institute')])[1]")
-    PARA_TEXT = (By.XPATH, "//div[contains(@class, 'text-module') and contains(@class, '__text')]")
+    PARA_TEXT = (By.XPATH, "//div[contains(@class, 'text-module') and contains(@class, '__text')] | //div[contains(@class, 'Text-module') and contains(@class, '__text')]")
     P_TEXT1 = (By.XPATH, "(//div[contains(@class,'sanity-content-preview-module') and contains(@class,'__text')])[1]")
     P_TEXT2 = (By.XPATH, "(//div[contains(@class,'sanity-content-preview-module') and contains(@class,'__text')])[2]")
     P_TEXT3 = (By.XPATH, "(//div[contains(@class,'sanity-content-preview-module') and contains(@class,'__text')])[3]")

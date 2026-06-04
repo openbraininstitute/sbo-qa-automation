@@ -1084,17 +1084,19 @@ class SimulateMeBetaPage(HomePage):
             return False
 
     def _find_timestamp_sweep_container(self):
-        """Find the first timestamp sweep container, checking both single and multiple variants."""
+        """Find the first timestamp sweep container, checking all sweep variants."""
         block = self.find_element(SimulateMeBetaLocators.CONFIG_BLOCK_SINGLE, timeout=10)
-        # After clicking plus-circle, element changes from float_parameter_sweep to float_parameter_sweep_multiple
-        sweep_elements = block.find_elements(
-            *SimulateMeBetaLocators.SWEEP_MULTIPLE
-        )
-        if not sweep_elements:
-            sweep_elements = block.find_elements(
-                *SimulateMeBetaLocators.SWEEP_SINGLE
-            )
-        return sweep_elements[0] if sweep_elements else None
+        # Check multiple sweep types (float, int, and generic)
+        for locator in [
+            SimulateMeBetaLocators.SWEEP_MULTIPLE,
+            SimulateMeBetaLocators.SWEEP_SINGLE,
+            (By.CSS_SELECTOR, "div[data-scan-config-block-element='int_parameter_sweep']"),
+            (By.CSS_SELECTOR, "div[data-scan-config-block-element*='parameter_sweep']"),
+        ]:
+            sweep_elements = block.find_elements(*locator)
+            if sweep_elements:
+                return sweep_elements[0]
+        return None
 
     def add_timestamp_sweep_value(self, value):
         """Add a sweep value to the first sweep-capable field on the Timestamps block_single form.
