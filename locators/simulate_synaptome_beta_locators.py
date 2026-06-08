@@ -49,7 +49,7 @@ class SimulateSynaptomeBetaLocators:
     MINI_DETAIL_DESCRIPTION = (By.CSS_SELECTOR, "#record-description")
     MINI_DETAIL_USE_MODEL_BTN = (
         By.CSS_SELECTOR,
-        "[data-testid='mini-viewer'] a[title='Start simulation']",
+        "[data-testid='mini-viewer'] [title='Start simulation']",
     )
 
     """Config page layout and top-level tabs."""

@@ -66,7 +66,7 @@ class SimulateMeBetaLocators:
         "[data-testid='mini-viewer'] .text-primary-3.text-base.font-light"
     )
     MINI_DETAIL_VIEW_DETAILS_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] a[title='Go to details page']")
-    MINI_DETAIL_USE_MODEL_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] a[title='Start simulation']")
+    MINI_DETAIL_USE_MODEL_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] [title='Start simulation']")
     MINI_DETAIL_CLOSE_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] button .anticon-close")
 
     """Config page layout, top-level tabs (Configuration / Simulations),

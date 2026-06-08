@@ -36,7 +36,7 @@ class SimulateMemLocators:
     """Mini-detail view after clicking a table row."""
     MINI_VIEWER = (By.CSS_SELECTOR, "[data-testid='mini-viewer']")
     MINI_DETAIL_TITLE = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] h1")
-    MINI_DETAIL_USE_MODEL_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] a[title='Start simulation']")
+    MINI_DETAIL_USE_MODEL_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] [title='Start simulation']")
 
     """Config page layout and top-level radix tabs (Configuration / Results)."""
     CONFIG_LAYOUT = (By.CSS_SELECTOR, "[data-testid='workflow-simulate-layout']")
