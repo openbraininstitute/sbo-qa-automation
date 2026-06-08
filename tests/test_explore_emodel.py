@@ -22,8 +22,8 @@ class TestExploreModelPage:
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
 
         explore_emodel.go_to_explore_emodel_page(lab_id, project_id)
+        explore_emodel.wait_for_network_idle(timeout=15)
         logger.info("Explore page is loaded")
-        time.sleep(5)  # Wait for brain region data to finish loading
 
         model_tab = explore_emodel.model_data_tab()
         assert model_tab.is_displayed(), "Model data tab is not displayed"

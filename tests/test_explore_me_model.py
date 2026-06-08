@@ -39,8 +39,8 @@ class TestExploreMeModel:
 
         # ── Prerequisites: Navigate to ME-model list ─────────────────────
         me_model_page.go_to_explore_memodel_page(lab_id, project_id)
+        me_model_page.wait_for_network_idle(timeout=15)
         logger.info("ME-model list page loaded")
-        time.sleep(3)
 
         # Select a random species
         species = me_model_page.select_random_species()

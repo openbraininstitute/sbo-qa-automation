@@ -168,23 +168,27 @@ class CustomBasePage:
         Uses Performance API to detect when all resources have finished loading.
         Reduces database connection pool pressure by not navigating away while requests are in-flight.
         """
-        import time as perf_time
-        end_time = perf_time.time() + timeout
-        while perf_time.time() < end_time:
+        start = time.time()
+        end_time = start + timeout
+        while time.time() < end_time:
             pending = self.browser.execute_script("""
                 return window.performance.getEntriesByType('resource')
                     .filter(e => e.responseEnd === 0).length;
             """)
             if pending == 0:
-                perf_time.sleep(idle_time)
+                time.sleep(idle_time)
                 # Re-check after idle period
                 pending = self.browser.execute_script("""
                     return window.performance.getEntriesByType('resource')
                         .filter(e => e.responseEnd === 0).length;
                 """)
                 if pending == 0:
+                    elapsed = round(time.time() - start, 2)
+                    self.logger.info(f"Network idle after {elapsed}s")
                     return True
-            perf_time.sleep(0.5)
+            time.sleep(0.5)
+        elapsed = round(time.time() - start, 2)
+        self.logger.warning(f"Network NOT idle after {elapsed}s (timeout={timeout}s)")
         return False
 
     def wait_for_page_to_load(self, timeout=10, element_locator=None):

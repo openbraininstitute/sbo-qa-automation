@@ -22,6 +22,7 @@ class TestExplorePage:
         explore_page = ExplorePage(browser, wait, logger, base_url)
         print(f"DEBUG: Using lab_id={lab_id}, project_id={project_id}")
         explore_page.go_to_explore_page(lab_id, project_id)
+        explore_page.wait_for_network_idle(timeout=15)
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
         # skip_onboarding = explore_page.skip_onboardin_btn(timeout=3)
