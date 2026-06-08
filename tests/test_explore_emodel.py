@@ -73,11 +73,7 @@ class TestExploreModelPage:
         input_placeholder = explore_emodel.input_placeholder(timeout=10)
         assert input_placeholder.is_displayed(), "Search input is not found"
         input_placeholder.click()
-        logger.info("Search input is clicked")
-
-        for char in searched_emodel:
-            input_placeholder.send_keys(char)
-            time.sleep(0.2)
+        input_placeholder.send_keys(searched_emodel)
         logger.info("Searching for 'cadpyr'")
         explore_emodel.wait_for_spinner_to_disappear(timeout=25)
 
