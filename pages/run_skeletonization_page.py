@@ -47,7 +47,10 @@ class RunSkeletonizationPage(HomePage):
 
     def click_process_data_category(self):
         """Click the Process Data category card."""
+        self.wait_for_network_idle(timeout=10)
         el = self.element_to_be_clickable(Loc.PROCESS_DATA_CATEGORY_CARD, timeout=15)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
+        time.sleep(0.5)
         try:
             el.click()
         except Exception:

@@ -26,7 +26,7 @@ class TestWorkflowActivities:
         # Navigate to workflows page
         workflows_page.go_to_workflows_page(lab_id, project_id)
         logger.info("✅ Navigated to workflows page")
-        
+
         # Verify Recent Activities section exists
         section_exists = workflows_page.verify_recent_activities_section()
         assert section_exists, "Recent Activities section should be displayed"
@@ -100,7 +100,7 @@ class TestWorkflowActivities:
         # Select category and type
         workflows_page.click_category_dropdown_option(category)
         workflows_page.click_type_dropdown_option(type_name)
-        time.sleep(2)
+        workflows_page.wait_for_network_idle(timeout=10)
         
         return browser, workflows_page
     
