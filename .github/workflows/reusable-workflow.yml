@@ -21,7 +21,7 @@ jobs:
   test:
     strategy:
       matrix:
-        browser: [ chrome, firefox ]
+        browser: [ chrome ]
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
     

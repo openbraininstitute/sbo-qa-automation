@@ -31,6 +31,10 @@ on:
     - cron: "0 7 * * *"  # Daily at 7:00 AM UTC (8:00 AM CET/9:00 AM CEST Zurich time)
     - cron: "0 2 * * 1"  # Weekly on Monday at 2:00 AM UTC for performance tests
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   run-tests:
     runs-on: ubuntu-latest
