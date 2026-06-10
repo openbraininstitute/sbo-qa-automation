@@ -21,7 +21,7 @@ jobs:
   test:
     strategy:
       matrix:
-        browser: [ chrome ]
+        browser: [ chrome, firefox ]
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
     
@@ -65,8 +65,13 @@ jobs:
           uv pip install -r requirements.txt
           ls -la
 
-      - name: Verify Chrome installation
-        run: google-chrome --version
+      - name: Verify browser installation
+        run: |
+          if [ "${{ matrix.browser }}" = "chrome" ]; then
+            google-chrome --version
+          elif [ "${{ matrix.browser }}" = "firefox" ]; then
+            firefox --version || (sudo apt-get install -y firefox && firefox --version)
+          fi
 
       - name: Setup Xvfb for headless testing
         run: |

@@ -255,32 +255,35 @@ class TestExplorePage:
         cerebrum_in_brpanel.click()
         logger.info(f"Clicked on '{region_text}' in the brain region panel")
 
-        # Try to navigate the tree: search for Cerebrum in the region search field
+        # Try to navigate the tree: search for brain region (species-dependent)
         time.sleep(2)
         try:
             from selenium.webdriver.common.by import By
             from selenium.webdriver.support.ui import WebDriverWait
             from selenium.webdriver.support import expected_conditions as EC
 
+            # Rat has "Cerebral cortex", Mouse/Human have "Cerebrum"
+            search_term = "Cerebral cortex" if "Rat" in species_value else "Cerebrum"
+
             region_input = browser.find_element(By.ID, "region-search")
             region_input.click()
-            region_input.send_keys("Cerebrum")
-            logger.info("Typed 'Cerebrum' in region search")
+            region_input.send_keys(search_term)
+            logger.info(f"Typed '{search_term}' in region search")
             time.sleep(2)
 
-            # Select Cerebrum from the dropdown
-            cerebrum_option = WebDriverWait(browser, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'ant-select-item')]//div[text()='Cerebrum']"))
+            # Select from the dropdown
+            option = WebDriverWait(browser, 10).until(
+                EC.element_to_be_clickable((By.XPATH, f"//div[contains(@class,'ant-select-item')]//div[text()='{search_term}']"))
             )
-            cerebrum_option.click()
-            logger.info("Selected Cerebrum from dropdown")
+            option.click()
+            logger.info(f"Selected '{search_term}' from dropdown")
             time.sleep(2)
         except Exception as tree_err:
-            logger.warning(f"Region search for Cerebrum failed: {tree_err}")
+            logger.warning(f"Region search for brain region failed: {tree_err}")
 
         try:
             cerebral_cortex_title = explore_page.find_cerebral_cortex_brp(timeout=15)
-            logger.info("Found Cerebral cortex as a child of Cerebrum")
+            logger.info("Found Cerebral cortex as a child region")
         except Exception:
             logger.warning("Cerebral cortex not found — tree may be at different level")
 
