@@ -19,6 +19,7 @@ class TestExploreNeuronDensity:
         explore_ndensity = ExploreNeuronDensityPage(browser, wait, logger, base_url)
         explore_ndensity.go_to_explore_neuron_density_page(lab_id, project_id)
         explore_ndensity.wait_for_ndensity_tab(timeout=120)
+        explore_ndensity.wait_for_network_idle(timeout=15)
         logger.info(f"Neuron density tab is displayed, {browser.current_url}")
 
         cerebrum_brp = explore_ndensity.find_cerebrum_brp(timeout=30)

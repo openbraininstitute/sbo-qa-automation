@@ -46,7 +46,7 @@ class SimulateSmallMicrocircuitLocators:
     MINI_VIEWER = (By.CSS_SELECTOR, "[data-testid='mini-viewer']")
     MINI_DETAIL_TITLE = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] h1")
     MINI_DETAIL_DESCRIPTION = (By.CSS_SELECTOR, "#record-description")
-    MINI_DETAIL_USE_MODEL_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] a[title='Start simulation']")
+    MINI_DETAIL_USE_MODEL_BTN = (By.CSS_SELECTOR, "[data-testid='mini-viewer'] [title='Start simulation']")
 
     """Config page layout and top-level tabs (Configuration / Results)."""
     CONFIG_LAYOUT = (By.CSS_SELECTOR, "button[data-scan-config-menu='left-menu-top-item']")
