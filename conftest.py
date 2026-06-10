@@ -598,7 +598,8 @@ def pytest_runtest_makereport(item):
                         with open(file_name, "rb") as image_file:
                             encoded = base64.b64encode(image_file.read()).decode("utf-8")
                             html = f'<div><img src="data:image/png;base64,{encoded}" ' \
-                                   f'style="width:304px;height:228px;" onclick="window.open(this.src)" align="right"/></div>'
+                                   f'style="width:304px;height:228px;display:block;margin-top:8px;" ' \
+                                   f'onclick="window.open(this.src)" /></div>'
                         extra.append(pytest_html.extras.html(html))
                     else:
                         print(f"Screenshot not found at: {file_name}")
