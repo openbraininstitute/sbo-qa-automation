@@ -75,77 +75,91 @@ class TestExplorePage:
         assert atlas.is_displayed()
         logger.info("3D Atlas is displayed")
 
-        atlas_fullscreen = explore_page.find_atlas_fullscreen_bt(timeout=15)
-        logger.info("Found atlas fullscreen button")
-        atlas_fullscreen.click()
+        # Fullscreen button only available for Human, Mouse, Rat
+        species_value = explore_page.get_species_value(timeout=10)
+        logger.info(f"Current species: '{species_value}'")
+        species_has_fullscreen = any(s in species_value for s in ["Human", "Mouse", "Rat"])
+        species_has_density = "Mouse" in species_value
 
-        fulscreen_exit = explore_page.find_fullscreen_exit(timeout=15)
-        logger.info("Fullscreen exit button is found")
-        fulscreen_exit.click()
-        logger.info("Fullscreen exit button is clicked, atlas is minimized")
-        density_start = time.time()
-        total_count_density_title = explore_page.find_total_count_density(timeout=45)
-        density_load_time = round(time.time() - density_start, 2)
-        assert total_count_density_title, "The total neurons count title is not found"
-        logger.info(f"Title for the total count of neurons is found (loaded in {density_load_time}s)")
+        if species_has_fullscreen:
+            atlas_fullscreen = explore_page.find_atlas_fullscreen_bt(timeout=15)
+            logger.info("Found atlas fullscreen button")
+            atlas_fullscreen.click()
 
-        # Log slow network requests for performance debugging
-        try:
-            perf_entries = browser.execute_script("""
-                return performance.getEntriesByType('resource')
-                    .filter(e => e.duration > 2000)
-                    .map(e => {
-                        const url = new URL(e.name);
-                        const path = url.pathname.length > 60 ? '...' + url.pathname.slice(-60) : url.pathname;
-                        return { name: path, duration: Math.round(e.duration), type: e.initiatorType };
-                    })
-                    .sort((a, b) => b.duration - a.duration)
-                    .slice(0, 10);
-            """)
-            if perf_entries:
-                logger.info("Slow resources (>2s):")
-                for entry in perf_entries:
-                    logger.info(f"  {entry['duration']}ms | {entry['type']} | {entry['name']}")
-        except Exception:
-            pass
-
-        # Performance thresholds: CI runs from US-East with higher latency
-        warn_threshold = 10 if test_config.get("env") != "production" else 15
-        fail_threshold = 15 if test_config.get("env") != "production" else 25
-        if density_load_time > warn_threshold:
-            logger.warning(f"⚠️ PERFORMANCE: Density count took {density_load_time}s (warn: {warn_threshold}s)")
-        assert density_load_time < fail_threshold, (
-            f"Performance issue: density count took {density_load_time}s (max {fail_threshold}s)"
-        )
-
-        total_count_number = explore_page.find_total_count_n()
-        neuron_count = total_count_number.text
-        assert neuron_count.strip(), "Total neuron count is empty"
-        logger.info(f"Total number of neurons is: {neuron_count}")
-
-        count_switch_button = explore_page.find_total_count_switch()
-        assert count_switch_button.is_displayed()
-        logger.info(f"Found the switch count/density button")
-        current_state = count_switch_button.get_attribute('aria-checked')
-        logger.info(f"Current state of the total count switch: {current_state}")
-
-        time.sleep(2)
-        if current_state == "false":
-            count_switch_button.click()
-            logger.info("Switch toggled to 'true'.")
-        elif current_state == "true":
-            count_switch_button.click()
-            logger.info(f"Switch toggled to 'on'.")
+            fulscreen_exit = explore_page.find_fullscreen_exit(timeout=15)
+            logger.info("Fullscreen exit button is found")
+            fulscreen_exit.click()
+            logger.info("Fullscreen exit button is clicked, atlas is minimized")
         else:
-            logger.error(f"Unexpected switch state: {current_state}")
+            logger.info(f"Skipping fullscreen test — not available for species '{species_value}'")
 
-        new_state = count_switch_button.get_attribute("aria-checked")
-        logger.info(f"New state of the switch: {new_state}")
+        # Count density only available for Mouse
+        if species_has_density:
+            density_start = time.time()
+            total_count_density_title = explore_page.find_total_count_density(timeout=45)
+            density_load_time = round(time.time() - density_start, 2)
+            assert total_count_density_title, "The total neurons count title is not found"
+            logger.info(f"Title for the total count of neurons is found (loaded in {density_load_time}s)")
 
-        total_count_number = explore_page.find_total_count_n()
-        neuron_count = total_count_number.text
-        assert neuron_count.strip(), "Total neuron DENSITY is empty"
-        logger.info(f"Total DENSITY is: {neuron_count}")
+            # Log slow network requests for performance debugging
+            try:
+                perf_entries = browser.execute_script("""
+                    return performance.getEntriesByType('resource')
+                        .filter(e => e.duration > 2000)
+                        .map(e => {
+                            const url = new URL(e.name);
+                            const path = url.pathname.length > 60 ? '...' + url.pathname.slice(-60) : url.pathname;
+                            return { name: path, duration: Math.round(e.duration), type: e.initiatorType };
+                        })
+                        .sort((a, b) => b.duration - a.duration)
+                        .slice(0, 10);
+                """)
+                if perf_entries:
+                    logger.info("Slow resources (>2s):")
+                    for entry in perf_entries:
+                        logger.info(f"  {entry['duration']}ms | {entry['type']} | {entry['name']}")
+            except Exception:
+                pass
+
+            # Performance thresholds: CI runs from US-East with higher latency
+            warn_threshold = 10 if test_config.get("env") != "production" else 15
+            fail_threshold = 15 if test_config.get("env") != "production" else 25
+            if density_load_time > warn_threshold:
+                logger.warning(f"PERFORMANCE: Density count took {density_load_time}s (warn: {warn_threshold}s)")
+            assert density_load_time < fail_threshold, (
+                f"Performance issue: density count took {density_load_time}s (max {fail_threshold}s)"
+            )
+
+            total_count_number = explore_page.find_total_count_n()
+            neuron_count = total_count_number.text
+            assert neuron_count.strip(), "Total neuron count is empty"
+            logger.info(f"Total number of neurons is: {neuron_count}")
+
+            count_switch_button = explore_page.find_total_count_switch()
+            assert count_switch_button.is_displayed()
+            logger.info(f"Found the switch count/density button")
+            current_state = count_switch_button.get_attribute('aria-checked')
+            logger.info(f"Current state of the total count switch: {current_state}")
+
+            time.sleep(2)
+            if current_state == "false":
+                count_switch_button.click()
+                logger.info("Switch toggled to 'true'.")
+            elif current_state == "true":
+                count_switch_button.click()
+                logger.info(f"Switch toggled to 'on'.")
+            else:
+                logger.error(f"Unexpected switch state: {current_state}")
+
+            new_state = count_switch_button.get_attribute("aria-checked")
+            logger.info(f"New state of the switch: {new_state}")
+
+            total_count_number = explore_page.find_total_count_n()
+            neuron_count = total_count_number.text
+            assert neuron_count.strip(), "Total neuron DENSITY is empty"
+            logger.info(f"Total DENSITY is: {neuron_count}")
+        else:
+            logger.info(f"Skipping density/count test — not available for species '{species_value}'")
 
         exp_data_titles = [
             ExplorePageLocators.NEURON_MORPHOLOGY,
