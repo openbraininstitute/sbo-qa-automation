@@ -304,13 +304,17 @@ class TestExplorePage:
         #
         # logger.info("Number of records for data types have been processed.")
 
-        neurons_panel = explore_page.find_neurons_panel()
-        assert neurons_panel.is_displayed()
-        logger.info("Neurons panel is displayed")
+        # Neurons panel and density/count switch only available for Mouse
+        if "Mouse" in species_value:
+            neurons_panel = explore_page.find_neurons_panel()
+            assert neurons_panel.is_displayed()
+            logger.info("Neurons panel is displayed")
 
-        density_count_switch = explore_page.find_count_switch(timeout=10)
-        assert density_count_switch.is_displayed()
-        logger.info("Density & count switch is displayed")
+            density_count_switch = explore_page.find_count_switch(timeout=10)
+            assert density_count_switch.is_displayed()
+            logger.info("Density & count switch is displayed")
+        else:
+            logger.info(f"Skipping neurons panel and density switch — not available for '{species_value}'")
 
         brain_region_search_field = explore_page.find_brain_region_search_field(timeout=25)
         assert brain_region_search_field.is_displayed()
@@ -332,12 +336,14 @@ class TestExplorePage:
             logger.error("Timeout: Search region input field is not clickable after multiple attempts.")
 
         search_region_input_field.send_keys(Keys.ENTER)
-        search_region_input_field.send_keys("Isocortex")
-        logger.info("Searching for 'Isocortex'")
+        # Isocortex only exists for Mouse; use Hippocampal formation for Rat
+        search_region_term = "Isocortex" if "Mouse" in species_value else "Hippocampal formation"
+        search_region_input_field.send_keys(search_region_term)
+        logger.info(f"Searching for '{search_region_term}'")
         search_region_input_field.send_keys(Keys.ENTER)
         selected_brain_region_title = explore_page.find_selected_brain_region_title()
-        assert selected_brain_region_title.text == 'Isocortex'
-        logger.info("Found 'Isocortex' in the brain region panel and the title is displayed ")
+        assert selected_brain_region_title.text == search_region_term
+        logger.info(f"Found '{search_region_term}' in the brain region panel and the title is displayed")
         explore_page.wait_for_page_ready(timeout=20)
         logger.info("Wait for the sorting action to complete.")
         model_data_tab = explore_page.find_model_data_title()
