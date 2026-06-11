@@ -91,3 +91,44 @@ class DataCircuitLocators:
     DV_COPY_ID_BTN = (By.XPATH, "//div[.//div[text()='Copy ID'] and .//span[@aria-label='copy']]")
     DV_DOWNLOAD_BTN = (By.XPATH, "//div[.//div[text()='Download'] and .//span[@aria-label='download']]")
     DV_SIMULATE_BTN = (By.XPATH, "//div[.//div[text()='Simulate'] and .//span[@aria-label='experiment']]")
+
+    # Analysis tab
+    DV_ANALYSIS_CELL_STATS_TITLE = (
+        By.XPATH,
+        "//div[contains(@class,'text-primary-8') and contains(@class,'font-bold') and contains(text(),'Cell statistics')]"
+    )
+    DV_ANALYSIS_CELL_STATS_IMAGE = (
+        By.XPATH,
+        "//div[contains(text(),'Cell statistics')]/following-sibling::div//img[contains(@alt,'node_stats')]"
+    )
+    DV_ANALYSIS_NETWORK_STATS_TITLE = (
+        By.XPATH,
+        "//div[contains(@class,'text-primary-8') and contains(@class,'font-bold') and contains(text(),'Network statistics')]"
+    )
+    DV_ANALYSIS_NETWORK_STATS_IMAGES = (
+        By.XPATH,
+        "//div[contains(text(),'Network statistics')]/following-sibling::div//img[contains(@alt,'network_stats')]"
+    )
+
+    # Related Publications tab
+    DV_PUB_PROVENANCE_BTN = (
+        By.XPATH,
+        "//button[@data-slot='button'][contains(.,'Provenance') and not(contains(.,'Related artifacts'))]"
+    )
+    DV_PUB_RELATED_ARTIFACTS_PROV_BTN = (
+        By.XPATH,
+        "//button[@data-slot='button'][contains(.,'Related artifacts provenance')]"
+    )
+    DV_PUB_APPLICATIONS_BTN = (
+        By.XPATH,
+        "//button[@data-slot='button'][contains(.,'Applications')]"
+    )
+    DV_PUB_ARTICLE_ITEMS = (By.CSS_SELECTOR, "li.ant-list-item")
+    DV_PUB_ARTICLE_TITLE = (By.XPATH, "//li[contains(@class,'ant-list-item')]//h2[contains(@class,'text-primary-8')]")
+    DV_PUB_COPY_DOI_BTN = (By.XPATH, "//button[contains(.,'Copy DOI')]")
+    DV_PUB_AUTHOR_NAMES = (By.XPATH, "//div[contains(@class,'text-paper-author')]//span")
+    DV_PUB_MORE_AUTHORS_BTN = (By.XPATH, "//button[contains(@class,'ant-btn-text')]//span[contains(text(),'+ ')]")
+    DV_PUB_READ_MORE_BTN = (By.XPATH, "//button[@aria-label='Read more']")
+    DV_PUB_PAGINATION = (By.CSS_SELECTOR, "ul.ant-pagination")
+    DV_PUB_PAGINATION_ITEMS = (By.CSS_SELECTOR, "li.ant-pagination-item")
+    DV_PUB_PAGINATION_NEXT = (By.CSS_SELECTOR, "li.ant-pagination-next button")

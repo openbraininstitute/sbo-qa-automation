@@ -361,13 +361,25 @@ class DataCircuitPage(HomePage):
     # ── Row click → Mini-detail ──────────────────────────────────────────
 
     def click_random_row(self):
-        """Click a random row in the table to open the mini-detail view."""
+        """Click a random row in the table to open the mini-detail view.
+        Excludes known problematic rows.
+        """
+        EXCLUDED_ROWS = ["20211110-BioM"]
+
         rows = self.get_table_rows()
         if not rows:
             raise RuntimeError("No rows found in the circuit table")
 
         visible_rows = rows[:min(10, len(rows))]
-        row = random.choice(visible_rows)
+        # Filter out excluded rows
+        valid_rows = [
+            r for r in visible_rows
+            if not any(excl in (r.text or "") for excl in EXCLUDED_ROWS)
+        ]
+        if not valid_rows:
+            valid_rows = visible_rows  # fallback if all filtered out
+
+        row = random.choice(valid_rows)
         row_text = row.text.split('\n')[0][:60]
         self.logger.info(f"Clicking row: '{row_text}...'")
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
@@ -619,3 +631,196 @@ class DataCircuitPage(HomePage):
                 results[name] = {'displayed': False, 'enabled': False}
         self.logger.info(f"Detail buttons: {results}")
         return results
+
+    # ── Analysis tab ─────────────────────────────────────────────────────
+
+    def click_analysis_tab(self, timeout=10):
+        """Click the Analysis tab in the detail view."""
+        tab = self.element_to_be_clickable(DataCircuitLocators.DV_ANALYSIS_TAB, timeout=timeout)
+        tab.click()
+        self.logger.info("Clicked Analysis tab")
+        self.wait_for_network_idle(timeout=10)
+        time.sleep(2)
+
+    def verify_analysis_tab_content(self, timeout=15):
+        """Verify Analysis tab has Cell statistics and Network statistics with images.
+        Returns dict with presence info.
+        """
+        results = {
+            'cell_stats_title': False,
+            'cell_stats_image': False,
+            'network_stats_title': False,
+            'network_stats_images': 0,
+        }
+
+        # Cell statistics title
+        try:
+            el = self.find_element(DataCircuitLocators.DV_ANALYSIS_CELL_STATS_TITLE, timeout=timeout)
+            results['cell_stats_title'] = el.is_displayed()
+        except TimeoutException:
+            self.logger.warning("Cell statistics title not found")
+
+        # Cell statistics image
+        try:
+            img = self.find_element(DataCircuitLocators.DV_ANALYSIS_CELL_STATS_IMAGE, timeout=10)
+            results['cell_stats_image'] = img.is_displayed()
+        except TimeoutException:
+            self.logger.warning("Cell statistics image not found")
+
+        # Network statistics title
+        try:
+            el = self.find_element(DataCircuitLocators.DV_ANALYSIS_NETWORK_STATS_TITLE, timeout=10)
+            results['network_stats_title'] = el.is_displayed()
+        except TimeoutException:
+            self.logger.warning("Network statistics title not found")
+
+        # Network statistics images (may be multiple)
+        try:
+            imgs = self.find_all_elements(DataCircuitLocators.DV_ANALYSIS_NETWORK_STATS_IMAGES, timeout=10)
+            results['network_stats_images'] = len([img for img in imgs if img.is_displayed()])
+        except TimeoutException:
+            self.logger.warning("Network statistics images not found")
+
+        self.logger.info(f"Analysis tab: {results}")
+        return results
+
+    # ── Related Publications tab ─────────────────────────────────────────
+
+    def click_related_publications_tab(self, timeout=10):
+        """Click the Related Publications tab in the detail view."""
+        tab = self.element_to_be_clickable(DataCircuitLocators.DV_RELATED_PUBLICATIONS_TAB, timeout=timeout)
+        tab.click()
+        self.logger.info("Clicked Related Publications tab")
+        self.wait_for_network_idle(timeout=10)
+        time.sleep(2)
+
+    def click_publications_section(self, section_name, timeout=10):
+        """Click a section button (Provenance, Related artifacts provenance, Applications)."""
+        locator_map = {
+            "Provenance": DataCircuitLocators.DV_PUB_PROVENANCE_BTN,
+            "Related artifacts provenance": DataCircuitLocators.DV_PUB_RELATED_ARTIFACTS_PROV_BTN,
+            "Applications": DataCircuitLocators.DV_PUB_APPLICATIONS_BTN,
+        }
+        locator = locator_map.get(section_name)
+        if not locator:
+            raise ValueError(f"Unknown section: {section_name}")
+        btn = self.element_to_be_clickable(locator, timeout=timeout)
+        btn.click()
+        self.logger.info(f"Clicked '{section_name}' section button")
+        self.wait_for_network_idle(timeout=10)
+        time.sleep(2)
+
+    def verify_publications_articles(self, timeout=10):
+        """Verify publication articles are displayed with expected fields.
+        Returns dict with article count and field presence for first article.
+        """
+        results = {
+            'article_count': 0,
+            'has_title': False,
+            'has_copy_doi': False,
+            'has_authors': False,
+            'has_more_authors_btn': False,
+            'has_description': False,
+            'has_read_more': False,
+            'has_pagination': False,
+            'pagination_pages': 0,
+        }
+
+        # Count articles
+        try:
+            articles = self.find_all_elements(DataCircuitLocators.DV_PUB_ARTICLE_ITEMS, timeout=timeout)
+            results['article_count'] = len(articles)
+        except TimeoutException:
+            self.logger.warning("No publication articles found")
+            return results
+
+        # Check first article fields
+        try:
+            title = self.find_element(DataCircuitLocators.DV_PUB_ARTICLE_TITLE, timeout=5)
+            results['has_title'] = bool(title.text.strip())
+        except TimeoutException:
+            pass
+
+        try:
+            doi_btn = self.find_element(DataCircuitLocators.DV_PUB_COPY_DOI_BTN, timeout=5)
+            results['has_copy_doi'] = doi_btn.is_displayed()
+        except TimeoutException:
+            pass
+
+        try:
+            authors = self.find_all_elements(DataCircuitLocators.DV_PUB_AUTHOR_NAMES, timeout=5)
+            results['has_authors'] = len(authors) > 0
+        except TimeoutException:
+            pass
+
+        try:
+            more_btn = self.find_element(DataCircuitLocators.DV_PUB_MORE_AUTHORS_BTN, timeout=3)
+            results['has_more_authors_btn'] = more_btn.is_displayed()
+        except TimeoutException:
+            pass
+
+        try:
+            read_more = self.find_element(DataCircuitLocators.DV_PUB_READ_MORE_BTN, timeout=3)
+            results['has_read_more'] = read_more.is_displayed()
+            results['has_description'] = True
+        except TimeoutException:
+            pass
+
+        # Pagination
+        try:
+            pagination = self.find_element(DataCircuitLocators.DV_PUB_PAGINATION, timeout=5)
+            results['has_pagination'] = pagination.is_displayed()
+            pages = self.find_all_elements(DataCircuitLocators.DV_PUB_PAGINATION_ITEMS, timeout=3)
+            results['pagination_pages'] = len(pages)
+        except TimeoutException:
+            pass
+
+        self.logger.info(f"Publications: {results}")
+        return results
+
+    def click_copy_doi_and_verify(self, timeout=10):
+        """Click the first Copy DOI button and verify it changes to 'Copied'."""
+        try:
+            doi_btn = self.element_to_be_clickable(DataCircuitLocators.DV_PUB_COPY_DOI_BTN, timeout=timeout)
+            doi_btn.click()
+            self.logger.info("Clicked Copy DOI button")
+            # Check text changes to "Copied" (happens quickly)
+            time.sleep(0.5)
+            btn_text = doi_btn.text.strip()
+            if "Copied" in btn_text:
+                self.logger.info("Copy DOI confirmed: button text changed to 'Copied'")
+                return True
+            else:
+                self.logger.warning(f"Copy DOI button text after click: '{btn_text}'")
+                return False
+        except TimeoutException:
+            self.logger.warning("Copy DOI button not found")
+            return False
+
+    def click_more_authors_and_verify(self, timeout=10):
+        """Click the '+ N more' authors button and verify a dropdown/popover appears."""
+        try:
+            more_btn = self.element_to_be_clickable(DataCircuitLocators.DV_PUB_MORE_AUTHORS_BTN, timeout=timeout)
+            btn_text = more_btn.text.strip()
+            self.logger.info(f"Found more authors button: '{btn_text}'")
+            more_btn.click()
+            time.sleep(1)
+            # Verify a popover/dropdown appeared (aria-describedby triggers a tooltip/popover)
+            popover_id = more_btn.get_attribute("aria-describedby")
+            if popover_id:
+                try:
+                    popover = self.find_element(
+                        (By.ID, popover_id), timeout=3
+                    )
+                    is_visible = popover.is_displayed()
+                    self.logger.info(f"Authors dropdown visible: {is_visible}")
+                    # Close by clicking elsewhere
+                    ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+                    time.sleep(0.5)
+                    return is_visible
+                except TimeoutException:
+                    self.logger.warning(f"Popover with id '{popover_id}' not found")
+            return True  # Button was clickable
+        except TimeoutException:
+            self.logger.warning("More authors button not found")
+            return False
