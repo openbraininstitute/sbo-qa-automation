@@ -824,3 +824,128 @@ class DataCircuitPage(HomePage):
         except TimeoutException:
             self.logger.warning("More authors button not found")
             return False
+
+    # ── Related Artifacts tab ────────────────────────────────────────────
+
+    def click_related_artifacts_tab(self, timeout=10):
+        """Click the Related Artifacts tab in the detail view."""
+        tab = self.element_to_be_clickable(DataCircuitLocators.DV_RELATED_ARTIFACTS_TAB, timeout=timeout)
+        tab.click()
+        self.logger.info("Clicked Related Artifacts tab")
+        self.wait_for_network_idle(timeout=15)
+        time.sleep(3)
+        # Wait for the section toggle buttons to appear
+        self.find_element(DataCircuitLocators.DV_ART_SUBCIRCUITS_BTN, timeout=10)
+        self.logger.info("Related Artifacts tab content loaded")
+
+    def click_artifacts_section(self, section_name, timeout=10):
+        """Click Subcircuits or Derived circuits section button."""
+        locator_map = {
+            "Subcircuits": DataCircuitLocators.DV_ART_SUBCIRCUITS_BTN,
+            "Derived circuits": DataCircuitLocators.DV_ART_DERIVED_CIRCUITS_BTN,
+        }
+        locator = locator_map.get(section_name)
+        if not locator:
+            raise ValueError(f"Unknown section: {section_name}")
+        btn = self.element_to_be_clickable(locator, timeout=timeout)
+        btn.click()
+        self.logger.info(f"Clicked '{section_name}' section")
+        self.wait_for_network_idle(timeout=10)
+        time.sleep(2)
+
+    def verify_artifacts_table(self, timeout=15):
+        """Verify the related artifacts table has rows and expected column headers.
+        Returns dict with row_count, header_count, has_download_btn, has_expand_btn.
+        """
+        results = {
+            'row_count': 0,
+            'header_count': 0,
+            'has_download_btn': False,
+            'has_expand_btn': False,
+        }
+
+        try:
+            rows = self.find_all_elements(DataCircuitLocators.DV_ART_TABLE_ROWS, timeout=timeout)
+            results['row_count'] = len(rows)
+        except TimeoutException:
+            self.logger.warning("No rows found in artifacts table")
+            return results
+
+        try:
+            headers = self.find_all_elements(DataCircuitLocators.DV_ART_TABLE_HEADERS, timeout=5)
+            results['header_count'] = len([h for h in headers if h.text.strip()])
+        except TimeoutException:
+            pass
+
+        try:
+            dl_btn = self.find_element(DataCircuitLocators.DV_ART_DOWNLOAD_BTN, timeout=5)
+            results['has_download_btn'] = dl_btn.is_displayed()
+        except TimeoutException:
+            pass
+
+        try:
+            expand_btn = self.find_element(DataCircuitLocators.DV_ART_EXPAND_BTN, timeout=5)
+            results['has_expand_btn'] = expand_btn.is_displayed()
+        except TimeoutException:
+            pass
+
+        self.logger.info(f"Artifacts table: {results}")
+        return results
+
+    def expand_first_artifact_row(self, timeout=10):
+        """Click the expand chevron on the first row with one."""
+        try:
+            btn = self.element_to_be_clickable(DataCircuitLocators.DV_ART_EXPAND_BTN, timeout=timeout)
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
+            time.sleep(0.5)
+            btn.click()
+            self.logger.info("Clicked expand chevron on first artifact row")
+            time.sleep(2)
+            return True
+        except TimeoutException:
+            self.logger.warning("No expand chevron found in artifacts table")
+            return False
+
+    def verify_expanded_nested_rows(self, timeout=10):
+        """Verify expanded row shows nested subcircuit rows."""
+        try:
+            expanded = self.find_element(DataCircuitLocators.DV_ART_EXPANDED_ROW, timeout=timeout)
+            if not expanded.is_displayed():
+                return 0
+            nested_rows = self.find_all_elements(DataCircuitLocators.DV_ART_NESTED_TABLE_ROWS, timeout=5)
+            count = len(nested_rows)
+            self.logger.info(f"Found {count} nested rows in expanded artifact")
+            return count
+        except TimeoutException:
+            self.logger.warning("No expanded row or nested rows found")
+            return 0
+
+    def click_download_btn_first_row(self, timeout=10):
+        """Click the download button on the first row. Returns True if panel appears."""
+        try:
+            dl_btn = self.element_to_be_clickable(DataCircuitLocators.DV_ART_DOWNLOAD_BTN, timeout=timeout)
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", dl_btn)
+            time.sleep(0.5)
+            dl_btn.click()
+            self.logger.info("Clicked download button on first row")
+            time.sleep(2)
+            # Check if download panel appeared
+            try:
+                panel = self.find_element(DataCircuitLocators.DV_DOWNLOAD_PANEL, timeout=5)
+                is_displayed = panel.is_displayed()
+                self.logger.info(f"Download panel displayed: {is_displayed}")
+                # Close the panel
+                try:
+                    close_btn = self.element_to_be_clickable(DataCircuitLocators.DV_DOWNLOAD_PANEL_CLOSE_BTN, timeout=5)
+                    close_btn.click()
+                    self.logger.info("Closed download panel")
+                    time.sleep(1)
+                except TimeoutException:
+                    self.logger.warning("Could not close download panel")
+                return is_displayed
+            except TimeoutException:
+                self.logger.info("No download panel detected")
+                return False
+        except TimeoutException:
+            self.logger.warning("Download button not found")
+            return False

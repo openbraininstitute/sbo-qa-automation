@@ -132,3 +132,42 @@ class DataCircuitLocators:
     DV_PUB_PAGINATION = (By.CSS_SELECTOR, "ul.ant-pagination")
     DV_PUB_PAGINATION_ITEMS = (By.CSS_SELECTOR, "li.ant-pagination-item")
     DV_PUB_PAGINATION_NEXT = (By.CSS_SELECTOR, "li.ant-pagination-next button")
+
+    # Related Artifacts tab
+    DV_ART_SUBCIRCUITS_BTN = (
+        By.XPATH,
+        "//button[@data-slot='button'][contains(.,'Subcircuits') and not(contains(.,'Derived'))]"
+    )
+    DV_ART_DERIVED_CIRCUITS_BTN = (
+        By.XPATH,
+        "//button[@data-slot='button'][contains(.,'Derived circuits')]"
+    )
+    DV_ART_TABLE_ROWS = (
+        By.XPATH,
+        "//tbody[contains(@class,'ant-table-tbody')]"
+        "//tr[contains(@class,'ant-table-row') and not(contains(@class,'ant-table-measure-row'))]"
+    )
+    DV_ART_TABLE_HEADERS = (
+        By.XPATH,
+        "//thead//th[@data-testid='column-header']//div[contains(@class,'columnTitle')]"
+    )
+    DV_ART_EXPAND_BTN = (
+        By.XPATH,
+        "//tr[contains(@class,'ant-table-row')]//td[contains(@class,'ant-table-row-expand-icon-cell')]//button"
+    )
+    DV_ART_DOWNLOAD_BTN = (
+        By.XPATH,
+        "//tr[contains(@class,'ant-table-row') and not(contains(@class,'ant-table-measure-row'))]"
+        "//td[1]//button[contains(@class,'ant-btn')]"
+    )
+    DV_ART_EXPANDED_ROW = (By.CSS_SELECTOR, "tr.ant-table-expanded-row")
+    DV_ART_NESTED_TABLE_ROWS = (
+        By.XPATH,
+        "//tr[contains(@class,'ant-table-expanded-row')]"
+        "//tbody[contains(@class,'ant-table-tbody')]"
+        "//tr[contains(@class,'ant-table-row') and not(contains(@class,'ant-table-measure-row'))]"
+    )
+
+    # Download panel
+    DV_DOWNLOAD_PANEL = (By.CSS_SELECTOR, "[data-testid='circuit-download-panel']")
+    DV_DOWNLOAD_PANEL_CLOSE_BTN = (By.XPATH, "//*[@data-testid='circuit-download-panel']//button[@aria-label='Close']")

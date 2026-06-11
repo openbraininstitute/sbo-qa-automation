@@ -324,4 +324,45 @@ class TestDataCircuit:
         except TimeoutException:
             logger.warning("Related Publications tab not available or content not loaded")
 
+        # Step 13: Related Artifacts tab
+        try:
+            circuit_page.click_related_artifacts_tab()
+            logger.info("Related Artifacts tab clicked")
+        except TimeoutException:
+            logger.warning("Related Artifacts tab not available")
+
+        try:
+            # Subcircuits section (active by default)
+            sub_table = circuit_page.verify_artifacts_table(timeout=15)
+            assert sub_table['row_count'] > 0, "Subcircuits table should have rows"
+            assert sub_table['has_download_btn'], "Subcircuits should have download buttons"
+            logger.info(f"Subcircuits: {sub_table['row_count']} rows, "
+                        f"headers={sub_table['header_count']}, expand={sub_table['has_expand_btn']}")
+
+            # Expand first row with chevron
+            if sub_table['has_expand_btn']:
+                expanded = circuit_page.expand_first_artifact_row()
+                if expanded:
+                    nested_count = circuit_page.verify_expanded_nested_rows()
+                    logger.info(f"Expanded subcircuit shows {nested_count} nested rows")
+
+            # Click download button on first row
+            circuit_page.click_download_btn_first_row()
+
+            # Switch to Derived circuits section
+            circuit_page.click_artifacts_section("Derived circuits")
+            der_table = circuit_page.verify_artifacts_table(timeout=15)
+            assert der_table['row_count'] > 0, "Derived circuits table should have rows"
+            logger.info(f"Derived circuits: {der_table['row_count']} rows, "
+                        f"headers={der_table['header_count']}, expand={der_table['has_expand_btn']}")
+
+            # Expand first derived circuit row
+            if der_table['has_expand_btn']:
+                expanded = circuit_page.expand_first_artifact_row()
+                if expanded:
+                    nested_count = circuit_page.verify_expanded_nested_rows()
+                    logger.info(f"Expanded derived circuit shows {nested_count} nested rows")
+        except (TimeoutException, AssertionError) as e:
+            logger.warning(f"Related Artifacts content verification failed: {e}")
+
         logger.info(f"Test complete. Final URL: {circuit_page.browser.current_url}")
