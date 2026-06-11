@@ -16,7 +16,7 @@ class RunSkeletonizationLocators:
     """Workflows page: Process Data category card and EM mesh skeletonization type card."""
     PROCESS_DATA_CATEGORY_CARD = (
         By.XPATH,
-        "//div[@data-slot='card']//div[@data-slot='card-title'][contains(., 'Process Data')]"
+        "//div[@data-slot='card-title'][contains(., 'Process data')]"
         "/ancestor::div[@data-slot='card']"
     )
     EM_MESH_SKELETONIZATION_CARD = (
@@ -138,11 +138,13 @@ class RunSkeletonizationLocators:
     """Initialization fields."""
     INIT_EM_CELL_MESH_ID = (
         By.XPATH,
-        "//div[@data-scan-config-block-element='model_identifier']//input[1]"
+        "//div[@data-scan-config-block-element='model_identifier']"
+        "//div[@data-testid='model-identifier-entity']"
     )
     INIT_EM_CELL_MESH_NAME = (
         By.XPATH,
-        "//div[@data-scan-config-block-element='model_identifier']//input[2]"
+        "//div[@data-scan-config-block-element='model_identifier']"
+        "//span[contains(@class,'truncate') and contains(@class,'font-semibold')]"
     )
     INIT_NEURON_VOXEL_SIZE = (
         By.XPATH,

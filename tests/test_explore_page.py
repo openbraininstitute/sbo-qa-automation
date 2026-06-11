@@ -75,77 +75,91 @@ class TestExplorePage:
         assert atlas.is_displayed()
         logger.info("3D Atlas is displayed")
 
-        atlas_fullscreen = explore_page.find_atlas_fullscreen_bt(timeout=15)
-        logger.info("Found atlas fullscreen button")
-        atlas_fullscreen.click()
+        # Fullscreen button only available for Human, Mouse, Rat
+        species_value = explore_page.get_species_value(timeout=10)
+        logger.info(f"Current species: '{species_value}'")
+        species_has_fullscreen = any(s in species_value for s in ["Human", "Mouse", "Rat"])
+        species_has_density = "Mouse" in species_value
 
-        fulscreen_exit = explore_page.find_fullscreen_exit(timeout=15)
-        logger.info("Fullscreen exit button is found")
-        fulscreen_exit.click()
-        logger.info("Fullscreen exit button is clicked, atlas is minimized")
-        density_start = time.time()
-        total_count_density_title = explore_page.find_total_count_density(timeout=45)
-        density_load_time = round(time.time() - density_start, 2)
-        assert total_count_density_title, "The total neurons count title is not found"
-        logger.info(f"Title for the total count of neurons is found (loaded in {density_load_time}s)")
+        if species_has_fullscreen:
+            atlas_fullscreen = explore_page.find_atlas_fullscreen_bt(timeout=15)
+            logger.info("Found atlas fullscreen button")
+            atlas_fullscreen.click()
 
-        # Log slow network requests for performance debugging
-        try:
-            perf_entries = browser.execute_script("""
-                return performance.getEntriesByType('resource')
-                    .filter(e => e.duration > 2000)
-                    .map(e => {
-                        const url = new URL(e.name);
-                        const path = url.pathname.length > 60 ? '...' + url.pathname.slice(-60) : url.pathname;
-                        return { name: path, duration: Math.round(e.duration), type: e.initiatorType };
-                    })
-                    .sort((a, b) => b.duration - a.duration)
-                    .slice(0, 10);
-            """)
-            if perf_entries:
-                logger.info("Slow resources (>2s):")
-                for entry in perf_entries:
-                    logger.info(f"  {entry['duration']}ms | {entry['type']} | {entry['name']}")
-        except Exception:
-            pass
-
-        # Performance thresholds: CI runs from US-East with higher latency
-        warn_threshold = 10 if test_config.get("env") != "production" else 15
-        fail_threshold = 15 if test_config.get("env") != "production" else 25
-        if density_load_time > warn_threshold:
-            logger.warning(f"⚠️ PERFORMANCE: Density count took {density_load_time}s (warn: {warn_threshold}s)")
-        assert density_load_time < fail_threshold, (
-            f"Performance issue: density count took {density_load_time}s (max {fail_threshold}s)"
-        )
-
-        total_count_number = explore_page.find_total_count_n()
-        neuron_count = total_count_number.text
-        assert neuron_count.strip(), "Total neuron count is empty"
-        logger.info(f"Total number of neurons is: {neuron_count}")
-
-        count_switch_button = explore_page.find_total_count_switch()
-        assert count_switch_button.is_displayed()
-        logger.info(f"Found the switch count/density button")
-        current_state = count_switch_button.get_attribute('aria-checked')
-        logger.info(f"Current state of the total count switch: {current_state}")
-
-        time.sleep(2)
-        if current_state == "false":
-            count_switch_button.click()
-            logger.info("Switch toggled to 'true'.")
-        elif current_state == "true":
-            count_switch_button.click()
-            logger.info(f"Switch toggled to 'on'.")
+            fulscreen_exit = explore_page.find_fullscreen_exit(timeout=15)
+            logger.info("Fullscreen exit button is found")
+            fulscreen_exit.click()
+            logger.info("Fullscreen exit button is clicked, atlas is minimized")
         else:
-            logger.error(f"Unexpected switch state: {current_state}")
+            logger.info(f"Skipping fullscreen test — not available for species '{species_value}'")
 
-        new_state = count_switch_button.get_attribute("aria-checked")
-        logger.info(f"New state of the switch: {new_state}")
+        # Count density only available for Mouse
+        if species_has_density:
+            density_start = time.time()
+            total_count_density_title = explore_page.find_total_count_density(timeout=45)
+            density_load_time = round(time.time() - density_start, 2)
+            assert total_count_density_title, "The total neurons count title is not found"
+            logger.info(f"Title for the total count of neurons is found (loaded in {density_load_time}s)")
 
-        total_count_number = explore_page.find_total_count_n()
-        neuron_count = total_count_number.text
-        assert neuron_count.strip(), "Total neuron DENSITY is empty"
-        logger.info(f"Total DENSITY is: {neuron_count}")
+            # Log slow network requests for performance debugging
+            try:
+                perf_entries = browser.execute_script("""
+                    return performance.getEntriesByType('resource')
+                        .filter(e => e.duration > 2000)
+                        .map(e => {
+                            const url = new URL(e.name);
+                            const path = url.pathname.length > 60 ? '...' + url.pathname.slice(-60) : url.pathname;
+                            return { name: path, duration: Math.round(e.duration), type: e.initiatorType };
+                        })
+                        .sort((a, b) => b.duration - a.duration)
+                        .slice(0, 10);
+                """)
+                if perf_entries:
+                    logger.info("Slow resources (>2s):")
+                    for entry in perf_entries:
+                        logger.info(f"  {entry['duration']}ms | {entry['type']} | {entry['name']}")
+            except Exception:
+                pass
+
+            # Performance thresholds: CI runs from US-East with higher latency
+            warn_threshold = 10 if test_config.get("env") != "production" else 15
+            fail_threshold = 15 if test_config.get("env") != "production" else 25
+            if density_load_time > warn_threshold:
+                logger.warning(f"PERFORMANCE: Density count took {density_load_time}s (warn: {warn_threshold}s)")
+            assert density_load_time < fail_threshold, (
+                f"Performance issue: density count took {density_load_time}s (max {fail_threshold}s)"
+            )
+
+            total_count_number = explore_page.find_total_count_n()
+            neuron_count = total_count_number.text
+            assert neuron_count.strip(), "Total neuron count is empty"
+            logger.info(f"Total number of neurons is: {neuron_count}")
+
+            count_switch_button = explore_page.find_total_count_switch()
+            assert count_switch_button.is_displayed()
+            logger.info(f"Found the switch count/density button")
+            current_state = count_switch_button.get_attribute('aria-checked')
+            logger.info(f"Current state of the total count switch: {current_state}")
+
+            time.sleep(2)
+            if current_state == "false":
+                count_switch_button.click()
+                logger.info("Switch toggled to 'true'.")
+            elif current_state == "true":
+                count_switch_button.click()
+                logger.info(f"Switch toggled to 'on'.")
+            else:
+                logger.error(f"Unexpected switch state: {current_state}")
+
+            new_state = count_switch_button.get_attribute("aria-checked")
+            logger.info(f"New state of the switch: {new_state}")
+
+            total_count_number = explore_page.find_total_count_n()
+            neuron_count = total_count_number.text
+            assert neuron_count.strip(), "Total neuron DENSITY is empty"
+            logger.info(f"Total DENSITY is: {neuron_count}")
+        else:
+            logger.info(f"Skipping density/count test — not available for species '{species_value}'")
 
         exp_data_titles = [
             ExplorePageLocators.NEURON_MORPHOLOGY,
@@ -241,32 +255,35 @@ class TestExplorePage:
         cerebrum_in_brpanel.click()
         logger.info(f"Clicked on '{region_text}' in the brain region panel")
 
-        # Try to navigate the tree: search for Cerebrum in the region search field
+        # Try to navigate the tree: search for brain region (species-dependent)
         time.sleep(2)
         try:
             from selenium.webdriver.common.by import By
             from selenium.webdriver.support.ui import WebDriverWait
             from selenium.webdriver.support import expected_conditions as EC
 
+            # Rat has "Cerebral cortex", Mouse/Human have "Cerebrum"
+            search_term = "Cerebral cortex" if "Rat" in species_value else "Cerebrum"
+
             region_input = browser.find_element(By.ID, "region-search")
             region_input.click()
-            region_input.send_keys("Cerebrum")
-            logger.info("Typed 'Cerebrum' in region search")
+            region_input.send_keys(search_term)
+            logger.info(f"Typed '{search_term}' in region search")
             time.sleep(2)
 
-            # Select Cerebrum from the dropdown
-            cerebrum_option = WebDriverWait(browser, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'ant-select-item')]//div[text()='Cerebrum']"))
+            # Select from the dropdown
+            option = WebDriverWait(browser, 10).until(
+                EC.element_to_be_clickable((By.XPATH, f"//div[contains(@class,'ant-select-item')]//div[text()='{search_term}']"))
             )
-            cerebrum_option.click()
-            logger.info("Selected Cerebrum from dropdown")
+            option.click()
+            logger.info(f"Selected '{search_term}' from dropdown")
             time.sleep(2)
         except Exception as tree_err:
-            logger.warning(f"Region search for Cerebrum failed: {tree_err}")
+            logger.warning(f"Region search for brain region failed: {tree_err}")
 
         try:
             cerebral_cortex_title = explore_page.find_cerebral_cortex_brp(timeout=15)
-            logger.info("Found Cerebral cortex as a child of Cerebrum")
+            logger.info("Found Cerebral cortex as a child region")
         except Exception:
             logger.warning("Cerebral cortex not found — tree may be at different level")
 
@@ -287,13 +304,17 @@ class TestExplorePage:
         #
         # logger.info("Number of records for data types have been processed.")
 
-        neurons_panel = explore_page.find_neurons_panel()
-        assert neurons_panel.is_displayed()
-        logger.info("Neurons panel is displayed")
+        # Neurons panel and density/count switch only available for Mouse
+        if "Mouse" in species_value:
+            neurons_panel = explore_page.find_neurons_panel()
+            assert neurons_panel.is_displayed()
+            logger.info("Neurons panel is displayed")
 
-        density_count_switch = explore_page.find_count_switch(timeout=10)
-        assert density_count_switch.is_displayed()
-        logger.info("Density & count switch is displayed")
+            density_count_switch = explore_page.find_count_switch(timeout=10)
+            assert density_count_switch.is_displayed()
+            logger.info("Density & count switch is displayed")
+        else:
+            logger.info(f"Skipping neurons panel and density switch — not available for '{species_value}'")
 
         brain_region_search_field = explore_page.find_brain_region_search_field(timeout=25)
         assert brain_region_search_field.is_displayed()
@@ -315,12 +336,14 @@ class TestExplorePage:
             logger.error("Timeout: Search region input field is not clickable after multiple attempts.")
 
         search_region_input_field.send_keys(Keys.ENTER)
-        search_region_input_field.send_keys("Isocortex")
-        logger.info("Searching for 'Isocortex'")
+        # Isocortex only exists for Mouse; use Hippocampal formation for Rat
+        search_region_term = "Isocortex" if "Mouse" in species_value else "Hippocampal formation"
+        search_region_input_field.send_keys(search_region_term)
+        logger.info(f"Searching for '{search_region_term}'")
         search_region_input_field.send_keys(Keys.ENTER)
         selected_brain_region_title = explore_page.find_selected_brain_region_title()
-        assert selected_brain_region_title.text == 'Isocortex'
-        logger.info("Found 'Isocortex' in the brain region panel and the title is displayed ")
+        assert selected_brain_region_title.text == search_region_term
+        logger.info(f"Found '{search_region_term}' in the brain region panel and the title is displayed")
         explore_page.wait_for_page_ready(timeout=20)
         logger.info("Wait for the sorting action to complete.")
         model_data_tab = explore_page.find_model_data_title()

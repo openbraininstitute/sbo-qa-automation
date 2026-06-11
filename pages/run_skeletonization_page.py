@@ -46,13 +46,16 @@ class RunSkeletonizationPage(HomePage):
         time.sleep(2)
 
     def click_process_data_category(self):
-        """Click the Process Data category card."""
+        """Click the Process Data category card on the workflows page."""
+        self.wait_for_network_idle(timeout=10)
         el = self.element_to_be_clickable(Loc.PROCESS_DATA_CATEGORY_CARD, timeout=15)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
+        time.sleep(0.5)
         try:
             el.click()
         except Exception:
             self.browser.execute_script("arguments[0].click();", el)
-        self.logger.info("Clicked Process Data category")
+        self.logger.info("Clicked Process Data category card")
         time.sleep(3)
 
     def click_em_mesh_skeletonization_card(self):
@@ -357,15 +360,18 @@ class RunSkeletonizationPage(HomePage):
         """Return dict with 'id' and 'name' values for EM cell mesh field."""
         result = {'id': '', 'name': ''}
         try:
-            id_input = self.find_element(Loc.INIT_EM_CELL_MESH_ID, timeout=10)
-            result['id'] = id_input.get_attribute("value") or id_input.text.strip()
+            id_el = self.find_element(Loc.INIT_EM_CELL_MESH_ID, timeout=10)
+            # The ID is in the data-testid attribute (contains entity ID)
+            test_id = id_el.get_attribute("data-testid") or ""
+            # Extract ID from data-testid="model-identifier-entity-<uuid>"
+            result['id'] = test_id.replace("model-identifier-entity-", "").strip()
         except TimeoutException:
-            self.logger.warning("EM cell mesh ID field not found")
+            self.logger.warning("EM cell mesh ID element not found")
         try:
-            name_input = self.find_element(Loc.INIT_EM_CELL_MESH_NAME, timeout=10)
-            result['name'] = name_input.get_attribute("value") or name_input.text.strip()
+            name_el = self.find_element(Loc.INIT_EM_CELL_MESH_NAME, timeout=10)
+            result['name'] = name_el.text.strip()
         except TimeoutException:
-            self.logger.warning("EM cell mesh name field not found")
+            self.logger.warning("EM cell mesh name element not found")
         self.logger.info(f"EM cell mesh — ID: '{result['id']}', Name: '{result['name']}'")
         return result
 
