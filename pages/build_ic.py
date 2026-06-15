@@ -226,6 +226,30 @@ class BuildIcPage(HomePage):
         logger.info("Clicked on M-model button")
         return True
 
+    def select_recording_species_rat(self, logger):
+        """Select Rat species in the recording modal to filter recordings."""
+        try:
+            dropdown = self.browser.find_element(*BuildIcLocators.RECORDING_SPECIES_DROPDOWN)
+            if dropdown.is_displayed():
+                dropdown.click()
+                logger.info("Opened species dropdown in recording modal")
+                time.sleep(1)
+                options = self.browser.find_elements(*BuildIcLocators.RECORDING_SPECIES_OPTIONS)
+                for option in options:
+                    if "rat" in option.text.strip().lower():
+                        option.click()
+                        logger.info("Selected Rat species in recording modal")
+                        time.sleep(3)
+                        return True
+                logger.warning("Rat option not found in species dropdown")
+                # Close dropdown
+                from selenium.webdriver.common.keys import Keys
+                from selenium.webdriver.common.action_chains import ActionChains
+                ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+        except Exception as e:
+            logger.info(f"Species dropdown not available in recording modal: {e}")
+        return False
+
     def select_model_via_radio_button(self, logger):
         """Select a random model by navigating to a random page and clicking a random radio button."""
         import random

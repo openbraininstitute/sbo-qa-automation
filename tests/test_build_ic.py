@@ -120,6 +120,9 @@ class TestBuildIc:
             except Exception as e:
                 logger.info(f"Public tab not available: {e}")
 
+            # Step 8b: Select Rat species (Mouse has known issues)
+            build_ic.select_recording_species_rat(logger)
+
             # Step 9: Select a recording via radio button
             logger.info("Selecting ion channel recording via radio button")
             try:

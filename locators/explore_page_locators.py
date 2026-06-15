@@ -124,3 +124,20 @@ class ExplorePageLocators:
     WORKFLOWS_HOME_BTN = (By.CSS_SELECTOR, "#workspace-workflows")
 
 
+
+    # Region search input and dropdown option
+    REGION_SEARCH_INPUT = (By.ID, "region-search")
+    REGION_SEARCH_OPTION = (
+        By.XPATH,
+        "//div[contains(@class,'ant-select-item')]//div"
+    )
+
+    # Record type counters (Experimental tab)
+    # Pattern: a#counter-{type} with spans showing "X of Y"
+    COUNTER_MORPHOLOGY = (By.ID, "counter-cell_morphology")
+    COUNTER_ELECTROPHYSIOLOGY = (By.ID, "counter-electrical_cell_recording")
+    COUNTER_ION_CHANNEL_EPHYS = (By.ID, "counter-ion_channel_recording")
+    COUNTER_NEURON_DENSITY = (By.ID, "counter-experimental_neuron_density")
+    COUNTER_BOUTON_DENSITY = (By.ID, "counter-experimental_bouton_density")
+    COUNTER_SYNAPSE_PER_CONNECTION = (By.ID, "counter-experimental_synapses_per_connection")
+    COUNTER_EM_MESH = (By.ID, "counter-em_cell_mesh")
