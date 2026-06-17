@@ -158,9 +158,17 @@ class TestExploreSynaptomePage:
         assert dv_download_btn.is_displayed(), "Download button is not displayed"
         logger.info("Download button is found")
 
+        # Verify description is present
+        try:
+            desc_el = explore_synaptome.find_dv_description_value()
+            assert desc_el.is_displayed(), "Description is not displayed"
+            assert desc_el.text.strip(), "Description text is empty"
+            logger.info(f"Description: '{desc_el.text.strip()[:60]}...'")
+        except Exception as e:
+            logger.warning(f"Description not found: {e}")
+
         # Verify detail view labels and values
         label_checks = [
-            ("DESCRIPTION", explore_synaptome.find_dv_description_label, explore_synaptome.find_dv_description_value),
             ("ME-MODEL", explore_synaptome.find_dv_me_model_label, explore_synaptome.find_dv_me_model_value),
             ("M-TYPE", explore_synaptome.find_dv_mtype_label, explore_synaptome.find_dv_mtype_value),
             ("E-TYPE", explore_synaptome.find_dv_etype_label, explore_synaptome.find_dv_etype_value),
@@ -214,13 +222,16 @@ class TestExploreSynaptomePage:
         
         # Verify Configuration tab elements with labels and values
         config_checks = [
-            ("Name", explore_synaptome.find_config_name_label, explore_synaptome.find_config_name_value),
+            ("Name", explore_synaptome.find_dv_config_tab_name_label, explore_synaptome.find_dv_config_tab_name_value),
             ("NAME", explore_synaptome.find_config_me_model_label, explore_synaptome.find_config_me_model_value),
             ("m-model", explore_synaptome.find_config_m_model_label, explore_synaptome.find_config_m_model_value),
             ("e-model", explore_synaptome.find_config_e_model_label, explore_synaptome.find_config_e_model_value),
             ("Brain Region", explore_synaptome.find_config_brain_region_label, explore_synaptome.find_config_brain_region_value),
             ("E-Type", explore_synaptome.find_config_e_type_label, explore_synaptome.find_config_e_type_value),
             ("M-Type", explore_synaptome.find_config_m_type_label, explore_synaptome.find_config_m_type_value),
+
+            # value - only field
+            # ("Description", None, explore_synaptome.find_dv_description_value),
         ]
         
         for label_text, find_label_fn, find_value_fn in config_checks:

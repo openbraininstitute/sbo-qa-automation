@@ -157,6 +157,12 @@ class ExploreSynaptomeDataPage(ExplorePage):
         """Find Configuration tab in detail view"""
         return self.find_element(ExploreSynaptomePageLocators.DV_CONFIGURATION_TAB)
 
+    def find_dv_config_tab_name_label(self):
+        return self.find_element(ExploreSynaptomePageLocators.DV_CONFIG_TAB_NAME_LABEL)
+
+    def find_dv_config_tab_name_value(self):
+        return self.find_element(ExploreSynaptomePageLocators.DV_CONFIG_TAB_NAME_VALUE)
+
     def find_dv_related_artifacts_tab(self):
         """Find Related artifacts tab in detail view"""
         return self.find_element(ExploreSynaptomePageLocators.DV_RELATED_ARTIFACTS_TAB)

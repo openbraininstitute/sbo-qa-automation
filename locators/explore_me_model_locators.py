@@ -62,15 +62,15 @@ class ExploreMeModelLocators:
     """Detail View: action buttons."""
     DV_COPY_ID_BTN = (
         By.XPATH,
-        "//div[.//div[text()='Copy ID'] and .//span[@aria-label='copy']]",
+        "//button[.//div[text()='Copy ID']]",
     )
     DV_SIMULATE_BTN = (
         By.XPATH,
-        "//div[.//div[text()='Simulate'] and .//span[@aria-label='experiment']]",
+        "//a[.//div[text()='Simulate']] | //button[.//div[text()='Simulate']]",
     )
     DV_DOWNLOAD_BTN = (
         By.XPATH,
-        "//div[.//div[text()='Download'] and .//span[@aria-label='download']]",
+        "//button[.//div[text()='Download']]",
     )
 
     """Detail View: Overview tab — metadata labels and values."""
@@ -79,34 +79,34 @@ class ExploreMeModelLocators:
         "(//div[contains(@class,'text-2xl') and contains(@class,'font-bold')])[1]"
         " | //h1[contains(@class,'font-bold')]",
     )
-    DV_DESCRIPTION_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'escription')]")
-    DV_DESCRIPTION_VALUE = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'escription')]/following-sibling::div[1]")
-    DV_CREATED_BY_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'reated by')]")
-    DV_CREATED_BY_VALUE = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'reated by')]/following-sibling::div[1]")
-    DV_CONTRIBUTORS_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and normalize-space()='Contributors']")
-    DV_CONTRIBUTORS_VALUE = (By.XPATH, "//div[contains(@class,'text-neutral-4') and normalize-space()='Contributors']/following-sibling::div[1]")
+    DV_DESCRIPTION_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'escription')]")
+    DV_DESCRIPTION_VALUE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'escription')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]")
+    DV_CREATED_BY_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'reated by')]")
+    DV_CREATED_BY_VALUE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'reated by')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]")
+    DV_CONTRIBUTORS_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and normalize-space()='Contributors']")
+    DV_CONTRIBUTORS_VALUE = (By.XPATH, "//div[contains(@class,'text-primary-3') and normalize-space()='Contributors']/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]")
     DV_INSTITUTIONAL_CONTRIBUTORS_LABEL = (
-        By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'nstitutional')]"
+        By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'nstitutional')]"
     )
     DV_INSTITUTIONAL_CONTRIBUTORS_VALUE = (
-        By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'nstitutional')]/following-sibling::div[1]"
+        By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'nstitutional')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]"
     )
-    DV_BRAIN_REGION_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'rain')]")
-    DV_BRAIN_REGION_VALUE = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'rain')]/following-sibling::div[1]")
-    DV_ETYPE_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'-Type') and contains(normalize-space(),'E')]")
-    DV_ETYPE_VALUE = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'-Type') and contains(normalize-space(),'E')]/following-sibling::div[1]")
-    DV_VALIDATED_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'alidated')]")
-    DV_VALIDATED_VALUE = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'alidated')]/following-sibling::div[1]")
-    DV_SPECIES_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'pecies')]")
-    DV_SPECIES_VALUE = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'pecies')]/following-sibling::div[1]")
-    DV_REGISTRATION_DATE_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'egistration')]")
+    DV_BRAIN_REGION_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'rain')]")
+    DV_BRAIN_REGION_VALUE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'rain')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]")
+    DV_ETYPE_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'-Type') and contains(normalize-space(),'E')]")
+    DV_ETYPE_VALUE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'-Type') and contains(normalize-space(),'E')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]")
+    DV_VALIDATED_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'alidated')]")
+    DV_VALIDATED_VALUE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'alidated')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]")
+    DV_SPECIES_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'pecies')]")
+    DV_SPECIES_VALUE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'pecies')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]")
+    DV_REGISTRATION_DATE_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'egistration')]")
     DV_REGISTRATION_DATE_VALUE = (
-        By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'egistration')]/following-sibling::div[1]"
+        By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'egistration')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]"
     )
-    DV_MTYPE_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'-Type') and contains(normalize-space(),'M')]")
-    DV_MTYPE_VALUE = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'-Type') and contains(normalize-space(),'M')]/following-sibling::div[1]")
-    DV_STRAIN_LABEL = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'train')]")
-    DV_STRAIN_VALUE = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(normalize-space(),'train')]/following-sibling::div[1]")
+    DV_MTYPE_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'-Type') and contains(normalize-space(),'M')]")
+    DV_MTYPE_VALUE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'-Type') and contains(normalize-space(),'M')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]")
+    DV_STRAIN_LABEL = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'train')]")
+    DV_STRAIN_VALUE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(normalize-space(),'train')]/following-sibling::div[contains(@class,'mt-2') and contains(@class,'break-words')]")
 
     """Detail View: Analysis tab."""
     DV_ANALYSIS_DROPDOWN = (

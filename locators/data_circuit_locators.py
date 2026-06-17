@@ -84,18 +84,18 @@ class DataCircuitLocators:
     DV_BREADCRUMB_CIRCUIT = (By.XPATH, "//span[contains(@class,'font-bold')]//a[contains(text(),'Circuit')]")
 
     # Detail view - metadata
-    DV_METADATA_LABELS = (By.XPATH, "//div[contains(@class,'text-neutral-4') and contains(@class,'uppercase')]")
+    DV_METADATA_LABELS = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(@class,'uppercase')]")
 
     # Detail view - image and buttons
-    DV_IMAGE = (By.XPATH, "//img[contains(@alt,'')]")
-    DV_COPY_ID_BTN = (By.XPATH, "//div[.//div[text()='Copy ID'] and .//span[@aria-label='copy']]")
-    DV_DOWNLOAD_BTN = (By.XPATH, "//div[.//div[text()='Download'] and .//span[@aria-label='download']]")
-    DV_SIMULATE_BTN = (By.XPATH, "//div[.//div[text()='Simulate'] and .//span[@aria-label='experiment']]")
+    DV_IMAGE = (By.XPATH, "//*[@data-testid='visualization']//img | //img[contains(@alt,'visualization')]")
+    DV_COPY_ID_BTN = (By.XPATH, "//button[.//div[text()='Copy ID']]")
+    DV_DOWNLOAD_BTN = (By.XPATH, "//button[.//div[text()='Download']]")
+    DV_SIMULATE_BTN = (By.XPATH, "//a[.//div[text()='Simulate']] | //button[.//div[text()='Simulate']]")
 
     # Analysis tab
     DV_ANALYSIS_CELL_STATS_TITLE = (
         By.XPATH,
-        "//div[contains(@class,'text-primary-8') and contains(@class,'font-bold') and contains(text(),'Cell statistics')]"
+        "//div[contains(text(),'Cell statistics')]"
     )
     DV_ANALYSIS_CELL_STATS_IMAGE = (
         By.XPATH,
@@ -103,7 +103,7 @@ class DataCircuitLocators:
     )
     DV_ANALYSIS_NETWORK_STATS_TITLE = (
         By.XPATH,
-        "//div[contains(@class,'text-primary-8') and contains(@class,'font-bold') and contains(text(),'Network statistics')]"
+        "//div[contains(text(), 'Network statistics')]"
     )
     DV_ANALYSIS_NETWORK_STATS_IMAGES = (
         By.XPATH,
@@ -124,7 +124,7 @@ class DataCircuitLocators:
         "//button[@data-slot='button'][contains(.,'Applications')]"
     )
     DV_PUB_ARTICLE_ITEMS = (By.CSS_SELECTOR, "li.ant-list-item")
-    DV_PUB_ARTICLE_TITLE = (By.XPATH, "//li[contains(@class,'ant-list-item')]//h2[contains(@class,'text-primary-8')]")
+    DV_PUB_ARTICLE_TITLE = (By.XPATH, "//li[contains(@class,'ant-list-item')]//h2[contains(@class,'font-bold')]")
     DV_PUB_COPY_DOI_BTN = (By.XPATH, "//button[contains(.,'Copy DOI')]")
     DV_PUB_AUTHOR_NAMES = (By.XPATH, "//div[contains(@class,'text-paper-author')]//span")
     DV_PUB_MORE_AUTHORS_BTN = (By.XPATH, "//button[contains(@class,'ant-btn-text')]//span[contains(text(),'+ ')]")
@@ -171,3 +171,23 @@ class DataCircuitLocators:
     # Download panel
     DV_DOWNLOAD_PANEL = (By.CSS_SELECTOR, "[data-testid='circuit-download-panel']")
     DV_DOWNLOAD_PANEL_CLOSE_BTN = (By.XPATH, "//*[@data-testid='circuit-download-panel']//button[@aria-label='Close']")
+
+    # Detail view - metadata name (special element)
+    DV_METADATA_NAME = (
+        By.XPATH,
+        "//div[contains(@class,'text-primary-8') and contains(@class,'text-2xl') and contains(@class,'font-bold')]"
+    )
+
+    # Subject section container
+    DV_SUBJECT_SECTION = (
+        By.XPATH,
+        "(//*[@data-testid='subject-details'] | //h2[contains(text(),'Subject')]/ancestor::div[contains(@class,'rounded')])[3]"
+    )
+    DV_SUBJECT_SECTION_FALLBACK = (By.XPATH, "//h2[contains(text(),'Subject')]/..")
+
+    # Brain region search (used in select_brain_region_root)
+    BRAIN_REGION_SEARCH_INPUT = (By.ID, "region-search")
+    BRAIN_REGION_ROOT_OPTION = (
+        By.XPATH,
+        "//div[contains(@class,'ant-select-item')]//div[text()='Root']"
+    )

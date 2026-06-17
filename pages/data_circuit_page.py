@@ -103,13 +103,13 @@ class DataCircuitPage(HomePage):
         """Select 'Root' as brain region via the search field."""
         self.click_brain_region_switcher()
         try:
-            region_input = self.browser.find_element(By.ID, "region-search")
+            region_input = self.browser.find_element(*DataCircuitLocators.BRAIN_REGION_SEARCH_INPUT)
             region_input.click()
             region_input.clear()
             region_input.send_keys("Root")
             time.sleep(2)
             root_option = WebDriverWait(self.browser, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'ant-select-item')]//div[text()='Root']"))
+                EC.element_to_be_clickable(DataCircuitLocators.BRAIN_REGION_ROOT_OPTION)
             )
             root_option.click()
             self.logger.info("Selected 'Root' as brain region")
@@ -502,7 +502,7 @@ class DataCircuitPage(HomePage):
         """Verify required metadata fields are present and not empty in the detail view.
         
         DOM structure per field:
-        - Label: <div class="text-neutral-4 uppercase">FIELD NAME</div>
+        - Label: <div class="text-primary-3 uppercase">FIELD NAME</div>
         - Value: <div class="mt-2 break-words">value text</div> (immediately following sibling)
         
         Name is special: <div class="text-primary-8 line-clamp-3 text-2xl font-bold">
@@ -519,10 +519,7 @@ class DataCircuitPage(HomePage):
 
         # Name has a special dedicated element (bold, larger text)
         try:
-            name_el = self.find_element(
-                (By.XPATH, "//div[contains(@class,'text-primary-8') and contains(@class,'text-2xl') and contains(@class,'font-bold')]"),
-                timeout=5
-            )
+            name_el = self.find_element(DataCircuitLocators.DV_METADATA_NAME, timeout=5)
             results["Name"] = name_el.text.strip()
         except Exception:
             results["Name"] = None
@@ -531,10 +528,10 @@ class DataCircuitPage(HomePage):
             if field == "Name":
                 continue  # Already handled above
             try:
-                # Label is uppercase text-neutral-4 div containing the field name (case-insensitive)
+                # Label is uppercase text-primary-3 div containing the field name (case-insensitive)
                 label_locator = (
                     By.XPATH,
-                    f"//div[contains(@class,'text-neutral-4') and contains(@class,'uppercase') and "
+                    f"//div[contains(@class,'text-primary-3') and contains(@class,'uppercase') and "
                     f"contains(translate(text(),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'), "
                     f"'{field.upper()}')]"
                 )
@@ -555,7 +552,7 @@ class DataCircuitPage(HomePage):
         """Verify subject metadata section fields within the Subject container.
         
         DOM structure: h2 "Subject" → parent container → label/value pairs
-        Label: div.text-neutral-4.uppercase
+        Label: div.text-primary-3.uppercase
         Value: following-sibling div.mt-2.break-words
         """
         subject_fields = [
@@ -566,18 +563,19 @@ class DataCircuitPage(HomePage):
 
         # Find the Subject section container
         try:
-            subject_section = self.find_element(
-                (By.XPATH,
-                 "//h2[contains(text(),'Subject')]/ancestor::div[contains(@class,'rounded')]"),
-                timeout=timeout
-            )
+            subject_section = self.find_element(DataCircuitLocators.DV_SUBJECT_SECTION, timeout=timeout)
+            # Scroll within the detail view content panel
+            self.browser.execute_script("""
+                var el = arguments[0];
+                var scrollParent = el.closest('.overflow-y-auto') || el.closest('[class*="scrollbar"]');
+                if (scrollParent) scrollParent.scrollTop = el.offsetTop - 100;
+                else el.scrollIntoView({block: 'center'});
+            """, subject_section)
+            time.sleep(1)
         except Exception:
             # Fallback: try to find by section heading
             try:
-                subject_section = self.find_element(
-                    (By.XPATH, "//h2[contains(text(),'Subject')]/.."),
-                    timeout=5
-                )
+                subject_section = self.find_element(DataCircuitLocators.DV_SUBJECT_SECTION_FALLBACK, timeout=5)
             except Exception:
                 self.logger.warning("Subject section not found")
                 return {f: None for f in subject_fields}
@@ -587,7 +585,7 @@ class DataCircuitPage(HomePage):
                 # Search within the Subject section only using same pattern as metadata
                 label_el = subject_section.find_element(
                     By.XPATH,
-                    f".//div[contains(@class,'text-neutral-4') and contains(@class,'uppercase') and "
+                    f".//div[contains(@class,'text-primary-3') and contains(@class,'uppercase') and "
                     f"contains(translate(text(),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'), "
                     f"'{field.upper()}')]"
                 )
