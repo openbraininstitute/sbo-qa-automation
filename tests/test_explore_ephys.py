@@ -202,10 +202,13 @@ class TestExploreEphys:
             if filters_applied:
                 logger.info("✅ E-type filters applied successfully")
                 explore_ephys_page.close_filter_panel()
-                time.sleep(1)
-                # Verify filtered results
-                time.sleep(3)  # Wait for results to load
-                
+                explore_ephys_page.wait_for_network_idle(timeout=10)
+
+                # Verify filter badge shows (1)
+                filter_count = explore_ephys_page.get_filter_count()
+                assert filter_count >= 1, f"Filter badge should show at least 1, got {filter_count}"
+                logger.info(f"✅ Filter badge shows ({filter_count}) active filter(s)")
+
                 find_table = explore_ephys_page.find_table()
                 filtered_etype = explore_ephys_page.find_filtered_etype()
                 if filtered_etype:
@@ -215,13 +218,18 @@ class TestExploreEphys:
                     logger.info(f"✅ E-type filter verified - found '{expected}' in results")
                 else:
                     logger.warning("⚠️ Filtered E-type cells cannot be found.")
+
                 
-                lv_total_results = explore_ephys_page.lv_total_results()
-                lv_total_text = lv_total_results.text
-                logger.info(f"📊 The total results for Ephys/bNAC is: {lv_total_text}")
+                # Verify counter changed after filter
+                filtered_count, total_count = explore_ephys_page.get_ephys_counter_values()
+                if filtered_count is not None and total_count is not None:
+                    assert filtered_count < total_count, \
+                        f"Filtered count ({filtered_count}) should be less than total ({total_count}) after applying bNAC filter"
+                    logger.info(f"✅ Counter after filter: {filtered_count} of {total_count}")
+                else:
+                    logger.warning("⚠️ Could not read counter values after filter")
             
-            explore_ephys_page.close_filter_panel()
-            time.sleep(1)
+
             
         except Exception as e:
             logger.warning(f"⚠️ E-type filter functionality test failed: {e}")
@@ -231,9 +239,10 @@ class TestExploreEphys:
             except:
                 pass
 
-        logger.info("🔍 Testing mini-detail view...")
         row_text = explore_ephys_page.click_random_row_with_pagination()
         logger.info(f"Clicked random row: '{row_text}'")
+        if "No thumbnail" in (row_text or ""):
+            logger.warning("⚠️ Selected row has no thumbnail in the table Preview column")
         time.sleep(2)  # Wait for mini-detail view to load
         
         try:
@@ -253,7 +262,17 @@ class TestExploreEphys:
                 logger.info("✅ License link is clickable")
             else:
                 logger.warning("⚠️ License link is not clickable")
-            
+
+            # Click image to verify preview modal opens (only if image is present)
+            if field_results.get('image', {}).get('present'):
+                image_preview_ok = explore_ephys_page.click_mdv_image_and_verify_preview()
+                if image_preview_ok:
+                    logger.info("✅ Image preview modal verified")
+                else:
+                    logger.warning("⚠️ Image preview modal could not be verified")
+            else:
+                logger.warning("⚠️ No image in mini-detail view — skipping preview test")
+
             logger.info("Verifying mini-detail view buttons...")
             button_results = explore_ephys_page.verify_mini_detail_view_buttons()
             
