@@ -264,8 +264,6 @@ class ExplorePage(HomePage):
             "Single cell electrophysiology": ExplorePageLocators.COUNTER_ELECTROPHYSIOLOGY,
             "Ion channel electrophysiology": ExplorePageLocators.COUNTER_ION_CHANNEL_EPHYS,
             "Neuron density": ExplorePageLocators.COUNTER_NEURON_DENSITY,
-            "Bouton density": ExplorePageLocators.COUNTER_BOUTON_DENSITY,
-            "Synapse per connection": ExplorePageLocators.COUNTER_SYNAPSE_PER_CONNECTION,
             "EM Mesh": ExplorePageLocators.COUNTER_EM_MESH,
         }
         results = {}
