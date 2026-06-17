@@ -16,7 +16,8 @@ class SimulateMemLocators:
     """Workflows page: Simulate category card and Single neuron type card."""
     SIMULATE_CATEGORY_CARD = (
         By.XPATH,
-        "(//div[@data-slot='card'])[2]"
+        "//div[@data-slot='card-title'][contains(., 'Simulate')]/ancestor::div[@data-slot='card']"
+        " | (//div[@data-slot='card'])[2]"
     )
     SINGLE_NEURON_CARD = (
         By.XPATH,

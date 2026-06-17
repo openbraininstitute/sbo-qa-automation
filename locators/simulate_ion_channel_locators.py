@@ -16,7 +16,8 @@ class SimulateIonChannelLocators:
     # ── Workflows page: Simulate category and Ion channel type card ──────
     SIMULATE_CATEGORY_CARD = (
         By.XPATH,
-        "(//div[@data-slot='card'])[2]",
+        "//div[@data-slot='card-title'][contains(., 'Simulate')]/ancestor::div[@data-slot='card']"
+        " | (//div[@data-slot='card'])[2]",
     )
     ION_CHANNEL_CARD = (
         By.XPATH,

@@ -16,7 +16,8 @@ class SimulateSynaptomeLocators:
     """Workflows page: Simulate category card and Synaptome type card."""
     SIMULATE_CATEGORY_CARD = (
         By.XPATH,
-        "(//div[@data-slot='card'])[2]"
+        "//div[@data-slot='card-title'][contains(., 'Simulate')]/ancestor::div[@data-slot='card']"
+        " | (//div[@data-slot='card'])[2]"
     )
     SYNAPTOME_CARD = (
         By.XPATH,
