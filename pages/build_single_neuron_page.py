@@ -256,6 +256,7 @@ class BuildSingleNeuronPage(ProjectHome):
                     m_model_button.click()
                     print("✅ M-model button clicked successfully")
                     self.wait_for_page_load()
+                    self.wait_for_network_idle(timeout=15)
                     
                     # Add debugging after click
                     print(f"🔍 After M-model button click, current URL: {self.browser.current_url}")

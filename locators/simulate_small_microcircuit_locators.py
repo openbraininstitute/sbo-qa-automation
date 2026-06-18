@@ -16,7 +16,8 @@ class SimulateSmallMicrocircuitLocators:
     """Workflows page: Simulate category card and Small microcircuit type card."""
     SIMULATE_CATEGORY_CARD = (
         By.XPATH,
-        "(//div[@data-slot='card'])[2]"
+        "//div[@data-slot='card-title'][contains(., 'Simulate')]/ancestor::div[@data-slot='card']"
+        " | (//div[@data-slot='card'])[2]"
     )
     SMALL_MICROCIRCUIT_CARD = (
         By.XPATH,

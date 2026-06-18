@@ -75,21 +75,25 @@ class ExploreElectrophysiologyPage(ExplorePage):
     # Enhanced search functionality
     def perform_name_search(self, search_term):
         """Perform a search by name"""
-        search_button = self.find_search_button()
-        search_button.click()
-        self.logger.info("Clicked search button")
-        
-        # Wait for search input to appear
-        time.sleep(1)
-        
-        search_input = self.find_search_input()
+        # Search input may already be visible (no need to click open button)
+        try:
+            search_input = self.find_search_input(timeout=5)
+            if search_input.is_displayed():
+                self.logger.info("Search input already visible")
+        except Exception:
+            # Fallback: click search button to open
+            search_button = self.find_search_button()
+            search_button.click()
+            self.logger.info("Clicked search button to open")
+            time.sleep(1)
+            search_input = self.find_search_input()
+
         search_input.clear()
         search_input.send_keys(search_term)
         self.logger.info(f"Entered search term: {search_term}")
-        
-        # Press Enter or wait for search results
+
         search_input.send_keys("\n")
-        time.sleep(2)  # Wait for search results to load
+        time.sleep(2)
         return True
 
     def clear_search(self):
@@ -257,6 +261,18 @@ class ExploreElectrophysiologyPage(ExplorePage):
         except TimeoutException:
             self.logger.warning("Close button not found")
             return False
+
+    def get_filter_count(self, timeout=5):
+        """Get the number of active filters shown on the filter button badge."""
+        try:
+            badge = self.find_element(ExploreEphysLocators.FILTER_COUNT, timeout=timeout)
+            text = badge.text.strip()
+            count = int(text) if text.isdigit() else 0
+            self.logger.info(f"Filter count badge: {count}")
+            return count
+        except TimeoutException:
+            self.logger.info("No filter count badge found (0 filters active)")
+            return 0
 
     def verify_filtered_results(self, expected_value, column_type="species"):
         """Verify that filtered results contain the expected value"""
@@ -628,6 +644,25 @@ class ExploreElectrophysiologyPage(ExplorePage):
     def lv_total_results(self):
         return self.find_element(ExploreEphysLocators.LV_TOTAL_RESULTS)
 
+    def get_ephys_counter_values(self, timeout=10):
+        """Get the filtered count and total count from the electrophysiology tab counter.
+        Returns tuple (filtered_count, total_count) or (None, None) if not found.
+        """
+        try:
+            from selenium.webdriver.common.by import By
+            counter = self.find_element(ExploreEphysLocators.SINGLE_CELL_ELECTROPHYSIOLOGY_BTN, timeout=timeout)
+            spans = counter.find_elements(By.XPATH, ".//span[contains(@class,'font-bold')]")
+            if len(spans) >= 2:
+                filtered_text = spans[0].text.strip().replace("'", "").replace(",", "")
+                total_text = spans[1].text.strip().replace("'", "").replace(",", "")
+                filtered = int(filtered_text) if filtered_text.isdigit() else None
+                total = int(total_text) if total_text.isdigit() else None
+                self.logger.info(f"Ephys counter: {filtered} of {total}")
+                return filtered, total
+        except Exception as e:
+            self.logger.warning(f"Could not read ephys counter: {e}")
+        return None, None
+
     def perform_full_validation(self):
         self.validate_empty_cells()
         load_more_button = self.find_load_more_btn()
@@ -838,6 +873,41 @@ class ExploreElectrophysiologyPage(ExplorePage):
             self.logger.warning(f"❌ View Details button error: {e}")
         
         return results
+
+    def click_mdv_image_and_verify_preview(self):
+        """Click the mini-detail image to open the preview modal, verify it, then close."""
+        try:
+            from selenium.webdriver.common.action_chains import ActionChains
+            from selenium.webdriver.common.keys import Keys
+
+            img = self.find_element(ExploreEphysLocators.MDV_IMAGE_CLICKABLE, timeout=10)
+            # Hover to reveal mask, then click
+            ActionChains(self.browser).move_to_element(img).pause(0.5).click().perform()
+            self.logger.info("Clicked mini-detail image (via hover + click)")
+            time.sleep(1)
+
+            # Verify preview modal appeared
+            preview = self.find_element(ExploreEphysLocators.MDV_IMAGE_PREVIEW_MODAL, timeout=5)
+            is_visible = preview.is_displayed()
+            self.logger.info(f"Image preview modal displayed: {is_visible}")
+
+            # Verify preview image is present
+            preview_img = self.find_element(ExploreEphysLocators.MDV_IMAGE_PREVIEW_IMG, timeout=5)
+            has_src = bool(preview_img.get_attribute("src"))
+            self.logger.info(f"Preview image has src: {has_src}")
+
+            # Close the preview
+            try:
+                close_btn = self.find_element(ExploreEphysLocators.MDV_IMAGE_PREVIEW_CLOSE, timeout=3)
+                close_btn.click()
+            except Exception:
+                ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+            self.logger.info("Closed image preview modal")
+            time.sleep(0.5)
+            return is_visible and has_src
+        except Exception as e:
+            self.logger.warning(f"Image preview test failed: {e}")
+            return False
 
     def click_mdv_view_details(self):
         """Click the View Details button in mini-detail view"""
@@ -1079,17 +1149,18 @@ class ExploreElectrophysiologyPage(ExplorePage):
         return True
 
     def click_interactive_details_tab(self):
-        """Click the Interactive Details tab"""
-        interactive_tab = self.find_interactive_details_tab()
-        
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", interactive_tab)
-        time.sleep(0.5)
-        
+        """Click the Interactive Details tab (skip if already active or not found)"""
         try:
+            interactive_tab = self.find_element(ExploreEphysLocators.DV_INTERACTIVE_DETAILS_TAB_BUTTON, timeout=5)
+            # Check if already checked
+            parent_label = interactive_tab.find_element(By.XPATH, "./ancestor::label")
+            if "checked" in (parent_label.get_attribute("class") or ""):
+                self.logger.info("Interactive Details tab already active")
+                return
             interactive_tab.click()
-        except Exception as e:
-            self.logger.warning(f"Regular click failed, using JavaScript click: {e}")
-            self.browser.execute_script("arguments[0].click();", interactive_tab)
+            self.logger.info("Clicked Interactive Details tab")
+        except Exception:
+            self.logger.info("Interactive Details tab not found or already active — skipping")
         
         self.logger.info("Clicked Interactive Details tab")
         time.sleep(1)

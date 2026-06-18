@@ -488,7 +488,10 @@ def login(navigate_to_login, test_config, logger):
     print("Login successful. Current URL:", login_page.browser.current_url)
 
     yield login_page.browser, login_page.wait
-    login_page.browser.delete_all_cookies()
+    try:
+        login_page.browser.delete_all_cookies()
+    except Exception:
+        pass  # Browser may already be closed
 
 @pytest.fixture(scope="function")
 def logger(request):

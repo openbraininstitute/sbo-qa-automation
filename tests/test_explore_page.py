@@ -70,10 +70,17 @@ class TestExplorePage:
         experimental_data_tab = explore_page.experimental_data_tab()
         assert experimental_data_tab.is_displayed(), f"Experimental data tab is not displayed"
         logger.info("Experimental data tab is displayed.")
-
         atlas = explore_page.find_3d_atlas()
         assert atlas.is_displayed()
         logger.info("3D Atlas is displayed")
+
+        # Dump localStorage species snapshot for debugging
+        ls_keys = browser.execute_script("return Object.keys(localStorage)")
+        logger.info(f"localStorage keys: {ls_keys}")
+        for key in ls_keys:
+            if 'species' in key.lower() or 'brain' in key.lower() or 'region' in key.lower():
+                val = browser.execute_script(f"return localStorage.getItem('{key}')")
+                logger.info(f"  {key}: {val}")
 
         # Fullscreen button only available for Human, Mouse, Rat
         species_value = explore_page.get_species_value(timeout=10)
@@ -251,33 +258,16 @@ class TestExplorePage:
         assert region_text, "Brain region text should not be empty"
         if br_load_time > 10:
             logger.warning(f"PERFORMANCE: Brain region panel took {br_load_time}s to load")
-
         cerebrum_in_brpanel.click()
         logger.info(f"Clicked on '{region_text}' in the brain region panel")
 
         # Try to navigate the tree: search for brain region (species-dependent)
         time.sleep(2)
         try:
-            from selenium.webdriver.common.by import By
-            from selenium.webdriver.support.ui import WebDriverWait
-            from selenium.webdriver.support import expected_conditions as EC
-
             # Rat has "Cerebral cortex", Mouse/Human have "Cerebrum"
             search_term = "Cerebral cortex" if "Rat" in species_value else "Cerebrum"
-
-            region_input = browser.find_element(By.ID, "region-search")
-            region_input.click()
-            region_input.send_keys(search_term)
-            logger.info(f"Typed '{search_term}' in region search")
-            time.sleep(2)
-
-            # Select from the dropdown
-            option = WebDriverWait(browser, 10).until(
-                EC.element_to_be_clickable((By.XPATH, f"//div[contains(@class,'ant-select-item')]//div[text()='{search_term}']"))
-            )
-            option.click()
-            logger.info(f"Selected '{search_term}' from dropdown")
-            time.sleep(2)
+            explore_page.search_and_select_brain_region(search_term)
+            logger.info(f"Selected '{search_term}' from region search")
         except Exception as tree_err:
             logger.warning(f"Region search for brain region failed: {tree_err}")
 
@@ -287,22 +277,12 @@ class TestExplorePage:
         except Exception:
             logger.warning("Cerebral cortex not found — tree may be at different level")
 
-        # record_count_locators = [
-        #     ExplorePageLocators.MORPHOLOGY_NRECORDS,
-        #     ExplorePageLocators.NEURON_EPHYS_NRECORDS,
-        #     ExplorePageLocators.NEURON_DENSITY_NRECORDS,
-        #     ExplorePageLocators.BOUTON_DENSITY_NRECORDS,
-        #     ExplorePageLocators.SYNAPSE_PER_CONNECTION_NRECORDS
-        # ]
-        # time.sleep(2)
-        # record_counts = explore_page.get_experiment_record_count(record_count_locators, timeout=40)
-        # for record_count in record_counts:
-        #     if record_count == 0:
-        #         logger.warning(f"Record count is 0 for one of the data types.")
-        #     else:
-        #         logger.info(f"Record count is {record_count} for one of the data types.")
-        #
-        # logger.info("Number of records for data types have been processed.")
+        # Verify Experimental tab record type counters (total should not be 0)
+        logger.info("Verifying Experimental record type counters:")
+        record_counts = explore_page.verify_experimental_record_counts(timeout=15)
+        for name, total in record_counts.items():
+            assert total > 0, f"Record type '{name}' has total count 0 — expected data"
+        logger.info("All experimental record type counters have non-zero totals")
 
         # Neurons panel and density/count switch only available for Mouse
         if "Mouse" in species_value:
@@ -336,16 +316,6 @@ class TestExplorePage:
             logger.error("Timeout: Search region input field is not clickable after multiple attempts.")
 
         search_region_input_field.send_keys(Keys.ENTER)
-        # Isocortex only exists for Mouse; use Hippocampal formation for Rat
-        search_region_term = "Isocortex" if "Mouse" in species_value else "Hippocampal formation"
-        search_region_input_field.send_keys(search_region_term)
-        logger.info(f"Searching for '{search_region_term}'")
-        search_region_input_field.send_keys(Keys.ENTER)
-        selected_brain_region_title = explore_page.find_selected_brain_region_title()
-        assert selected_brain_region_title.text == search_region_term
-        logger.info(f"Found '{search_region_term}' in the brain region panel and the title is displayed")
-        explore_page.wait_for_page_ready(timeout=20)
-        logger.info("Wait for the sorting action to complete.")
         model_data_tab = explore_page.find_model_data_title()
         assert model_data_tab.text == "Model"
         logger.info("Model tab is found")

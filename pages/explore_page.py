@@ -4,6 +4,7 @@
 import time
 
 from selenium.common import TimeoutException, StaleElementReferenceException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.explore_page_locators import ExplorePageLocators
@@ -111,6 +112,20 @@ class ExplorePage(HomePage):
 
     def find_cerebral_cortex_brp(self, timeout=15):
         return self.find_element(ExplorePageLocators.CEREBRAL_CORTEX_TITLE, timeout=timeout)
+
+    def search_and_select_brain_region(self, search_term, timeout=10):
+        """Type a brain region name in the region search dropdown and select it."""
+        region_input = self.element_to_be_clickable(ExplorePageLocators.REGION_SEARCH_INPUT, timeout=timeout)
+        region_input.click()
+        region_input.send_keys(search_term)
+        self.logger.info(f"Typed '{search_term}' in region search")
+        time.sleep(2)
+
+        option_locator = (By.XPATH, f"//div[contains(@class,'ant-select-item')]//div[text()='{search_term}']")
+        option = self.element_to_be_clickable(option_locator, timeout=timeout)
+        option.click()
+        self.logger.info(f"Selected '{search_term}' from region search dropdown")
+        time.sleep(2)
 
     def find_cerebrum_title_main_page(self, timeout=30):
         return self.find_element(ExplorePageLocators.CEREBRUM_TITLE_MAIN_PAGE, timeout=timeout)
@@ -222,3 +237,41 @@ class ExplorePage(HomePage):
             WebDriverWait(self.browser, timeout).until(
                 EC.text_to_be_present_in_element(locator, '')
             )
+
+    def get_record_type_total_count(self, locator, timeout=10):
+        """Get the total record count (second number after 'of') for a record type.
+        Returns the total as int, or 0 if not found.
+        """
+        try:
+            element = self.find_element(locator, timeout=timeout)
+            # The total count is the last span.font-bold inside the element
+            spans = element.find_elements(By.XPATH, ".//span[contains(@class,'font-bold')]")
+            if len(spans) >= 2:
+                total_text = spans[-1].text.strip()
+                # Remove thousands separators
+                total_text = total_text.replace("'", "").replace(",", "").replace(" ", "")
+                return int(total_text) if total_text.isdigit() else 0
+            return 0
+        except (TimeoutException, ValueError):
+            return 0
+
+    def verify_experimental_record_counts(self, timeout=10):
+        """Verify all experimental record type counters have a non-zero total.
+        Returns dict with type name → total count.
+        """
+        record_types = {
+            "Morphology": ExplorePageLocators.COUNTER_MORPHOLOGY,
+            "Single cell electrophysiology": ExplorePageLocators.COUNTER_ELECTROPHYSIOLOGY,
+            "Ion channel electrophysiology": ExplorePageLocators.COUNTER_ION_CHANNEL_EPHYS,
+            "Neuron density": ExplorePageLocators.COUNTER_NEURON_DENSITY,
+            "EM Mesh": ExplorePageLocators.COUNTER_EM_MESH,
+        }
+        results = {}
+        for name, locator in record_types.items():
+            total = self.get_record_type_total_count(locator, timeout=timeout)
+            results[name] = total
+            if total > 0:
+                self.logger.info(f"  {name}: total={total}")
+            else:
+                self.logger.warning(f"  {name}: total is 0 or not found")
+        return results

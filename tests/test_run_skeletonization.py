@@ -41,7 +41,6 @@ class TestRunSkeletonization:
         page.click_public_tab()
         row_count = page.get_row_count()
         assert row_count > 0, "Expected at least one row in the table"
-
         # Step 3: Verify pagination and navigate to random page
         page_count = page.get_pagination_page_count()
         if page_count >= 2:

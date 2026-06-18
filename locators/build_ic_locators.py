@@ -140,3 +140,7 @@ class BuildIcLocators:
     # Debug elements
     CLICKABLE_ELEMENTS = (By.XPATH, "//button | //a | //div[@role='button'] | //tr[@role='button'] | //td[@role='button']")
     TABLE_ROWS = (By.XPATH, "//tr")
+
+    # Species selector in recording modal
+    RECORDING_SPECIES_DROPDOWN = (By.XPATH, "//span[@id='species-selector']//button[@data-slot='select-trigger']")
+    RECORDING_SPECIES_OPTIONS = (By.CSS_SELECTOR, "div[data-slot='select-item'], div[role='option']")

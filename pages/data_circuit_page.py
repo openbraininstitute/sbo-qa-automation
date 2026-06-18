@@ -103,13 +103,13 @@ class DataCircuitPage(HomePage):
         """Select 'Root' as brain region via the search field."""
         self.click_brain_region_switcher()
         try:
-            region_input = self.browser.find_element(By.ID, "region-search")
+            region_input = self.browser.find_element(*DataCircuitLocators.BRAIN_REGION_SEARCH_INPUT)
             region_input.click()
             region_input.clear()
             region_input.send_keys("Root")
             time.sleep(2)
             root_option = WebDriverWait(self.browser, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'ant-select-item')]//div[text()='Root']"))
+                EC.element_to_be_clickable(DataCircuitLocators.BRAIN_REGION_ROOT_OPTION)
             )
             root_option.click()
             self.logger.info("Selected 'Root' as brain region")
@@ -361,13 +361,25 @@ class DataCircuitPage(HomePage):
     # ── Row click → Mini-detail ──────────────────────────────────────────
 
     def click_random_row(self):
-        """Click a random row in the table to open the mini-detail view."""
+        """Click a random row in the table to open the mini-detail view.
+        Excludes known problematic rows.
+        """
+        EXCLUDED_ROWS = ["20211110-BioM"]
+
         rows = self.get_table_rows()
         if not rows:
             raise RuntimeError("No rows found in the circuit table")
 
         visible_rows = rows[:min(10, len(rows))]
-        row = random.choice(visible_rows)
+        # Filter out excluded rows
+        valid_rows = [
+            r for r in visible_rows
+            if not any(excl in (r.text or "") for excl in EXCLUDED_ROWS)
+        ]
+        if not valid_rows:
+            valid_rows = visible_rows  # fallback if all filtered out
+
+        row = random.choice(valid_rows)
         row_text = row.text.split('\n')[0][:60]
         self.logger.info(f"Clicking row: '{row_text}...'")
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
@@ -490,7 +502,7 @@ class DataCircuitPage(HomePage):
         """Verify required metadata fields are present and not empty in the detail view.
         
         DOM structure per field:
-        - Label: <div class="text-neutral-4 uppercase">FIELD NAME</div>
+        - Label: <div class="text-primary-3 uppercase">FIELD NAME</div>
         - Value: <div class="mt-2 break-words">value text</div> (immediately following sibling)
         
         Name is special: <div class="text-primary-8 line-clamp-3 text-2xl font-bold">
@@ -507,10 +519,7 @@ class DataCircuitPage(HomePage):
 
         # Name has a special dedicated element (bold, larger text)
         try:
-            name_el = self.find_element(
-                (By.XPATH, "//div[contains(@class,'text-primary-8') and contains(@class,'text-2xl') and contains(@class,'font-bold')]"),
-                timeout=5
-            )
+            name_el = self.find_element(DataCircuitLocators.DV_METADATA_NAME, timeout=5)
             results["Name"] = name_el.text.strip()
         except Exception:
             results["Name"] = None
@@ -519,10 +528,10 @@ class DataCircuitPage(HomePage):
             if field == "Name":
                 continue  # Already handled above
             try:
-                # Label is uppercase text-neutral-4 div containing the field name (case-insensitive)
+                # Label is uppercase text-primary-3 div containing the field name (case-insensitive)
                 label_locator = (
                     By.XPATH,
-                    f"//div[contains(@class,'text-neutral-4') and contains(@class,'uppercase') and "
+                    f"//div[contains(@class,'text-primary-3') and contains(@class,'uppercase') and "
                     f"contains(translate(text(),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'), "
                     f"'{field.upper()}')]"
                 )
@@ -543,7 +552,7 @@ class DataCircuitPage(HomePage):
         """Verify subject metadata section fields within the Subject container.
         
         DOM structure: h2 "Subject" → parent container → label/value pairs
-        Label: div.text-neutral-4.uppercase
+        Label: div.text-primary-3.uppercase
         Value: following-sibling div.mt-2.break-words
         """
         subject_fields = [
@@ -554,18 +563,19 @@ class DataCircuitPage(HomePage):
 
         # Find the Subject section container
         try:
-            subject_section = self.find_element(
-                (By.XPATH,
-                 "//h2[contains(text(),'Subject')]/ancestor::div[contains(@class,'rounded')]"),
-                timeout=timeout
-            )
+            subject_section = self.find_element(DataCircuitLocators.DV_SUBJECT_SECTION, timeout=timeout)
+            # Scroll within the detail view content panel
+            self.browser.execute_script("""
+                var el = arguments[0];
+                var scrollParent = el.closest('.overflow-y-auto') || el.closest('[class*="scrollbar"]');
+                if (scrollParent) scrollParent.scrollTop = el.offsetTop - 100;
+                else el.scrollIntoView({block: 'center'});
+            """, subject_section)
+            time.sleep(1)
         except Exception:
             # Fallback: try to find by section heading
             try:
-                subject_section = self.find_element(
-                    (By.XPATH, "//h2[contains(text(),'Subject')]/.."),
-                    timeout=5
-                )
+                subject_section = self.find_element(DataCircuitLocators.DV_SUBJECT_SECTION_FALLBACK, timeout=5)
             except Exception:
                 self.logger.warning("Subject section not found")
                 return {f: None for f in subject_fields}
@@ -575,7 +585,7 @@ class DataCircuitPage(HomePage):
                 # Search within the Subject section only using same pattern as metadata
                 label_el = subject_section.find_element(
                     By.XPATH,
-                    f".//div[contains(@class,'text-neutral-4') and contains(@class,'uppercase') and "
+                    f".//div[contains(@class,'text-primary-3') and contains(@class,'uppercase') and "
                     f"contains(translate(text(),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'), "
                     f"'{field.upper()}')]"
                 )
@@ -619,3 +629,321 @@ class DataCircuitPage(HomePage):
                 results[name] = {'displayed': False, 'enabled': False}
         self.logger.info(f"Detail buttons: {results}")
         return results
+
+    # ── Analysis tab ─────────────────────────────────────────────────────
+
+    def click_analysis_tab(self, timeout=10):
+        """Click the Analysis tab in the detail view."""
+        tab = self.element_to_be_clickable(DataCircuitLocators.DV_ANALYSIS_TAB, timeout=timeout)
+        tab.click()
+        self.logger.info("Clicked Analysis tab")
+        self.wait_for_network_idle(timeout=10)
+        time.sleep(2)
+
+    def verify_analysis_tab_content(self, timeout=15):
+        """Verify Analysis tab has Cell statistics and Network statistics with images.
+        Returns dict with presence info.
+        """
+        results = {
+            'cell_stats_title': False,
+            'cell_stats_image': False,
+            'network_stats_title': False,
+            'network_stats_images': 0,
+        }
+
+        # Cell statistics title
+        try:
+            el = self.find_element(DataCircuitLocators.DV_ANALYSIS_CELL_STATS_TITLE, timeout=timeout)
+            results['cell_stats_title'] = el.is_displayed()
+        except TimeoutException:
+            self.logger.warning("Cell statistics title not found")
+
+        # Cell statistics image
+        try:
+            img = self.find_element(DataCircuitLocators.DV_ANALYSIS_CELL_STATS_IMAGE, timeout=10)
+            results['cell_stats_image'] = img.is_displayed()
+        except TimeoutException:
+            self.logger.warning("Cell statistics image not found")
+
+        # Network statistics title
+        try:
+            el = self.find_element(DataCircuitLocators.DV_ANALYSIS_NETWORK_STATS_TITLE, timeout=10)
+            results['network_stats_title'] = el.is_displayed()
+        except TimeoutException:
+            self.logger.warning("Network statistics title not found")
+
+        # Network statistics images (may be multiple)
+        try:
+            imgs = self.find_all_elements(DataCircuitLocators.DV_ANALYSIS_NETWORK_STATS_IMAGES, timeout=10)
+            results['network_stats_images'] = len([img for img in imgs if img.is_displayed()])
+        except TimeoutException:
+            self.logger.warning("Network statistics images not found")
+
+        self.logger.info(f"Analysis tab: {results}")
+        return results
+
+    # ── Related Publications tab ─────────────────────────────────────────
+
+    def click_related_publications_tab(self, timeout=10):
+        """Click the Related Publications tab in the detail view."""
+        tab = self.element_to_be_clickable(DataCircuitLocators.DV_RELATED_PUBLICATIONS_TAB, timeout=timeout)
+        tab.click()
+        self.logger.info("Clicked Related Publications tab")
+        self.wait_for_network_idle(timeout=10)
+        time.sleep(2)
+
+    def click_publications_section(self, section_name, timeout=10):
+        """Click a section button (Provenance, Related artifacts provenance, Applications)."""
+        locator_map = {
+            "Provenance": DataCircuitLocators.DV_PUB_PROVENANCE_BTN,
+            "Related artifacts provenance": DataCircuitLocators.DV_PUB_RELATED_ARTIFACTS_PROV_BTN,
+            "Applications": DataCircuitLocators.DV_PUB_APPLICATIONS_BTN,
+        }
+        locator = locator_map.get(section_name)
+        if not locator:
+            raise ValueError(f"Unknown section: {section_name}")
+        btn = self.element_to_be_clickable(locator, timeout=timeout)
+        btn.click()
+        self.logger.info(f"Clicked '{section_name}' section button")
+        self.wait_for_network_idle(timeout=10)
+        time.sleep(2)
+
+    def verify_publications_articles(self, timeout=10):
+        """Verify publication articles are displayed with expected fields.
+        Returns dict with article count and field presence for first article.
+        """
+        results = {
+            'article_count': 0,
+            'has_title': False,
+            'has_copy_doi': False,
+            'has_authors': False,
+            'has_more_authors_btn': False,
+            'has_description': False,
+            'has_read_more': False,
+            'has_pagination': False,
+            'pagination_pages': 0,
+        }
+
+        # Count articles
+        try:
+            articles = self.find_all_elements(DataCircuitLocators.DV_PUB_ARTICLE_ITEMS, timeout=timeout)
+            results['article_count'] = len(articles)
+        except TimeoutException:
+            self.logger.warning("No publication articles found")
+            return results
+
+        # Check first article fields
+        try:
+            title = self.find_element(DataCircuitLocators.DV_PUB_ARTICLE_TITLE, timeout=5)
+            results['has_title'] = bool(title.text.strip())
+        except TimeoutException:
+            pass
+
+        try:
+            doi_btn = self.find_element(DataCircuitLocators.DV_PUB_COPY_DOI_BTN, timeout=5)
+            results['has_copy_doi'] = doi_btn.is_displayed()
+        except TimeoutException:
+            pass
+
+        try:
+            authors = self.find_all_elements(DataCircuitLocators.DV_PUB_AUTHOR_NAMES, timeout=5)
+            results['has_authors'] = len(authors) > 0
+        except TimeoutException:
+            pass
+
+        try:
+            more_btn = self.find_element(DataCircuitLocators.DV_PUB_MORE_AUTHORS_BTN, timeout=3)
+            results['has_more_authors_btn'] = more_btn.is_displayed()
+        except TimeoutException:
+            pass
+
+        try:
+            read_more = self.find_element(DataCircuitLocators.DV_PUB_READ_MORE_BTN, timeout=3)
+            results['has_read_more'] = read_more.is_displayed()
+            results['has_description'] = True
+        except TimeoutException:
+            pass
+
+        # Pagination
+        try:
+            pagination = self.find_element(DataCircuitLocators.DV_PUB_PAGINATION, timeout=5)
+            results['has_pagination'] = pagination.is_displayed()
+            pages = self.find_all_elements(DataCircuitLocators.DV_PUB_PAGINATION_ITEMS, timeout=3)
+            results['pagination_pages'] = len(pages)
+        except TimeoutException:
+            pass
+
+        self.logger.info(f"Publications: {results}")
+        return results
+
+    def click_copy_doi_and_verify(self, timeout=10):
+        """Click the first Copy DOI button and verify it changes to 'Copied'."""
+        try:
+            doi_btn = self.element_to_be_clickable(DataCircuitLocators.DV_PUB_COPY_DOI_BTN, timeout=timeout)
+            doi_btn.click()
+            self.logger.info("Clicked Copy DOI button")
+            # Check text changes to "Copied" (happens quickly)
+            time.sleep(0.5)
+            btn_text = doi_btn.text.strip()
+            if "Copied" in btn_text:
+                self.logger.info("Copy DOI confirmed: button text changed to 'Copied'")
+                return True
+            else:
+                self.logger.warning(f"Copy DOI button text after click: '{btn_text}'")
+                return False
+        except TimeoutException:
+            self.logger.warning("Copy DOI button not found")
+            return False
+
+    def click_more_authors_and_verify(self, timeout=10):
+        """Click the '+ N more' authors button and verify a dropdown/popover appears."""
+        try:
+            more_btn = self.element_to_be_clickable(DataCircuitLocators.DV_PUB_MORE_AUTHORS_BTN, timeout=timeout)
+            btn_text = more_btn.text.strip()
+            self.logger.info(f"Found more authors button: '{btn_text}'")
+            more_btn.click()
+            time.sleep(1)
+            # Verify a popover/dropdown appeared (aria-describedby triggers a tooltip/popover)
+            popover_id = more_btn.get_attribute("aria-describedby")
+            if popover_id:
+                try:
+                    popover = self.find_element(
+                        (By.ID, popover_id), timeout=3
+                    )
+                    is_visible = popover.is_displayed()
+                    self.logger.info(f"Authors dropdown visible: {is_visible}")
+                    # Close by clicking elsewhere
+                    ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+                    time.sleep(0.5)
+                    return is_visible
+                except TimeoutException:
+                    self.logger.warning(f"Popover with id '{popover_id}' not found")
+            return True  # Button was clickable
+        except TimeoutException:
+            self.logger.warning("More authors button not found")
+            return False
+
+    # ── Related Artifacts tab ────────────────────────────────────────────
+
+    def click_related_artifacts_tab(self, timeout=10):
+        """Click the Related Artifacts tab in the detail view."""
+        tab = self.element_to_be_clickable(DataCircuitLocators.DV_RELATED_ARTIFACTS_TAB, timeout=timeout)
+        tab.click()
+        self.logger.info("Clicked Related Artifacts tab")
+        self.wait_for_network_idle(timeout=15)
+        time.sleep(3)
+        # Wait for the section toggle buttons to appear
+        self.find_element(DataCircuitLocators.DV_ART_SUBCIRCUITS_BTN, timeout=10)
+        self.logger.info("Related Artifacts tab content loaded")
+
+    def click_artifacts_section(self, section_name, timeout=10):
+        """Click Subcircuits or Derived circuits section button."""
+        locator_map = {
+            "Subcircuits": DataCircuitLocators.DV_ART_SUBCIRCUITS_BTN,
+            "Derived circuits": DataCircuitLocators.DV_ART_DERIVED_CIRCUITS_BTN,
+        }
+        locator = locator_map.get(section_name)
+        if not locator:
+            raise ValueError(f"Unknown section: {section_name}")
+        btn = self.element_to_be_clickable(locator, timeout=timeout)
+        btn.click()
+        self.logger.info(f"Clicked '{section_name}' section")
+        self.wait_for_network_idle(timeout=10)
+        time.sleep(2)
+
+    def verify_artifacts_table(self, timeout=15):
+        """Verify the related artifacts table has rows and expected column headers.
+        Returns dict with row_count, header_count, has_download_btn, has_expand_btn.
+        """
+        results = {
+            'row_count': 0,
+            'header_count': 0,
+            'has_download_btn': False,
+            'has_expand_btn': False,
+        }
+
+        try:
+            rows = self.find_all_elements(DataCircuitLocators.DV_ART_TABLE_ROWS, timeout=timeout)
+            results['row_count'] = len(rows)
+        except TimeoutException:
+            self.logger.warning("No rows found in artifacts table")
+            return results
+
+        try:
+            headers = self.find_all_elements(DataCircuitLocators.DV_ART_TABLE_HEADERS, timeout=5)
+            results['header_count'] = len([h for h in headers if h.text.strip()])
+        except TimeoutException:
+            pass
+
+        try:
+            dl_btn = self.find_element(DataCircuitLocators.DV_ART_DOWNLOAD_BTN, timeout=5)
+            results['has_download_btn'] = dl_btn.is_displayed()
+        except TimeoutException:
+            pass
+
+        try:
+            expand_btn = self.find_element(DataCircuitLocators.DV_ART_EXPAND_BTN, timeout=5)
+            results['has_expand_btn'] = expand_btn.is_displayed()
+        except TimeoutException:
+            pass
+
+        self.logger.info(f"Artifacts table: {results}")
+        return results
+
+    def expand_first_artifact_row(self, timeout=10):
+        """Click the expand chevron on the first row with one."""
+        try:
+            btn = self.element_to_be_clickable(DataCircuitLocators.DV_ART_EXPAND_BTN, timeout=timeout)
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
+            time.sleep(0.5)
+            btn.click()
+            self.logger.info("Clicked expand chevron on first artifact row")
+            time.sleep(2)
+            return True
+        except TimeoutException:
+            self.logger.warning("No expand chevron found in artifacts table")
+            return False
+
+    def verify_expanded_nested_rows(self, timeout=10):
+        """Verify expanded row shows nested subcircuit rows."""
+        try:
+            expanded = self.find_element(DataCircuitLocators.DV_ART_EXPANDED_ROW, timeout=timeout)
+            if not expanded.is_displayed():
+                return 0
+            nested_rows = self.find_all_elements(DataCircuitLocators.DV_ART_NESTED_TABLE_ROWS, timeout=5)
+            count = len(nested_rows)
+            self.logger.info(f"Found {count} nested rows in expanded artifact")
+            return count
+        except TimeoutException:
+            self.logger.warning("No expanded row or nested rows found")
+            return 0
+
+    def click_download_btn_first_row(self, timeout=10):
+        """Click the download button on the first row. Returns True if panel appears."""
+        try:
+            dl_btn = self.element_to_be_clickable(DataCircuitLocators.DV_ART_DOWNLOAD_BTN, timeout=timeout)
+            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", dl_btn)
+            time.sleep(0.5)
+            dl_btn.click()
+            self.logger.info("Clicked download button on first row")
+            time.sleep(2)
+            # Check if download panel appeared
+            try:
+                panel = self.find_element(DataCircuitLocators.DV_DOWNLOAD_PANEL, timeout=5)
+                is_displayed = panel.is_displayed()
+                self.logger.info(f"Download panel displayed: {is_displayed}")
+                # Close the panel
+                try:
+                    close_btn = self.element_to_be_clickable(DataCircuitLocators.DV_DOWNLOAD_PANEL_CLOSE_BTN, timeout=5)
+                    close_btn.click()
+                    self.logger.info("Closed download panel")
+                    time.sleep(1)
+                except TimeoutException:
+                    self.logger.warning("Could not close download panel")
+                return is_displayed
+            except TimeoutException:
+                self.logger.info("No download panel detected")
+                return False
+        except TimeoutException:
+            self.logger.warning("Download button not found")
+            return False

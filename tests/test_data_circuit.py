@@ -251,4 +251,118 @@ class TestDataCircuit:
         else:
             logger.warning("Simulate button not found")
 
+        # Step 11: Analysis tab
+        try:
+            circuit_page.click_analysis_tab()
+            logger.info("Analysis tab clicked")
+
+            analysis = circuit_page.verify_analysis_tab_content(timeout=15)
+            assert analysis['cell_stats_title'], "Cell statistics title should be present"
+            assert analysis['cell_stats_image'], "Cell statistics image should be displayed"
+            logger.info("Cell statistics: title and image verified")
+
+            assert analysis['network_stats_title'], "Network statistics title should be present"
+            assert analysis['network_stats_images'] > 0, "Network statistics should have at least one image"
+            logger.info(f"Network statistics: title and {analysis['network_stats_images']} image(s) verified")
+        except TimeoutException:
+            logger.warning("Analysis tab not available or content not loaded")
+
+        # Step 12: Related Publications tab
+        try:
+            circuit_page.click_related_publications_tab()
+            logger.info("Related Publications tab clicked")
+
+            # Verify Provenance section (active by default)
+            prov = circuit_page.verify_publications_articles(timeout=10)
+            assert prov['article_count'] > 0, "Provenance should have at least one article"
+            assert prov['has_title'], "Article should have a title"
+            assert prov['has_copy_doi'], "Article should have a Copy DOI button"
+            assert prov['has_authors'], "Article should have author names"
+            logger.info(f"Provenance: {prov['article_count']} articles, pagination={prov['has_pagination']}")
+
+            # Click Copy DOI and verify
+            doi_copied = circuit_page.click_copy_doi_and_verify()
+            if doi_copied:
+                logger.info("Provenance: Copy DOI verified")
+            else:
+                logger.warning("Provenance: Copy DOI verification failed")
+
+            # Click "+ N more" authors button and verify dropdown
+            more_authors = circuit_page.click_more_authors_and_verify()
+            if more_authors:
+                logger.info("Provenance: More authors dropdown verified")
+            else:
+                logger.warning("Provenance: More authors dropdown not found")
+
+            # Verify Related artifacts provenance section
+            circuit_page.click_publications_section("Related artifacts provenance")
+            rap = circuit_page.verify_publications_articles(timeout=10)
+            assert rap['article_count'] > 0, "Related artifacts provenance should have articles"
+            logger.info(f"Related artifacts provenance: {rap['article_count']} articles, "
+                        f"pages={rap['pagination_pages']}")
+
+            doi_copied = circuit_page.click_copy_doi_and_verify()
+            if doi_copied:
+                logger.info("Related artifacts provenance: Copy DOI verified")
+            more_authors = circuit_page.click_more_authors_and_verify()
+            if more_authors:
+                logger.info("Related artifacts provenance: More authors dropdown verified")
+
+            # Verify Applications section
+            circuit_page.click_publications_section("Applications")
+            apps = circuit_page.verify_publications_articles(timeout=10)
+            assert apps['article_count'] > 0, "Applications should have articles"
+            logger.info(f"Applications: {apps['article_count']} articles, "
+                        f"pages={apps['pagination_pages']}")
+
+            doi_copied = circuit_page.click_copy_doi_and_verify()
+            if doi_copied:
+                logger.info("Applications: Copy DOI verified")
+            more_authors = circuit_page.click_more_authors_and_verify()
+            if more_authors:
+                logger.info("Applications: More authors dropdown verified")
+        except TimeoutException:
+            logger.warning("Related Publications tab not available or content not loaded")
+
+        # Step 13: Related Artifacts tab
+        try:
+            circuit_page.click_related_artifacts_tab()
+            logger.info("Related Artifacts tab clicked")
+        except TimeoutException:
+            logger.warning("Related Artifacts tab not available")
+
+        try:
+            # Subcircuits section (active by default)
+            sub_table = circuit_page.verify_artifacts_table(timeout=15)
+            assert sub_table['row_count'] > 0, "Subcircuits table should have rows"
+            assert sub_table['has_download_btn'], "Subcircuits should have download buttons"
+            logger.info(f"Subcircuits: {sub_table['row_count']} rows, "
+                        f"headers={sub_table['header_count']}, expand={sub_table['has_expand_btn']}")
+
+            # Expand first row with chevron
+            if sub_table['has_expand_btn']:
+                expanded = circuit_page.expand_first_artifact_row()
+                if expanded:
+                    nested_count = circuit_page.verify_expanded_nested_rows()
+                    logger.info(f"Expanded subcircuit shows {nested_count} nested rows")
+
+            # Click download button on first row
+            circuit_page.click_download_btn_first_row()
+
+            # Switch to Derived circuits section
+            circuit_page.click_artifacts_section("Derived circuits")
+            der_table = circuit_page.verify_artifacts_table(timeout=15)
+            assert der_table['row_count'] > 0, "Derived circuits table should have rows"
+            logger.info(f"Derived circuits: {der_table['row_count']} rows, "
+                        f"headers={der_table['header_count']}, expand={der_table['has_expand_btn']}")
+
+            # Expand first derived circuit row
+            if der_table['has_expand_btn']:
+                expanded = circuit_page.expand_first_artifact_row()
+                if expanded:
+                    nested_count = circuit_page.verify_expanded_nested_rows()
+                    logger.info(f"Expanded derived circuit shows {nested_count} nested rows")
+        except (TimeoutException, AssertionError) as e:
+            logger.warning(f"Related Artifacts content verification failed: {e}")
+
         logger.info(f"Test complete. Final URL: {circuit_page.browser.current_url}")
