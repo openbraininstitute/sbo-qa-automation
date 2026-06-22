@@ -43,9 +43,8 @@ class TestProjectCredits:
         browser, wait, base_url, lab_id, project_id = login_direct_complete
 
         # Guard: only run on staging (Stripe test mode)
-        assert "staging" in base_url, (
-            f"This test must only run on staging (Stripe test keys). Got: {base_url}"
-        )
+        if "staging" not in base_url:
+            pytest.skip("Skipping: credits test only runs on staging (Stripe test keys)")
 
         credits_page = ProjectCreditsPage(browser, wait, logger, base_url)
 
