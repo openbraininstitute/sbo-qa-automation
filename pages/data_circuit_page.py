@@ -363,6 +363,7 @@ class DataCircuitPage(HomePage):
     def click_random_row(self):
         """Click a random row in the table to open the mini-detail view.
         Excludes known problematic rows.
+        Clicks on a cell within the row (not the <tr> itself) for reliable interaction.
         """
         EXCLUDED_ROWS = ["20211110-BioM"]
 
@@ -382,12 +383,22 @@ class DataCircuitPage(HomePage):
         row = random.choice(valid_rows)
         row_text = row.text.split('\n')[0][:60]
         self.logger.info(f"Clicking row: '{row_text}...'")
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+
+        # Click on a cell within the row (2nd td) for reliable click registration
+        try:
+            cell = row.find_element(By.CSS_SELECTOR, "td.ant-table-cell:nth-child(2)")
+        except Exception:
+            cell = row  # fallback to row if cell not found
+
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", cell)
         time.sleep(1)
         try:
-            ActionChains(self.browser).move_to_element(row).click().perform()
+            cell.click()
         except Exception:
-            self.browser.execute_script("arguments[0].click();", row)
+            try:
+                ActionChains(self.browser).move_to_element(cell).click().perform()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", cell)
         time.sleep(3)
         return row_text
 

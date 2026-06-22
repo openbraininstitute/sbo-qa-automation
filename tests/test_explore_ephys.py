@@ -257,6 +257,7 @@ class TestExploreEphys:
                     logger.info(f"✅ {field.replace('_', ' ').title()} field is present")
                 else:
                     logger.warning(f"⚠️ {field.replace('_', ' ').title()} field is missing")
+            explore_ephys_page.wait_for_network_idle(timeout=10)
             
             if field_results.get('license', {}).get('clickable'):
                 logger.info("✅ License link is clickable")

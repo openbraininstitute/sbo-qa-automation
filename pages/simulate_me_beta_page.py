@@ -948,40 +948,39 @@ class SimulateMeBetaPage(HomePage):
         # "Full Neuron Variable Modification" has 1 input; "Variable Modification
         # by Section List" has multiple (somatic, axonal, basal, apical).
         if selected_label:
-            try:
-                block = self.find_element(SimulateMeBetaLocators.CONFIG_BLOCK_SINGLE, timeout=5)
-                value_inputs = block.find_elements(
-                    *SimulateMeBetaLocators.BLOCK_VALUE_INPUT
-                )
-                for inp in value_inputs:
-                    # Read min/max from the input's HTML attributes
-                    min_attr = inp.get_attribute("min")
-                    max_attr = inp.get_attribute("max")
-                    
-                    # Calculate a safe value within [min, max]
-                    min_val = float(min_attr) if min_attr else 0
-                    max_val = float(max_attr) if max_attr else 100
-                    
-                    # Use midpoint or min if range is tiny
-                    if max_val > min_val:
-                        manip_value = round((min_val + max_val) / 2, 2)
-                    else:
-                        manip_value = min_val
-                    
-                    inp.click()
-                    inp.send_keys(Keys.COMMAND + "a")
-                    inp.send_keys(Keys.BACKSPACE)
-                    time.sleep(0.2)
-                    inp.send_keys(str(manip_value))
-                    time.sleep(0.3)
-                    self.logger.info(
-                        f"Filled input (min={min_attr}, max={max_attr}) with {manip_value}"
-                    )
+            block = self.find_element(SimulateMeBetaLocators.CONFIG_BLOCK_SINGLE, timeout=5)
+            value_inputs = block.find_elements(
+                *SimulateMeBetaLocators.BLOCK_VALUE_INPUT
+            )
+            if not value_inputs:
+                self.logger.warning("No value inputs found after variable selection")
+            for inp in value_inputs:
+                # Read min/max from the input's HTML attributes
+                min_attr = inp.get_attribute("min")
+                max_attr = inp.get_attribute("max")
+                
+                # Calculate a safe value within [min, max]
+                min_val = float(min_attr) if min_attr else 0
+                max_val = float(max_attr) if max_attr else 100
+                
+                # Use midpoint or min if range is tiny
+                if max_val > min_val:
+                    manip_value = round((min_val + max_val) / 2, 2)
+                else:
+                    manip_value = min_val
+                
+                inp.click()
+                inp.send_keys(Keys.COMMAND + "a")
+                inp.send_keys(Keys.BACKSPACE)
+                time.sleep(0.2)
+                inp.send_keys(str(manip_value))
+                time.sleep(0.3)
                 self.logger.info(
-                    f"Filled {len(value_inputs)} neuronal manipulation value input(s)"
+                    f"Filled input (min={min_attr}, max={max_attr}) with {manip_value}"
                 )
-            except Exception as e:
-                self.logger.warning(f"Could not fill manipulation value input: {e}")
+            self.logger.info(
+                f"Filled {len(value_inputs)} neuronal manipulation value input(s)"
+            )
 
         return selected_label
 
