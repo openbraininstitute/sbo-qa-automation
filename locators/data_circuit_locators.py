@@ -35,8 +35,10 @@ class DataCircuitLocators:
     TABLE_BODY = (By.CSS_SELECTOR, ".ant-table-body")
     TABLE_ROWS = (
         By.XPATH,
-        "(//tbody[contains(@class,'ant-table-tbody')]"
-        "//tr[contains(@class,'ant-table-row') and not(contains(@class,'ant-table-measure-row'))])[3]",
+        # "(//tbody[contains(@class,'ant-table-tbody')]"
+        # "//tr[contains(@class,'ant-table-row') and not(contains(@class,'ant-table-measure-row'))])[3]",
+        # "//td[contains(@class, 'ant-table-cell')]"
+        "//tr[contains(@class, 'ant-table-row')]"
     )
     TABLE_COLUMN_HEADERS = (
         By.XPATH,
