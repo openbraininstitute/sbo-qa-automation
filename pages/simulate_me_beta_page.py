@@ -871,6 +871,7 @@ class SimulateMeBetaPage(HomePage):
         #   1. Wait for groups to appear, click a random group button to expand it
         #   2. Click a random select-item (variable) inside the expanded group
         selected_label = None
+        valid_groups = []
 
         # Step 1: wait for channel groups, click one to expand
         for wait_round in range(10):
@@ -879,11 +880,23 @@ class SimulateMeBetaPage(HomePage):
             )
             visible_groups = [g for g in groups if g.is_displayed() and g.text.strip()]
             if visible_groups:
-                chosen_group = random.choice(visible_groups)
+                # Filter out groups labeled "unknown" — these are invalid channels
+                valid_groups = [
+                    g for g in visible_groups
+                    if "unknown" not in g.text.strip().lower()
+                ]
+                if not valid_groups:
+                    self.logger.warning(
+                        "All visible channel groups are 'unknown' — cannot select a variable"
+                    )
+                    break
+
+                chosen_group = random.choice(valid_groups)
                 group_btn = chosen_group.find_element(*SimulateMeBetaLocators.SELECT_GROUP_BUTTON)
                 group_name = group_btn.text.strip().split('\n')[0]
                 self.logger.info(
-                    f"Found {len(visible_groups)} channel group(s) after ~{wait_round + 2}s, "
+                    f"Found {len(valid_groups)} valid channel group(s) "
+                    f"(excluded {len(visible_groups) - len(valid_groups)} 'unknown'), "
                     f"clicking '{group_name}'"
                 )
                 self.browser.execute_script(
@@ -903,7 +916,7 @@ class SimulateMeBetaPage(HomePage):
             time.sleep(1)
 
         # Step 2: find and click a variable item inside the expanded group
-        if visible_groups:
+        if visible_groups and valid_groups:
             for item_round in range(5):
                 items = self.browser.find_elements(
                     *SimulateMeBetaLocators.SELECT_ITEM
