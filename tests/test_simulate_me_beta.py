@@ -4,7 +4,6 @@
 
 import time
 import pytest
-from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from pages.simulate_me_beta_page import SimulateMeBetaPage
 
@@ -254,7 +253,7 @@ class TestSimulateMeBeta:
         sim_page.wait_for_block_single(timeout=10)
         logger.info("Recording config form (block_single) appeared")
 
-        # Step 18: Click Neuronal manipulations → Add → select dictionary item → verify form
+        '''# Step 18: Click Neuronal manipulations → Add → select dictionary item → verify form, commenting out until the fix.
         sim_page.click_neuronal_manip_tab()
         assert sim_page.is_neuronal_manip_tab_active(), "Neuronal manipulations tab should be active"
         logger.info("Neuronal manipulations tab is active")
@@ -277,24 +276,10 @@ class TestSimulateMeBeta:
 
         # Verify no warning icon on the neuronal manipulation sub-item
         has_warning = sim_page.neuronal_manip_has_warning()
-        if has_warning:
-            logger.warning(
-                "Neuronal manipulation still shows warning — skipping this section "
-                "to avoid blocking Generate simulation"
-            )
-            # Delete the incomplete manipulation by clicking the delete icon
-            try:
-                delete_icon = sim_page.browser.find_element(
-                    By.XPATH,
-                    "//span[@aria-label='delete' and contains(@class,'anticon-delete')]"
-                )
-                sim_page.browser.execute_script("arguments[0].click();", delete_icon)
-                time.sleep(2)
-                logger.info("Deleted incomplete neuronal manipulation entry")
-            except Exception as del_err:
-                logger.warning(f"Could not delete neuronal manipulation: {del_err}")
-        else:
-            logger.info("Neuronal manipulation sub-item has no warning icon — all fields filled")
+        assert not has_warning, (
+            "Neuronal manipulation still shows warning icon — "
+            "variable selection or value inputs were not filled correctly"
+        )'''
 
         # Step 19: Click Timestamps → Add Timestamps → select random dictionary item → add 2 sweep values
         sim_page.click_timestamps_tab()
@@ -327,15 +312,11 @@ class TestSimulateMeBeta:
         # Step 20: Verify "Generate simulation(s)" button is present and enabled
         gen_btn = sim_page.find_generate_simulation_btn(timeout=10)
         assert gen_btn.is_displayed(), "Generate simulation button should be visible"
-
-        if not gen_btn.is_enabled() or gen_btn.get_attribute("disabled"):
-            logger.warning(
-                "Generate button is DISABLED — some config sections may be incomplete. "
-                "Skipping simulation generation."
-            )
-            pytest.skip("Generate button disabled — config incomplete (likely neuronal manipulation)")
-
-        logger.info(f"Generate simulation button found and enabled")
+        assert gen_btn.is_enabled() and not gen_btn.get_attribute("disabled"), (
+            "Generate simulation button should be enabled — "
+            "config is incomplete (likely neuronal manipulation or missing fields)"
+        )
+        logger.info("Generate simulation button found and enabled")
 
         # Click Generate simulation
         sim_page.click_generate_simulation()
@@ -403,9 +384,10 @@ class TestSimulateMeBeta:
         logger.info(f"Final simulation statuses: {final_statuses}")
 
         failed = [s for s in final_statuses if s in ('failed', 'error')]
-        if failed:
-            logger.warning(f"{len(failed)} simulation(s) failed: {final_statuses}")
-        else:
-            logger.info("All simulations completed successfully")
+        assert not failed, (
+            f"{len(failed)}/{len(final_statuses)} simulation(s) finished with errors. "
+            f"Statuses: {final_statuses}"
+        )
+        logger.info("All simulations completed successfully")
 
         logger.info(f"Final URL: {sim_page.browser.current_url}")

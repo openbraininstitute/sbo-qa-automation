@@ -153,9 +153,9 @@ class ExploreSynaptomeDataPage(ExplorePage):
         """Find Overview tab in detail view"""
         return self.find_element(ExploreSynaptomePageLocators.DV_OVERVIEW_TAB)
 
-    def find_dv_configuration_tab(self):
+    def find_dv_configuration_tab(self, timeout=10):
         """Find Configuration tab in detail view"""
-        return self.find_element(ExploreSynaptomePageLocators.DV_CONFIGURATION_TAB)
+        return self.find_element(ExploreSynaptomePageLocators.DV_CONFIGURATION_TAB, timeout=timeout)
 
     def find_dv_config_tab_name_label(self):
         return self.find_element(ExploreSynaptomePageLocators.DV_CONFIG_TAB_NAME_LABEL)

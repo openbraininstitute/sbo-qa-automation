@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import time
+from asyncio import timeout
+
 import pytest
 from selenium.common import ElementClickInterceptedException, StaleElementReferenceException
 from selenium.webdriver import Keys
@@ -205,7 +207,7 @@ class TestExploreSynaptomePage:
         logger.info("Detail view overview tab is found")
 
         # Click on Configuration tab
-        dv_config_tab = explore_synaptome.find_dv_configuration_tab()
+        dv_config_tab = explore_synaptome.find_dv_configuration_tab(timeout=10)
         dv_config_tab.click()
         logger.info("Configuration tab is clicked")
         time.sleep(2)
