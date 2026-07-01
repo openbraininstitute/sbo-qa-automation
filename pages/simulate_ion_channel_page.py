@@ -1366,3 +1366,11 @@ class SimulateIonChannelPage(HomePage):
             return el.is_displayed()
         except TimeoutException:
             return False
+
+    def is_generate_button_enabled(self, timeout=5):
+        """Check if the Generate simulation button is enabled (not disabled)."""
+        try:
+            btn = self.find_element(Loc.GENERATE_SIMULATION_BTN, timeout=timeout)
+            return btn.get_attribute("disabled") is None
+        except Exception:
+            return False

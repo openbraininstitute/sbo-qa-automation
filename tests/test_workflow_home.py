@@ -7,7 +7,6 @@ import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from pages.workflows_page import WorkflowsPage
-from locators.workflow_locators import WorkflowLocators
 
 
 class TestWorkflowHome:
@@ -80,21 +79,8 @@ class TestWorkflowHome:
             
             # Scroll carousel BEFORE verifying buttons
             logger.info("🔍 Scrolling horizontally to find all cards...")
-            try:
-                # Find the carousel container
-                carousel = workflows_page.find_element(WorkflowLocators.TYPE_CAROUSEL, timeout=5)
-                
-                # Scroll right to reveal more cards
-                for i in range(3):  # Try scrolling a few times
-                    browser.execute_script("arguments[0].scrollLeft += 300;", carousel)
-                    time.sleep(0.5)
-                    logger.info(f"Scrolled right (attempt {i+1})")
-                
-                # Wait for cards to settle after scrolling
-                time.sleep(2)
-                
-            except Exception as e:
-                logger.warning(f"Could not scroll carousel: {e}")
+            workflows_page.scroll_carousel_right()
+            time.sleep(2)
             
             # 5. Find and verify Simulate type cards
             logger.info("🔍 Verifying Simulate type cards...")
@@ -135,7 +121,7 @@ class TestWorkflowHome:
                 logger.warning("⚠️ No beta cards found - checking page structure...")
                 try:
                     # Find all cards on the page
-                    all_cards = workflows_page.find_all_elements(WorkflowLocators.ALL_TYPE_CARDS)
+                    all_cards = workflows_page.find_all_type_cards()
                     logger.info(f"Found {len(all_cards)} total cards on page")
                     
                     # Log card titles

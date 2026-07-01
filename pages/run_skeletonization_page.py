@@ -172,7 +172,7 @@ class RunSkeletonizationPage(HomePage):
         time.sleep(1)
 
     def verify_mini_detail_contents(self):
-        """Verify mini-detail includes name, description, metadata, buttons.
+        """Verify mini-detail includes name, description, metadata, View details button.
         Returns dict of presence checks.
         """
         results = {}
@@ -201,12 +201,6 @@ class RunSkeletonizationPage(HomePage):
             results['view_details_btn'] = {'present': False}
 
         try:
-            self.find_element(Loc.MINI_DETAIL_USE_MODEL_BTN, timeout=5)
-            results['use_model_btn'] = {'present': True}
-        except TimeoutException:
-            results['use_model_btn'] = {'present': False}
-
-        try:
             self.find_element(Loc.MINI_DETAIL_CLOSE_BTN, timeout=5)
             results['close_btn'] = {'present': True}
         except TimeoutException:
@@ -214,14 +208,45 @@ class RunSkeletonizationPage(HomePage):
 
         return results
 
-    def click_use_model(self):
-        btn = self.find_element(Loc.MINI_DETAIL_USE_MODEL_BTN, timeout=10)
-        self.logger.info(f"Clicking 'Use model'")
+    def tick_row_checkboxes(self, count=2):
+        """Tick the specified number of row checkboxes. Returns the number actually ticked."""
+        checkboxes = self.find_all_elements(Loc.TABLE_ROW_CHECKBOXES, timeout=10)
+        if not checkboxes:
+            raise RuntimeError("No row checkboxes found in the table")
+
+        ticked = 0
+        for checkbox in checkboxes[:count]:
+            try:
+                self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", checkbox)
+                time.sleep(0.5)
+                checkbox.click()
+                ticked += 1
+                time.sleep(0.5)
+            except Exception as e:
+                self.logger.warning(f"Could not tick checkbox: {e}")
+        return ticked
+
+    def click_use_selection(self, timeout=10):
+        """Click the 'Use selection (N)' button after selecting rows."""
+        btn = self.element_to_be_clickable(Loc.USE_SELECTION_BTN, timeout=timeout)
+        btn_text = btn.text.strip()
+        self.logger.info(f"Clicking '{btn_text}'")
         try:
             btn.click()
         except Exception:
             self.browser.execute_script("arguments[0].click();", btn)
         time.sleep(5)
+
+    def get_use_selection_count(self, timeout=5):
+        """Get the count shown on the Use selection button (e.g., 2 from 'Use selection (2)')."""
+        try:
+            btn = self.find_element(Loc.USE_SELECTION_BTN, timeout=timeout)
+            text = btn.text.strip()
+            import re
+            match = re.search(r'\((\d+)\)', text)
+            return int(match.group(1)) if match else 0
+        except Exception:
+            return 0
 
     # ── Config page ──────────────────────────────────────────────────────
 
@@ -357,22 +382,15 @@ class RunSkeletonizationPage(HomePage):
         return results
 
     def get_em_cell_mesh_values(self):
-        """Return dict with 'id' and 'name' values for EM cell mesh field."""
-        result = {'id': '', 'name': ''}
+        """Return dict with mesh card names for the multi-selection EM cell mesh field."""
+        result = {'names': [], 'count': 0}
         try:
-            id_el = self.find_element(Loc.INIT_EM_CELL_MESH_ID, timeout=10)
-            # The ID is in the data-testid attribute (contains entity ID)
-            test_id = id_el.get_attribute("data-testid") or ""
-            # Extract ID from data-testid="model-identifier-entity-<uuid>"
-            result['id'] = test_id.replace("model-identifier-entity-", "").strip()
+            name_elements = self.find_all_elements(Loc.INIT_EM_CELL_MESH_NAMES, timeout=10)
+            result['names'] = [el.text.strip() for el in name_elements if el.text.strip()]
+            result['count'] = len(result['names'])
+            self.logger.info(f"EM cell mesh — {result['count']} selected: {result['names']}")
         except TimeoutException:
-            self.logger.warning("EM cell mesh ID element not found")
-        try:
-            name_el = self.find_element(Loc.INIT_EM_CELL_MESH_NAME, timeout=10)
-            result['name'] = name_el.text.strip()
-        except TimeoutException:
-            self.logger.warning("EM cell mesh name element not found")
-        self.logger.info(f"EM cell mesh — ID: '{result['id']}', Name: '{result['name']}'")
+            self.logger.warning("EM cell mesh cards not found")
         return result
 
     def get_neuron_voxel_size_value(self):

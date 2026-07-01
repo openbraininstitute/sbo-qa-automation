@@ -4,9 +4,7 @@
 
 import time
 import pytest
-from selenium.webdriver.common.by import By
 
-from locators.landing_locators import LandingLocators
 from pages.landing_page import LandingPage
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -98,8 +96,8 @@ class TestLanding:
         assert video_title.is_displayed(), "The video title is not displayed."
         logger.info("Looking for video title 1")
 
-        video_container = landing_page.browser.find_element(*LandingLocators.VIDEO_CONTAINER)
-        landing_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", video_container)
+        video_container = landing_page.find_video_container()
+        landing_page.scroll_to_element(video_container)
         time.sleep(2)  # Let layout settle
 
         video_play_btn = landing_page.digital_brains_play_btn(timeout=10)
@@ -108,7 +106,7 @@ class TestLanding:
         logger.info("Clicked on play btn")
 
         logger.info("Video play button is clicked")
-        landing_page.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", video_container)
+        landing_page.scroll_to_element(video_container)
         actions = ActionChains(landing_page.browser)
         actions.move_to_element(video_container).perform()
 
@@ -253,7 +251,7 @@ class TestLanding:
         logger.info("✅ Landing Page loaded for navbar dropdown test.")
 
         # Scroll to top so the navbar is fully visible
-        browser.execute_script("window.scrollTo(0, 0);")
+        landing_page.scroll_to_top()
         time.sleep(1)
 
         # ── About dropdown ──────────────────────────────────────────
@@ -325,7 +323,7 @@ class TestLanding:
 
         # ── About dropdown items ────────────────────────────────────
         for label, (expected_path, finder) in about_submenu_items.items():
-            browser.execute_script("window.scrollTo(0, 0);")
+            landing_page.scroll_to_top()
             time.sleep(0.5)
 
             landing_page.click_about_dropdown()
@@ -347,7 +345,7 @@ class TestLanding:
 
         # ── The Platform dropdown items ─────────────────────────────
         for label, (expected_path, finder) in platform_submenu_items.items():
-            browser.execute_script("window.scrollTo(0, 0);")
+            landing_page.scroll_to_top()
             time.sleep(0.5)
 
             landing_page.click_platform_dropdown()

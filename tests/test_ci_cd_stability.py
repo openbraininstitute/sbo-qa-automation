@@ -2,6 +2,7 @@
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import pytest
 import time
 from selenium.common import TimeoutException
@@ -172,4 +173,3 @@ class TestCICDStability:
             landing_page.browser.save_screenshot("/tmp/interaction_failure.png")
             raise
 
-import os

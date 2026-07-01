@@ -275,3 +275,109 @@ class ExplorePage(HomePage):
             else:
                 self.logger.warning(f"  {name}: total is 0 or not found")
         return results
+
+    def verify_experimental_data_sections(self, timeout=5):
+        """Verify all experimental data type sections are present and displayed.
+        Returns tuple (missing_locators, not_displayed) for assertion.
+        """
+        exp_data_locators = [
+            ExplorePageLocators.NEURON_MORPHOLOGY,
+            ExplorePageLocators.NEURON_ELECTROPHYSIOLOGY,
+            ExplorePageLocators.NEURON_DENSITY,
+            ExplorePageLocators.BOUTON_DENSITY,
+            ExplorePageLocators.SYNAPSE_PER_CONNECTION,
+            ExplorePageLocators.ION_CHANNEL_EPHYS,
+        ]
+        missing_locators = []
+        not_displayed = []
+
+        for locator in exp_data_locators:
+            try:
+                elements = self.find_all_elements(locator, timeout=timeout)
+                if not elements:
+                    missing_locators.append(locator)
+                    continue
+                for element in elements:
+                    if not element.is_displayed():
+                        label = (
+                            element.text.strip()
+                            or element.get_attribute("aria-label")
+                            or element.get_attribute("title")
+                            or f"<no text> tag={element.tag_name}"
+                        )
+                        not_displayed.append(f"{locator} (label='{label}')")
+            except Exception:
+                missing_locators.append(locator)
+
+        return missing_locators, not_displayed
+
+    def verify_explore_page_tab_buttons(self, timeout=15):
+        """Verify Experimental, Model, and Simulations tab buttons are displayed.
+        Returns list of found elements.
+        """
+        tab_locators = [
+            ExplorePageLocators.EXPERIMENTAL_DATA_BTN,
+            ExplorePageLocators.MODEL_DATA_BTN,
+            ExplorePageLocators.SIMULATIONS_BTN,
+        ]
+        return self.find_explore_page_titles(tab_locators, timeout=timeout)
+
+    def verify_model_data_sections(self, timeout=5):
+        """Verify all model data sections are present and displayed.
+        Returns tuple (missing_locators, not_displayed) for assertion.
+        """
+        model_data_locators = [
+            ExplorePageLocators.PANEL_EMODEL,
+            ExplorePageLocators.PANEL_CIRCUIT,
+            ExplorePageLocators.PANEL_MEMODEL,
+            ExplorePageLocators.PANEL_SYNAPTOME,
+            ExplorePageLocators.PANEL_SYNAPTOME_BETA,
+            ExplorePageLocators.PANEL_ION_CHANNEL_MODEL_BETA,
+        ]
+        missing_locators = []
+        not_displayed = []
+
+        for locator in model_data_locators:
+            try:
+                elements = self.find_all_elements(locator, timeout=timeout)
+                if not elements:
+                    missing_locators.append(locator)
+                    continue
+                for element in elements:
+                    if not element.is_displayed():
+                        text = element.text.strip()
+                        not_displayed.append(f"{locator} (text='{text}')")
+            except Exception:
+                missing_locators.append(locator)
+
+        return missing_locators, not_displayed
+
+    def get_local_storage_species_info(self):
+        """Dump localStorage keys related to species/brain/region for debugging."""
+        info = {}
+        try:
+            ls_keys = self.browser.execute_script("return Object.keys(localStorage)")
+            for key in ls_keys:
+                if 'species' in key.lower() or 'brain' in key.lower() or 'region' in key.lower():
+                    val = self.browser.execute_script(f"return localStorage.getItem('{key}')")
+                    info[key] = val
+        except Exception:
+            pass
+        return info
+
+    def get_slow_network_resources(self, min_duration_ms=2000, max_entries=10):
+        """Get slow network resources from Performance API for debugging."""
+        try:
+            return self.browser.execute_script(f"""
+                return performance.getEntriesByType('resource')
+                    .filter(e => e.duration > {min_duration_ms})
+                    .map(e => {{
+                        const url = new URL(e.name);
+                        const path = url.pathname.length > 60 ? '...' + url.pathname.slice(-60) : url.pathname;
+                        return {{ name: path, duration: Math.round(e.duration), type: e.initiatorType }};
+                    }})
+                    .sort((a, b) => b.duration - a.duration)
+                    .slice(0, {max_entries});
+            """)
+        except Exception:
+            return []

@@ -13,13 +13,14 @@ class TestRunSkeletonization:
     Flow:
     1.  Workflows → Process Data → EM mesh skeletonization → model picker
     2.  Public tab → verify rows → navigate random page → click random row
-    3.  Mini-detail: verify name, description, metadata, buttons → Use model
-    4.  Config page: verify Configuration tab active, Info tab active
-    5.  Info tab: fill Campaign name (datestamp) + Campaign description ("automated test")
-    6.  Initialization tab: verify EM cell mesh not empty, voxel sizes filled, checkbox ticked
-    7.  Click Generate skeletonization(s) → Skeletonizations tab active
-    8.  Verify cards with "Created" badge, input files, JSON preview
-    9.  Click Launch skeletonizations → poll status until terminal (300s)
+    3.  Mini-detail: verify name, description, metadata, View details button
+    4.  Select 2 rows via checkboxes → click "Use selection (2)"
+    5.  Config page: verify Configuration tab active, Info tab active
+    6.  Info tab: fill Campaign name (datestamp) + Campaign description ("automated test")
+    7.  Initialization tab: verify EM cell mesh not empty, voxel sizes filled, checkbox ticked
+    8.  Click Generate skeletonization(s) → Skeletonizations tab active
+    9.  Verify cards with "Created" badge, input files, JSON preview
+    10. Click Launch skeletonizations → poll status until terminal (300s)
     """
 
     def _get_page(self, setup, logger):
@@ -50,11 +51,11 @@ class TestRunSkeletonization:
         else:
             logger.warning(f"Pagination has only {page_count} page(s), skipping random navigation")
 
-        # Step 4: Click random row
+        # Step 4: Click a row to verify mini-detail
         row_text = page.click_random_row()
         logger.info(f"Clicked row: '{row_text}'")
 
-        # Step 5: Mini-detail: verify contents
+        # Step 5: Mini-detail: verify contents (now only has "View details" button)
         page.wait_for_mini_detail()
         detail = page.verify_mini_detail_contents()
         assert detail['title']['present'], "Mini-detail title should be present"
@@ -64,12 +65,20 @@ class TestRunSkeletonization:
             logger.warning("Mini-detail description not found")
         if detail.get('metadata', {}).get('present'):
             logger.info("Mini-detail metadata section present")
-        if detail.get('use_model_btn', {}).get('present'):
-            logger.info("Mini-detail 'Use model' button present")
+        if detail.get('view_details_btn', {}).get('present'):
+            logger.info("Mini-detail 'View details' button present")
 
-        # Step 6: Click Use model → config page
-        page.click_use_model()
-        logger.info(f"After Use model, URL: {page.browser.current_url}")
+        # Step 6: Select 2 rows via checkboxes and click "Use selection"
+        ticked = page.tick_row_checkboxes(count=2)
+        assert ticked == 2, f"Expected to tick 2 checkboxes, ticked {ticked}"
+        logger.info(f"Ticked {ticked} row checkboxes")
+
+        selection_count = page.get_use_selection_count()
+        assert selection_count == 2, f"Use selection button should show (2), got ({selection_count})"
+        logger.info(f"Use selection button shows count: {selection_count}")
+
+        page.click_use_selection()
+        logger.info(f"After Use selection, URL: {page.browser.current_url}")
 
         # Step 7: Wait for config page, verify Configuration tab active
         page.wait_for_config_page(timeout=30)
@@ -114,11 +123,11 @@ class TestRunSkeletonization:
         if init_info['description']:
             logger.info("Initialization description present: 'Parameters for initializing the skeletonization'")
 
-        # Step 12: Verify EM cell mesh fields are not empty
+        # Step 12: Verify EM cell mesh selections are present
         mesh_values = page.get_em_cell_mesh_values()
-        assert mesh_values['id'] or mesh_values['name'], \
-            "EM cell mesh should have at least ID or name pre-filled"
-        logger.info(f"EM cell mesh — ID: '{mesh_values['id']}', Name: '{mesh_values['name']}'")
+        assert mesh_values['count'] >= 2, \
+            f"Expected at least 2 EM cell meshes selected, got {mesh_values['count']}"
+        logger.info(f"EM cell mesh — {mesh_values['count']} selected: {mesh_values['names']}")
 
         # Step 13: Verify Neuron voxel size is filled
         neuron_voxel = page.get_neuron_voxel_size_value()

@@ -5,9 +5,7 @@ import re
 import time
 
 from selenium.common import TimeoutException
-from selenium.webdriver.support.wait import WebDriverWait
 
-from locators.about_locators import AboutLocators
 from pages.about_page import AboutPage
 
 class TestAbout:
@@ -30,20 +28,11 @@ class TestAbout:
         logger.info("Hero video has loaded successfully")
 
 
-        title_paragraphs = [
-            (AboutLocators.TITLE1, AboutLocators.PARAGRAPH1),
-            (AboutLocators.TITLE2, AboutLocators.PARAGRAPH2),
-            (AboutLocators.TITLE3, AboutLocators.PARAGRAPH3),
-            (AboutLocators.TITLE4, AboutLocators.PARAGRAPH4),
-            (AboutLocators.TITLE5, AboutLocators.PARAGRAPH5),
-        ]
+        title_paragraphs = about_page.get_title_paragraph_pairs()
 
-        for title_locator, parag_locator in title_paragraphs:
-            title_ele = about_page.get_element(title_locator)
-            parag_ele = about_page.get_element(parag_locator)
-
-            assert title_ele.is_displayed(), f"Title is not displayed: {title_locator}"
-            assert parag_ele.text.strip(), f"Paragraph is not displayed: {parag_locator}"
+        for title_ele, parag_ele in title_paragraphs:
+            assert title_ele.is_displayed(), f"Title is not displayed"
+            assert parag_ele.text.strip(), f"Paragraph is not displayed"
             logger.info(f"Title displayed: {title_ele.text}")
             logger.info(f"Paragraph with text is displayed.")
 
@@ -84,10 +73,6 @@ class TestAbout:
         assert contributors_list.is_displayed(), "Contributors' list is not found"
         logger.info("Contributors' list is displayed.")
 
-        about_page.browser.save_screenshot("before_click_b_btn.png")
-        with open("before_click_b_btn.html", "w", encoding="utf-8") as f:
-            f.write(about_page.browser.page_source)
-
         b_btn = about_page.click_b_btn(timeout=20)
         logger.info("The B button is clicked to select contributors")
 
@@ -99,7 +84,7 @@ class TestAbout:
         logger.info(f"Initial number of B contributors: {initial_count}")
 
         load_more_column = about_page.find_load_more_column(timeout=10)
-        browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", load_more_column)
+        about_page.scroll_to_element(load_more_column)
         logger.info("Scrolling to view load_more_column")
         assert load_more_column.is_displayed(), f"{load_more_column} is not displayed"
         logger.info("Found holder for 'Load more column'")
@@ -132,40 +117,18 @@ class TestAbout:
         assert not failures, f"These contributors do not have last names starting with B: {failures}"
 
 
-        image_locators = [
-            AboutLocators.IMG1,
-            AboutLocators.IMG2,
-            AboutLocators.IMG3,
-            AboutLocators.IMG4,
-            AboutLocators.IMG5,
-            AboutLocators.IMG6,
-            AboutLocators.IMG7,
-            AboutLocators.IMG8,
-            AboutLocators.IMG_HERO,
-            AboutLocators.IMG_BACKGROUND
-
-        ]
-        failures = []
-        for locator in image_locators:
-            img = about_page.get_image(locator)
-            try:
-                browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", img)
-                time.sleep(1)
-                about_page.wait_for_card_image_to_load(img)
-            except TimeoutException:
-                failures.append(locator)
-
+        failures = about_page.verify_all_page_images(timeout=20)
         assert not failures, f"These images are not visible: {failures}"
         logger.info("The main hero, background and all Portals images are displayed.")
 
         social_images = about_page.find_all_social_images()
         for img in social_images:
-            browser.execute_script("arguments[0].scrollIntoView();", img)
+            about_page.scroll_to_element(img)
         assert len(social_images) == 5, f"Expected 5 social images, but found {len(social_images)}"
 
         not_displayed = []
         for img in social_images:
-            browser.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", img)
+            about_page.scroll_to_element(img)
 
             try:
                 about_page.wait_for_card_image_to_load(img)

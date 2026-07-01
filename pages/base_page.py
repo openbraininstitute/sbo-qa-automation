@@ -254,6 +254,14 @@ class CustomBasePage:
         el.click()
         return el
 
+    def scroll_to_element(self, element):
+        """Scroll element into center of viewport."""
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+
+    def scroll_to_top(self):
+        """Scroll the page to the top."""
+        self.browser.execute_script("window.scrollTo(0, 0);")
+
     def wait_and_click(self, by_locator, timeout=20):
         """Wait until element is visible and enabled, then click (with JS fallback)."""
         try:

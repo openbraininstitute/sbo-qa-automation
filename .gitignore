@@ -21,6 +21,7 @@ container_venv/
 tests/container_venv
 podman
 venv/
+.venv/
 
 # Debug artifacts from failed clicks/tests
 before_click_*.html
@@ -29,6 +30,7 @@ error_wait_and_click_*.png
 error_wait_and_click_*.html
 staging_login_fail_*.png
 login_click_failed_*.png
+generate_btn_disabled.png
 
 # Spec files (local only, used for test generation)
 specs/*.txt
