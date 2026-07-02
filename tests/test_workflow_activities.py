@@ -55,9 +55,7 @@ class TestWorkflowActivities:
             logger.info("✅ All required table columns verified")
         else:
             logger.info("ℹ️ No activities table (no activities yet)")
-    
-        time.sleep(100)
-    
+
     @pytest.mark.workflow
     @pytest.mark.activities
     def test_build_category_types(self, setup, login, logger, test_config):

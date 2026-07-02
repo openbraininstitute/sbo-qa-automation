@@ -292,21 +292,11 @@ class TestSimulateIonChannel:
 
         # ── Step 36: Generate simulation(s) ─────────────────────────────
         # Verify the button is enabled (all required fields filled)
-        from locators.simulate_ion_channel_locators import SimulateIonChannelLocators as Loc
-        try:
-            gen_btn = page.find_element(Loc.GENERATE_SIMULATION_BTN, timeout=5)
-            is_disabled = gen_btn.get_attribute("disabled")
-            if is_disabled:
-                logger.warning(
-                    "Generate button is DISABLED — Initialization may be incomplete. "
-                    "Check sweep values were added correctly."
-                )
-                try:
-                    page.browser.save_screenshot("generate_btn_disabled.png")
-                except Exception:
-                    pass
-        except Exception:
-            pass
+        if not page.is_generate_button_enabled():
+            logger.warning(
+                "Generate button is DISABLED — Initialization may be incomplete. "
+                "Check sweep values were added correctly."
+            )
 
         page.click_generate_simulation()
         logger.info("Clicked Generate simulation(s)")

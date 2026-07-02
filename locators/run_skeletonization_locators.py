@@ -59,18 +59,29 @@ class RunSkeletonizationLocators:
     )
     MINI_DETAIL_VIEW_DETAILS_BTN = (
         By.XPATH,
-        "//*[@data-testid='mini-viewer']//a[contains(text(),'View details') or @title='View details']"
+        "//*[@data-testid='mini-viewer']//a[contains(text(),'View details') or @title='Go to details page']"
         " | //*[@data-testid='mini-viewer']//button[contains(text(),'View details')]"
-    )
-    MINI_DETAIL_USE_MODEL_BTN = (
-        By.XPATH,
-        "//*[@data-testid='mini-viewer']//a[@title='Use model' or contains(text(),'Use model')]"
-        " | //*[@data-testid='mini-viewer']//button[contains(text(),'Use model')]"
     )
     MINI_DETAIL_CLOSE_BTN = (
         By.XPATH,
         "//*[@data-testid='mini-viewer']//button[contains(@aria-label,'close') or contains(@class,'close')]"
         " | //*[@data-testid='mini-viewer']//button[.//span[contains(@class,'anticon-close')]]"
+    )
+
+    """Table row checkboxes for multi-selection."""
+    TABLE_ROW_CHECKBOXES = (
+        By.CSS_SELECTOR,
+        "td.ant-table-selection-column .ant-checkbox-input"
+    )
+    TABLE_ROW_CHECKBOX_WRAPPERS = (
+        By.CSS_SELECTOR,
+        "td.ant-table-selection-column .ant-checkbox-wrapper"
+    )
+
+    """Use selection button (appears after selecting rows via checkboxes)."""
+    USE_SELECTION_BTN = (
+        By.CSS_SELECTOR,
+        "#workflow-browse-use-selection button"
     )
 
     """Config page layout and top-level tabs (Configuration / Skeletonizations)."""
@@ -127,8 +138,7 @@ class RunSkeletonizationLocators:
     """Initialization section: title and description."""
     INIT_TITLE = (
         By.XPATH,
-        "//div[contains(@class,'font-semibold') or contains(@class,'text-primary')]"
-        "[contains(translate(text(),'INFO','info'),'info')]"
+        "//div[contains(@class,'uppercase') and contains(translate(text(),'INITIALIZATION','initialization'),'initialization')]"
     )
     INIT_DESCRIPTION = (
         By.XPATH,
@@ -136,15 +146,13 @@ class RunSkeletonizationLocators:
     )
 
     """Initialization fields."""
-    INIT_EM_CELL_MESH_ID = (
-        By.XPATH,
-        "//div[@data-scan-config-block-element='model_identifier']"
-        "//div[@data-testid='model-identifier-entity']"
+    INIT_EM_CELL_MESH_CARDS = (
+        By.CSS_SELECTOR,
+        "div[data-testid='model-identifier-entity-card']"
     )
-    INIT_EM_CELL_MESH_NAME = (
-        By.XPATH,
-        "//div[@data-scan-config-block-element='model_identifier']"
-        "//span[contains(@class,'truncate') and contains(@class,'font-semibold')]"
+    INIT_EM_CELL_MESH_NAMES = (
+        By.CSS_SELECTOR,
+        "div[data-testid='model-identifier-entity-card'] span.font-semibold"
     )
     INIT_NEURON_VOXEL_SIZE = (
         By.XPATH,

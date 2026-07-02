@@ -813,3 +813,26 @@ class WorkflowsPage(HomePage):
         except Exception as e:
             self.logger.warning(f"Error testing View Configuration redirect: {e}")
             return False
+
+    def find_type_carousel(self, timeout=5):
+        """Find the type carousel container element."""
+        from locators.workflow_locators import WorkflowLocators
+        return self.find_element(WorkflowLocators.TYPE_CAROUSEL, timeout=timeout)
+
+    def scroll_carousel_right(self, scroll_amount=300, times=3):
+        """Scroll the type carousel to the right to reveal more cards."""
+        try:
+            carousel = self.find_type_carousel(timeout=5)
+            for i in range(times):
+                self.browser.execute_script(
+                    "arguments[0].scrollLeft += arguments[1];", carousel, scroll_amount
+                )
+                import time
+                time.sleep(0.5)
+        except Exception:
+            pass
+
+    def find_all_type_cards(self):
+        """Find all type cards currently visible on the page."""
+        from locators.workflow_locators import WorkflowLocators
+        return self.find_all_elements(WorkflowLocators.ALL_TYPE_CARDS)

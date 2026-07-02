@@ -1456,3 +1456,27 @@ class SimulateMeBetaPage(HomePage):
         except Exception:
             pass
         self.logger.info("=== END PAGE STRUCTURE ===")
+
+    def wait_for_card_status_badge(self, card_element, timeout=30):
+        """Wait for a simulation card's status badge to have text."""
+        from selenium.webdriver.support.ui import WebDriverWait
+        try:
+            WebDriverWait(card_element, timeout).until(
+                lambda card: card.find_element(
+                    *SimulateMeBetaLocators.SIM_CARD_STATUS_BADGE
+                ).text.strip()
+            )
+            return True
+        except Exception:
+            return False
+
+    def wait_for_etype_filter_applied(self, filter_value, timeout=15):
+        """Wait for E-type column values to reflect the applied filter."""
+        from selenium.webdriver.support.ui import WebDriverWait
+        try:
+            WebDriverWait(self.browser, timeout).until(
+                lambda d: all(filter_value in v for v in self.get_etype_column_values()[:3])
+                if self.get_etype_column_values() else False
+            )
+        except Exception:
+            pass  # Will be caught by assertions in the test

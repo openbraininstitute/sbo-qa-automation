@@ -131,3 +131,48 @@ class AboutPage(HomePage):
                 "return arguments[0].complete && arguments[0].naturalWidth > 0;", img_element
             )
         )
+
+    def get_title_paragraph_pairs(self):
+        """Return list of (title_element, paragraph_element) pairs for the 5 content sections."""
+        pairs = [
+            (AboutLocators.TITLE1, AboutLocators.PARAGRAPH1),
+            (AboutLocators.TITLE2, AboutLocators.PARAGRAPH2),
+            (AboutLocators.TITLE3, AboutLocators.PARAGRAPH3),
+            (AboutLocators.TITLE4, AboutLocators.PARAGRAPH4),
+            (AboutLocators.TITLE5, AboutLocators.PARAGRAPH5),
+        ]
+        result = []
+        for title_loc, para_loc in pairs:
+            title_el = self.find_element(title_loc)
+            para_el = self.find_element(para_loc)
+            result.append((title_el, para_el))
+        return result
+
+    def get_all_page_image_locators(self):
+        """Return list of image locators for all main page images."""
+        return [
+            AboutLocators.IMG1,
+            AboutLocators.IMG2,
+            AboutLocators.IMG3,
+            AboutLocators.IMG4,
+            AboutLocators.IMG5,
+            AboutLocators.IMG6,
+            AboutLocators.IMG7,
+            AboutLocators.IMG8,
+            AboutLocators.IMG_HERO,
+            AboutLocators.IMG_BACKGROUND,
+        ]
+
+    def verify_all_page_images(self, timeout=20):
+        """Scroll to and verify each page image is loaded. Returns list of failed locators."""
+        failures = []
+        for locator in self.get_all_page_image_locators():
+            img = self.get_image(locator)
+            try:
+                self.scroll_to_element(img)
+                import time
+                time.sleep(1)
+                self.wait_for_card_image_to_load(img, timeout=timeout)
+            except Exception:
+                failures.append(locator)
+        return failures

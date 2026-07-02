@@ -6,13 +6,11 @@ import logging
 import os
 import sys
 import time
-from io import BytesIO
 
 import pytest
 import base64
-from PIL import Image
 from selenium import webdriver
-from selenium.common import exceptions, TimeoutException
+from selenium.common import TimeoutException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -22,12 +20,6 @@ from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from pages.landing_page import LandingPage
 from pages.login_page import LoginPage
-
-
-def get_safe_config(config):
-    safe = config.copy()
-    safe["password"] = "****"
-    return safe
 
 def create_browser(pytestconfig):
     browser_name = pytestconfig.getoption("--browser-name")
@@ -168,6 +160,7 @@ def test_config(pytestconfig):
 
     if env =="staging":
         base_url = "https://staging.openbraininstitute.org"
+        # base_url = "https://main.preview.openbraininstitute.org"
         lab_url = f"{base_url}/app/virtual-lab"
         lab_id = os.getenv("LAB_ID_STAGING")
         project_id = os.getenv("PROJECT_ID_STAGING")
@@ -701,72 +694,9 @@ def pytest_addoption(parser):
     )
 
 
-def make_full_screenshot(browser, savename):
-    """Performs a full screenshot of the entire page.
-    Taken from https://gist.github.com/fabtho/13e4a2e7cfbfde671b8fa81bbe9359fb
-    """
-    logger.debug('Making full-page screenshot')
-    # initiate value
-    img_list = []  # to store image fragment
-    offset = 0  # where to start
-
-    # js to get height of the window
-    try:
-        height = browser.execute_script(
-            "return Math.max("
-            "document.documentElement.clientHeight, window.innerHeight);"
-        )
-    except exceptions.WebDriverException:
-        return
-
-    max_window_height = browser.execute_script(
-        "return Math.max("
-        "document.body.scrollHeight, "
-        "document.body.offsetHeight, "
-        "document.documentElement.clientHeight, "
-        "document.documentElement.scrollHeight, "
-        "document.documentElement.offsetHeight);"
-    )
-
-    header_height = 0
-    while offset < max_window_height:
-        browser.execute_script(f"window.scrollTo(0, {offset});")
-
-        # get the screenshot of the current window
-        img = Image.open(BytesIO((browser.driver.get_screenshot_as_png())))
-        img_list.append(img)
-        offset += height - header_height
-
-    # Stitch image into one, set up the full screen frame
-    img_frame_height = sum([img_frag.size[1] for img_frag in img_list])
-    img_frame = Image.new("RGB", (img_list[0].size[0], img_frame_height))
-
-    offset = 0  # offset used to create the snapshots
-    img_loc = 0  # offset used to create the final image
-    for img_frag in img_list:
-        # image fragment must be cropped in case the page is a jupyter notebook;
-        # also make sure the last image fragment gets added correctly to avoid overlap.
-        offset1 = offset + height
-        if offset1 > max_window_height:
-            top_offset = offset + height - max_window_height
-            box = (0, top_offset, img_frag.size[0], img_frag.size[1])
-        else:
-            box = (0, header_height, img_frag.size[0], img_frag.size[1])
-        img_frame.paste(img_frag.crop(box), (0, img_loc))
-        img_loc += img_frag.size[1] - header_height
-        offset += height - header_height
-
-    # Save the final image
-    img_frame.save(savename)
-
-
 @pytest.fixture(scope="session", autouse=True)
 def check_skip_condition():
     """ Skips a test file from running"""
     import os
     if os.getenv("SKIP_MODULES") == "1":
         pytest.skip("Skipping tests due to global configuration.", allow_module_level=True)
-
-def mask_sensitive(config):
-    """Mask sensitive keys like 'password' before logging."""
-    return {k: (v if "pass" in k.lower() else "***") for k, v in config.items()}
