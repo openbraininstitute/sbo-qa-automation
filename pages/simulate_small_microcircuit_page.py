@@ -94,26 +94,62 @@ class SimulateSmallMicrocircuitPage(HomePage):
         time.sleep(3)
 
     def verify_column_headers(self):
-        """Verify expected column headers are present. Returns dict of {name: {'present': bool}}."""
+        """Verify expected column headers are present. Returns dict of {name: {'present': bool}}.
+        Reads headers before and after scrolling to capture all columns.
+        """
+        # Core columns expected in both environments
         expected = [
             "Name", "Description", "Brain region",
             "Number of neurons", "Number of synapses", "Number of connections",
-            "Created by", "Registration date"
-            # "Species" — temporarily excluded, will appear in next deployment
+            "Created by", "Registration date",
         ]
-        headers = self.find_all_elements(Loc.COLUMN_HEADERS, timeout=15)
-        header_texts = []
-        for h in headers:
-            # Read from the inner columnTitle div to avoid sort icon text
-            try:
-                title_div = h.find_element(By.CSS_SELECTOR, "div[class*='columnTitle']")
-                header_texts.append(title_div.text.strip())
-            except Exception:
-                header_texts.append(h.text.strip().split("\n")[0])
-        self.logger.info(f"Column headers found: {header_texts}")
+        # "Target simulator" is staging-only until production release
+        if "staging" in self.lab_url:
+            expected.append("Target simulator")
+
+        def _read_header_texts():
+            headers = self.find_all_elements(Loc.COLUMN_HEADERS, timeout=15)
+            texts = []
+            for h in headers:
+                try:
+                    title_div = h.find_element(By.CSS_SELECTOR, "div[class*='columnTitle']")
+                    texts.append(title_div.text.strip())
+                except Exception:
+                    texts.append(h.text.strip().split("\n")[0])
+            return texts
+
+        # Read headers at current scroll position (left side visible)
+        header_texts_left = _read_header_texts()
+        self.logger.info(f"Column headers (before scroll): {header_texts_left}")
+
+        # Click the table scroll-to-end button to expose right-side columns
+        try:
+            scroll_btn = self.element_to_be_clickable(Loc.TABLE_SCROLL_END_BTN, timeout=5)
+            scroll_btn.click()
+            self.logger.info("Clicked table scroll-to-end button")
+            time.sleep(1)
+        except Exception:
+            pass
+
+        # Read headers again (right side visible)
+        header_texts_right = _read_header_texts()
+        self.logger.info(f"Column headers (after scroll): {header_texts_right}")
+
+        # Combine both reads — use a set to deduplicate, filter out empty strings
+        all_headers = set(header_texts_left + header_texts_right) - {''}
+        self.logger.info(f"All column headers combined: {sorted(all_headers)}")
+
+        # Scroll table back to start for subsequent interactions
+        try:
+            table = self.browser.find_element(By.CSS_SELECTOR, ".ant-table-content")
+            self.browser.execute_script("arguments[0].scrollLeft = 0;", table)
+            time.sleep(0.5)
+        except Exception:
+            pass
+
         results = {}
         for name in expected:
-            results[name] = {'present': name in header_texts}
+            results[name] = {'present': name in all_headers}
         return results
 
     def get_table_rows(self, timeout=15):
