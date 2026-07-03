@@ -5,8 +5,6 @@ import time
 
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.project_notebooks_locators import ProjectNotebooksLocators
 from pages.home_page import HomePage
@@ -38,8 +36,11 @@ class ProjectNotebooks(HomePage):
 
         input_field.clear()
 
-        WebDriverWait(self.browser, timeout).until(
-            lambda d: input_field.get_attribute("value") == ""
+        self.wait_for_condition(
+            lambda d: input_field.get_attribute("value") == "",
+            timeout=timeout,
+            retries=1,
+            message="Search input did not clear"
         )
     def column_headers(self):
         return self.find_all_elements(ProjectNotebooksLocators.COLUMN_HEADER)
@@ -257,7 +258,12 @@ class ProjectNotebooks(HomePage):
             except Exception:
                 return False
 
-        WebDriverWait(self.browser, timeout).until(check_scale_values)
+        self.wait_for_condition(
+            check_scale_values,
+            timeout=timeout,
+            retries=1,
+            message=f"Scale column values did not all become '{value}'"
+        )
 
     def notebook_actions_button_1(self):
         """Get the first notebook action button."""
@@ -296,9 +302,11 @@ class ProjectNotebooks(HomePage):
 
     def wait_for_jupyter_tab(self, timeout=30):
         """Wait for a second tab (Jupyter notebook) to open and verify it."""
-        WebDriverWait(self.browser, timeout).until(
+        self.wait_for_condition(
             lambda d: len(d.window_handles) > 1,
-            "Second tab (Jupyter notebook) did not open within timeout"
+            timeout=timeout,
+            retries=1,
+            message="Second tab (Jupyter notebook) did not open within timeout"
         )
         self.logger.info(f"Second tab opened. Total tabs: {len(self.browser.window_handles)}")
 
@@ -336,9 +344,7 @@ class ProjectNotebooks(HomePage):
             self.logger.info(f"Attempt {attempt}/{max_attempts} to detect Jupyter notebook...")
             for selector in jupyter_selectors:
                 try:
-                    element = WebDriverWait(self.browser, timeout // max_attempts).until(
-                        EC.presence_of_element_located(selector)
-                    )
+                    element = self.find_element(selector, timeout=timeout // max_attempts)
                     self.logger.info(f"Jupyter notebook loaded — found element: {selector}")
                     jupyter_loaded = True
                     break
@@ -381,9 +387,7 @@ class ProjectNotebooks(HomePage):
                 btn = self.element_to_be_clickable(action_button_locator, timeout=5)
                 btn.click()
                 self.logger.info(f"Clicked action button (attempt {attempt})")
-                WebDriverWait(self.browser, timeout).until(
-                    EC.visibility_of_element_located(menu_locator)
-                )
+                self.element_visibility(menu_locator, timeout=timeout)
                 self.logger.info("Popover menu appeared")
                 return True
             except TimeoutException:

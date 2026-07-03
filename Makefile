@@ -90,7 +90,7 @@ feature:
 	$(MAKE) run-tests ENV=production ENV_URL=production TEST="tests/test_data_circuit.py tests/test_simulate_paired_neurons.py -sv --html=report.html --self-contained-html"
 
 feature-staging:
-	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_build_em_mapping.py -sv --html=report.html --self-contained-html"
+	$(MAKE) run-tests ENV=staging ENV_URL=staging TEST="tests/test_build_synaptome.py tests/test_login.py tests/test_project_credits.py tests/test_project_notebooks.py tests/test_about.py tests/test_news.py tests/test_data_circuit.py tests/test_contact.py tests/test_explore_page.py tests/test_ai_assistant_workflow.py tests/test_explore_ephys.py -sv --html=report.html --self-contained-html"
 
 # Workflow tests
 workflow:

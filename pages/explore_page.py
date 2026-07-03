@@ -5,10 +5,9 @@ import time
 
 from selenium.common import TimeoutException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from locators.explore_page_locators import ExplorePageLocators
-from selenium.webdriver.support import expected_conditions as EC
 from pages.home_page import HomePage
 
 
@@ -51,7 +50,7 @@ class ExplorePage(HomePage):
         return self.find_element(ExplorePageLocators.EXPERIMENTAL_DATA_BTN)
 
     def wait_for_dynamically_loaded_links(self):
-        self.wait.until(EC.presence_of_element_located(ExplorePageLocators.EXPLORE_LINK1))
+        self.find_element(ExplorePageLocators.EXPLORE_LINK1)
 
     def find_ai_assistant_panel(self, timeout=25):
         return self.is_visible(ExplorePageLocators.AI_ASSISTANT_PANEL, timeout=timeout)
@@ -66,9 +65,7 @@ class ExplorePage(HomePage):
         return self.find_element(ExplorePageLocators.ATLAS_FULLSCREEN, timeout=timeout)
 
     def find_brain_region_panel(self, timeout=40):
-        WebDriverWait(self.browser, timeout).until(
-            lambda driver: driver.execute_script("return document.readyState") == "complete"
-        )
+        self.wait_for_page_ready(timeout=timeout)
         return self.is_visible(ExplorePageLocators.BRAIN_REGION_PANEL, timeout=timeout)
 
     def find_species_dropdown(self, timeout=10):
@@ -234,8 +231,11 @@ class ExplorePage(HomePage):
 
     def wait_for_locators_to_have_text(self, browser, locators, timeout=20):
         for locator in locators:
-            WebDriverWait(self.browser, timeout).until(
-                EC.text_to_be_present_in_element(locator, '')
+            self.wait_for_condition(
+                EC.text_to_be_present_in_element(locator, ''),
+                timeout=timeout,
+                retries=1,
+                message=f"Element {locator} did not have text within {timeout}s"
             )
 
     def get_record_type_total_count(self, locator, timeout=10):

@@ -3,7 +3,6 @@
 
 import time
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from locators.ai_assistant_locators import AIAssistantLocators
 from pages.project_home import ProjectHome
@@ -223,7 +222,7 @@ class AIAssistantPage(ProjectHome):
         response_found = False
         for selector in selectors:
             try:
-                self.wait.until(EC.presence_of_element_located(selector))
+                self.find_element(selector)
                 self.logger.info(f"Found AI response with selector: {selector}")
                 response_found = True
                 break
@@ -259,7 +258,7 @@ class AIAssistantPage(ProjectHome):
                 if cancel_elements:
                     self.logger.info(f"Found cancel button, waiting for it to disappear: {cancel_selector}")
                     # Wait for it to disappear
-                    self.wait.until_not(EC.presence_of_element_located(cancel_selector))
+                    self.wait_for_element_to_disappear(cancel_selector, timeout=30)
                     self.logger.info(f"Cancel button disappeared: {cancel_selector}")
                     cancel_disappeared = True
                     break
@@ -288,7 +287,7 @@ class AIAssistantPage(ProjectHome):
         spinner_found = False
         for selector in spinner_selectors:
             try:
-                self.wait.until(EC.presence_of_element_located(selector))
+                self.find_element(selector)
                 self.logger.info(f"Found AI spinner/loading indicator with selector: {selector}")
                 spinner_found = True
                 break

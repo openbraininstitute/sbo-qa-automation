@@ -4,8 +4,6 @@
 import time
 
 from selenium.common import ElementNotVisibleException, TimeoutException, StaleElementReferenceException
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
 from pages.explore_page import ExplorePage
@@ -687,9 +685,7 @@ class ExploreElectrophysiologyPage(ExplorePage):
 
     def wait_for_page_ready(self, timeout=30):
         """Wait for the page to be ready"""
-        WebDriverWait(self.browser, timeout).until(
-            lambda driver: driver.execute_script("return document.readyState") == "complete"
-        )
+        super().wait_for_page_ready(timeout=timeout)
         try:
             self.find_data_table_with_filters(timeout=timeout)
         except TimeoutException:

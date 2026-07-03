@@ -5,11 +5,9 @@ import time
 
 from selenium.common import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.about_locators import AboutLocators
 from pages.home_page import HomePage
-from selenium.webdriver.support import expected_conditions as EC
 
 
 
@@ -126,10 +124,13 @@ class AboutPage(HomePage):
         self.browser.execute_script("window.scrollTo(0, 0);")
 
     def wait_for_card_image_to_load(self, img_element, timeout=20):
-        WebDriverWait(self.browser, timeout).until(
+        self.wait_for_condition(
             lambda d: d.execute_script(
                 "return arguments[0].complete && arguments[0].naturalWidth > 0;", img_element
-            )
+            ),
+            timeout=timeout,
+            retries=1,
+            message="Card image did not load within timeout"
         )
 
     def get_title_paragraph_pairs(self):

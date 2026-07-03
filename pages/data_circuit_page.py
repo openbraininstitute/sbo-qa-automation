@@ -9,8 +9,6 @@ from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from pages.home_page import HomePage
 from locators.data_circuit_locators import DataCircuitLocators
 
@@ -108,9 +106,7 @@ class DataCircuitPage(HomePage):
             region_input.clear()
             region_input.send_keys("Root")
             time.sleep(2)
-            root_option = WebDriverWait(self.browser, 10).until(
-                EC.element_to_be_clickable(DataCircuitLocators.BRAIN_REGION_ROOT_OPTION)
-            )
+            root_option = self.element_to_be_clickable(DataCircuitLocators.BRAIN_REGION_ROOT_OPTION, timeout=10)
             root_option.click()
             self.logger.info("Selected 'Root' as brain region")
             time.sleep(2)
@@ -226,9 +222,7 @@ class DataCircuitPage(HomePage):
         """Click the expand chevron on the first parent circuit row."""
         try:
             # Wait for hierarchy rows to render (chevrons take time after toggle)
-            WebDriverWait(self.browser, timeout).until(
-                EC.presence_of_element_located(DataCircuitLocators.HIERARCHY_EXPAND_BTN)
-            )
+            self.find_element(DataCircuitLocators.HIERARCHY_EXPAND_BTN, timeout=timeout)
             chevron = self.element_to_be_clickable(DataCircuitLocators.HIERARCHY_EXPAND_BTN, timeout=5)
             self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", chevron)
             time.sleep(0.5)

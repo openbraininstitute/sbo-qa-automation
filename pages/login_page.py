@@ -6,10 +6,9 @@ import time
 from selenium.common import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import Keys
-from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from locators.login_locators import LoginPageLocators
-from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import CustomBasePage
 from selenium.webdriver.common.by import By
 
@@ -31,11 +30,14 @@ class LoginPage(CustomBasePage):
             pass
         self.logger.info(f"INFO: Target URL is {target_url}")
         try:
-            WebDriverWait(self.browser, 30).until(
-                lambda d: "openid-connect" in d.current_url or "auth" in d.current_url
+            self.wait_for_condition(
+                lambda d: "openid-connect" in d.current_url or "auth" in d.current_url,
+                timeout=30,
+                retries=1,
+                message="Timeout while waiting for URL containing 'openid-connect'"
             )
             self.logger.info(f"INFO: Successfully reached {self.browser.current_url}")
-        except TimeoutException:
+        except (TimeoutException, RuntimeError):
             self.logger.error(f"ERROR: Timeout while waiting for URL containing 'openid-connect'")
         self.logger.info(f"INFO: target_url from pages/login_page.py:, {target_url}")
         self.logger.info(f"INFO: Starting URL from pages/login_page.py:, {self.browser.current_url}")
@@ -48,26 +50,29 @@ class LoginPage(CustomBasePage):
         # Multiple strategies to detect successful login
         strategies = [
             # Strategy 1: Check for virtual-lab in URL
-            lambda: self.wait.until(EC.url_contains("app/virtual-lab")),
+            lambda: self.wait_for_url_contains("app/virtual-lab", timeout=15),
             
-            # Strategy 2: Check for sync in URL  
-            lambda: WebDriverWait(self.browser, 15).until(
-                lambda d: "sync" in d.current_url
+            # Strategy 2: Check for sync in URL
+            lambda: self.wait_for_condition(
+                lambda d: "sync" in d.current_url,
+                timeout=15, retries=1, message="sync not in URL"
             ),
             
             # Strategy 3: Check for any app/ URL
-            lambda: WebDriverWait(self.browser, 15).until(
-                lambda d: "/app/" in d.current_url
+            lambda: self.wait_for_condition(
+                lambda d: "/app/" in d.current_url,
+                timeout=15, retries=1, message="/app/ not in URL"
             ),
             
             # Strategy 4: Look for logged-in page elements
-            lambda: WebDriverWait(self.browser, 15).until(
+            lambda: self.wait_for_condition(
                 EC.any_of(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid*='lab']")),
                     EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='virtual-lab']")),
                     EC.presence_of_element_located((By.XPATH, "//h1[contains(text(), 'Virtual Lab')]")),
                     EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid*='user']"))
-                )
+                ),
+                timeout=15, retries=1, message="No logged-in page elements found"
             )
         ]
         
@@ -79,7 +84,7 @@ class LoginPage(CustomBasePage):
                 self.logger.info(f"Strategy {i} succeeded! Current URL: {self.browser.current_url}")
                 success = True
                 break
-            except TimeoutException:
+            except (TimeoutException, RuntimeError):
                 self.logger.debug(f"Strategy {i} failed")
                 continue
         
@@ -100,12 +105,12 @@ class LoginPage(CustomBasePage):
         if "sync" in self.browser.current_url:
             self.logger.info("Detected sync URL, waiting for redirect to complete...")
             try:
-                # Wait for redirect away from sync page (up to 30 seconds)
-                WebDriverWait(self.browser, 30).until(
-                    lambda d: "sync" not in d.current_url
+                self.wait_for_condition(
+                    lambda d: "sync" not in d.current_url,
+                    timeout=30, retries=1, message="Sync redirect did not complete"
                 )
                 self.logger.info(f"Sync redirect completed. Final URL: {self.browser.current_url}")
-            except TimeoutException:
+            except (TimeoutException, RuntimeError):
                 self.logger.warning(f"Sync redirect timeout, but continuing. Current URL: {self.browser.current_url}")
                 # Don't fail here, just log and continue
         
@@ -122,7 +127,7 @@ class LoginPage(CustomBasePage):
         return self.element_visibility(LoginPageLocators.PASSWORD_FIELD)
 
     def find_logout_button(self):
-        return self.wait.until(EC.element_to_be_clickable(LoginPageLocators.LOGOUT))
+        return self.element_to_be_clickable(LoginPageLocators.LOGOUT)
 
     def submit_button(self):
         return self.element_to_be_clickable(LoginPageLocators.SUBMIT_BUTTON)
@@ -138,11 +143,11 @@ class LoginPage(CustomBasePage):
         if "/auth/realms/" not in current_url:
             raise RuntimeError(f"Expected to be on auth page, but current URL is: {current_url}")
 
-        self.wait.until(EC.presence_of_element_located((By.ID, "kc-form-wrapper")))
+        self.find_element((By.ID, "kc-form-wrapper"))
 
         self.make_form_visible()
-        self.wait.until(EC.visibility_of_element_located((By.ID, "username")))
-        self.wait.until(EC.visibility_of_element_located((By.ID, "password")))
+        self.element_visibility((By.ID, "username"))
+        self.element_visibility((By.ID, "password"))
 
         username_field = self.browser.find_element(By.ID, "username")
         password_field = self.browser.find_element(By.ID, "password")
@@ -152,7 +157,7 @@ class LoginPage(CustomBasePage):
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                self.wait.until(EC.url_contains("app/virtual-lab"))
+                self.wait_for_url_contains("app/virtual-lab", timeout=30)
                 break
             except (TimeoutException, WebDriverException) as e:
                 error_msg = str(e).lower()

@@ -7,7 +7,6 @@ import time
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.project_credits_locators import ProjectCreditsLocators
 from pages.home_page import HomePage
@@ -231,9 +230,11 @@ class ProjectCreditsPage(HomePage):
 
     def wait_for_new_tab(self, timeout=15):
         """Wait for a second browser tab to open."""
-        WebDriverWait(self.browser, timeout).until(
+        self.wait_for_condition(
             lambda d: len(d.window_handles) > 1,
-            "Second tab did not open within timeout",
+            timeout=timeout,
+            retries=1,
+            message="Second tab did not open within timeout",
         )
         return self.browser.window_handles
 
@@ -252,8 +253,11 @@ class ProjectCreditsPage(HomePage):
 
     def _switch_to_iframe(self, iframe_element, timeout=10):
         """Switch webdriver context into an iframe element."""
-        WebDriverWait(self.browser, timeout).until(
-            EC.frame_to_be_available_and_switch_to_it(iframe_element)
+        self.wait_for_condition(
+            EC.frame_to_be_available_and_switch_to_it(iframe_element),
+            timeout=timeout,
+            retries=1,
+            message="Iframe not available for switching"
         )
 
     def _switch_to_default(self):
@@ -280,20 +284,16 @@ class ProjectCreditsPage(HomePage):
 
         try:
             # Select country from dropdown
-            country_select = WebDriverWait(self.browser, timeout).until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "select#billingAddress-countryInput")
-                )
+            country_select = self.find_element(
+                (By.CSS_SELECTOR, "select#billingAddress-countryInput"), timeout=timeout
             )
             from selenium.webdriver.support.ui import Select
             Select(country_select).select_by_value(country_code)
             time.sleep(1)  # Wait for form fields to update based on country
 
             # Fill address line 1
-            address_input = WebDriverWait(self.browser, timeout).until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "input#billingAddress-addressLine1Input")
-                )
+            address_input = self.find_element(
+                (By.CSS_SELECTOR, "input#billingAddress-addressLine1Input"), timeout=timeout
             )
             address_input.clear()
             address_input.send_keys(address)
@@ -347,28 +347,22 @@ class ProjectCreditsPage(HomePage):
 
         try:
             # Card number
-            card_input = WebDriverWait(self.browser, timeout).until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "input#payment-numberInput")
-                )
+            card_input = self.find_element(
+                (By.CSS_SELECTOR, "input#payment-numberInput"), timeout=timeout
             )
             card_input.clear()
             card_input.send_keys(card_number)
 
             # Expiry (MM/YY)
-            expiry_input = WebDriverWait(self.browser, timeout).until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "input#payment-expiryInput")
-                )
+            expiry_input = self.find_element(
+                (By.CSS_SELECTOR, "input#payment-expiryInput"), timeout=timeout
             )
             expiry_input.clear()
             expiry_input.send_keys(expiry)
 
             # CVC
-            cvc_input = WebDriverWait(self.browser, timeout).until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "input#payment-cvcInput")
-                )
+            cvc_input = self.find_element(
+                (By.CSS_SELECTOR, "input#payment-cvcInput"), timeout=timeout
             )
             cvc_input.clear()
             cvc_input.send_keys(cvc)
@@ -380,11 +374,13 @@ class ProjectCreditsPage(HomePage):
 
     def wait_for_pay_btn_enabled(self, timeout=15):
         """Wait until the Pay button becomes enabled (not disabled)."""
-        WebDriverWait(self.browser, timeout).until(
+        self.wait_for_condition(
             lambda d: d.find_element(
                 *ProjectCreditsLocators.PAY_BTN
             ).get_attribute("disabled") is None,
-            "Pay button did not become enabled within timeout",
+            timeout=timeout,
+            retries=1,
+            message="Pay button did not become enabled within timeout",
         )
         self.logger.info("Pay button is now enabled")
 
