@@ -139,17 +139,16 @@ class TestSimulateMem:
         logger.info(f"Added {len(desired)} recording(s): {desired}")
 
         # Step 9: Verify Run experiment button is enabled and click it
-        run_btn = sim_page.find_run_experiment_btn(timeout=10)
-        assert run_btn.is_displayed(), "Run experiment button should be visible"
-        assert run_btn.is_enabled(), "Run experiment button should be enabled"
+        btn_ready = sim_page.wait_for_run_experiment_ready(timeout=60)
+        assert btn_ready, "Run experiment button should become active (not greyed out)"
         logger.info("Run experiment button is ready")
 
         sim_page.click_run_experiment()
         logger.info("Clicked Run experiment")
 
         # Step 10: Verify redirected to Results tab
-        time.sleep(5)
-        assert sim_page.is_results_tab_active(), "Results tab should be active after Run experiment"
+        results_active = sim_page.wait_for_results_tab_active(timeout=30)
+        assert results_active, "Results tab should be active after Run experiment"
         logger.info("Results tab active after Run experiment")
 
         # Step 11: While simulation is running, Download CSV and Reconfigure should be disabled
