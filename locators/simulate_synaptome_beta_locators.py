@@ -35,6 +35,10 @@ class SimulateSynaptomeBetaLocators:
 
     """Column headers in the model picker table."""
     COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")
+    TABLE_SCROLL_END_BTN = (
+        By.CSS_SELECTOR,
+        "div.ml-auto button.ant-btn-circle.ant-btn-icon-only"
+    )
 
     """Table rows."""
     TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")

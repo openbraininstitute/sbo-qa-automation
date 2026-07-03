@@ -40,7 +40,7 @@ class TestSimulateSmallMicrocircuit:
         sim_page.click_simulate_category()
         sim_page.click_small_microcircuit_card()
         logger.info(f"On model picker. URL: {sim_page.browser.current_url}")
-
+        
         # Step 3: Public tab → verify table has rows
         sim_page.click_public_tab()
         row_count = sim_page.get_row_count()
@@ -191,7 +191,11 @@ class TestSimulateSmallMicrocircuit:
 
         ns_items = sim_page.get_dictionary_items()
         assert len(ns_items) > 0, "Expected at least one neuron set dictionary item"
-        ns_label = sim_page.click_dictionary_item_by_label("All Neurons")
+        # "ALL POPULATIONS (Biophysical)" is staging-only until production release
+        if "staging" in test_config["base_url"]:
+            ns_label = sim_page.click_dictionary_item_by_label("ALL POPULATIONS (Biophysical)")
+        else:
+            ns_label = sim_page.click_dictionary_item_by_label("All Neurons")
         logger.info(f"Selected neuron set: '{ns_label}'")
 
         sim_page.wait_for_block_single(timeout=10)

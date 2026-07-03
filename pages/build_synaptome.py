@@ -2,11 +2,9 @@
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 import time
-from tkinter.constants import RADIOBUTTON
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common import TimeoutException, NoSuchElementException, StaleElementReferenceException
 import logging
 
@@ -134,25 +132,24 @@ class BuildSynaptomePage(HomePage):
         # Wait until the table element is present
         table = self.find_element(BuildSynaptomeLocators.TABLE)
         # Wait until at least one row of the table is populated with data
-        WebDriverWait(self.browser, 20).until(
+        self.wait_for_condition(
             lambda driver: any(
-                self.find_all_elements((By.TAG_NAME, "td"), timeout=10) and  # Corrected Tuple Argument
+                self.find_all_elements((By.TAG_NAME, "td"), timeout=10) and
                 any(cell.text.strip() for cell in self.find_all_elements((By.TAG_NAME, "td"), timeout=10))
-                # Corrected Tuple Argument
                 for row in table.find_elements(By.TAG_NAME, "tr")
             ),
-            "Table rows are not populated with data within the timeout."
+            timeout=20,
+            retries=1,
+            message="Table rows are not populated with data within the timeout."
         )
 
         # Extract table content once it is fully loaded
-        rows = self.find_all_elements((By.TAG_NAME, "tr"))  # Corrected Tuple Argument
+        rows = self.find_all_elements((By.TAG_NAME, "tr"))
         table_content = []
         for row in rows:
-            # For each row, get all cell elements using the custom helper
-            cells = self.find_all_elements((By.TAG_NAME, "td"), timeout=10)  # Corrected Tuple Argument
-            # Extract and clean the text content of all cells in the row
+            cells = self.find_all_elements((By.TAG_NAME, "td"), timeout=10)
             row_content = [cell.text.strip() for cell in cells]
-            if row_content:  # Include non-empty rows only
+            if row_content:
                 table_content.append(row_content)
 
         return table_content
@@ -282,8 +279,11 @@ class BuildSynaptomePage(HomePage):
         raise last_exception
 
     def wait_for_target_dropdown_expanded2(self, timeout=25):
-        WebDriverWait(self.browser, timeout).until(
-            lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT2).get_attribute("aria-expanded") == "true"
+        self.wait_for_condition(
+            lambda d: d.find_element(*BuildSynaptomeLocators.TARGET_INPUT2).get_attribute("aria-expanded") == "true",
+            timeout=timeout,
+            retries=1,
+            message="Target dropdown 2 did not expand"
         )
 
     def type_field(self):
@@ -311,12 +311,14 @@ class BuildSynaptomePage(HomePage):
         initial_table_content = self.get_table_content()
 
         try:
-            WebDriverWait(self.browser, timeout).until(
+            self.wait_for_condition(
                 lambda driver: self.get_table_content() != initial_table_content,
-                "Table sorting did not complete within the provided timeout."
+                timeout=timeout,
+                retries=1,
+                message="Table sorting did not complete within the provided timeout."
             )
             print("Table sorting is completed. The table content was updated.")
-        except TimeoutException:
+        except (TimeoutException, RuntimeError):
             current_table_content = self.get_table_content()
             raise Exception(
                 f"Table sorting timed out. Initial content: {initial_table_content}, "
@@ -332,9 +334,11 @@ class BuildSynaptomePage(HomePage):
         """
         self.wait_for_spinner_to_disappear()
         # Then wait for table rows to load
-        WebDriverWait(self.browser, timeout).until(
+        self.wait_for_condition(
             lambda driver: len(self.get_all_table_rows()) > 0 and "No data" not in self.get_table_content(),
-            "Table data is not loaded within the timeout."
+            timeout=timeout,
+            retries=1,
+            message="Table data is not loaded within the timeout."
         )
 
     def wait_for_zoom_ui(self, timeout=15):
@@ -582,15 +586,11 @@ class BuildSynaptomePage(HomePage):
         
         for i, selector in enumerate(search_button_selectors):
             try:
-                from selenium.webdriver.support.ui import WebDriverWait
-                from selenium.webdriver.support import expected_conditions as EC
-                search_button = WebDriverWait(self.browser, 3).until(
-                    EC.element_to_be_clickable(selector)
-                )
+                search_button = self.element_to_be_clickable(selector, timeout=3)
                 if logger:
                     logger.info(f"Found search button with selector {i+1}: {selector}")
                 break
-            except:
+            except TimeoutException:
                 if logger:
                     logger.info(f"Search button selector {i+1} failed: {selector}")
                 continue
@@ -618,15 +618,11 @@ class BuildSynaptomePage(HomePage):
         
         for i, selector in enumerate(search_field_selectors):
             try:
-                from selenium.webdriver.support.ui import WebDriverWait
-                from selenium.webdriver.support import expected_conditions as EC
-                search_field = WebDriverWait(self.browser, 3).until(
-                    EC.visibility_of_element_located(selector)
-                )
+                search_field = self.element_visibility(selector, timeout=3)
                 if logger:
                     logger.info(f"Found search field with selector {i+1}: {selector}")
                 break
-            except:
+            except TimeoutException:
                 if logger:
                     logger.info(f"Search field selector {i+1} failed: {selector}")
                 continue
@@ -849,14 +845,10 @@ class BuildSynaptomePage(HomePage):
 
         for i, selector in enumerate(radio_selectors):
             try:
-                from selenium.webdriver.support.ui import WebDriverWait
-                from selenium.webdriver.support import expected_conditions as EC
-                radio_btn = WebDriverWait(self.browser, 10).until(
-                    EC.element_to_be_clickable(selector)
-                )
+                radio_btn = self.element_to_be_clickable(selector, timeout=10)
                 logger.info(f"Found clickable radio button with selector {i+1}: {selector}")
                 break
-            except:
+            except TimeoutException:
                 logger.info(f"Radio button selector {i+1} failed: {selector}")
                 continue
 

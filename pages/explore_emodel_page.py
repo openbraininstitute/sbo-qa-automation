@@ -5,7 +5,6 @@ import time
 
 from selenium.common import ElementNotVisibleException, TimeoutException, \
     StaleElementReferenceException
-from selenium.webdriver.support.wait import WebDriverWait
 
 from pages.explore_page import ExplorePage
 from locators.explore_emodel_locators import ExploreEModelPageLocators
@@ -45,9 +44,7 @@ class ExploreEModelDataPage(ExplorePage):
         return self.find_element(ExploreEModelPageLocators.BR_SEARCH_FIELD_TYPE, timeout=timeout)
 
     def find_brain_region_panel(self, timeout=40):
-        WebDriverWait(self.browser, timeout).until(
-            lambda driver: driver.execute_script("return document.readyState") == "complete"
-        )
+        self.wait_for_page_ready(timeout=timeout)
         return self.is_visible(ExploreEModelPageLocators.BRAIN_REGION_PANEL, timeout=timeout)
 
     def find_br_cerebrum_title(self, timeout=15):
@@ -179,16 +176,9 @@ class ExploreEModelDataPage(ExplorePage):
         return self.wait_for_element_to_disappear(ExploreEModelPageLocators.SPINNER, timeout=timeout)
 
     def wait_for_emodel_tab_ready(self, timeout=30):
-        WebDriverWait(self.browser, timeout).until(
-            lambda driver: driver.execute_script(
-                "return document.readyState === 'complete';"
-            ),
-            "Page did not reach readyState=complete"
-        )
+        self.wait_for_page_ready(timeout=timeout)
         self.is_visible(ExploreEModelPageLocators.EMODEL_TAB, timeout=timeout)
         return self.browser.find_element(*ExploreEModelPageLocators.EMODEL_TAB)
 
     def wait_for_emodel_detail_page(self, timeout: int = 10):
-        WebDriverWait(self.browser, timeout).until(
-            EC.url_contains("/data/view/emodel/")
-        )
+        self.wait_for_url_contains("/data/view/emodel/", timeout=timeout)

@@ -4,11 +4,9 @@
 import time
 
 from selenium.common import TimeoutException
-from selenium.webdriver.support.wait import WebDriverWait
 
 from locators.news_locators import NewsLocators
 from pages.home_page import HomePage
-from selenium.webdriver.support import expected_conditions as EC
 
 
 

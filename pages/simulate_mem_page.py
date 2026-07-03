@@ -364,6 +364,31 @@ class SimulateMemPage(HomePage):
     def find_run_experiment_btn(self, timeout=10):
         return self.find_element(SimulateMemLocators.RUN_EXPERIMENT_BTN, timeout=timeout)
 
+    def is_run_experiment_btn_truly_enabled(self, timeout=5):
+        """Check if Run experiment button is actually clickable (not greyed out via CSS)."""
+        try:
+            btn = self.find_element(SimulateMemLocators.RUN_EXPERIMENT_BTN, timeout=timeout)
+            classes = btn.get_attribute("class") or ""
+            # Greyed-out buttons typically have bg-gray-300/text-gray-500 or disabled attribute
+            if btn.get_attribute("disabled"):
+                return False
+            if "bg-gray-300" in classes or "text-gray-500" in classes or "cursor-not-allowed" in classes:
+                return False
+            return True
+        except TimeoutException:
+            return False
+
+    def wait_for_run_experiment_ready(self, timeout=60, poll_interval=3):
+        """Wait until the Run experiment button is truly active (not greyed out)."""
+        start = time.time()
+        while time.time() - start < timeout:
+            if self.is_run_experiment_btn_truly_enabled():
+                self.logger.info("Run experiment button is ready (not greyed)")
+                return True
+            time.sleep(poll_interval)
+        self.logger.warning(f"Run experiment button still greyed after {timeout}s")
+        return False
+
     def click_run_experiment(self):
         btn = self.element_to_be_clickable(SimulateMemLocators.RUN_EXPERIMENT_BTN, timeout=10)
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
@@ -386,9 +411,39 @@ class SimulateMemPage(HomePage):
     def is_results_tab_active(self):
         try:
             tab = self.find_element(SimulateMemLocators.CONFIG_TAB_RESULTS, timeout=5)
-            return tab.get_attribute("data-state") == "active"
+            # Check data-state attribute
+            if tab.get_attribute("data-state") == "active":
+                return True
+            # Fallback: check for active styling classes
+            classes = tab.get_attribute("class") or ""
+            if "text-white" in classes or "from-[#003A8C]" in classes or "bg-primary" in classes:
+                return True
+            # Fallback: check aria-selected
+            if tab.get_attribute("aria-selected") == "true":
+                return True
+            return False
         except TimeoutException:
             return False
+
+    def wait_for_results_tab_active(self, timeout=30, poll_interval=2):
+        """Poll until the Results tab becomes active, clicking it if needed."""
+        start = time.time()
+        while time.time() - start < timeout:
+            if self.is_results_tab_active():
+                self.logger.info("Results tab is active")
+                return True
+            time.sleep(poll_interval)
+        # Final attempt: click the Results tab manually
+        try:
+            self.click_results_tab()
+            time.sleep(2)
+            if self.is_results_tab_active():
+                self.logger.info("Results tab became active after manual click")
+                return True
+        except Exception:
+            pass
+        self.logger.warning(f"Results tab not active after {timeout}s")
+        return False
 
     def wait_for_build_done(self, timeout=180, poll_interval=10):
         """Poll build card status until 'done' badge appears."""

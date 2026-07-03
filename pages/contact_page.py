@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from selenium.common import TimeoutException, NoSuchElementException
-from selenium.webdriver.support import expected_conditions as EC
 from locators.contact_locators import ContactLocators
 from pages.home_page import HomePage
 
@@ -292,10 +291,7 @@ class ContactPage(HomePage):
             try:
                 self.browser.switch_to.frame(map_iframe)
                 # Check if map content is loaded
-                map_loaded = self.wait.until(
-                    EC.presence_of_element_located(("xpath", "//div | //canvas")),
-                    timeout=10
-                )
+                map_loaded = self.find_element(("xpath", "//div | //canvas"), timeout=10)
                 self.browser.switch_to.default_content()
                 return True
             except:
