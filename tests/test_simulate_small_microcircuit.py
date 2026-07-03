@@ -191,7 +191,7 @@ class TestSimulateSmallMicrocircuit:
 
         ns_items = sim_page.get_dictionary_items()
         assert len(ns_items) > 0, "Expected at least one neuron set dictionary item"
-        ns_label = sim_page.click_dictionary_item_by_label("All Neurons")
+        ns_label = sim_page.click_dictionary_item_by_label("ALL POPULATIONS (Biophysical)")
         logger.info(f"Selected neuron set: '{ns_label}'")
 
         sim_page.wait_for_block_single(timeout=10)

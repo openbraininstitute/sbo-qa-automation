@@ -210,9 +210,12 @@ class TestSimulatePairedNeurons:
         ns_items = page.get_dictionary_items()
         assert len(ns_items) > 0, "Expected at least one neuron set item"
         try:
-            ns_label = page.click_dictionary_item_by_label("All Neurons")
+            ns_label = page.click_dictionary_item_by_label("ALL POPULATIONS")
         except AssertionError:
-            ns_label = page.click_random_dictionary_item()
+            try:
+                ns_label = page.click_dictionary_item_by_label("All Neurons")
+            except AssertionError:
+                ns_label = page.click_random_dictionary_item()
         logger.info(f"Selected neuron set: '{ns_label}'")
 
         page.wait_for_block_single(timeout=10)
