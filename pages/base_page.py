@@ -2,16 +2,18 @@
 # Copyright (c) 2025 Open Brain Institute
 # SPDX-License-Identifier: Apache-2.0
 
-import pytest
 import time
-from selenium.common import TimeoutException
+
+import pytest
+from selenium.common import StaleElementReferenceException, TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+
+from locators.species_selector_locators import SpeciesSelectorLocators
 
 
 @pytest.mark.usefixtures("setup", "logger")
 class CustomBasePage:
-
     def __init__(self, browser, wait, lab_url, logger=None):
         self.browser = browser
         self.wait = wait
@@ -24,29 +26,33 @@ class CustomBasePage:
             raise ValueError("lab_url is not set. Cannot navigate to page.")
 
         url = self.lab_url + page_url
-        print(f"INFO: CustomPage base_url + page_url = {url}" )
+        print(f"INFO: CustomPage base_url + page_url = {url}")
         self.browser.get(url)
-        
+
         # Set Matomo exclusion flag for automated tests
         try:
-            self.browser.execute_script('window._isSeleniumTest = true;')
+            self.browser.execute_script("window._isSeleniumTest = true;")
         except Exception:
             pass  # Silently fail if script execution fails
 
     def assert_visible(self, element, description, file_path=None, line=None):
         if not element.is_displayed():
             loc = f"{file_path}:{line}" if file_path and line else ""
-            raise AssertionError(f"❌ {description} not visible {f'@ {loc}' if loc else ''}")
+            raise AssertionError(
+                f"❌ {description} not visible {f'@ {loc}' if loc else ''}"
+            )
         else:
             print(f"{description} is visible.")
 
-    def assert_elements_present_and_displayed(self, locators:list, context_name:str, timeout: int=5, logger=None):
+    def assert_elements_present_and_displayed(
+        self, locators: list, context_name: str, timeout: int = 5, logger=None
+    ):
         """
-               Validates that each locator:
-                 1. Exists on the page
-                 2. Is displayed
-               Logs missing locators and elements that are not displayed.
-               """
+        Validates that each locator:
+          1. Exists on the page
+          2. Is displayed
+        Logs missing locators and elements that are not displayed.
+        """
         missing_locators = []
         not_displayed = []
 
@@ -54,7 +60,10 @@ class CustomBasePage:
             text = ele.text.strip()
             if text:
                 return text
-            return ele.get_attribute("innerText").strip() or f"<no text> tag={ele.tag_name}"
+            return (
+                ele.get_attribute("innerText").strip()
+                or f"<no text> tag={ele.tag_name}"
+            )
 
         self.logger.info(f"Verifying {context_name}")
 
@@ -68,9 +77,13 @@ class CustomBasePage:
 
                 for el in elements:
                     label = get_element_label(el)
-                    self.logger.info(f"Found {context_name}: locator={locator}, label='{label}'")
+                    self.logger.info(
+                        f"Found {context_name}: locator={locator}, label='{label}'"
+                    )
                 try:
-                    visible_elements = self.visibility_of_all_elements(locator, timeout=timeout)
+                    visible_elements = self.visibility_of_all_elements(
+                        locator, timeout=timeout
+                    )
                     visible = bool(visible_elements)
                 except TimeoutException:
                     visible = False
@@ -124,7 +137,9 @@ class CustomBasePage:
         return element.is_enabled()
 
     def enter_text(self, by_locator, text):
-        return self.wait.until(EC.visibility_of_element_located(by_locator)).send_keys(text)
+        return self.wait.until(EC.visibility_of_element_located(by_locator)).send_keys(
+            text
+        )
 
     def is_visible(self, by_locator, timeout=10):
         try:
@@ -134,9 +149,154 @@ class CustomBasePage:
         except TimeoutException:
             raise TimeoutException(f"Element not visible: {by_locator}")
 
+    # A user with no saved preference lands in All-species mode, where the region
+    # switcher is deliberately not rendered. Tests needing region controls pick a
+    # species first.
+    ALL_SPECIES_LABEL = "All"
+
+    # Mouse first: the data these tests assert on — neuron density, the cadpyr
+    # e-models, the density/count switch, Mouse-atlas regions like Isocortex — only
+    # exists for Mouse. Options are ordered by display name, so taking whatever comes
+    # first lands on Human and every downstream listing comes back empty.
+    PREFERRED_SPECIES = ("Mouse",)
+
+    def wait_for_brain_region_banner(self, timeout=40):
+        """Wait for the species/region banner, which renders in both species modes."""
+        return self.is_visible(
+            SpeciesSelectorLocators.BRAIN_REGION_BANNER, timeout=timeout
+        )
+
+    def get_species_label(self, timeout=40):
+        """Return the species selector label — a species name, or 'All'.
+
+        Blocks until the label is non-empty, which is the signal that the app has
+        finished resolving the stored preference. The region switcher renders for a
+        moment before that happens and is then removed, so checking the switcher's
+        presence too early reports focused mode when the app is really in All mode.
+        """
+
+        def _settled_label(driver):
+            elements = driver.find_elements(*SpeciesSelectorLocators.SPECIES_VALUE)
+            if not elements:
+                return False
+            try:
+                return elements[0].text.strip() or False
+            except StaleElementReferenceException:
+                return False
+
+        return WebDriverWait(self.browser, timeout).until(
+            _settled_label,
+            "Species selector label stayed empty — species mode never resolved",
+        )
+
+    def is_all_species_mode(self, timeout=40):
+        return self.get_species_label(timeout=timeout) == self.ALL_SPECIES_LABEL
+
+    def select_species(self, species_name=None, timeout=20):
+        """Open the species dropdown and pick a species.
+
+        Falls back through PREFERRED_SPECIES, then the first concrete option, when no
+        name is given. The 'All' option is never picked here — use `?s=all` for that.
+        """
+        trigger = self.element_to_be_clickable(
+            SpeciesSelectorLocators.SPECIES_TRIGGER, timeout=timeout
+        )
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block:'center'});", trigger
+        )
+        trigger.click()
+
+        options = self.find_all_elements(
+            SpeciesSelectorLocators.SPECIES_OPTION_ANY, timeout=timeout
+        )
+        # Each option renders the display name above a latin-name subtitle.
+        labelled = [((o.text or "").strip().splitlines() or [""])[0] for o in options]
+
+        wanted = [species_name] if species_name else list(self.PREFERRED_SPECIES)
+        option = chosen = None
+        for name in wanted:
+            for element, label in zip(options, labelled):
+                if label.casefold() == name.casefold():
+                    option, chosen = element, label
+                    break
+            if option is not None:
+                break
+
+        if option is None:
+            if species_name:
+                raise AssertionError(
+                    f"Species '{species_name}' is not offered — available: {labelled}"
+                )
+            option, chosen = options[0], labelled[0]
+            if self.logger:
+                self.logger.warning(
+                    f"None of {self.PREFERRED_SPECIES} offered ({labelled}) — "
+                    f"falling back to '{chosen}'"
+                )
+
+        option.click()
+        if self.logger:
+            self.logger.info(f"Selected species '{chosen}' from the species selector")
+        return chosen
+
+    def ensure_focused_species_mode(self, species_name=None, timeout=60):
+        """Select the wanted species and return its name, leaving focused mode active.
+
+        Idempotent, and it pins the species rather than accepting whatever is already
+        selected. The saved preference is one row per user with no lab or project
+        scoping and the suite runs as a single shared account, so without the pin a
+        species chosen by an earlier test silently becomes the starting point here.
+        """
+        self.wait_for_brain_region_banner(timeout=timeout)
+        label = self.get_species_label(timeout=timeout)
+        target = species_name or (
+            self.PREFERRED_SPECIES[0] if self.PREFERRED_SPECIES else None
+        )
+
+        already_right = label != self.ALL_SPECIES_LABEL and (
+            target is None or label.casefold() == target.casefold()
+        )
+        if already_right:
+            if self.logger:
+                self.logger.info(f"Already in focused mode with species '{label}'")
+            self.is_visible(
+                SpeciesSelectorLocators.BRAIN_REGION_SWITCHER, timeout=timeout
+            )
+            return label
+
+        if self.logger:
+            current = (
+                "All-species mode"
+                if label == self.ALL_SPECIES_LABEL
+                else f"species '{label}'"
+            )
+            self.logger.info(f"Switching from {current} to '{target}'")
+        chosen = self.select_species(species_name, timeout=timeout)
+
+        def _label_settled(driver):
+            elements = driver.find_elements(*SpeciesSelectorLocators.SPECIES_VALUE)
+            if not elements:
+                return False
+            try:
+                text = elements[0].text.strip()
+            except StaleElementReferenceException:
+                return False
+            return text.casefold() == chosen.casefold()
+
+        WebDriverWait(self.browser, timeout).until(
+            _label_settled,
+            f"Species selector never settled on '{chosen}' after selecting it",
+        )
+        self.is_visible(SpeciesSelectorLocators.BRAIN_REGION_SWITCHER, timeout=timeout)
+
+        label = self.get_species_label(timeout=timeout)
+        if self.logger:
+            self.logger.info(f"Focused mode active with species '{label}'")
+        return label
+
     def text_is_visible(self, by_locator, text, timeout=10):
         return WebDriverWait(self.browser, timeout).until(
-        EC.text_to_be_present_in_element(by_locator, text)
+            EC.text_to_be_present_in_element(by_locator, text)
         )
 
     def wait_for_long_load(self, element_locator, timeout=60):
@@ -146,7 +306,9 @@ class CustomBasePage:
                 EC.visibility_of_element_located(element_locator)
             )
         except TimeoutException as ex:
-            raise Exception(f"Element {element_locator} not visible after {timeout} seconds. Exception: {ex}")
+            raise Exception(
+                f"Element {element_locator} not visible after {timeout} seconds. Exception: {ex}"
+            )
 
     def wait_for_page_ready(self, timeout=20):
         """
@@ -159,8 +321,10 @@ class CustomBasePage:
             bool: True if the page is ready within the timeout, False otherwise.
         """
         return self.wait.until(
-            lambda driver: self.browser.execute_script("return document.readyState") == "complete",
-            f"Page did not reach ready state within {timeout} seconds"
+            lambda driver: (
+                self.browser.execute_script("return document.readyState") == "complete"
+            ),
+            f"Page did not reach ready state within {timeout} seconds",
         )
 
     def wait_for_network_idle(self, timeout=10, idle_time=1):
@@ -194,13 +358,17 @@ class CustomBasePage:
     def wait_for_page_to_load(self, timeout=10, element_locator=None):
         local_wait = WebDriverWait(self.browser, timeout)
         local_wait.until(
-            lambda driver: self.browser.execute_script("return document.readyState") == "complete",
-            f"Page did not reach ready state within {timeout} seconds"
+            lambda driver: (
+                self.browser.execute_script("return document.readyState") == "complete"
+            ),
+            f"Page did not reach ready state within {timeout} seconds",
         )
         if element_locator:
             local_wait.until(EC.visibility_of_element_located(element_locator))
 
-    def wait_for_condition(self, condition, timeout=60, retries=3, delay=5, message=None):
+    def wait_for_condition(
+        self, condition, timeout=60, retries=3, delay=5, message=None
+    ):
         """
         General-purpose wait function to wait for a specific condition with retries.
 
@@ -221,18 +389,21 @@ class CustomBasePage:
                     print(f"Condition not met. Retrying in {delay} seconds...")
                     time.sleep(delay)
                 attempt += 1
-        raise RuntimeError(message or f"Condition not met within {timeout} seconds after {retries} retries.")
+        raise RuntimeError(
+            message
+            or f"Condition not met within {timeout} seconds after {retries} retries."
+        )
 
     def wait_for_url_contains(self, url_fragment: str, timeout: int = 30):
         WebDriverWait(self.browser, timeout).until(
             EC.url_contains(url_fragment),
-            message=f"Timed out waiting for URL to contain: '{url_fragment}'"
+            message=f"Timed out waiting for URL to contain: '{url_fragment}'",
         )
 
-    def wait_for_url_change(self, old_url, timeout: int=30):
+    def wait_for_url_change(self, old_url, timeout: int = 30):
         WebDriverWait(self.browser, timeout).until(
             lambda driver: driver.current_url != old_url,
-            message="Timed out waiting for URL to change"
+            message="Timed out waiting for URL to change",
         )
 
     def is_clickable_via_js(self, element):
@@ -240,23 +411,30 @@ class CustomBasePage:
         Checks if an element is not covered by another element at its center point.
         Returns True if the element is the topmost element at its center.
         """
-        return self.browser.execute_script("""
+        return self.browser.execute_script(
+            """
             const rect = arguments[0].getBoundingClientRect();
             const x = rect.left + (rect.width / 2);
             const y = rect.top + (rect.height / 2);
             const elAtCenter = document.elementFromPoint(x, y);
             return elAtCenter === arguments[0];
-        """, element)
+        """,
+            element,
+        )
 
     def scroll_into_view_and_click(self, locator, timeout=10):
         el = self.element_to_be_clickable(locator, timeout=timeout)
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", el
+        )
         el.click()
         return el
 
     def scroll_to_element(self, element):
         """Scroll element into center of viewport."""
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+        self.browser.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", element
+        )
 
     def scroll_to_top(self):
         """Scroll the page to the top."""
@@ -265,7 +443,6 @@ class CustomBasePage:
     def wait_and_click(self, by_locator, timeout=20):
         """Wait until element is visible and enabled, then click (with JS fallback)."""
         try:
-
             WebDriverWait(self.browser, 10).until(
                 lambda d: d.execute_script("return document.readyState") == "complete"
             )
@@ -279,13 +456,17 @@ class CustomBasePage:
             )
 
             elem = self.browser.find_element(*by_locator)
-            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", elem)
+            self.browser.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", elem
+            )
             time.sleep(2)
 
             try:
                 elem.click()
             except Exception as click_error:
-                print(f"Standard click failed: {click_error}. Trying JavaScript click...")
+                print(
+                    f"Standard click failed: {click_error}. Trying JavaScript click..."
+                )
                 self.browser.execute_script("arguments[0].click();", elem)
 
             return
@@ -293,7 +474,9 @@ class CustomBasePage:
         except Exception as e:
             timestamp = int(time.time())
             self.browser.save_screenshot(f"error_wait_and_click_{timestamp}.png")
-            with open(f"error_wait_and_click_{timestamp}.html", "w", encoding="utf-8") as f:
+            with open(
+                f"error_wait_and_click_{timestamp}.html", "w", encoding="utf-8"
+            ) as f:
                 f.write(self.browser.page_source)
 
             try:
@@ -301,31 +484,39 @@ class CustomBasePage:
                 location = elem.location_once_scrolled_into_view
                 top_element = self.browser.execute_script(
                     "return document.elementFromPoint(arguments[0], arguments[1]);",
-                    location['x'], location['y']
+                    location["x"],
+                    location["y"],
                 )
-                print("Top element at click point:", top_element.get_attribute('outerHTML'))
+                print(
+                    "Top element at click point:",
+                    top_element.get_attribute("outerHTML"),
+                )
             except Exception as diag_error:
                 print("Could not inspect top element:", diag_error)
 
             try:
-                for entry in self.browser.get_log('browser'):
+                for entry in self.browser.get_log("browser"):
                     print(entry)
             except Exception as log_error:
                 print("Browser logs not available:", log_error)
 
-            raise TimeoutException(f"Element {by_locator} was not clickable after {timeout}s. Error: {e}")
+            raise TimeoutException(
+                f"Element {by_locator} was not clickable after {timeout}s. Error: {e}"
+            )
 
     def wait_for_image_to_load(self, img_locator, timeout=20):
         WebDriverWait(self.browser, timeout).until(
-            lambda driver: driver.find_element(*img_locator).get_attribute("src") and
-                           driver.find_element(*img_locator).is_displayed()
+            lambda driver: (
+                driver.find_element(*img_locator).get_attribute("src")
+                and driver.find_element(*img_locator).is_displayed()
+            )
         )
 
     def wait_for_video_to_load(self, video_locator, timeout=20):
         WebDriverWait(self.browser, timeout).until(
             lambda driver: driver.execute_script(
                 "const video = arguments[0]; return video.readyState >= 3;",
-                driver.find_element(*video_locator)
+                driver.find_element(*video_locator),
             )
         )
 
@@ -342,7 +533,7 @@ class CustomBasePage:
         """Wait for the element to disappear (become invisible) using explicit wait."""
         WebDriverWait(self.browser, timeout).until(
             EC.invisibility_of_element_located(by_locator),
-            message=f"Element {by_locator} did not disappear within {timeout} seconds."
+            message=f"Element {by_locator} did not disappear within {timeout} seconds.",
         )
 
     def wait_for_non_empty_text(self, locator, timeout=25):
@@ -361,10 +552,14 @@ class CustomBasePage:
                 record = self.wait_for_non_empty_text(locator, timeout)
                 record_text = record.text.strip()
                 print(f"Found text for {locator}: '{record_text}'")
-                record_number = int(''.join(filter(str.isdigit, record_text)))
+                record_number = int("".join(filter(str.isdigit, record_text)))
                 record_counts.append(record_number)
             except TimeoutException:
-                raise TimeoutException(f"Timeout: No text found for record at {locator} within {timeout} seconds.")
+                raise TimeoutException(
+                    f"Timeout: No text found for record at {locator} within {timeout} seconds."
+                )
             except ValueError:
-                raise ValueError(f"Could not parse record count from text: '{record_text}'")
+                raise ValueError(
+                    f"Could not parse record count from text: '{record_text}'"
+                )
         return record_counts

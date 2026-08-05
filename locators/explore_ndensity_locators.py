@@ -9,12 +9,10 @@ class ExploreNDensityPageLocators:
     AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
     AI_ASSISTANT_PANEL_CLOSE = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     BRAIN_REGIONS_PANEL_BTN = (By.CSS_SELECTOR, ".ant-btn-icon")
-    BR_REGION_BANNER = (
-        By.XPATH,
-        "//div[@data-label='brain-region-switcher']"
-        " | //div[@aria-label='brain-region-banner']",
-    )
-    BR_REGION_CLOSE_BTN = (By.XPATH, "//div[@aria-label='brain-region-banner']//span[@aria-label='close']")
+    # The switcher is the element carrying the "open the region tree" click handler.
+    # It only exists in focused mode — see SpeciesSelectorLocators.
+    BR_REGION_BANNER = (By.CSS_SELECTOR, "div[data-label='brain-region-switcher']")
+    BR_REGION_CLOSE_BTN = (By.XPATH, "//div[@data-label='brain-region-banner']//span[@aria-label='close']")
     BR_REGION_SEARCH_INPUT = (
         By.XPATH,
         "//div[@id='brain-region-hierarchy']//input[@id='region-search']"
@@ -22,10 +20,11 @@ class ExploreNDensityPageLocators:
     )
     BR_REGION_ROOT_OPTION = (By.XPATH, "//button[@title='Root']")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
+    # Scoped to the switcher on purpose: the species name inside the banner is also
+    # font-bold, so a banner-wide match would pass on the species instead of the region.
     BR_VERTICAL_PANEL_CEREBRUM = (
         By.XPATH,
-        "//div[@data-label='brain-region-switcher']//span[contains(@class,'font-bold')]"
-        " | //div[@aria-label='brain-region-banner']//span[contains(@class, 'font-bold')]",
+        "//div[@data-label='brain-region-switcher']//span[contains(@class,'font-bold')]",
     )
     TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
     TABLE_CELLS = (
