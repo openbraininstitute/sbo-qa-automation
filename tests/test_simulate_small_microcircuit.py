@@ -184,18 +184,14 @@ class TestSimulateSmallMicrocircuit:
             sim_page.wait_for_block_single(timeout=10)
             logger.info(f"Distribution {dist_i + 1} config form appeared")
 
-        # Step 15: Neuron sets tab — click Add Neuron Set → select "All Neurons"
+        # Step 15: Neuron sets tab — click Add Neuron Set → select "ALL POPULATIONS (Biophysical)"
         sim_page.click_neuron_sets_tab()
         sim_page.click_add_button_in_active_sub_entry("Neuron Set")
         logger.info("Clicked 'Add Neuron Set'")
 
         ns_items = sim_page.get_dictionary_items()
         assert len(ns_items) > 0, "Expected at least one neuron set dictionary item"
-        # "ALL POPULATIONS (Biophysical)" is staging-only until production release
-        if "staging" in test_config["base_url"]:
-            ns_label = sim_page.click_dictionary_item_by_label("ALL POPULATIONS (Biophysical)")
-        else:
-            ns_label = sim_page.click_dictionary_item_by_label("All Neurons")
+        ns_label = sim_page.click_dictionary_item_by_label("ALL POPULATIONS (Biophysical)")
         logger.info(f"Selected neuron set: '{ns_label}'")
 
         sim_page.wait_for_block_single(timeout=10)
