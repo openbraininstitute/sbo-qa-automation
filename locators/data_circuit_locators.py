@@ -73,11 +73,26 @@ class DataCircuitLocators:
     MINI_DETAIL_DESCRIPTION = (By.CSS_SELECTOR, "#record-description")
     MINI_DETAIL_FIELDS = (By.XPATH, "//*[@data-testid='mini-viewer']//div[contains(@class,'text-primary-3') and contains(@class,'font-light')]")
 
-    # Detail view - tabs
-    DV_OVERVIEW_TAB = (By.XPATH, "//a[contains(@href,'overview')]")
-    DV_ANALYSIS_TAB = (By.XPATH, "//a[contains(@href,'analysis')]")
-    DV_RELATED_PUBLICATIONS_TAB = (By.XPATH, "//a[contains(@href,'related-publications')]")
-    DV_RELATED_ARTIFACTS_TAB = (By.XPATH, "//a[contains(@href,'related-artifacts')]")
+    # Detail view - tabs (DetailMenu renders NextLink tabs as
+    # /data/view/{type}/{id}/{section}; section label is capitalize(section).
+    # Do NOT use bare contains(@href,'analysis') — that also matches
+    # notebooks/browse/analysis_notebook_template in the top nav.
+    DV_OVERVIEW_TAB = (
+        By.XPATH,
+        "//a[normalize-space()='Overview' and contains(@href,'/data/view/') and contains(@href,'/overview')]",
+    )
+    DV_ANALYSIS_TAB = (
+        By.XPATH,
+        "//a[normalize-space()='Analysis' and contains(@href,'/data/view/') and contains(@href,'/analysis') and not(contains(@href,'notebook'))]",
+    )
+    DV_RELATED_PUBLICATIONS_TAB = (
+        By.XPATH,
+        "//a[normalize-space()='Related publications' and contains(@href,'/data/view/') and contains(@href,'related-publications')]",
+    )
+    DV_RELATED_ARTIFACTS_TAB = (
+        By.XPATH,
+        "//a[normalize-space()='Related artifacts' and contains(@href,'/data/view/') and contains(@href,'related-artifacts')]",
+    )
     DV_CLOSE_BTN = (By.XPATH, "//a[@title='Close']")
 
     # Detail view - breadcrumbs
@@ -94,22 +109,23 @@ class DataCircuitLocators:
     DV_DOWNLOAD_BTN = (By.XPATH, "//button[.//div[text()='Download']]")
     DV_SIMULATE_BTN = (By.XPATH, "//a[.//div[text()='Simulate']] | //button[.//div[text()='Simulate']]")
 
-    # Analysis tab
+    # Analysis tab content (circuit Overview component under Analysis section)
+    # titles from Header; sections use data-testid="{cell|network}-overview"
     DV_ANALYSIS_CELL_STATS_TITLE = (
         By.XPATH,
-        "//div[contains(text(),'Cell statistics')]"
+        "//div[normalize-space()='Cell statistics']"
     )
     DV_ANALYSIS_CELL_STATS_IMAGE = (
-        By.XPATH,
-        "//div[contains(text(),'Cell statistics')]/following-sibling::div//img[contains(@alt,'node_stats')]"
+        By.CSS_SELECTOR,
+        "[data-testid='cell-overview'] img"
     )
     DV_ANALYSIS_NETWORK_STATS_TITLE = (
         By.XPATH,
-        "//div[contains(text(), 'Network statistics')]"
+        "//div[normalize-space()='Network statistics']"
     )
     DV_ANALYSIS_NETWORK_STATS_IMAGES = (
-        By.XPATH,
-        "//div[contains(text(),'Network statistics')]/following-sibling::div//img[contains(@alt,'network_stats')]"
+        By.CSS_SELECTOR,
+        "[data-testid='network-overview'] img"
     )
 
     # Related Publications tab

@@ -20,7 +20,7 @@ class TestSimulateSynaptomeBeta:
     15-23. Stimuli: add random + "Poisson Spikes (Efferent)" with Frequency=50
     24-27. Recordings: add random recording type
     28-31. Distributions: add 3 random parameters
-    32-34. Neuron sets: add "All Neurons"
+    32-34. Neuron sets: add "SINGLE POPULATION (Virtual)"
     35-37. Synaptic manipulations: add random
     38-40. Timestamps: add random
     41-43. Generate simulation(s) → Simulations tab
@@ -199,7 +199,7 @@ class TestSimulateSynaptomeBeta:
         else:
             logger.info("Skipping Distributions — not yet available in production")
 
-        # ── Steps 32-34: Neuron sets — add "All Neurons" ─────────────────
+        # ── Steps 32-34: Neuron sets — add "SINGLE POPULATION (Virtual)" ──
         page.click_neuron_sets_tab()
         logger.info("On Neuron sets tab")
 
@@ -208,10 +208,7 @@ class TestSimulateSynaptomeBeta:
 
         ns_items = page.get_dictionary_items()
         assert len(ns_items) > 0, "Expected at least one neuron set item"
-        try:
-            ns_label = page.click_dictionary_item_by_label("All Neurons")
-        except AssertionError:
-            ns_label = page.click_random_dictionary_item()
+        ns_label = page.click_dictionary_item_by_label("SINGLE POPULATION (Virtual)")
         logger.info(f"Selected neuron set: '{ns_label}'")
 
         page.wait_for_block_single(timeout=10)
