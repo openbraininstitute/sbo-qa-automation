@@ -331,7 +331,7 @@ class ExplorePage(HomePage):
             ExplorePageLocators.PANEL_CIRCUIT,
             ExplorePageLocators.PANEL_MEMODEL,
             ExplorePageLocators.PANEL_SYNAPTOME,
-            ExplorePageLocators.PANEL_SYNAPTOME_BETA,
+            ExplorePageLocators.PANEL_SYNAPTOME_LEGACY,
             ExplorePageLocators.PANEL_ION_CHANNEL_MODEL_BETA,
         ]
         missing_locators = []

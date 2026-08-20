@@ -14,10 +14,22 @@ class WorkflowLocators:
     TYPE_CAROUSEL = (By.CSS_SELECTOR, "#workflow-category-menu")
     TYPE_CAROUSEL_HEADER = (By.XPATH, "//h1[text()='Type']")
     
-    # Build type cards (clickable cards with aria-disabled="false")
-    BUILD_SINGLE_NEURON = (By.XPATH, "//div[@data-slot='card' and @aria-disabled='false']//div[text()='Single neuron']")
-    BUILD_SYNAPTOME = (By.XPATH, "//div[@data-slot='card' and @aria-disabled='false']//div[text()='Synaptome']")
-    BUILD_ION_CHANNEL = (By.XPATH, "//div[@data-slot='card' and @aria-disabled='false']//div[text()='Ion channel']")
+    # Build type cards — titles are prefixed (e.g. "Cellular: Single neuron")
+    BUILD_SINGLE_NEURON = (
+        By.XPATH,
+        "//div[@data-slot='card' and @aria-disabled='false']"
+        "//div[@data-slot='card-title'][contains(., 'Single neuron') and not(contains(., 'legacy'))]",
+    )
+    BUILD_SYNAPTOME = (
+        By.XPATH,
+        "//div[@data-slot='card' and @aria-disabled='false']"
+        "//div[@data-slot='card-title'][contains(., 'Synaptome')]",
+    )
+    BUILD_ION_CHANNEL = (
+        By.XPATH,
+        "//div[@data-slot='card' and @aria-disabled='false']"
+        "//div[@data-slot='card-title'][contains(., 'Ion channel')]",
+    )
     
     # Simulate type cards
     # Non-beta cards - must NOT contain "beta" anywhere

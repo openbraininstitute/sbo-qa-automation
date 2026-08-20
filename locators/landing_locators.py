@@ -21,7 +21,11 @@ class LandingLocators:
     FOOTER_OBI_LOGO = (By.XPATH, "//div[contains(@class,'footer-panel-module') and contains(@class,'__title')]//h2")
     FOOTER_OBI_COPYRIGHT = (By.XPATH, "//div[contains(@class,'footer-panel-module') and contains(@class,'__copyright')]")
     FOOTER_LINK_TITLES = (By.XPATH, "//div[contains(@class,'footer-panel-module') and contains(@class,'__links')]//a")
-    FOOTER_SUBSCRIBE_BLOCK = (By.XPATH, "//div[contains(@class,'footer-panel-module') and contains(@class,'__subscribe')]")
+    # Subscribe block is a <form>, not a <div>
+    FOOTER_SUBSCRIBE_BLOCK = (
+        By.XPATH,
+        "//*[contains(@class,'footer-panel-module') and contains(@class,'__subscribe')]",
+    )
     FOOTER_SOCIAL_MEDIA_LINKS = (By.XPATH, "//div[contains(@class,'social-media-links-module') and contains(@class,'__socialMediaLinks')]//a[@href]")
     GOTO_LAB = (By.XPATH, "//a[@href='/app/virtual-lab/sync']")
     HERO_BACKGROUND_IMG = (By.CSS_SELECTOR, "div[class*='__background']")

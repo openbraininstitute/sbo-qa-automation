@@ -57,23 +57,23 @@ class WorkflowsPage(HomePage):
 
     # Build type cards
     def find_build_single_neuron(self, timeout=10):
-        """Find Build > Single neuron card"""
+        """Find Build > Cellular: Single neuron card"""
         element = self.find_element(WorkflowLocators.BUILD_SINGLE_NEURON, timeout=timeout)
         # Return the parent card element which is clickable
         return element.find_element(By.XPATH, "./ancestor::div[@data-slot='card']")
 
     def find_build_synaptome(self, timeout=10):
-        """Find Build > Synaptome card"""
+        """Find Build > Cellular: Synaptome (legacy) card"""
         element = self.find_element(WorkflowLocators.BUILD_SYNAPTOME, timeout=timeout)
         return element.find_element(By.XPATH, "./ancestor::div[@data-slot='card']")
 
     def find_build_ion_channel(self, timeout=10):
-        """Find Build > Ion channel card"""
+        """Find Build > Subcellular: Ion channel card"""
         element = self.find_element(WorkflowLocators.BUILD_ION_CHANNEL, timeout=timeout)
         return element.find_element(By.XPATH, "./ancestor::div[@data-slot='card']")
 
     def verify_build_buttons(self):
-        """Verify all Build type cards are displayed and clickable"""
+        """Verify Build type cards are displayed and clickable (prefixed UI titles)."""
         results = {}
         cards = [
             ('Single neuron', WorkflowLocators.BUILD_SINGLE_NEURON),

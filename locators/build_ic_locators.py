@@ -14,12 +14,15 @@ class BuildIcLocators:
     BUILD_LINK = (By.XPATH, "//a[contains(text(), 'Build')]")
     BUILD_SPAN = (By.XPATH, "//span[contains(text(), 'Build')]")
     
-    # Ion channel card selectors
-    ION_CHANNEL_CARD_PRIMARY = (By.XPATH, "//div[@data-slot='card-title']//div[text()='Ion channel']")
-    ION_CHANNEL_CARD_SUBTITLE = (By.XPATH, "//div[@data-slot='card-title']//div[text()='Subcellular']")
-    ION_CHANNEL_CARD_COMBINED = (By.XPATH, "//div[@data-slot='card-title'][.//div[text()='Subcellular'] and .//div[text()='Ion channel']]")
-    ION_CHANNEL_CARD_CLASS = (By.XPATH, "//div[contains(@class, 'card')]//div[text()='Ion channel']")
-    ION_CHANNEL_CARD_TEXT = (By.XPATH, "//div[text()='Ion channel']")
+    # Ion channel card selectors (UI title is now e.g. "Subcellular: Ion channel")
+    ION_CHANNEL_CARD_PRIMARY = (By.XPATH, "//div[@data-slot='card-title'][contains(., 'Ion channel')]")
+    ION_CHANNEL_CARD_SUBTITLE = (By.XPATH, "//div[@data-slot='card-title'][contains(., 'Subcellular')]")
+    ION_CHANNEL_CARD_COMBINED = (
+        By.XPATH,
+        "//div[@data-slot='card-title'][contains(., 'Subcellular') and contains(., 'Ion channel')]",
+    )
+    ION_CHANNEL_CARD_CLASS = (By.XPATH, "//div[contains(@class, 'card')]//div[contains(normalize-space(), 'Ion channel')]")
+    ION_CHANNEL_CARD_TEXT = (By.XPATH, "//div[contains(normalize-space(), 'Ion channel')]")
     ION_CHANNEL_CARD_ANY = (By.XPATH, "//*[contains(text(), 'Ion channel')]")
     ION_CHANNEL_CARD_BUTTON = (By.XPATH, "//button[contains(text(), 'Ion channel')]")
     ION_CHANNEL_CARD_CASE_INSENSITIVE = (By.XPATH, "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'ion channel')]")

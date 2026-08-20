@@ -89,7 +89,9 @@ class ExplorePageLocators:
     PANEL_EMODEL = (By.XPATH, "//div[normalize-space()='E-model']")
     PANEL_MEMODEL = (By.XPATH, "//div[normalize-space()='ME-model']")
     PANEL_SYNAPTOME = (By.XPATH, "//div[normalize-space()='Synaptome']")
-    PANEL_SYNAPTOME_BETA = (By.XPATH, "//div[normalize-space()='Synaptome (beta)']")
+    PANEL_SYNAPTOME_LEGACY = (By.XPATH, "//div[normalize-space()='Synaptome (legacy)']")
+    # Alias kept for older call sites; UI renamed Synaptome (beta) → Synaptome (legacy)
+    PANEL_SYNAPTOME_BETA = PANEL_SYNAPTOME_LEGACY
     PANEL_ION_CHANNEL_MODEL_BETA = (By.XPATH, "//div[normalize-space()='Ion channel model']")
     PUBLIC_TAB = (By.XPATH, "//button[contains(.,'Public')]")
     PROJECT_HOME_BTN = (By.CSS_SELECTOR, "#workspace-home")
