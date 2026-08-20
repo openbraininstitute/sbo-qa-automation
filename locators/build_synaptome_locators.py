@@ -92,10 +92,14 @@ class BuildSynaptomeLocators:
     BUILD_LINK = (By.XPATH, "//a[contains(text(), 'Build')]")
     BUILD_SPAN = (By.XPATH, "//span[contains(text(), 'Build')]")
     
-    # Synaptome card selectors
-    SYNAPTOME_CARD_PRIMARY = (By.XPATH, "//div[@data-slot='card']//div[text()='Synaptome']")
-    SYNAPTOME_CARD_CLASS = (By.XPATH, "//div[contains(@class, 'card')]//div[text()='Synaptome']")
-    SYNAPTOME_CARD_TEXT = (By.XPATH, "//div[text()='Synaptome']")
+    # Synaptome card selectors (UI title is now e.g. "Cellular: Synaptome (legacy)")
+    SYNAPTOME_CARD_PRIMARY = (
+        By.XPATH,
+        "//div[@data-slot='card' and @aria-disabled='false']"
+        "//div[@data-slot='card-title'][contains(., 'Synaptome')]",
+    )
+    SYNAPTOME_CARD_CLASS = (By.XPATH, "//div[contains(@class, 'card')]//div[contains(normalize-space(), 'Synaptome')]")
+    SYNAPTOME_CARD_TEXT = (By.XPATH, "//div[contains(normalize-space(), 'Synaptome')]")
     SYNAPTOME_CARD_ANY = (By.XPATH, "//*[contains(text(), 'Synaptome')]")
     SYNAPTOME_CARD_BUTTON = (By.XPATH, "//button[contains(text(), 'Synaptome')]")
     SYNAPTOME_CARD_CASE_INSENSITIVE = (By.XPATH, "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'synaptome')]")

@@ -41,7 +41,7 @@ class TestWorkflowHome:
             logger.info("✅ Clicked Build category button")
             time.sleep(2)  # Wait for type cards to load
             
-            # 3. Find and verify Build type cards: Single neuron, Synaptome, Ion channel
+            # 3. Find and verify Build type cards (UI titles are prefixed, e.g. "Cellular: Single neuron")
             logger.info("🔍 Verifying Build type cards...")
             build_buttons = workflows_page.verify_build_buttons()
             
