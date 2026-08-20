@@ -37,6 +37,11 @@ class TestExploreModelPage:
         emodel_tab.click()
         logger.info("E-model data tab is clicked")
 
+        # A user with no saved preference lands in All-species mode, where the region
+        # switcher is intentionally not rendered. Pick a species to get it back.
+        selected_species = explore_emodel.ensure_focused_species_mode(timeout=60)
+        logger.info(f"Focused species mode active with '{selected_species}'")
+
         # Verify brain region panel shows a value
         cerebrum_title = explore_emodel.find_br_cerebrum_title(timeout=25)
         cerebrum_text = cerebrum_title.text

@@ -22,6 +22,11 @@ class TestExploreNeuronDensity:
         explore_ndensity.wait_for_network_idle(timeout=15)
         logger.info(f"Neuron density tab is displayed, {browser.current_url}")
 
+        # A user with no saved preference lands in All-species mode, where the region
+        # switcher is intentionally not rendered. Pick a species to get it back.
+        selected_species = explore_ndensity.ensure_focused_species_mode(timeout=60)
+        logger.info(f"Focused species mode active with '{selected_species}'")
+
         cerebrum_brp = explore_ndensity.find_cerebrum_brp(timeout=30)
         assert cerebrum_brp.is_displayed()
         region_text = cerebrum_brp.text.strip()

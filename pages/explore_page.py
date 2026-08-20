@@ -16,8 +16,10 @@ class ExplorePage(HomePage):
         super().__init__(browser, wait, base_url)
         self.logger = logger
 
-    def go_to_explore_page(self, lab_id: str, project_id: str, retries=3, delay=5):
-        path = f"/app/virtual-lab/{lab_id}/{project_id}/data"
+    def go_to_explore_page(self, lab_id: str, project_id: str, retries=3, delay=5, query=""):
+        """Open the explore page. `query` accepts a URL override such as '?s=all',
+        which pins the species mode ahead of any stored preference."""
+        path = f"/app/virtual-lab/{lab_id}/{project_id}/data{query}"
         for attempt in range(retries):
             try:
                 self.browser.set_page_load_timeout(100)

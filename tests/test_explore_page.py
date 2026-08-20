@@ -23,6 +23,11 @@ class TestExplorePage:
         explore_page.wait_for_network_idle(timeout=15)
         logger.info(f"Explore page is loaded, {browser.current_url}")
 
+        # A user with no saved preference lands in All-species mode, where the region
+        # switcher is intentionally not rendered. Pick a species to get it back.
+        selected_species = explore_page.ensure_focused_species_mode(timeout=60)
+        logger.info(f"Focused species mode active with '{selected_species}'")
+
         brain_region_panel = explore_page.find_brain_region_panel(timeout=40)
         logger.info("Found Brain Region Panel")
 
