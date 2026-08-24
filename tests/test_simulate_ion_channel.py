@@ -91,28 +91,21 @@ class TestSimulateIonChannel:
         logger.info(f"Found {num_types} model type(s) available")
 
         # Configure up to 3 models (or as many as available)
-        # Models 1-2: full flow (model + conductance + right-column verification)
+        # Models 1-2: full flow (model + conductance/permeability + model info verification)
         # Model 3: "Ion channel model without conductance nor max permeability"
-        #           — only select a model, no conductance, no plots in right column
+        #           — only select a model, no conductance
         models_to_add = min(3, num_types)
         for i in range(models_to_add):
             is_third_model = (i == 2)
             logger.info(f"── Configuring ion channel model {i + 1}/{models_to_add} ──")
 
             if is_third_model:
-                # 3rd model: no conductance, no plots
+                # 3rd model: no conductance
                 page.add_and_configure_ion_channel_model(
                     type_index=i,
                     conductance=None,
                 )
                 logger.info(f"✓ Ion channel model {i + 1} configured (no conductance)")
-
-                # Right column should have no plots for this model type
-                plot_count = page.get_right_column_plot_count(timeout=3)
-                logger.info(
-                    f"  Right column plots for model {i + 1}: {plot_count} "
-                    f"(expected 0 — no plots for this model type)"
-                )
             else:
                 # Model 1: conductance, Model 2: permeability (ms/s)
                 if i == 0:
@@ -129,37 +122,16 @@ class TestSimulateIonChannel:
                     )
                     logger.info(f"✓ Ion channel model {i + 1} configured (permeability=400 ms/s)")
 
-                # Verify right column: Model traces dropdown, Activation dropdown, plots
-                rc = page.verify_right_column_after_model_selection()
-
-                assert rc['model_traces_visible'], (
-                    f"Model traces dropdown should be visible after model {i + 1}"
-                )
-                assert rc['model_traces_items'] >= 2, (
-                    f"Model traces dropdown should have at least 2 items, "
-                    f"got {rc['model_traces_items']}"
+                # Verify model info preview is visible after model selection
+                # (The right-column Model traces/Activation plots were removed from the UI;
+                #  the config view now shows model metadata inline instead)
+                mi = page.verify_model_info_after_selection()
+                assert mi['model_name_visible'], (
+                    f"Model name should be visible after configuring model {i + 1}"
                 )
                 logger.info(
-                    f"  Model traces dropdown: {rc['model_traces_items']} item(s)"
+                    f"  Model info visible: name='{mi.get('model_name', 'N/A')}'"
                 )
-
-                assert rc['activation_visible'], (
-                    f"Activation dropdown should be visible after model {i + 1}"
-                )
-                assert rc['activation_items'] >= 1, (
-                    f"Activation dropdown should have at least 1 item, "
-                    f"got {rc['activation_items']}"
-                )
-                logger.info(
-                    f"  Activation dropdown: {rc['activation_items']} item(s), "
-                    f"selected: '{rc.get('activation_selected', 'N/A')}'"
-                )
-
-                assert rc['plot_count'] >= 1, (
-                    f"Expected at least 1 plot in right column after model {i + 1}, "
-                    f"got {rc['plot_count']}"
-                )
-                logger.info(f"  Right column plots: {rc['plot_count']}")
 
             # Add next model if not last — the sub-entry with "Add" button
             # is already visible, no need to re-click the tab

@@ -108,6 +108,13 @@ class SimulateIonChannelLocators:
         By.XPATH,
         "//div[contains(@class,'ant-collapse-item')] | //div[contains(@class,'ant-select')]",
     )
+    # ── Model info metadata (shown inline after model selection) ─────────
+    MODEL_INFO_METADATA = (
+        By.XPATH,
+        "//div[@data-scan-config-block='block_single']"
+        "//*[contains(text(),'Brain Region') or contains(text(),'Species')"
+        " or contains(text(),'Temperature') or contains(text(),'Lifecycle status')]",
+    )
 
     # ── Left menu buttons ────────────────────────────────────────────────
     LEFT_MENU_INFO_BTN = (
@@ -149,24 +156,30 @@ class SimulateIonChannelLocators:
     ION_CHANNEL_MODEL_FIELD = (
         By.XPATH,
         "//div[@data-scan-config-block='block_single']"
+        "//div[@data-scan-config-block-element='model_selector_single']//button"
+        " | //div[@data-scan-config-block='block_single']"
+        "//button[.//span[contains(text(),'Select ion channel model')]]"
+        " | //div[@data-scan-config-block='block_single']"
         "//button[contains(@class,'ant-select') or contains(@class,'placeholder')]"
         " | //div[@data-scan-config-block='block_single']"
-        "//div[contains(@class,'ant-select-selector')]"
-        " | //div[@data-scan-config-block='block_single']"
-        "//button[contains(text(),'Click to select') or contains(text(),'select')]",
+        "//div[contains(@class,'ant-select-selector')]",
     )
     ION_CHANNEL_MODEL_LIST_ROWS = (
         By.CSS_SELECTOR,
-        "tbody.ant-table-tbody tr.ant-table-row",
+        ".ag-row[role='row']",
     )
     ION_CHANNEL_MODEL_RADIO_BTN = (
         By.XPATH,
-        "//table//input[@type='radio']"
+        "//div[contains(@class,'ag-selection-checkbox')]//input"
+        " | //div[contains(@class,'ag-checkbox-input-wrapper')]//input"
+        " | //table//input[@type='radio']"
         " | //table//span[contains(@class,'ant-radio-inner')]",
     )
     ION_CHANNEL_MODEL_SELECT_BTN = (
         By.XPATH,
-        "//div[@id='modal-footer']//button[contains(.,'Select')]"
+        "//button[contains(text(),'Confirm') or .//span[contains(text(),'Confirm')]"
+        " or contains(normalize-space(),'Confirm')]"
+        " | //div[@id='modal-footer']//button[contains(.,'Select')]"
         " | //button[text()='Select']",
     )
     ION_CHANNEL_CONDUCTANCE_INPUT = (

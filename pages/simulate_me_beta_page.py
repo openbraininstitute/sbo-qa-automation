@@ -50,11 +50,22 @@ class SimulateMeBetaPage(HomePage):
     # ── Tabs ─────────────────────────────────────────────────────────────
 
     def click_public_tab(self):
-        """Click the Public tab."""
+        """Click the Public tab and wait for table data to load."""
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
         el = self.find_element(SimulateMeBetaLocators.PUBLIC_TAB, timeout=15)
         el.click()
         self.logger.info("Clicked Public tab")
         time.sleep(3)
+        # Wait for AG Grid rows to appear (data loading can be slow on staging)
+        try:
+            WebDriverWait(self.browser, 30).until(
+                EC.presence_of_element_located(SimulateMeBetaLocators.TABLE_ROWS)
+            )
+            self.logger.info("Table rows appeared after Public tab click")
+        except Exception:
+            self.logger.warning("Table rows not found within 30s after Public tab click")
+        time.sleep(1)
 
     def click_project_tab(self):
         """Click the Project tab."""
@@ -67,7 +78,7 @@ class SimulateMeBetaPage(HomePage):
 
     EXPECTED_COLUMNS = [
         'Name', 'Morphology', 'Trace', 'Validated',
-        'Brain region', 'M-type', 'E-type',
+        'Brain region', 'Species', 'M-type', 'E-type',
         'Created by', 'Registration date',
     ]
 
@@ -77,6 +88,7 @@ class SimulateMeBetaPage(HomePage):
         'Trace': SimulateMeBetaLocators.COL_TRACE,
         'Validated': SimulateMeBetaLocators.COL_VALIDATED,
         'Brain region': SimulateMeBetaLocators.COL_BRAIN_REGION,
+        'Species': SimulateMeBetaLocators.COL_SPECIES,
         'M-type': SimulateMeBetaLocators.COL_MTYPE,
         'E-type': SimulateMeBetaLocators.COL_ETYPE,
         'Created by': SimulateMeBetaLocators.COL_CREATED_BY,
@@ -107,7 +119,7 @@ class SimulateMeBetaPage(HomePage):
 
     # ── Table rows ───────────────────────────────────────────────────────
 
-    def get_table_rows(self, timeout=15):
+    def get_table_rows(self, timeout=30):
         """Get all visible table rows."""
         self.find_element(SimulateMeBetaLocators.TABLE_ROWS, timeout=timeout)
         return self.browser.find_elements(*SimulateMeBetaLocators.TABLE_ROWS)
@@ -126,28 +138,22 @@ class SimulateMeBetaPage(HomePage):
         if not rows:
             raise RuntimeError("No rows found in the table")
 
-        # Find column indices dynamically
-        headers = self.browser.find_elements(*SimulateMeBetaLocators.COLUMN_HEADERS)
-        creator_idx = None
-        date_idx = None
-        for i, h in enumerate(headers):
-            text = h.text.strip()
-            if 'Created by' in text:
-                creator_idx = i
-            if 'Registration date' in text:
-                date_idx = i
-
         visible_rows = rows[:min(10, len(rows))]
         eligible = []
         for row in visible_rows:
-            cells = row.find_elements("tag name", "td")
             skip = False
-            if creator_idx is not None and date_idx is not None and len(cells) > max(creator_idx, date_idx):
-                creator = cells[creator_idx].text.strip()
-                reg_date = cells[date_idx].text.strip()
-                if exclude_creator in creator and exclude_date in reg_date:
-                    self.logger.info(f"Skipping row: creator='{creator}', date='{reg_date}'")
-                    skip = True
+            # AG Grid uses .ag-cell with col-id attributes
+            try:
+                creator_cell = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='createdBy']")
+                date_cell = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='registrationDate']")
+                if creator_cell and date_cell:
+                    creator = creator_cell[0].text.strip()
+                    reg_date = date_cell[0].text.strip()
+                    if exclude_creator in creator and exclude_date in reg_date:
+                        self.logger.info(f"Skipping row: creator='{creator}', date='{reg_date}'")
+                        skip = True
+            except Exception:
+                pass
             if not skip:
                 eligible.append(row)
 
@@ -194,91 +200,110 @@ class SimulateMeBetaPage(HomePage):
             self.logger.warning(f"Could not read column headers: {e}")
 
     def get_etype_column_values(self):
-        """Get all E-type values from the visible rows by finding the E-type column index dynamically."""
-        # Find E-type column index from headers
-        etype_idx = None
-        try:
-            headers = self.browser.find_elements(*SimulateMeBetaLocators.COLUMN_HEADERS)
-            for i, h in enumerate(headers):
-                if 'E-type' in h.text:
-                    etype_idx = i
-                    break
-        except Exception:
-            pass
-
-        if etype_idx is None:
-            self.logger.warning("E-type column header not found, defaulting to index 6")
-            etype_idx = 6
-
-        self.logger.info(f"E-type column index: {etype_idx}")
-
+        """Get all E-type values from the visible rows using AG Grid cell col-id."""
         rows = self.get_table_rows()
         values = []
         for row in rows:
-            cells = row.find_elements("tag name", "td")
-            if len(cells) > etype_idx:
-                values.append(cells[etype_idx].text.strip())
+            etype_cells = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='etype']")
+            if etype_cells:
+                values.append(etype_cells[0].text.strip())
         self.logger.info(f"E-type values: {values[:5]}...")
         return values
 
-    # ── Filter panel ─────────────────────────────────────────────────────
+    # ── Filter panel (AG Grid column filter — Radix popover) ────────────────
+
+    def _wait_for_table_loaded(self, timeout=30):
+        """Wait for AG Grid rows to appear and loading overlay to disappear."""
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        WebDriverWait(self.browser, timeout).until(
+            EC.presence_of_element_located(SimulateMeBetaLocators.TABLE_ROWS)
+        )
+        try:
+            WebDriverWait(self.browser, 10).until(
+                EC.invisibility_of_element_located(SimulateMeBetaLocators.AG_GRID_LOADING_OVERLAY)
+            )
+        except Exception:
+            pass
+        time.sleep(1)
 
     def open_filter_panel(self):
-        """Click the Filters button to open the filter panel."""
-        btn = self.find_element(SimulateMeBetaLocators.FILTER_BUTTON, timeout=10)
-        btn.click()
-        self.logger.info("Opened filter panel")
+        """Click the E-type column filter button to open the Radix popover."""
+        self._wait_for_table_loaded()
+        btn = self.find_element(SimulateMeBetaLocators.FILTER_ETYPE_BUTTON, timeout=10)
+        self.browser.execute_script("arguments[0].click()", btn)
+        self.logger.info("Opened E-type filter popover")
+        time.sleep(2)
+        # Verify popover opened
+        self.find_element(SimulateMeBetaLocators.FILTER_POPOVER_DIALOG, timeout=5)
+
+    def expand_etype_filter(self):
+        """No-op: AG Grid popover shows options directly without accordion."""
+        pass
+
+    def type_etype_filter(self, value):
+        """No-op: AG Grid filter uses checkboxes, not a search input."""
+        pass
+
+    def select_etype_option(self, option_text):
+        """Check the checkbox for the given E-type value in the filter popover."""
+        dialog = self.find_element(SimulateMeBetaLocators.FILTER_POPOVER_DIALOG, timeout=10)
+        labels = dialog.find_elements(*SimulateMeBetaLocators.FILTER_POPOVER_CHECKBOX_LABELS)
+        for label in labels:
+            # Each label contains a span with the E-type name
+            spans = label.find_elements(By.CSS_SELECTOR, "span.flex-1.truncate")
+            if spans and spans[0].text.strip() == option_text:
+                # Click the checkbox button inside the label
+                checkbox = label.find_element(By.CSS_SELECTOR, "button[role='checkbox']")
+                self.browser.execute_script("arguments[0].click()", checkbox)
+                self.logger.info(f"Checked E-type option: '{option_text}'")
+                time.sleep(1)
+                return
+        # Fallback: try matching by label text
+        for label in labels:
+            if option_text in label.text:
+                checkbox = label.find_element(By.CSS_SELECTOR, "button[role='checkbox']")
+                self.browser.execute_script("arguments[0].click()", checkbox)
+                self.logger.info(f"Checked E-type option (fallback match): '{option_text}'")
+                time.sleep(1)
+                return
+        available = [lbl.text.split(chr(10))[0] for lbl in labels[:10]]
+        raise RuntimeError(f"E-type option '{option_text}' not found. Available: {available}")
+
+    def click_filter_apply(self):
+        """Click the Apply button inside the filter popover and wait for data reload."""
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        btn = self.find_element(SimulateMeBetaLocators.FILTER_POPOVER_APPLY_BUTTON, timeout=5)
+        self.browser.execute_script("arguments[0].click()", btn)
+        self.logger.info("Clicked Apply in filter popover")
+        # Wait for the AG Grid loading overlay to appear and then disappear
+        time.sleep(1)
+        try:
+            WebDriverWait(self.browser, 30).until(
+                EC.invisibility_of_element_located(SimulateMeBetaLocators.AG_GRID_LOADING_OVERLAY)
+            )
+            self.logger.info("Loading overlay disappeared — filter data loaded")
+        except Exception:
+            self.logger.warning("Loading overlay did not disappear within 30s")
         time.sleep(2)
 
     def close_filter_panel(self):
-        """Close the filter panel."""
-        btn = self.find_element(SimulateMeBetaLocators.FILTER_CLOSE_BUTTON, timeout=5)
-        btn.click()
-        self.logger.info("Closed filter panel")
-        time.sleep(1)
-
-    def expand_etype_filter(self):
-        """Expand the E-type accordion in the filter panel."""
-        trigger = self.find_element(SimulateMeBetaLocators.FILTER_ETYPE_TRIGGER, timeout=10)
-        trigger.click()
-        self.logger.info("Expanded E-type filter")
-        time.sleep(1)
-
-    def type_etype_filter(self, value):
-        """Type a value into the E-type filter search input."""
-        input_el = self.find_element(
-            SimulateMeBetaLocators.FILTER_ETYPE_SEARCH_INPUT, timeout=10
-        )
-        input_el.click()
-        input_el.send_keys(value)
-        self.logger.info(f"Typed '{value}' in E-type filter")
-        time.sleep(2)
-
-    def select_etype_option(self, option_text):
-        """Select an option from the E-type dropdown."""
-        locator = (By.XPATH, f"//div[contains(@class,'ant-select-item-option') and @title='{option_text}']")
-        option = self.element_to_be_clickable(locator, timeout=10)
-        option.click()
-        self.logger.info(f"Selected E-type option: '{option_text}'")
-        time.sleep(1)
-
-    def click_filter_apply(self):
-        """Click the Apply button in the filter panel."""
+        """Close the filter popover by pressing Escape."""
+        from selenium.webdriver.common.keys import Keys
+        from selenium.webdriver.common.action_chains import ActionChains
         try:
-            btn = self.find_element(SimulateMeBetaLocators.FILTER_APPLY_BUTTON, timeout=5)
-            btn.click()
-            self.logger.info("Clicked Apply filter")
-        except TimeoutException:
-            self.logger.info("No explicit Apply button found — filter may auto-apply")
-        time.sleep(3)
+            ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+            self.logger.info("Closed filter popover via Escape")
+        except Exception:
+            pass
+        time.sleep(1)
 
     def filter_by_etype(self, etype_value):
-        """Full flow: open filters, expand E-type, type value, select, close."""
+        """Full flow: open E-type filter popover → check value → apply."""
         self.open_filter_panel()
-        self.expand_etype_filter()
-        self.type_etype_filter(etype_value)
         self.select_etype_option(etype_value)
-        self.close_filter_panel()
+        self.click_filter_apply()
         time.sleep(2)
 
     # ── Search ───────────────────────────────────────────────────────────

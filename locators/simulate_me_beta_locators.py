@@ -17,36 +17,40 @@ class SimulateMeBetaLocators:
     PROJECT_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Project')] or text()='Project']")
 
     """Data table container wrappers."""
-    DATA_TABLE_WITH_FILTERS = (By.CSS_SELECTOR, "#data-table-with-filters")
-    BASE_TABLE_WRAPPER = (By.CSS_SELECTOR, "#base-table-wrapper")
+    DATA_TABLE_WITH_FILTERS = (By.CSS_SELECTOR, "#data-table-container-me_model_circuit")
+    BASE_TABLE_WRAPPER = (By.CSS_SELECTOR, "#data-table-container-me_model_circuit")
 
-    """Column headers in the model picker table (9 columns)."""
-    COL_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class,'columnTitle') and text()='Name']")
-    COL_MORPHOLOGY = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class,'columnTitle') and text()='Morphology']")
-    COL_TRACE = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class,'columnTitle') and text()='Trace']")
-    COL_VALIDATED = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class,'columnTitle') and text()='Validated']")
-    COL_BRAIN_REGION = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class,'columnTitle') and text()='Brain region']")
-    COL_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class,'columnTitle') and text()='M-type']")
-    COL_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class,'columnTitle') and text()='E-type']")
-    COL_CREATED_BY = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class,'columnTitle') and text()='Created by']")
-    COL_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[contains(@class,'columnTitle') and text()='Registration date']")
+    """Column headers in the model picker table (10 columns, AG Grid)."""
+    COL_NAME = (By.CSS_SELECTOR, ".ag-header-cell[col-id='name']")
+    COL_MORPHOLOGY = (By.CSS_SELECTOR, ".ag-header-cell[col-id='meModelMorphologyPreview']")
+    COL_TRACE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='meModelTracePreview']")
+    COL_VALIDATED = (By.CSS_SELECTOR, ".ag-header-cell[col-id='validationStatus']")
+    COL_BRAIN_REGION = (By.CSS_SELECTOR, ".ag-header-cell[col-id='brainRegion']")
+    COL_SPECIES = (By.CSS_SELECTOR, ".ag-header-cell[col-id='species']")
+    COL_MTYPE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='mtype']")
+    COL_ETYPE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='etype']")
+    COL_CREATED_BY = (By.CSS_SELECTOR, ".ag-header-cell[col-id='createdBy']")
+    COL_REGISTRATION_DATE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='registrationDate']")
 
-    """Table rows and cells."""
-    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
-    TABLE_FIRST_ROW = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row:first-child")
-    TABLE_ROW_NAME_CELLS = (By.XPATH, "//tbody[@class='ant-table-tbody']//tr[contains(@class,'ant-table-row')]//td[1]")
-    COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")
+    """Table rows and cells (AG Grid)."""
+    TABLE_ROWS = (By.CSS_SELECTOR, ".ag-row[role='row']")
+    TABLE_FIRST_ROW = (By.CSS_SELECTOR, ".ag-row[row-index='0']")
+    TABLE_ROW_NAME_CELLS = (By.CSS_SELECTOR, ".ag-row[role='row'] .ag-cell[col-id='name']")
+    COLUMN_HEADERS = (By.CSS_SELECTOR, ".ag-header-cell[role='columnheader']")
 
-    """Filter panel: open/close, E-type accordion, search input, apply button."""
-    FILTER_BUTTON = (By.XPATH, "//button[@aria-label='listing-view-filter-button']")
-    FILTER_CLOSE_BUTTON = (By.XPATH, "//button[@aria-label='Close']")
-    FILTER_ETYPE_TRIGGER = (
+    """Filter panel: AG Grid column filter (Radix popover with checkboxes)."""
+    FILTER_ETYPE_BUTTON = (By.CSS_SELECTOR, "button[aria-label='Filter E-type']")
+    FILTER_POPOVER_DIALOG = (By.CSS_SELECTOR, "[role='dialog'][data-state='open']")
+    FILTER_POPOVER_CHECKBOX_LABELS = (By.CSS_SELECTOR, "[role='dialog'][data-state='open'] label.flex.cursor-pointer")
+    FILTER_POPOVER_APPLY_BUTTON = (
         By.XPATH,
-        "//button[contains(@class,'accordionTrigger')]//span[text()='E-type']/parent::button"
+        "//div[@role='dialog'][@data-state='open']//button[.//text()='Apply']"
     )
-    FILTER_ETYPE_SEARCH_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input'])[last()]")
-    FILTER_ETYPE_SEARCH_OVERFLOW = (By.XPATH, "//div[@class='ant-select-selection-overflow']")
-    FILTER_APPLY_BUTTON = (By.XPATH, "//button[@role='button']//span[text()='Apply']/parent::button")
+    FILTER_POPOVER_RESET_BUTTON = (
+        By.XPATH,
+        "//div[@role='dialog'][@data-state='open']//button[.//text()='Reset']"
+    )
+    AG_GRID_LOADING_OVERLAY = (By.CSS_SELECTOR, ".ag-overlay-loading-wrapper")
 
     """Search bar."""
     SEARCH_BUTTON = (By.XPATH, "//button[@aria-label='Open search']")
@@ -130,8 +134,8 @@ class SimulateMeBetaLocators:
         "input.ant-input-number-input"
     )
     CONFIG_PLUS_CIRCLE_BTNS = (
-        By.XPATH,
-        "//span[@aria-label='plus-circle']"
+        By.CSS_SELECTOR,
+        "button[aria-label='Scan over several values'], button[aria-label='Add a value']"
     )
     CONFIG_SWEEP_INPUTS = (
         By.CSS_SELECTOR,
@@ -223,7 +227,7 @@ class SimulateMeBetaLocators:
     BLOCK_NUMBER_INPUT = (By.CSS_SELECTOR, "input.ant-input-number-input")
     BLOCK_SELECT_ITEM = (By.CSS_SELECTOR, ".ant-select-selection-item")
     BLOCK_STRING_INPUT = (By.CSS_SELECTOR, "input[data-scan-config-block-element='string_input']")
-    BLOCK_PLUS_CIRCLE = (By.XPATH, ".//span[@aria-label='plus-circle']")
+    BLOCK_PLUS_CIRCLE = (By.CSS_SELECTOR, "button[aria-label='Scan over several values'], button[aria-label='Add a value']")
     BLOCK_COMBOBOX_TRIGGER = (By.CSS_SELECTOR, "button[role='combobox']")
     BLOCK_VALUE_INPUT = (By.CSS_SELECTOR, "input[type='number'][placeholder='Enter value…']")
     WARNING_ICON = (By.CSS_SELECTOR, ".anticon-warning")
