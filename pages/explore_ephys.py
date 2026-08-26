@@ -684,13 +684,14 @@ class ExploreElectrophysiologyPage(ExplorePage):
                     print(error_message)
 
     def wait_for_page_ready(self, timeout=30):
-        """Wait for the page to be ready"""
+        """Wait for the page to be ready (AG Grid listing)."""
         super().wait_for_page_ready(timeout=timeout)
         try:
             self.find_data_table_with_filters(timeout=timeout)
         except TimeoutException:
-            # Fallback to legacy grid view
             self.find_explore_section_grid()
+        # Ensure at least one header/row is present so the listing is interactive
+        self.find_element(ExploreEphysLocators.LV_NAME, timeout=timeout)
 
     def find_mini_detail_view(self, timeout=10):
         """Find the mini-detail view container"""

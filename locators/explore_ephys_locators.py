@@ -15,8 +15,8 @@ class ExploreEphysLocators:
     FILTER_BUTTON = (By.XPATH, "//button[@aria-label='listing-view-filter-button']")
     FILTER_COUNT = (By.XPATH, "//button[@aria-label='listing-view-filter-button']//span[contains(@class,'bg-primary-8') and contains(@class,'rounded-full')]")
     
-    # Thumbnails (images within table cells)
-    THUMBNAILS = (By.XPATH, "//td//img")
+    # Thumbnails (images within AG Grid cells)
+    THUMBNAILS = (By.CSS_SELECTOR, ".ag-cell[col-id='preview'] img")
     
     # Data type selector tabs (Experimental, Model, Simulations)
     DATA_TYPE_SELECTOR = (By.CSS_SELECTOR, "#data-type-selector")
@@ -29,35 +29,35 @@ class ExploreEphysLocators:
     SINGLE_CELL_ELECTROPHYSIOLOGY_BTN = (By.CSS_SELECTOR, "#counter-electrical_cell_recording")
     SINGLE_CELL_ELECTROPHYSIOLOGY_TEXT = (By.CSS_SELECTOR, "a[id='counter-electrical_cell_recording'] div["
                                                            "class='font-bold text-current']")
-    # Data table with filters
-    DATA_TABLE_WITH_FILTERS = (By.CSS_SELECTOR, "#data-table-with-filters")
+    # Data table container (AG Grid)
+    DATA_TABLE_WITH_FILTERS = (By.CSS_SELECTOR, ".ag-root-wrapper, .ag-root")
     
     # Search functionality
     SEARCH_BUTTON = (By.XPATH, "//button[@aria-label='Open search']")
     SEARCH_INPUT = (By.XPATH, "//input[@placeholder='Search for entities...']")
     SEARCH_CLEAR_BTN = (By.XPATH, "//button[@aria-label='Clear search']")
     
-    # Table columns based on your requirements
-    TABLE_HEADER_PREVIEW = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Preview']")
-    TABLE_HEADER_BRAIN_REGION = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Brain region']")
-    TABLE_HEADER_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-type']")
-    TABLE_HEADER_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
-    TABLE_HEADER_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
-    TABLE_HEADER_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
-    TABLE_HEADER_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Registration date']")
+    # Table columns (AG Grid headers)
+    TABLE_HEADER_PREVIEW = (By.CSS_SELECTOR, ".ag-header-cell[col-id='preview']")
+    TABLE_HEADER_BRAIN_REGION = (By.CSS_SELECTOR, ".ag-header-cell[col-id='brainRegion']")
+    TABLE_HEADER_ETYPE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='etype']")
+    TABLE_HEADER_NAME = (By.CSS_SELECTOR, ".ag-header-cell[col-id='name']")
+    TABLE_HEADER_SPECIES = (By.CSS_SELECTOR, ".ag-header-cell[col-id='species']")
+    TABLE_HEADER_CONTRIBUTORS = (By.CSS_SELECTOR, ".ag-header-cell[col-id='contributions']")
+    TABLE_HEADER_REGISTRATION_DATE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='registrationDate']")
     
-    # Table content
-    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
-    TABLE_CELLS = (By.CSS_SELECTOR, "tbody.ant-table-tbody td.ant-table-cell")
-    TABLE_BRAIN_REGION_CELLS = (By.XPATH, "//td[@class='ant-table-cell text-primary-7 cursor-pointer "
-                                          "before:!content-none ant-table-cell-ellipsis' and @title]")
+    # Table content (AG Grid)
+    TABLE_ROWS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
+    TABLE_CELLS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-cell")
+    TABLE_BRAIN_REGION_CELLS = (By.CSS_SELECTOR, ".ag-cell[col-id='brainRegion']")
     
     # Base locator for brain region cells (to be formatted in page object)
-    TABLE_BRAIN_REGION_CELL_EXACT_TEMPLATE = ("//td[@class='ant-table-cell text-primary-7 cursor-pointer "
-                                              "before:!content-none ant-table-cell-ellipsis' and @title='{}']")
-    TABLE_BRAIN_REGION_CELL_PARTIAL_TEMPLATE = ("//td[@class='ant-table-cell text-primary-7 cursor-pointer "
-                                                "before:!content-none ant-table-cell-ellipsis' and contains(@title, "
-                                                "'{}')]")
+    TABLE_BRAIN_REGION_CELL_EXACT_TEMPLATE = (
+        "//div[contains(@class,'ag-cell') and @col-id='brainRegion' and normalize-space()='{}']"
+    )
+    TABLE_BRAIN_REGION_CELL_PARTIAL_TEMPLATE = (
+        "//div[contains(@class,'ag-cell') and @col-id='brainRegion' and contains(normalize-space(), '{}')]"
+    )
     # Filter panel locators
     FILTER_SPECIES_BUTTON = (By.XPATH, "//span[text()='Species']")
     FILTER_SPECIES_TEXT = (By.XPATH, "//span[text()='Rattus norvegicus']")
@@ -86,13 +86,13 @@ class ExploreEphysLocators:
     MDV_VIEW_DETAILS_BUTTON = (By.XPATH, "//a[@title='Go to details page' and contains(text(), 'View details')]")
     
     # Legacy locators (keeping for backward compatibility)
-    ALL_CHECKBOXES = (By.XPATH, "//span[@class='ant-checkbox ant-wave-target']")
+    ALL_CHECKBOXES = (By.CSS_SELECTOR, ".ag-header-select-all .ag-checkbox-input, .ag-header-cell[col-id='ag-Grid-SelectionColumn'] input")
     AI_ASSISTANT_PANEL = (By.XPATH, "//div[starts-with(@class,'ai-assistant-module')]")
     AI_ASSISTANT_PANEL_CLOSE_BTN = (By.XPATH, "(//span[@aria-label='minus'])[3]")
     APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")
     BRAIN_REGION_PANEL_CLOSE_BTN = (By.CSS_SELECTOR, ".ant-btn-icon")
     BRAIN_REGION_PANEL_OPEN_BTN = (By.CSS_SELECTOR, "span[class='anticon anticon-plus']")
-    CHECKBOXES = (By.XPATH, "//input[@class='ant-checkbox-input' and @type='checkbox']")
+    CHECKBOXES = (By.CSS_SELECTOR, ".ag-selection-checkbox input, .ag-cell[col-id='ag-Grid-SelectionColumn'] input")
     DOWNLOAD_RESOURCES = (By.XPATH, "//button[@type='button' and @aria-label='download-resources-button']")
     # Breadcrumbs
     DV_BREADCRUMB_DATA = (By.XPATH, "//a[contains(@class,'capitalize') and text()='Data']")
@@ -212,31 +212,31 @@ class ExploreEphysLocators:
     DV_STIMULUS_IMG_GRID = (By.XPATH, "//div[@class='flex flex-col gap-10']")
     DV_STIM_IMAGES = (By.XPATH, "//div[@class='flex flex-col gap-3 divide-y divide-neutral-2']//div[@class='grid grid-cols-4 gap-7 pt-5 2xl:grid-cols-6']")
     
-    # List View locators
-    FILTERED_ETYPE = (By.XPATH, "(//td[@class='ant-table-cell text-primary-7 cursor-pointer before:!content-none ant-table-cell-ellipsis']/div[@title='bNAC'])[2]")
+    # List View locators (AG Grid)
+    FILTERED_ETYPE = (By.CSS_SELECTOR, ".ag-cell[col-id='etype']")
     FILTER_ETYPE_BTN = (By.XPATH, "//button[starts-with(@class, 'filters-module__') and starts-with(@id, 'radix-') and @type='button']//span[text()='E-type']")
     FILTER_ETYPE_SEARCH_INPUT = (By.XPATH, "(//input[@class='ant-select-selection-search-input'])[2]")
     FILTER_ETYPE_INPUT_TYPE_AREA = (By.XPATH, "//div[@class='ant-select-selection-search']")
     FILTER_ETYPE_SEARCH = (By.XPATH, "//div[@class='ant-select-selection-overflow']")
     LOAD_MORE_BUTTON = (By.XPATH, "//button[@type='button' and text()='Load 30 more results...']")
-    LV_GRID_VIEW = (By.CSS_SELECTOR, "#base-table-wrapper")
-    LV_BRAIN_REGION = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Brain region']")
-    LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
-    LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-type']")
+    LV_GRID_VIEW = (By.CSS_SELECTOR, ".ag-root-wrapper, .ag-root")
+    LV_BRAIN_REGION = (By.CSS_SELECTOR, ".ag-header-cell[col-id='brainRegion']")
+    LV_CONTRIBUTORS = (By.CSS_SELECTOR, ".ag-header-cell[col-id='contributions']")
+    LV_ETYPE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='etype']")
     LV_FILTER_APPLY_BTN = (By.XPATH, "//button[@type='submit' and text()='Apply']")
     LV_FILTER_BTN = (By.XPATH, "//button[@type='button' and @aria-label='listing-view-filter-button']")
     LV_FILTER_CLOSE_BTN = (By.XPATH, "//button[@type='button' and @aria-label='Close']")
     LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-type']")
-    LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
-    LV_PREVIEW = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Preview']")
-    LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Registration date']")
-    LV_ROW1 = (By.XPATH, "(//td[@class='ant-table-cell text-primary-7 cursor-pointer before:!content-none ant-table-cell-ellipsis'])[1]")
-    LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
-    LV_THUMBNAIL = (By.XPATH, "//td//img")
+    LV_NAME = (By.CSS_SELECTOR, ".ag-header-cell[col-id='name']")
+    LV_PREVIEW = (By.CSS_SELECTOR, ".ag-header-cell[col-id='preview']")
+    LV_REGISTRATION_DATE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='registrationDate']")
+    LV_ROW1 = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
+    LV_SPECIES = (By.CSS_SELECTOR, ".ag-header-cell[col-id='species']")
+    LV_THUMBNAIL = (By.CSS_SELECTOR, ".ag-cell[col-id='preview'] img")
     LV_TOTAL_RESULTS = (By.XPATH, "//div[@class='w-max']")
-    SEARCHED_SPECIES = (By.XPATH, "//td[@title='Rattus norvegicus' and contains(text(),'Rattus norvegicus')][1]")
+    SEARCHED_SPECIES = (By.XPATH, "//div[contains(@class,'ag-cell') and @col-id='species' and contains(normalize-space(),'Rattus norvegicus')]")
     SEARCH_INPUT_FIELD = (By.XPATH, "button[aria-label='Open search']")
-    TABLE = (By.XPATH, "//tbody[@class='ant-table-tbody']")
+    TABLE = (By.CSS_SELECTOR, ".ag-root-wrapper, .ag-root")
     # TABLE_CELLS = (By.CSS_SELECTOR, "tbody.ant-table-tbody td.ant-table-cell.text-primary-7.cursor-pointer.ant-table-cell-ellipsis")
 
     """Pagination."""
@@ -246,8 +246,8 @@ class ExploreEphysLocators:
     PAGINATION_NEXT = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-next button")
     PAGINATION_PREV = (By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-prev button")
 
-    """Table rows (clickable cells)."""
-    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
+    """Table rows (AG Grid)."""
+    TABLE_ROWS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
 
     """Unit toggle (nA/pA) radio buttons on interactive detail plots."""
     DV_UNIT_TOGGLE_NA = (By.XPATH, "//label[contains(@class,'ant-radio-button-wrapper')]//span[text()='nA']")
