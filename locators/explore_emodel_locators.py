@@ -67,19 +67,23 @@ class ExploreEModelPageLocators:
         By.XPATH,
         "//button[@aria-label='Open search'] | //button[@aria-label='Close search']",
     )
-    INPUT_PLACEHOLDER = (By.CSS_SELECTOR, "input[placeholder='Search for entities...']")
-    LV_EM_TD = (
-        By.XPATH,
-        "//tbody[contains(@class,'ant-table-tbody')]//tr[contains(@class,'ant-table-row') and not(contains(@class,'ant-table-measure-row'))][1]"
+    # UI uses unicode ellipsis (…) in the placeholder, not three ASCII dots
+    INPUT_PLACEHOLDER = (
+        By.CSS_SELECTOR,
+        "input[placeholder*='Search for entities'], input[placeholder*='Search for resources']",
     )
-    LV_ROW = (By.CSS_SELECTOR, ".ant-table-body")
+    LV_EM_TD = (
+        By.CSS_SELECTOR,
+        ".ag-center-cols-container .ag-row[role='row'] .ag-cell[col-id='name']",
+    )
+    LV_ROW = (By.CSS_SELECTOR, ".ag-root-wrapper, .ag-root, .ag-center-cols-container")
     ME_MODEL_TAB = (By.XPATH, "//li[@title='ME-model']")
     MINI_DETAIL_VIEW = (By.CSS_SELECTOR, "a[title='Go to details page']")
     MODEL_DATA_TAB = (By.XPATH, "//button[@role='tab' and text()='Model']")
     SEARCH_REGION = (By.XPATH, "//input[@class='ant-select-selection-search-input']")
     SEARCH_RESOURCES = (
         By.CSS_SELECTOR,
-        "input[placeholder='Search for entities...'], input[placeholder='Search for resources...']",
+        "input[placeholder*='Search for entities'], input[placeholder*='Search for resources']",
     )
     SELECTED_BRAIN_REGION = (
         By.XPATH,

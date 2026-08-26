@@ -504,46 +504,27 @@ class BuildSingleNeuronPage(ProjectHome):
 
 
     def select_random_m_model(self, exclude_indices=None, timeout=15):
-        """Select a random M-model from the table, optionally excluding already-tried indices.
+        """Select a random M-model from the AG Grid picker.
+
         Returns the index selected, or -1 if failed.
         """
         import random
         exclude_indices = exclude_indices or set()
         try:
-            # Wait for radio buttons to appear (poll up to 30s)
-            radios = []
-            for wait_attempt in range(15):
-                time.sleep(2)
-                radios = self.browser.find_elements(
-                    By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//span[@class='ant-radio-inner']"
-                )
-                if radios:
-                    self.logger.info(f"Found {len(radios)} M-model radio buttons after {(wait_attempt+1)*2}s")
-                    break
-                self.logger.info(f"Waiting for M-model radio buttons... attempt {wait_attempt + 1}/15")
-            if not radios:
-                radios = self.browser.find_elements(
-                    By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//input[@class='ant-radio-input']"
-                )
-            if not radios:
-                radios = self.browser.find_elements(
-                    By.CSS_SELECTOR, "span.ant-radio-inner"
-                )
-            if not radios:
-                self.logger.warning("No M-model radio buttons found")
+            self.find_element(self.locators.M_MODEL_TABLE, timeout=timeout)
+            selectors = self._wait_for_ag_selection_inputs(timeout=30)
+            if not selectors:
+                self.logger.warning("No M-model AG Grid selection inputs found")
                 return -1
 
-            available = [i for i in range(len(radios)) if i not in exclude_indices]
+            available = [i for i in range(len(selectors)) if i not in exclude_indices]
             if not available:
                 self.logger.warning("All M-models already tried")
                 return -1
 
             idx = random.choice(available)
-            radio = radios[idx]
-            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", radio)
-            time.sleep(0.5)
-            self.browser.execute_script("arguments[0].click();", radio)
-            self.logger.info(f"Selected M-model at index {idx} (of {len(radios)})")
+            self._click_ag_selection_input(selectors[idx])
+            self.logger.info(f"Selected M-model at index {idx} (of {len(selectors)})")
             time.sleep(2)
             return idx
         except Exception as e:
@@ -551,13 +532,14 @@ class BuildSingleNeuronPage(ProjectHome):
             return -1
 
     def select_random_e_model(self, exclude_indices=None, timeout=15):
-        """Select a random E-model from the table, optionally navigating to a random page.
+        """Select a random E-model from the AG Grid picker.
+
         Returns the index selected, or -1 if failed.
         """
         import random
         exclude_indices = exclude_indices or set()
         try:
-            self.find_element(self.locators.E_MODEL_TABLE, timeout)
+            self.find_element(self.locators.E_MODEL_TABLE, timeout=timeout)
             self.wait_for_spinner_to_disappear()
             time.sleep(2)
 
@@ -567,7 +549,6 @@ class BuildSingleNeuronPage(ProjectHome):
                     By.CSS_SELECTOR, "ul[data-testid='listing-pagination'] li.ant-pagination-item"
                 )
                 if len(pages) > 1:
-                    # Pick a random page that isn't the current active one
                     non_active = [p for p in pages if 'ant-pagination-item-active' not in (p.get_attribute('class') or '')]
                     if non_active:
                         target_page = random.choice(non_active)
@@ -578,35 +559,61 @@ class BuildSingleNeuronPage(ProjectHome):
                         time.sleep(3)
             except Exception:
                 pass
-            radios = self.browser.find_elements(
-                By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//span[@class='ant-radio-inner']"
-            )
-            if not radios:
-                radios = self.browser.find_elements(
-                    By.XPATH, "//td[contains(@class,'ant-table-selection-column')]//input[@class='ant-radio-input']"
-                )
-            if not radios:
-                radios = self.browser.find_elements(By.XPATH, "//span[@class='ant-radio-inner']")
-            if not radios:
-                self.logger.warning("No E-model radio buttons found")
+
+            selectors = self._wait_for_ag_selection_inputs(timeout=30)
+            if not selectors:
+                self.logger.warning("No E-model AG Grid selection inputs found")
                 return -1
 
-            available = [i for i in range(len(radios)) if i not in exclude_indices]
+            available = [i for i in range(len(selectors)) if i not in exclude_indices]
             if not available:
                 self.logger.warning("All E-models already tried")
                 return -1
 
             idx = random.choice(available)
-            radio = radios[idx]
-            self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", radio)
-            time.sleep(0.5)
-            self.browser.execute_script("arguments[0].click();", radio)
-            self.logger.info(f"Selected E-model at index {idx} (of {len(radios)})")
+            self._click_ag_selection_input(selectors[idx])
+            self.logger.info(f"Selected E-model at index {idx} (of {len(selectors)})")
             time.sleep(2)
             return idx
         except Exception as e:
             self.logger.warning(f"Error selecting random E-model: {e}")
             return -1
+
+    def _wait_for_ag_selection_inputs(self, timeout=30):
+        """Poll for AG Grid selection checkboxes/radios in the model picker."""
+        deadline = time.time() + timeout
+        attempt = 0
+        while time.time() < deadline:
+            attempt += 1
+            selectors = self.browser.find_elements(
+                By.CSS_SELECTOR,
+                ".ag-selection-checkbox input, "
+                ".ag-cell[col-id='ag-Grid-SelectionColumn'] input, "
+                ".ag-center-cols-container .ag-row[role='row'] input[type='checkbox'], "
+                ".ag-center-cols-container .ag-row[role='row'] input[type='radio']",
+            )
+            # Prefer inputs that belong to visible data rows
+            selectors = [el for el in selectors if el.is_enabled()]
+            if selectors:
+                self.logger.info(f"Found {len(selectors)} AG Grid selection inputs after attempt {attempt}")
+                return selectors
+            self.logger.info(f"Waiting for AG Grid selection inputs... attempt {attempt}")
+            time.sleep(2)
+        return []
+
+    def _click_ag_selection_input(self, element):
+        """Click an AG Grid selection input (often visually hidden)."""
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+        time.sleep(0.3)
+        try:
+            self.browser.execute_script("arguments[0].click();", element)
+        except Exception:
+            # Fallback: click the surrounding checkbox wrapper / cell
+            try:
+                wrapper = element.find_element(By.XPATH, "./ancestor::div[contains(@class,'ag-selection-checkbox') or contains(@class,'ag-cell')][1]")
+                self.browser.execute_script("arguments[0].click();", wrapper)
+            except Exception:
+                element.click()
 
     def _run_compatibility_check(self, timeout=60):
         """Run a single compatibility check cycle. Returns True if compatible, False if not."""
