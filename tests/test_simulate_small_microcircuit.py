@@ -267,6 +267,10 @@ class TestSimulateSmallMicrocircuit:
             assert clicked, f"Could not click input file '{fname}'"
 
             if fname.endswith('.json'):
+                # circuit_config.json is a folder of assets, not a text JSON preview
+                if fname == 'circuit_config.json':
+                    logger.info(f"  ✓ '{fname}': folder asset (skipping text JSON preview)")
+                    continue
                 preview = sim_page.get_json_preview_text(timeout=10)
                 assert len(preview) > 0, f"JSON preview for '{fname}' should not be empty"
                 logger.info(f"  ✓ '{fname}': JSON preview {len(preview)} chars")

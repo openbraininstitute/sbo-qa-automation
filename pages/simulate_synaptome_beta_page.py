@@ -85,10 +85,20 @@ class SimulateSynaptomeBetaPage(HomePage):
     # ── Model picker ─────────────────────────────────────────────────────
 
     def click_public_tab(self):
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
         el = self.find_element(Loc.PUBLIC_TAB, timeout=15)
         el.click()
         self.logger.info("Clicked Public tab")
         time.sleep(3)
+        try:
+            WebDriverWait(self.browser, 30).until(
+                EC.presence_of_element_located(Loc.TABLE_ROWS)
+            )
+            self.logger.info("Table rows appeared after Public tab click")
+        except Exception:
+            self.logger.warning("Table rows not found within 30s after Public tab click")
+        time.sleep(1)
 
     def get_table_rows(self, timeout=15):
         self.find_element(Loc.TABLE_ROWS, timeout=timeout)
@@ -109,40 +119,29 @@ class SimulateSynaptomeBetaPage(HomePage):
 
         def _read_header_texts():
             headers = self.find_all_elements(Loc.COLUMN_HEADERS, timeout=15)
-            texts = []
-            for h in headers:
-                try:
-                    title_div = h.find_element(By.CSS_SELECTOR, "div[class*='columnTitle']")
-                    texts.append(title_div.text.strip())
-                except Exception:
-                    texts.append(h.text.strip().split("\n")[0])
-            return texts
+            return [(h.text or "").strip().split("\n")[0] for h in headers]
 
-        # Read headers at current scroll position (left side)
+        def _scroll_ag(to_end=True):
+            try:
+                viewport = self.browser.find_element(
+                    By.CSS_SELECTOR, ".ag-body-horizontal-scroll-viewport"
+                )
+                if to_end:
+                    self.browser.execute_script(
+                        "arguments[0].scrollLeft = arguments[0].scrollWidth;", viewport
+                    )
+                else:
+                    self.browser.execute_script("arguments[0].scrollLeft = 0;", viewport)
+                time.sleep(0.5)
+            except Exception:
+                pass
+
         header_texts_left = _read_header_texts()
-
-        # Click scroll-to-end button to expose right-side columns
-        try:
-            scroll_btn = self.element_to_be_clickable(Loc.TABLE_SCROLL_END_BTN, timeout=5)
-            scroll_btn.click()
-            time.sleep(1)
-        except Exception:
-            pass
-
-        # Read headers again (right side)
+        _scroll_ag(to_end=True)
         header_texts_right = _read_header_texts()
-
-        # Combine both reads, deduplicate, filter empty
         all_headers = set(header_texts_left + header_texts_right) - {''}
         self.logger.info(f"Column headers found: {sorted(all_headers)}")
-
-        # Scroll back to start
-        try:
-            table = self.browser.find_element(By.CSS_SELECTOR, ".ant-table-content")
-            self.browser.execute_script("arguments[0].scrollLeft = 0;", table)
-            time.sleep(0.5)
-        except Exception:
-            pass
+        _scroll_ag(to_end=False)
 
         results = {}
         for name in expected:
@@ -183,14 +182,18 @@ class SimulateSynaptomeBetaPage(HomePage):
             raise RuntimeError("No rows found in the table")
         visible_rows = rows[:min(10, len(rows))]
         row = random.choice(visible_rows)
-        row_text = row.text.split('\n')[0][:60]
+        click_target = row
+        name_cells = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='name']")
+        if name_cells:
+            click_target = name_cells[0]
+        row_text = (click_target.text or row.text).split('\n')[0][:60]
         self.logger.info(f"Clicking row: '{row_text}...'")
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", click_target)
         time.sleep(1)
         try:
-            ActionChains(self.browser).move_to_element(row).click().perform()
+            ActionChains(self.browser).move_to_element(click_target).click().perform()
         except Exception:
-            self.browser.execute_script("arguments[0].click();", row)
+            self.browser.execute_script("arguments[0].click();", click_target)
         time.sleep(3)
         return row_text
 
@@ -376,24 +379,36 @@ class SimulateSynaptomeBetaPage(HomePage):
 
     # ── Dictionary items (shared) ────────────────────────────────────────
 
-    def click_add_button_in_active_sub_entry(self):
+    def click_add_button_in_active_sub_entry(self, add_text=None):
+        """Click Add in the active sub-entry. Optional add_text scopes the button
+        (e.g. 'Timestamp', 'Neuron Set', 'Recording').
+        """
         self._dismiss_tooltips()
-        btn = self.element_to_be_clickable(Loc.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
+        if add_text:
+            locator = (
+                By.XPATH,
+                f"//button[.//span[contains(text(),'{add_text}')]]"
+                f"[.//span[contains(@class,'anticon-plus-circle')]]"
+            )
+            btn = self.element_to_be_clickable(locator, timeout=10)
+        else:
+            btn = self.element_to_be_clickable(Loc.CONFIG_ADD_BTN_IN_SUB_ENTRY, timeout=10)
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
         time.sleep(0.5)
         try:
             ActionChains(self.browser).move_to_element(btn).click().perform()
         except Exception:
             self.browser.execute_script("arguments[0].click();", btn)
-        self.logger.info(f"Clicked Add button")
+        self.logger.info(f"Clicked Add button: '{btn.text.strip()}'")
         time.sleep(2)
 
     def get_dictionary_items(self, timeout=10):
         try:
             items = self.find_all_elements(Loc.CONFIG_BLOCK_DICTIONARY_ITEMS, timeout=timeout)
-            labels = [item.text.strip().split(chr(10))[0][:40] for item in items]
-            self.logger.info(f"Dictionary items ({len(items)}): {labels}")
-            return items
+            visible = [item for item in items if item.is_displayed()]
+            labels = [item.text.strip().split(chr(10))[0][:40] for item in visible]
+            self.logger.info(f"Dictionary items ({len(visible)}): {labels}")
+            return visible
         except TimeoutException:
             return []
 
@@ -556,7 +571,13 @@ class SimulateSynaptomeBetaPage(HomePage):
     def get_json_preview_text(self, timeout=10):
         try:
             code = self.find_element(Loc.JSON_PREVIEW_CODE, timeout=timeout)
-            return code.text.strip()
+            text = (code.text or "").strip()
+            if not text:
+                text = (self.browser.execute_script(
+                    "return arguments[0].textContent || '';", code
+                ) or "").strip()
+            self.logger.info(f"JSON preview: {len(text)} chars")
+            return text
         except TimeoutException:
             return ""
 
@@ -586,16 +607,24 @@ class SimulateSynaptomeBetaPage(HomePage):
         btn = self.element_to_be_clickable(Loc.LAUNCH_SIMULATIONS_BTN, timeout=10)
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
         time.sleep(0.5)
-        self.browser.execute_script("arguments[0].click();", btn)
+        try:
+            ActionChains(self.browser).move_to_element(btn).click().perform()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", btn)
         self.logger.info("Clicked 'Launch simulations'")
         time.sleep(3)
 
     def wait_for_simulation_terminal_state(self, timeout=300, poll_interval=10):
         import time as _time
+        from selenium.common.exceptions import WebDriverException
         terminal = {'done', 'failed', 'error', 'completed', 'success'}
         start = _time.time()
         while _time.time() - start < timeout:
-            statuses = self.get_simulation_card_statuses()
+            try:
+                statuses = self.get_simulation_card_statuses()
+            except WebDriverException as e:
+                self.logger.warning(f"Lost browser session while polling statuses: {e}")
+                return False
             if statuses and all(s['status'] in terminal for s in statuses):
                 elapsed = int(_time.time() - start)
                 self.logger.info(f"All simulations reached terminal state after {elapsed}s")
