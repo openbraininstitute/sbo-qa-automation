@@ -38,11 +38,11 @@ class RunSkeletonizationLocators:
     PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
     PROJECT_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Project')] or text()='Project']")
 
-    """Column headers in the model picker table."""
-    COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")
+    """Column headers in the model picker table (AG Grid)."""
+    COLUMN_HEADERS = (By.CSS_SELECTOR, ".ag-header-cell[role='columnheader']")
 
-    """Table rows."""
-    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
+    """Table rows (AG Grid)."""
+    TABLE_ROWS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
 
     """Pagination."""
     PAGINATION_CONTAINER = (By.CSS_SELECTOR, "ul.ant-pagination")
@@ -68,14 +68,18 @@ class RunSkeletonizationLocators:
         " | //*[@data-testid='mini-viewer']//button[.//span[contains(@class,'anticon-close')]]"
     )
 
-    """Table row checkboxes for multi-selection."""
+    """Table row checkboxes for multi-selection (AG Grid — pinned left)."""
     TABLE_ROW_CHECKBOXES = (
         By.CSS_SELECTOR,
-        "td.ant-table-selection-column .ant-checkbox-input"
+        ".ag-pinned-left-cols-container .ag-row input.ag-checkbox-input, "
+        ".ag-pinned-left-cols-container .ag-row .ag-selection-checkbox input, "
+        ".ag-cell[col-id='ag-Grid-SelectionColumn'] input.ag-checkbox-input"
     )
     TABLE_ROW_CHECKBOX_WRAPPERS = (
         By.CSS_SELECTOR,
-        "td.ant-table-selection-column .ant-checkbox-wrapper"
+        ".ag-pinned-left-cols-container .ag-row .ag-selection-checkbox, "
+        ".ag-cell[col-id='ag-Grid-SelectionColumn'] .ag-selection-checkbox, "
+        ".ag-pinned-left-cols-container .ag-row .ag-checkbox-input-wrapper"
     )
 
     """Use selection button (appears after selecting rows via checkboxes)."""

@@ -123,16 +123,43 @@ class DataCircuitPage(HomePage):
         return is_displayed
 
     def get_circuit_record_count(self, timeout=15):
-        """Get the record count displayed on the Circuit tab."""
-        try:
-            count_el = self.wait_for_non_empty_text(DataCircuitLocators.CIRCUIT_TAB_COUNT, timeout=timeout)
-            text = count_el.text.strip()
-            count = int(''.join(filter(str.isdigit, text)))
-            self.logger.info(f"Circuit record count: {count}")
-            return count
-        except (TimeoutException, ValueError) as e:
-            self.logger.warning(f"Could not get circuit record count: {e}")
-            return 0
+        """Get the record count displayed on the Circuit tab or results footer."""
+        import re
+        deadline = time.time() + timeout
+        last_err = None
+        while time.time() < deadline:
+            try:
+                # Prefer footer "N results" (always visible on the grid)
+                try:
+                    results = self.browser.find_elements(*DataCircuitLocators.RESULTS_COUNT)
+                    for el in results:
+                        nums = re.findall(r'\d+', el.text or "")
+                        if nums and int(nums[0]) > 0:
+                            count = int(nums[0])
+                            self.logger.info(f"Circuit record count: {count}")
+                            return count
+                except Exception:
+                    pass
+
+                tab = self.find_element(DataCircuitLocators.CIRCUIT_TAB, timeout=3)
+                nums = re.findall(r'\d+', tab.text or "")
+                # Prefer the largest number (e.g. "Circuit 162 of 162" → 162)
+                if nums:
+                    count = max(int(n) for n in nums)
+                    if count > 0:
+                        self.logger.info(f"Circuit record count: {count}")
+                        return count
+
+                # Fall back to visible AG Grid rows
+                rows = self.browser.find_elements(*DataCircuitLocators.TABLE_ROWS)
+                if rows:
+                    self.logger.info(f"Circuit record count (from rows): {len(rows)}")
+                    return len(rows)
+            except Exception as e:
+                last_err = e
+            time.sleep(1)
+        self.logger.warning(f"Could not get circuit record count: {last_err}")
+        return 0
 
     # ── View toggle ──────────────────────────────────────────────────────
 
@@ -189,15 +216,15 @@ class DataCircuitPage(HomePage):
     # ── Table ────────────────────────────────────────────────────────────
 
     def get_column_headers(self, timeout=15):
-        """Return list of column header texts."""
+        """Return list of column header texts (AG Grid)."""
         self.find_element(DataCircuitLocators.TABLE_COLUMN_HEADERS, timeout=timeout)
         headers = self.browser.find_elements(*DataCircuitLocators.TABLE_COLUMN_HEADERS)
-        texts = [h.text.strip() for h in headers if h.text.strip()]
+        texts = [(h.text or "").strip().split("\n")[0] for h in headers if (h.text or "").strip()]
         self.logger.info(f"Column headers ({len(texts)}): {texts}")
         return texts
 
     def get_table_rows(self, timeout=15):
-        """Return all visible table rows."""
+        """Return all visible AG Grid table rows."""
         self.find_element(DataCircuitLocators.TABLE_ROWS, timeout=timeout)
         rows = self.browser.find_elements(*DataCircuitLocators.TABLE_ROWS)
         self.logger.info(f"Table has {len(rows)} rows")
@@ -208,7 +235,6 @@ class DataCircuitPage(HomePage):
         headers = self.browser.find_elements(*DataCircuitLocators.TABLE_COLUMN_HEADERS)
         sortable_count = 0
         for h in headers:
-            # Check for sort class or aria-sort attribute
             classes = h.get_attribute("class") or ""
             aria_sort = h.get_attribute("aria-sort") or ""
             if "sort" in classes.lower() or aria_sort or h.get_attribute("role") == "columnheader":
@@ -359,14 +385,14 @@ class DataCircuitPage(HomePage):
         Excludes known problematic rows.
         Clicks on a cell within the row (not the <tr> itself) for reliable interaction.
         """
-        EXCLUDED_ROWS = ["20211110-BioM"]
+        EXCLUDED_ROWS = ["20211110-BioM", "__staging-", "ErcSst"]
 
         rows = self.get_table_rows()
         if not rows:
             raise RuntimeError("No rows found in the circuit table")
 
-        visible_rows = rows[:min(10, len(rows))]
-        # Filter out excluded rows
+        visible_rows = rows[:min(15, len(rows))]
+        # Prefer stable public circuits; filter out excluded / ephemeral rows
         valid_rows = [
             r for r in visible_rows
             if not any(excl in (r.text or "") for excl in EXCLUDED_ROWS)
@@ -374,25 +400,28 @@ class DataCircuitPage(HomePage):
         if not valid_rows:
             valid_rows = visible_rows  # fallback if all filtered out
 
+        # Prefer short well-known names (e.g. nbS1-O1, rCA1) over long generated ones
+        preferred = [
+            r for r in valid_rows
+            if len((r.text or "").split("\n")[0]) <= 24
+        ]
+        if preferred:
+            valid_rows = preferred
+
         row = random.choice(valid_rows)
-        row_text = row.text.split('\n')[0][:60]
+        click_target = row
+        name_cells = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='name']")
+        if name_cells:
+            click_target = name_cells[0]
+        row_text = (click_target.text or row.text).split('\n')[0][:60]
         self.logger.info(f"Clicking row: '{row_text}...'")
 
-        # Click on a cell within the row (2nd td) for reliable click registration
-        try:
-            cell = row.find_element(By.CSS_SELECTOR, "td.ant-table-cell:nth-child(2)")
-        except Exception:
-            cell = row  # fallback to row if cell not found
-
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", cell)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", click_target)
         time.sleep(1)
         try:
-            cell.click()
+            ActionChains(self.browser).move_to_element(click_target).click().perform()
         except Exception:
-            try:
-                ActionChains(self.browser).move_to_element(cell).click().perform()
-            except Exception:
-                self.browser.execute_script("arguments[0].click();", cell)
+            self.browser.execute_script("arguments[0].click();", click_target)
         time.sleep(3)
         return row_text
 

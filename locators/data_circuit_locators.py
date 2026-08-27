@@ -14,7 +14,14 @@ class DataCircuitLocators:
     # Circuit tab in left sidebar (active state has bg-primary-9)
     CIRCUIT_TAB = (By.CSS_SELECTOR, "a#counter-circuit")
     CIRCUIT_TAB_ACTIVE = (By.XPATH, "//a[@id='counter-circuit' and contains(@class,'bg-primary-9')]")
-    CIRCUIT_TAB_COUNT = (By.XPATH, "//a[@id='counter-circuit']//span[@class='font-bold']")
+    CIRCUIT_TAB_COUNT = (
+        By.XPATH,
+        "//a[@id='counter-circuit']//span[contains(@class,'font-bold')]",
+    )
+    RESULTS_COUNT = (
+        By.XPATH,
+        "//span[contains(@class,'text-xs') and contains(text(),'results')]",
+    )
 
     # Public / Project scope tabs
     PUBLIC_TAB = (By.XPATH, "//button[normalize-space()='Public'] | //div[normalize-space()='Public']")
@@ -30,29 +37,37 @@ class DataCircuitLocators:
     # translate-x-[2px] = hierarchy view, translate-x-[21px] = list view
     VIEW_TOGGLE_BTN = (By.ID, "toggle-view")
 
-    # Table structure
-    TABLE_CONTAINER = (By.CSS_SELECTOR, "#circuit-table-container")
-    TABLE_BODY = (By.CSS_SELECTOR, ".ant-table-body")
+    # Table structure (AG Grid)
+    TABLE_CONTAINER = (By.CSS_SELECTOR, ".ag-root, #circuit-table-container")
+    TABLE_BODY = (By.CSS_SELECTOR, ".ag-body-viewport, .ag-center-cols-viewport")
     TABLE_ROWS = (
-        By.XPATH,
-        # "(//tbody[contains(@class,'ant-table-tbody')]"
-        # "//tr[contains(@class,'ant-table-row') and not(contains(@class,'ant-table-measure-row'))])[3]",
-        # "//td[contains(@class, 'ant-table-cell')]"
-        "//tr[contains(@class, 'ant-table-row')]"
+        By.CSS_SELECTOR,
+        ".ag-center-cols-container .ag-row[role='row']",
     )
     TABLE_COLUMN_HEADERS = (
-        By.XPATH,
-        "//thead//th[@data-testid='column-header']//div[contains(@class,'columnTitle')]",
+        By.CSS_SELECTOR,
+        ".ag-header-cell[role='columnheader']",
     )
 
-    # Hierarchy expand button (chevron in rows)
-    HIERARCHY_EXPAND_BTN = (By.CSS_SELECTOR, "button.ant-table-row-expand-icon")
+    # Hierarchy expand button (AG Grid group / tree expand — contracted only)
+    HIERARCHY_EXPAND_BTN = (
+        By.CSS_SELECTOR,
+        ".ag-group-contracted, .ag-icon-tree-closed, "
+        ".ag-row .ag-group-contracted, .ag-cell .ag-icon-tree-closed, "
+        "button[aria-label*='Expand'], .ag-row button.ag-group-contracted"
+    )
 
     # Search input
-    SEARCH_INPUT = (By.XPATH, "//input[@placeholder='Search for entities...']")
+    SEARCH_INPUT = (
+        By.XPATH,
+        "//input[contains(@placeholder,'Search for entities')]",
+    )
 
     # Filter panel
-    FILTER_BTN = (By.XPATH, "//button[@aria-label='listing-view-filter-button']")
+    FILTER_BTN = (
+        By.XPATH,
+        "//button[@aria-label='Filters' or @title='Filters' or @aria-label='listing-view-filter-button']"
+    )
     FILTER_NEURONS = (By.XPATH, "//button[contains(@class,'accordionTrigger') and .//span[contains(text(),'Number of neurons')]]")
     FILTER_SYNAPSES = (By.XPATH, "//button[contains(@class,'accordionTrigger') and .//span[contains(text(),'Number of synapses')]]")
     FILTER_CONNECTIONS = (By.XPATH, "//button[contains(@class,'accordionTrigger') and .//span[contains(text(),'Number of connections')]]")
@@ -141,8 +156,17 @@ class DataCircuitLocators:
         By.XPATH,
         "//button[@data-slot='button'][contains(.,'Applications')]"
     )
-    DV_PUB_ARTICLE_ITEMS = (By.CSS_SELECTOR, "li.ant-list-item")
-    DV_PUB_ARTICLE_TITLE = (By.XPATH, "//li[contains(@class,'ant-list-item')]//h2[contains(@class,'font-bold')]")
+    DV_PUB_ARTICLE_ITEMS = (
+        By.CSS_SELECTOR,
+        "li.ant-list-item, [data-testid='publication-card'], article, "
+        "div[class*='publication'] li, [data-testid='related-publications'] li"
+    )
+    DV_PUB_ARTICLE_TITLE = (
+        By.XPATH,
+        "//li[contains(@class,'ant-list-item')]//h2[contains(@class,'font-bold')]"
+        " | //*[@data-testid='publication-card']//h2"
+        " | //article//h2"
+    )
     DV_PUB_COPY_DOI_BTN = (By.XPATH, "//button[contains(.,'Copy DOI')]")
     DV_PUB_AUTHOR_NAMES = (By.XPATH, "//div[contains(@class,'text-paper-author')]//span")
     DV_PUB_MORE_AUTHORS_BTN = (By.XPATH, "//button[contains(@class,'ant-btn-text')]//span[contains(text(),'+ ')]")

@@ -94,10 +94,20 @@ class RunSkeletonizationPage(HomePage):
     # ── Model picker ─────────────────────────────────────────────────────
 
     def click_public_tab(self):
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
         el = self.find_element(Loc.PUBLIC_TAB, timeout=15)
         el.click()
         self.logger.info("Clicked Public tab")
         time.sleep(3)
+        try:
+            WebDriverWait(self.browser, 30).until(
+                EC.presence_of_element_located(Loc.TABLE_ROWS)
+            )
+            self.logger.info("Table rows appeared after Public tab click")
+        except Exception:
+            self.logger.warning("Table rows not found within 30s after Public tab click")
+        time.sleep(1)
 
     def get_table_rows(self, timeout=15):
         self.find_element(Loc.TABLE_ROWS, timeout=timeout)
@@ -146,21 +156,25 @@ class RunSkeletonizationPage(HomePage):
         time.sleep(3)
 
     def click_random_row(self):
-        """Click a random visible row. Returns the row text snippet."""
+        """Click a random visible AG Grid row. Returns the row text snippet."""
         rows = self.get_table_rows()
         if not rows:
             raise RuntimeError("No rows found in the table")
 
         visible_rows = rows[:min(10, len(rows))]
         row = random.choice(visible_rows)
-        row_text = row.text.split('\n')[0][:60]
+        click_target = row
+        name_cells = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='name']")
+        if name_cells:
+            click_target = name_cells[0]
+        row_text = (click_target.text or row.text).split('\n')[0][:60]
         self.logger.info(f"Clicking row: '{row_text}...'")
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", click_target)
         time.sleep(1)
         try:
-            ActionChains(self.browser).move_to_element(row).click().perform()
+            ActionChains(self.browser).move_to_element(click_target).click().perform()
         except Exception:
-            self.browser.execute_script("arguments[0].click();", row)
+            self.browser.execute_script("arguments[0].click();", click_target)
         time.sleep(3)
         return row_text
 
@@ -209,17 +223,27 @@ class RunSkeletonizationPage(HomePage):
         return results
 
     def tick_row_checkboxes(self, count=2):
-        """Tick the specified number of row checkboxes. Returns the number actually ticked."""
-        checkboxes = self.find_all_elements(Loc.TABLE_ROW_CHECKBOXES, timeout=10)
+        """Tick AG Grid row selection checkboxes (inputs are often visually hidden)."""
+        checkboxes = self.find_all_elements(Loc.TABLE_ROW_CHECKBOXES, timeout=15)
         if not checkboxes:
             raise RuntimeError("No row checkboxes found in the table")
 
         ticked = 0
         for checkbox in checkboxes[:count]:
             try:
-                self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", checkbox)
-                time.sleep(0.5)
-                checkbox.click()
+                self.browser.execute_script(
+                    "arguments[0].scrollIntoView({block: 'center'});", checkbox
+                )
+                time.sleep(0.3)
+                try:
+                    self.browser.execute_script("arguments[0].click();", checkbox)
+                except Exception:
+                    wrapper = checkbox.find_element(
+                        By.XPATH,
+                        "./ancestor::div[contains(@class,'ag-selection-checkbox') "
+                        "or contains(@class,'ag-cell')][1]"
+                    )
+                    self.browser.execute_script("arguments[0].click();", wrapper)
                 ticked += 1
                 time.sleep(0.5)
             except Exception as e:

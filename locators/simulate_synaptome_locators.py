@@ -21,24 +21,41 @@ class SimulateSynaptomeLocators:
     )
     SYNAPTOME_CARD = (
         By.XPATH,
-        "//div[@data-slot='card']//div[@data-slot='card-title'][contains(., 'Synaptome') and not(contains(., 'beta'))]"
+        "//div[@data-slot='card']//div[@data-slot='card-title']"
+        "[contains(., 'Synaptome') and not(contains(., 'legacy')) and not(contains(., 'beta'))]"
     )
 
     """Model picker: Public/Project tabs."""
     PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
     PROJECT_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Project')] or text()='Project']")
 
-    """Column headers and table rows."""
-    COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")
-    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
+    """Column headers and table rows (AG Grid)."""
+    COLUMN_HEADERS = (By.CSS_SELECTOR, ".ag-header-cell[role='columnheader']")
+    TABLE_ROWS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
+    TABLE_ROW_NAME_CELLS = (
+        By.CSS_SELECTOR,
+        ".ag-center-cols-container .ag-row[role='row'] .ag-cell[col-id='name']",
+    )
 
     """Filter panel."""
-    FILTER_BUTTON = (By.XPATH, "//button[@aria-label='listing-view-filter-button']")
-    FILTER_CLOSE_BUTTON = (By.XPATH, "//button[@aria-label='Close']")
+    FILTER_BUTTON = (
+        By.XPATH,
+        "//button[@aria-label='Filters' or @title='Filters' or @aria-label='listing-view-filter-button']"
+    )
+    FILTER_CLOSE_BUTTON = (
+        By.XPATH,
+        "//button[@aria-label='Close' or @aria-label='Close filters']"
+    )
     FILTER_ACCORDION_TRIGGERS = (
         By.XPATH,
         "//button[contains(@class,'accordionTrigger')]"
     )
+    FILTER_MENU_ITEMS = (
+        By.CSS_SELECTOR,
+        "[data-testid='advanced-filters-pane'] button[role='menuitem'], "
+        "[role='dialog'] button[role='menuitem']"
+    )
+    FILTERS_PANE = (By.CSS_SELECTOR, "[data-testid='advanced-filters-pane'], [role='dialog']")
 
     """Mini-detail view after clicking a table row."""
     MINI_VIEWER = (By.CSS_SELECTOR, "[data-testid='mini-viewer']")
