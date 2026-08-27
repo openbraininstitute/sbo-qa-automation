@@ -106,7 +106,7 @@ class TestSimulateSynaptome:
 
         # Step 12: Recordings
         beta.click_recordings_tab()
-        beta.click_add_button_in_active_sub_entry()
+        beta.click_add_button_in_active_sub_entry("Recording")
         rec_items = beta.get_dictionary_items()
         assert len(rec_items) > 0, "Expected at least one recording item"
         rec_label = beta.click_random_dictionary_item()
@@ -115,7 +115,7 @@ class TestSimulateSynaptome:
 
         # Step 13: Neuron sets
         beta.click_neuron_sets_tab()
-        beta.click_add_button_in_active_sub_entry()
+        beta.click_add_button_in_active_sub_entry("Neuron Set")
         ns_items = beta.get_dictionary_items()
         assert len(ns_items) > 0, "Expected at least one neuron set item"
         try:
@@ -130,7 +130,7 @@ class TestSimulateSynaptome:
 
         # Step 14: Synaptic manipulations
         beta.click_synaptic_manip_tab()
-        beta.click_add_button_in_active_sub_entry()
+        beta.click_add_button_in_active_sub_entry("Synaptic Manipulation")
         sm_items = beta.get_dictionary_items()
         assert len(sm_items) > 0, "Expected at least one synaptic manipulation item"
         sm_label = beta.click_random_dictionary_item()

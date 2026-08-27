@@ -399,8 +399,9 @@ class SimulatePairedNeuronsPage(HomePage):
         if add_text:
             locator = (
                 By.XPATH,
-                f"//button[.//span[contains(text(),'{add_text}')]]"
-                f"[.//span[contains(@class,'anticon-plus-circle')]]"
+                "//button[.//span[contains(@class,'anticon-plus-circle')]]"
+                f"[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "
+                f"'{add_text.lower()}')]"
             )
             btn = self.element_to_be_clickable(locator, timeout=10)
         else:
@@ -528,8 +529,18 @@ class SimulatePairedNeuronsPage(HomePage):
 
     # ── Generate simulation(s) ───────────────────────────────────────────
 
-    def click_generate_simulation(self):
-        btn = self.element_to_be_clickable(Loc.GENERATE_SIMULATION_BTN, timeout=10)
+    def click_generate_simulation(self, timeout=30):
+        """Click Generate once the button is present and enabled."""
+        from selenium.webdriver.support.ui import WebDriverWait
+
+        def _enabled(driver):
+            try:
+                btn = driver.find_element(*Loc.GENERATE_SIMULATION_BTN)
+                return btn if btn.is_displayed() and btn.is_enabled() else False
+            except Exception:
+                return False
+
+        btn = WebDriverWait(self.browser, timeout).until(_enabled)
         self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
         time.sleep(0.5)
         try:

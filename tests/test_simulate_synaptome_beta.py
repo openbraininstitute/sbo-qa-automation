@@ -167,7 +167,7 @@ class TestSimulateSynaptomeBeta:
         page.click_recordings_tab()
         logger.info("On Recordings tab")
 
-        page.click_add_button_in_active_sub_entry()
+        page.click_add_button_in_active_sub_entry("Recording")
         logger.info("Clicked 'Add Recording'")
 
         rec_items = page.get_dictionary_items()
@@ -186,7 +186,7 @@ class TestSimulateSynaptomeBeta:
             logger.info("On Distributions tab")
 
             for dist_i in range(3):
-                page.click_add_button_in_active_sub_entry()
+                page.click_add_button_in_active_sub_entry("Distribution")
                 logger.info(f"Clicked 'Add Distribution' ({dist_i + 1}/3)")
 
                 dist_items = page.get_dictionary_items()
@@ -203,7 +203,7 @@ class TestSimulateSynaptomeBeta:
         page.click_neuron_sets_tab()
         logger.info("On Neuron sets tab")
 
-        page.click_add_button_in_active_sub_entry()
+        page.click_add_button_in_active_sub_entry("Neuron Set")
         logger.info("Clicked 'Add Neuron Set'")
 
         ns_items = page.get_dictionary_items()
@@ -224,7 +224,7 @@ class TestSimulateSynaptomeBeta:
         page.click_synaptic_manip_tab()
         logger.info("On Synaptic manipulations tab")
 
-        page.click_add_button_in_active_sub_entry()
+        page.click_add_button_in_active_sub_entry("Synaptic Manipulation")
         logger.info("Clicked 'Add Synaptic Manipulation'")
 
         sm_items = page.get_dictionary_items()
