@@ -576,61 +576,20 @@ class BuildSynaptomePage(HomePage):
         # Wait for the page to fully load after clicking Public tab
         time.sleep(3)
         
-        # First, click the search button to open the search input
-        search_button = None
-        search_button_selectors = [
-            (By.XPATH, "//button[@aria-label='Open search']"),
-            (By.CSS_SELECTOR, "button[aria-label='Open search']"),
-            (By.XPATH, "//button[contains(@aria-label, 'search')]"),
-        ]
-        
-        for i, selector in enumerate(search_button_selectors):
-            try:
-                search_button = self.element_to_be_clickable(selector, timeout=3)
-                if logger:
-                    logger.info(f"Found search button with selector {i+1}: {selector}")
-                break
-            except TimeoutException:
-                if logger:
-                    logger.info(f"Search button selector {i+1} failed: {selector}")
-                continue
-        
-        if not search_button:
-            if logger:
-                logger.error("Could not find search button")
-            raise Exception("Cannot find search button")
-        
-        # Click the search button to open the search input
-        search_button.click()
-        if logger:
-            logger.info("Clicked search button to open search")
-        # Wait for the animation to complete (300ms transition + buffer)
-        time.sleep(2)
-        
-        # Now find the search input field
         search_field = None
-        search_field_selectors = [
-            (By.XPATH, "//input[@placeholder='Search for entities...']"),
-            (By.XPATH, "//input[@aria-label='Search input']"),
-            (By.CSS_SELECTOR, "input[placeholder='Search for entities...']"),
-            (By.CSS_SELECTOR, "input[aria-label='Search input']"),
-        ]
-        
-        for i, selector in enumerate(search_field_selectors):
-            try:
-                search_field = self.element_visibility(selector, timeout=3)
-                if logger:
-                    logger.info(f"Found search field with selector {i+1}: {selector}")
-                break
-            except TimeoutException:
-                if logger:
-                    logger.info(f"Search field selector {i+1} failed: {selector}")
-                continue
-        
-        if not search_field:
+        try:
+            search_field = self.element_visibility(BuildSynaptomeLocators.SEARCH_INPUT, timeout=2)
             if logger:
-                logger.error("Could not find search field after clicking button")
-            raise Exception("Cannot find search field")
+                logger.info("Search field already visible")
+        except TimeoutException:
+            search_button = self.element_to_be_clickable(BuildSynaptomeLocators.SEARCH_BUTTON, timeout=5)
+            search_button.click()
+            if logger:
+                logger.info("Clicked search button to open search")
+            time.sleep(1)
+            search_field = self.element_visibility(BuildSynaptomeLocators.SEARCH_INPUT, timeout=10)
+            if logger:
+                logger.info("Found search field after opening toolbar search")
         
         # Clear and enter search text
         search_field.clear()
@@ -827,45 +786,94 @@ class BuildSynaptomePage(HomePage):
             logger.info("Clicked 'Add set' button")
         time.sleep(3)  # Wait for new set form to load
 
-    def select_model_via_radio_button(self, logger):
-        """Select a model by clicking radio button"""
-        logger.info("Waiting for models table to load...")
-        time.sleep(5)  # Give more time for table to load
+    def _wait_for_ag_selection_inputs(self, timeout=30):
+        """Poll for AG Grid selection inputs in the model picker."""
+        deadline = time.time() + timeout
+        attempt = 0
+        while time.time() < deadline:
+            attempt += 1
+            selectors = self.browser.find_elements(*BuildSynaptomeLocators.AG_SELECTION_INPUTS)
+            selectors = [el for el in selectors if el.is_enabled()]
+            if selectors:
+                self.logger.info(
+                    f"Found {len(selectors)} AG Grid selection inputs after attempt {attempt}"
+                )
+                return selectors
+            self.logger.info(f"Waiting for AG Grid selection inputs... attempt {attempt}")
+            time.sleep(2)
+        return []
 
-        # Try to find and click radio button
-        radio_btn = None
+    def _click_ag_selection_input(self, element):
+        """Click an AG Grid selection input (often visually hidden)."""
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+        time.sleep(0.3)
+        try:
+            self.browser.execute_script("arguments[0].click();", element)
+        except Exception:
+            try:
+                wrapper = element.find_element(
+                    By.XPATH,
+                    "./ancestor::div[contains(@class,'ag-selection-checkbox') or contains(@class,'ag-cell')][1]",
+                )
+                self.browser.execute_script("arguments[0].click();", wrapper)
+            except Exception:
+                element.click()
+
+    def select_model_via_radio_button(self, logger):
+        """Select a model via AG Grid row selection (replaces legacy ant-radio)."""
+        logger.info("Waiting for models table to load...")
+        time.sleep(3)
+
+        try:
+            self.find_element(BuildSynaptomeLocators.TABLE_ROWS, timeout=30)
+            logger.info("AG Grid rows loaded")
+        except TimeoutException:
+            logger.warning("AG Grid rows not found within timeout")
+
+        selection_inputs = self._wait_for_ag_selection_inputs(timeout=30)
+        if selection_inputs:
+            target = selection_inputs[0]
+            self._click_ag_selection_input(target)
+            logger.info("Selected model via AG Grid selection input")
+            time.sleep(2)
+            return True
+
+        # Fallback: click the first name cell (opens mini-detail / selects row)
+        try:
+            name_cell = self.element_to_be_clickable(
+                BuildSynaptomeLocators.TABLE_ROW_NAME_CELL, timeout=10
+            )
+            self.browser.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", name_cell
+            )
+            time.sleep(0.5)
+            try:
+                name_cell.click()
+            except Exception:
+                self.browser.execute_script("arguments[0].click();", name_cell)
+            logger.info("Selected model by clicking name cell")
+            time.sleep(2)
+            return True
+        except TimeoutException:
+            pass
+
+        # Legacy ant-radio fallbacks
         radio_selectors = [
             BuildSynaptomeLocators.RADIO_BUTTON_ANT_INPUT,
             BuildSynaptomeLocators.RADIO_BUTTON_INPUT_CLASS,
             BuildSynaptomeLocators.RADIO_BUTTON_SPAN_TARGET,
-            BuildSynaptomeLocators.RADIO_BUTTON_SPAN_WRAPPER,
             BuildSynaptomeLocators.RADIO_BUTTON_TABLE_FIRST,
             BuildSynaptomeLocators.RADIO_BUTTON_ANY,
         ]
-
         for i, selector in enumerate(radio_selectors):
             try:
-                radio_btn = self.element_to_be_clickable(selector, timeout=10)
-                logger.info(f"Found clickable radio button with selector {i+1}: {selector}")
-                break
+                radio_btn = self.element_to_be_clickable(selector, timeout=5)
+                self._click_ag_selection_input(radio_btn)
+                logger.info(f"Selected model via legacy radio selector {i + 1}")
+                time.sleep(2)
+                return True
             except TimeoutException:
-                logger.info(f"Radio button selector {i+1} failed: {selector}")
-                continue
+                logger.info(f"Radio button selector {i + 1} failed: {selector}")
 
-        if not radio_btn:
-            logger.error("Cannot find radio button")
-            raise Exception("Cannot find radio button or selectable model element")
-
-        # Click the radio button
-        try:
-            radio_btn.click()
-            logger.info("Clicked on radio button to select model")
-        except:
-            # Try JavaScript click if regular click fails
-            self.browser.execute_script("arguments[0].click();", radio_btn)
-            logger.info("Clicked on radio button using JavaScript")
-
-        # Wait for selection to register
-        time.sleep(2)
-        logger.info("Model selected via radio button")
-        return True
+        logger.error("Cannot find radio button or AG Grid selection input")
+        raise Exception("Cannot find radio button or selectable model element")
