@@ -32,11 +32,11 @@ class TestLaunchingNotebook:
 
         try:
             time.sleep(1)
-            modal_close = project_notebooks.modal_close_button()
-            if modal_close.is_displayed():
-                modal_close.click()
+            if project_notebooks.close_blocking_overlays():
                 logger.info("Modal closed")
-        except:
+            else:
+                logger.info("No modal to close")
+        except Exception:
             logger.info("No modal to close")
 
         logger.info("Readme test passed")
@@ -52,11 +52,11 @@ class TestLaunchingNotebook:
 
         try:
             time.sleep(1)
-            modal_close = project_notebooks.modal_close_button()
-            if modal_close.is_displayed():
-                modal_close.click()
+            if project_notebooks.close_blocking_overlays():
                 logger.info("Modal closed")
-        except:
+            else:
+                logger.info("No modal to close")
+        except Exception:
             logger.info("No modal to close")
 
         logger.info("Download test passed")
@@ -65,12 +65,18 @@ class TestLaunchingNotebook:
         time.sleep(2)
         project_notebooks.open_notebook_actions_menu(1)
 
-        run_button = project_notebooks.action_menu_run()
-        assert run_button.is_displayed(), "Run action is not displayed"
-        project_notebooks.js_click(run_button)
+        project_notebooks.click_run_notebook()
         logger.info("Run action clicked")
 
-        jupyter_url = project_notebooks.wait_for_jupyter_tab(timeout=30)
+        # Staging project may not have enough credits to spawn Jupyter.
+        jupyter_url, credit_block = project_notebooks.wait_for_jupyter_tab_or_credit_block(
+            timeout=30
+        )
+        if credit_block:
+            logger.warning(f"Run blocked by credits: {credit_block}")
+            pytest.skip(f"Insufficient project credits to launch notebook: {credit_block}")
+
+        assert jupyter_url, "Expected Jupyter tab URL after Run"
         assert "jupyter" in jupyter_url.lower() or "lab" in jupyter_url.lower(), \
             f"Expected Jupyter notebook URL, got: {jupyter_url}"
         logger.info("Jupyter notebook tab opened successfully")
