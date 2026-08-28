@@ -127,7 +127,9 @@ class TestExploreSynaptomePage:
 
         breadcrumb_synaptome = explore_synaptome.find_breadcrumb_synaptome(timeout=20)
         assert breadcrumb_synaptome.is_displayed(), "Synaptome breadcrumb is not displayed"
-        assert breadcrumb_synaptome.text == "Synaptome", f"Expected 'Synaptome', got '{breadcrumb_synaptome.text}'"
+        assert "Synaptome" in breadcrumb_synaptome.text, (
+            f"Expected breadcrumb to contain 'Synaptome', got '{breadcrumb_synaptome.text}'"
+        )
         logger.info("Synaptome breadcrumb is found")
 
         breadcrumb_close = explore_synaptome.find_breadcrumb_close(timeout=20)

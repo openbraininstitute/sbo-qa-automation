@@ -122,14 +122,39 @@ class BuildSynaptomeLocators:
     PROJECT_TAB_TEXT = (By.XPATH, "//button[text()='Project']")
     PROJECT_TAB_ROLE = (By.XPATH, "//*[@role='tab'][contains(text(), 'Project')]")
     
-    # Model selection table and radio buttons
-    MODELS_TABLE = (By.XPATH, "//table")
+    # Model selection table (AG Grid)
+    MODELS_TABLE = (By.CSS_SELECTOR, ".ag-root-wrapper, .ag-root")
+    TABLE_ROWS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
+    TABLE_ROW_NAME_CELL = (
+        By.CSS_SELECTOR,
+        ".ag-center-cols-container .ag-row[role='row'] .ag-cell[col-id='name']",
+    )
+    AG_SELECTION_INPUTS = (
+        By.CSS_SELECTOR,
+        ".ag-pinned-left-cols-container .ag-row input.ag-checkbox-input, "
+        ".ag-pinned-left-cols-container .ag-row .ag-selection-checkbox input, "
+        ".ag-cell[col-id='ag-Grid-SelectionColumn'] input, "
+        ".ag-selection-checkbox input, "
+        ".ag-center-cols-container .ag-row[role='row'] input[type='radio'], "
+        ".ag-center-cols-container .ag-row[role='row'] input[type='checkbox']",
+    )
+    # Legacy ant-radio fallbacks
     RADIO_BUTTON_ANT_INPUT = (By.XPATH, "//span[contains(@class, 'ant-radio')]//input[@class='ant-radio-input']")
     RADIO_BUTTON_INPUT_CLASS = (By.XPATH, "//input[@class='ant-radio-input']")
     RADIO_BUTTON_SPAN_TARGET = (By.XPATH, "//span[@class='ant-radio ant-wave-target']//input[@type='radio']")
     RADIO_BUTTON_SPAN_WRAPPER = (By.XPATH, "//span[contains(@class, 'ant-radio')]")
     RADIO_BUTTON_TABLE_FIRST = (By.XPATH, "//table//input[@type='radio'][1]")
     RADIO_BUTTON_ANY = (By.XPATH, "//input[@type='radio']")
+
+    # Search (AG Grid listing toolbar)
+    SEARCH_BUTTON = (
+        By.XPATH,
+        "//button[@aria-label='Open search'] | //button[contains(@aria-label, 'search')]",
+    )
+    SEARCH_INPUT = (
+        By.CSS_SELECTOR,
+        "input[placeholder*='Search for entities'], input[placeholder*='Search for resources']",
+    )
     
     # Debug elements for model selection
     CLICKABLE_ELEMENTS = (By.XPATH, "//button | //a | //div[@role='button'] | //tr[@role='button'] | //td[@role='button']")

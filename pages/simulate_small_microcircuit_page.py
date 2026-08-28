@@ -88,64 +88,61 @@ class SimulateSmallMicrocircuitPage(HomePage):
     # ── Model picker ─────────────────────────────────────────────────────
 
     def click_public_tab(self):
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
         el = self.find_element(Loc.PUBLIC_TAB, timeout=15)
         el.click()
         self.logger.info("Clicked Public tab")
         time.sleep(3)
+        try:
+            WebDriverWait(self.browser, 30).until(
+                EC.presence_of_element_located(Loc.TABLE_ROWS)
+            )
+            self.logger.info("Table rows appeared after Public tab click")
+        except Exception:
+            self.logger.warning("Table rows not found within 30s after Public tab click")
+        time.sleep(1)
 
     def verify_column_headers(self):
         """Verify expected column headers are present. Returns dict of {name: {'present': bool}}.
         Reads headers before and after scrolling to capture all columns.
         """
-        # Core columns expected in both environments
         expected = [
             "Name", "Description", "Brain region",
             "Number of neurons", "Number of synapses", "Number of connections",
             "Created by", "Registration date",
         ]
-        # "Target simulator" is staging-only until production release
         if "staging" in self.lab_url:
             expected.append("Target simulator")
 
         def _read_header_texts():
             headers = self.find_all_elements(Loc.COLUMN_HEADERS, timeout=15)
-            texts = []
-            for h in headers:
-                try:
-                    title_div = h.find_element(By.CSS_SELECTOR, "div[class*='columnTitle']")
-                    texts.append(title_div.text.strip())
-                except Exception:
-                    texts.append(h.text.strip().split("\n")[0])
-            return texts
+            return [(h.text or "").strip().split("\n")[0] for h in headers]
 
-        # Read headers at current scroll position (left side visible)
+        def _scroll_ag(to_end=True):
+            try:
+                viewport = self.browser.find_element(
+                    By.CSS_SELECTOR, ".ag-body-horizontal-scroll-viewport"
+                )
+                if to_end:
+                    self.browser.execute_script(
+                        "arguments[0].scrollLeft = arguments[0].scrollWidth;", viewport
+                    )
+                else:
+                    self.browser.execute_script("arguments[0].scrollLeft = 0;", viewport)
+                time.sleep(0.5)
+            except Exception:
+                pass
+
         header_texts_left = _read_header_texts()
         self.logger.info(f"Column headers (before scroll): {header_texts_left}")
-
-        # Click the table scroll-to-end button to expose right-side columns
-        try:
-            scroll_btn = self.element_to_be_clickable(Loc.TABLE_SCROLL_END_BTN, timeout=5)
-            scroll_btn.click()
-            self.logger.info("Clicked table scroll-to-end button")
-            time.sleep(1)
-        except Exception:
-            pass
-
-        # Read headers again (right side visible)
+        _scroll_ag(to_end=True)
         header_texts_right = _read_header_texts()
         self.logger.info(f"Column headers (after scroll): {header_texts_right}")
 
-        # Combine both reads — use a set to deduplicate, filter out empty strings
         all_headers = set(header_texts_left + header_texts_right) - {''}
         self.logger.info(f"All column headers combined: {sorted(all_headers)}")
-
-        # Scroll table back to start for subsequent interactions
-        try:
-            table = self.browser.find_element(By.CSS_SELECTOR, ".ant-table-content")
-            self.browser.execute_script("arguments[0].scrollLeft = 0;", table)
-            time.sleep(0.5)
-        except Exception:
-            pass
+        _scroll_ag(to_end=False)
 
         results = {}
         for name in expected:
@@ -206,14 +203,18 @@ class SimulateSmallMicrocircuitPage(HomePage):
 
         visible_rows = rows[:min(10, len(rows))]
         row = random.choice(visible_rows)
-        row_text = row.text.split('\n')[0][:60]
+        click_target = row
+        name_cells = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='name']")
+        if name_cells:
+            click_target = name_cells[0]
+        row_text = (click_target.text or row.text).split('\n')[0][:60]
         self.logger.info(f"Clicking row: '{row_text}...'")
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", click_target)
         time.sleep(1)
         try:
-            ActionChains(self.browser).move_to_element(row).click().perform()
+            ActionChains(self.browser).move_to_element(click_target).click().perform()
         except Exception:
-            self.browser.execute_script("arguments[0].click();", row)
+            self.browser.execute_script("arguments[0].click();", click_target)
         time.sleep(3)
         return row_text
 
@@ -536,9 +537,10 @@ class SimulateSmallMicrocircuitPage(HomePage):
         """Get all dictionary item buttons in the middle column."""
         try:
             items = self.find_all_elements(Loc.CONFIG_BLOCK_DICTIONARY_ITEMS, timeout=timeout)
-            short_labels = [item.text.strip().split(chr(10))[0][:40] for item in items]
-            self.logger.info(f"Dictionary items ({len(items)}): {short_labels}")
-            return items
+            visible = [item for item in items if item.is_displayed()]
+            short_labels = [item.text.strip().split(chr(10))[0][:40] for item in visible]
+            self.logger.info(f"Dictionary items ({len(visible)}): {short_labels}")
+            return visible
         except TimeoutException:
             self.logger.warning("No dictionary items found")
             return []
@@ -685,7 +687,11 @@ class SimulateSmallMicrocircuitPage(HomePage):
         """Return the text content of the JSON preview code block."""
         try:
             code = self.find_element(Loc.JSON_PREVIEW_CODE, timeout=timeout)
-            text = code.text.strip()
+            text = (code.text or "").strip()
+            if not text:
+                text = (self.browser.execute_script(
+                    "return arguments[0].textContent || '';", code
+                ) or "").strip()
             self.logger.info(f"JSON preview: {len(text)} chars")
             return text
         except TimeoutException:
@@ -732,10 +738,15 @@ class SimulateSmallMicrocircuitPage(HomePage):
     def wait_for_simulation_terminal_state(self, timeout=300, poll_interval=10):
         """Poll simulation card statuses until all reach a terminal state (done/failed/error)."""
         import time as _time
+        from selenium.common.exceptions import WebDriverException
         terminal = {'done', 'failed', 'error', 'completed', 'success'}
         start = _time.time()
         while _time.time() - start < timeout:
-            statuses = self.get_simulation_card_statuses()
+            try:
+                statuses = self.get_simulation_card_statuses()
+            except WebDriverException as e:
+                self.logger.warning(f"Lost browser session while polling statuses: {e}")
+                return False
             if statuses and all(s['status'] in terminal for s in statuses):
                 elapsed = int(_time.time() - start)
                 self.logger.info(f"All simulations reached terminal state after {elapsed}s: {statuses}")

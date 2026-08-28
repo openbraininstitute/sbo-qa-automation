@@ -167,7 +167,7 @@ class TestSimulateSynaptomeBeta:
         page.click_recordings_tab()
         logger.info("On Recordings tab")
 
-        page.click_add_button_in_active_sub_entry()
+        page.click_add_button_in_active_sub_entry("Recording")
         logger.info("Clicked 'Add Recording'")
 
         rec_items = page.get_dictionary_items()
@@ -186,7 +186,7 @@ class TestSimulateSynaptomeBeta:
             logger.info("On Distributions tab")
 
             for dist_i in range(3):
-                page.click_add_button_in_active_sub_entry()
+                page.click_add_button_in_active_sub_entry("Distribution")
                 logger.info(f"Clicked 'Add Distribution' ({dist_i + 1}/3)")
 
                 dist_items = page.get_dictionary_items()
@@ -203,12 +203,18 @@ class TestSimulateSynaptomeBeta:
         page.click_neuron_sets_tab()
         logger.info("On Neuron sets tab")
 
-        page.click_add_button_in_active_sub_entry()
+        page.click_add_button_in_active_sub_entry("Neuron Set")
         logger.info("Clicked 'Add Neuron Set'")
 
         ns_items = page.get_dictionary_items()
         assert len(ns_items) > 0, "Expected at least one neuron set item"
-        ns_label = page.click_dictionary_item_by_label("SINGLE POPULATION (Virtual)")
+        try:
+            ns_label = page.click_dictionary_item_by_label("ALL POPULATIONS")
+        except AssertionError:
+            try:
+                ns_label = page.click_dictionary_item_by_label("SINGLE POPULATION (Virtual)")
+            except AssertionError:
+                ns_label = page.click_random_dictionary_item()
         logger.info(f"Selected neuron set: '{ns_label}'")
 
         page.wait_for_block_single(timeout=10)
@@ -218,7 +224,7 @@ class TestSimulateSynaptomeBeta:
         page.click_synaptic_manip_tab()
         logger.info("On Synaptic manipulations tab")
 
-        page.click_add_button_in_active_sub_entry()
+        page.click_add_button_in_active_sub_entry("Synaptic Manipulation")
         logger.info("Clicked 'Add Synaptic Manipulation'")
 
         sm_items = page.get_dictionary_items()
@@ -233,12 +239,15 @@ class TestSimulateSynaptomeBeta:
         page.click_timestamps_tab()
         logger.info("On Timestamps tab")
 
-        page.click_add_button_in_active_sub_entry()
+        page.click_add_button_in_active_sub_entry("Timestamp")
         logger.info("Clicked 'Add Timestamp'")
 
         ts_items = page.get_dictionary_items()
         assert len(ts_items) > 0, "Expected at least one timestamp item"
-        ts_label = page.click_random_dictionary_item()
+        try:
+            ts_label = page.click_dictionary_item_by_label("Timestamp")
+        except AssertionError:
+            ts_label = page.click_random_dictionary_item()
         logger.info(f"Selected timestamp: '{ts_label}'")
 
         page.wait_for_block_single(timeout=10)
@@ -291,6 +300,10 @@ class TestSimulateSynaptomeBeta:
             assert clicked, f"Could not click input file '{fname}'"
 
             if fname.endswith('.json'):
+                # circuit_config.json is a folder of assets, not a text JSON preview
+                if fname == 'circuit_config.json':
+                    logger.info(f"  ✓ '{fname}': folder asset (skipping text JSON preview)")
+                    continue
                 preview = page.get_json_preview_text(timeout=10)
                 assert len(preview) > 0, f"JSON preview for '{fname}' should not be empty"
                 logger.info(f"  ✓ '{fname}': JSON preview {len(preview)} chars")

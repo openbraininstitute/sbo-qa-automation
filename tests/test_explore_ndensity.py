@@ -42,18 +42,16 @@ class TestExploreNeuronDensity:
             ExploreNDensityPageLocators.LV_CONTRIBUTORS,
             ExploreNDensityPageLocators.LV_REGISTRATION_DATE
         ]
-        column_headers = explore_ndensity.find_column_headers(column_locators, timeout=40)
-
-        found_column_headers = [element.text for element in column_headers]
+        found_column_headers = explore_ndensity.get_column_header_texts(column_locators, timeout=40)
         logger.info(f"Found n.density list view column headers: {found_column_headers}")
 
-        if not column_headers:
+        if not found_column_headers:
             logger.error("No column headers were found.")
             raise ValueError("Column headers list is empty. Cannot proceed.")
 
-        for header in column_headers:
-            header_text = header.text.strip() if header.text else 'No text found'
-            logger.info(f"Column header text: {header_text}")
+        for header_text in found_column_headers:
+            logger.info(f"Column header text: {header_text or 'No text found'}")
+            assert header_text, "Expected non-empty AG Grid column header text"
 
         lv_br_row1 = explore_ndensity.lv_br_row1()
         browser.execute_script("arguments[0].scrollIntoView(true);", lv_br_row1)

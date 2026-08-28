@@ -4,7 +4,6 @@
 import time
 
 import pytest
-from selenium.webdriver.common.by import By
 
 from pages.project_notebooks import ProjectNotebooks
 
@@ -26,24 +25,23 @@ class TestProjectNotebooks:
         logger.info("Public tab is found")
 
         expected_headers = [
+            "",
             "Name",
             "Description",
+            "Scale",
             "Contributors",
             "Registration date",
-            "Scale",
-            ""
         ]
 
         project_notebooks.validate_table_headers(expected_headers)
 
-        search_notebook = project_notebooks.search_notebook()
-        assert search_notebook.is_displayed(), "Search input is not displayed"
-        logger.info("Search input is found")
+        search_toggle = project_notebooks.search_notebook()
+        assert search_toggle.is_displayed(), "Search control is not displayed"
+        logger.info("Search control is found")
 
-        search_notebook.click()
-        logger.info("Search input is clicked")
-
-        search_input = project_notebooks.search_input()
+        # Search may already be open (Close search); only click Open search when needed
+        search_input = project_notebooks.open_search()
+        search_input.clear()
         search_input.send_keys("cellular")
         logger.info("Searching for 'cellular' using the free text search")
 
@@ -58,10 +56,11 @@ class TestProjectNotebooks:
         scale_values = [cell.text.strip() for cell in scale_cells]
         logger.info(f"Scale values in results: {scale_values}")
 
-        clear_search_input = project_notebooks.clear_search_notebook_input()
+        project_notebooks.clear_search_notebook_input()
         logger.info("Search input is cleared")
 
-        assert search_notebook.get_attribute("value") == "", "Search input is not empty after clearing"
+        search_input = project_notebooks.search_input()
+        assert search_input.get_attribute("value") == "", "Search input is not empty after clearing"
         logger.info("Search input is confirmed to be empty")
 
         time.sleep(5)
@@ -70,17 +69,11 @@ class TestProjectNotebooks:
         logger.info(f"Total rows before filter: {total_rows_before_filter}")
 
         page_filter = project_notebooks.page_filter()
-        assert page_filter.is_displayed(), "Page filter is not displayed"
-        logger.info("Page filter is found")
+        assert page_filter.is_displayed(), "Name column filter is not displayed"
+        logger.info("Name column filter is found")
 
         page_filter.click()
-        logger.info("Page filter is clicked")
-
-        filter_name_label = project_notebooks.filter_name_label(timeout=10)
-        assert filter_name_label.is_displayed(), "Filter name label is not displayed"
-        logger.info("Filter name label is found")
-        filter_name_label.click()
-        logger.info("Filter name label is clicked")
+        logger.info("Name column filter is clicked")
 
         filter_name_input = project_notebooks.filter_name_input(timeout=10)
         assert filter_name_input.is_displayed(), "Filter name input is not displayed"
@@ -88,19 +81,9 @@ class TestProjectNotebooks:
         filter_name_input.click()
         logger.info("Filter name input is clicked")
 
+        filter_name_input.clear()
         filter_name_input.send_keys("Visualize skeletonized neuronal")
         logger.info("Filter name input is filled")
-
-        filter_name_label.click()
-        logger.info("Filter name label is clicked again")
-
-        filter_scale_title = project_notebooks.filter_scale_title(timeout=10)
-        assert filter_scale_title, "'Scale' title inside the filter is not found."
-        logger.info("'Scale' title inside Filter is found.")
-
-        filter_contributor_label = project_notebooks.filter_contributor_label(timeout=10)
-        assert filter_contributor_label.is_displayed(), "Filter scale input is not displayed"
-        logger.info("Filter contributor input is found")
 
         filter_apply_btn = project_notebooks.filter_apply_btn()
         assert filter_apply_btn.is_displayed(), "Filter apply button is not displayed"
@@ -108,12 +91,6 @@ class TestProjectNotebooks:
 
         filter_apply_btn.click()
         logger.info("Filter is applied")
-
-        filter_close_btn = project_notebooks.filter_close_btn()
-        assert filter_close_btn.is_displayed(), "Filter close button is not displayed"
-        logger.info("Filter close button is found")
-        filter_close_btn.click()
-        logger.info("Filter is closed")
 
         table_body_container = project_notebooks.table_body_container(timeout=15)
         logger.info("Looking for table container")
@@ -134,15 +111,12 @@ class TestProjectNotebooks:
         filtered_rows = project_notebooks.rows()
         total_filtered_rows = len(filtered_rows)
         logger.info(f"Total filtered rows: {total_filtered_rows}")
+        assert total_filtered_rows < total_rows_before_filter, (
+            "Name filter should reduce the number of rows"
+        )
 
-        page_filter.click()
-        logger.info("Page filter is clicked")
-
-        filter_clear_btn = project_notebooks.filter_clear_btn(timeout=15)
-        assert filter_clear_btn.is_displayed(), "Filter clear button is not displayed"
-        logger.info("Filter clear button is found")
-        filter_clear_btn.click()
-        logger.info("Filter is cleared")
+        project_notebooks.clear_name_column_filter(timeout=15)
+        logger.info("Name column filter cleared")
 
         rows_after_filter = project_notebooks.rows()
         total_rows_after_filter = len(rows_after_filter)

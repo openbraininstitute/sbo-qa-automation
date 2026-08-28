@@ -83,40 +83,40 @@ class BuildEMMappingLocators:
         "/ancestor::div[@data-slot='card']//span[contains(@class,'text-gray')]",
     )
 
-    # ── Table: column headers, rows, checkboxes ──────────────────────────
+    # ── Table: column headers, rows, checkboxes (AG Grid) ────────────────
 
-    COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")
+    COLUMN_HEADERS = (By.CSS_SELECTOR, ".ag-header-cell[role='columnheader']")
 
-    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
+    TABLE_ROWS = (
+        By.CSS_SELECTOR,
+        ".ag-center-cols-container .ag-row[role='row']",
+    )
 
     TABLE_CHECKBOX = (
-        By.XPATH,
-        "//tbody[contains(@class,'ant-table-tbody')]"
-        "//tr[contains(@class,'ant-table-row')]"
-        "//input[@type='checkbox']",
+        By.CSS_SELECTOR,
+        ".ag-pinned-left-cols-container .ag-row input.ag-checkbox-input, "
+        ".ag-cell[col-id='ag-Grid-SelectionColumn'] input.ag-checkbox-input, "
+        ".ag-selection-checkbox input.ag-checkbox-input",
     )
 
     TABLE_FIRST_CHECKBOX = (
-        By.XPATH,
-        "(//span[@class='ant-checkbox-inner'])[3]"
-        # "(//tbody[contains(@class,'ant-table-tbody')]"
-        # "//tr[contains(@class,'ant-table-row')]"
-        # "//input[@type='checkbox'])[1]",
+        By.CSS_SELECTOR,
+        ".ag-pinned-left-cols-container .ag-row input.ag-checkbox-input, "
+        ".ag-center-cols-container .ag-row input.ag-checkbox-input",
     )
 
     # ── Use selection button ─────────────────────────────────────────────
 
     USE_SELECTION_BTN = (
         By.XPATH,
-        "//button[@data-testid='workflow-browse-use-selection' or "
-        "contains(@id,'workflow-browse-use-selection')]"
-        " | //div[@id='workflow-browse-use-selection']//button[contains(text(),'Use selection')]",
+        "//div[@id='workflow-browse-use-selection']"
+        "//button[contains(normalize-space(.),'Use selection')]",
     )
 
     USE_SELECTION_BTN_ENABLED = (
         By.XPATH,
-        "//div[@id='workflow-browse-use-selection']//button[not(@disabled)]"
-        "[contains(text(),'Use selection')]",
+        "//div[@id='workflow-browse-use-selection']"
+        "//button[not(@disabled) and contains(normalize-space(.),'Use selection')]",
     )
 
     # ── Filter dropdown (Cell morphology / ME-model) ─────────────────────

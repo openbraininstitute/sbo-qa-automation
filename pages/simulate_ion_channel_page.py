@@ -108,7 +108,12 @@ class SimulateIonChannelPage(HomePage):
 
         visible_rows = rows[:min(10, len(rows))]
         row = random.choice(visible_rows)
-        row_text = row.text.split('\n')[0][:60]
+        # Extract model name from the AG Grid 'name' column cell
+        try:
+            name_cell = row.find_element(By.CSS_SELECTOR, ".ag-cell[col-id='name']")
+            row_text = name_cell.text.strip()[:60]
+        except Exception:
+            row_text = row.text.split('\n')[0][:60]
         self.logger.info(f"Clicking row: '{row_text}...'")
         self.browser.execute_script(
             "arguments[0].scrollIntoView({block: 'center'});", row
@@ -281,6 +286,57 @@ class SimulateIonChannelPage(HomePage):
         # Plots
         results['plot_count'] = self.get_right_column_plot_count(timeout=5)
 
+        return results
+
+    def verify_model_info_after_selection(self):
+        """Verify that model info is visible after selecting an ion channel model.
+        The old right-column Model traces/Activation plots were removed from the
+        Configuration view. Now we verify the model name appears in the form.
+
+        Returns a dict with:
+          - model_name_visible: bool
+          - model_name: str (the displayed model name)
+        """
+        results = {}
+        time.sleep(2)  # Allow UI to settle after model selection
+
+        # Check if a model name is visible in the block_single form area
+        # After selection, the form shows the model name (e.g., "HCN2")
+        # and the conductance field was already filled
+        try:
+            block = self.find_element(
+                (By.CSS_SELECTOR, "div[data-scan-config-block='block_single']"),
+                timeout=5
+            )
+            block_text = block.text
+            # The block should NOT contain the placeholder text if a model was selected
+            if "Select ion channel model" not in block_text and len(block_text) > 20:
+                results['model_name_visible'] = True
+                # Extract model name: it typically appears after "ION CHANNEL MODEL" label
+                # as a standalone line in the block text
+                lines = [l.strip() for l in block_text.split('\n') if l.strip()]
+                # Find a line that looks like a model name (short, not a label)
+                model_name = ''
+                for line in lines:
+                    if (line.upper() != line and  # not ALL CAPS (label)
+                            len(line) < 40 and
+                            line not in ('Required', 'S/cm2', 'Show more', 'Preview') and
+                            'ion channel' not in line.lower() and
+                            'conductance' not in line.lower()):
+                        model_name = line
+                        break
+                results['model_name'] = model_name
+            else:
+                results['model_name_visible'] = False
+                results['model_name'] = ''
+        except TimeoutException:
+            results['model_name_visible'] = False
+            results['model_name'] = ''
+
+        self.logger.info(
+            f"Model info verification: name_visible={results['model_name_visible']}, "
+            f"name='{results.get('model_name', '')}'"
+        )
         return results
 
     def is_model_traces_visible(self, timeout=15):
@@ -459,7 +515,14 @@ class SimulateIonChannelPage(HomePage):
         whose name starts with *exclude_prefix*.  If *row_index* is explicitly
         provided, that specific row is selected instead (legacy behaviour).
         """
-        rows = self.find_all_elements(Loc.ION_CHANNEL_MODEL_LIST_ROWS, timeout=timeout)
+        # Wait for AG Grid rows to appear (may take time to load from API)
+        rows = []
+        for wait_attempt in range(10):
+            rows = self.find_all_elements(Loc.ION_CHANNEL_MODEL_LIST_ROWS, timeout=timeout)
+            if len(rows) > 2:
+                break
+            time.sleep(2)
+            self.logger.info(f"Waiting for AG Grid rows... ({len(rows)} found)")
         assert len(rows) > 0, "No model rows found in the list"
 
         if row_index is not None:
@@ -496,33 +559,95 @@ class SimulateIonChannelPage(HomePage):
         )
         time.sleep(0.5)
 
-        # Try clicking the radio button inside the row
+        # Select the row in AG Grid
+        # AG Grid may re-render rows after selection, causing stale references
+        row_id = row.get_attribute("row-id") or ""
+        self.logger.info(f"Attempting to select row with row-id='{row_id}'")
+
+        # Click the row to trigger selection
         try:
-            radio = row.find_element(
-                By.XPATH, ".//input[@type='radio'] | .//span[contains(@class,'ant-radio-inner')]"
-            )
-            radio.click()
+            ActionChains(self.browser).move_to_element(row).click().perform()
         except Exception:
-            # Fallback: click the row itself
             try:
-                ActionChains(self.browser).move_to_element(row).click().perform()
-            except Exception:
                 self.browser.execute_script("arguments[0].click();", row)
+            except Exception:
+                pass
+
+        # Wait for AG Grid to process the selection
+        time.sleep(2)
+
+        # Verify selection (re-find row to avoid stale reference)
+        try:
+            if row_id:
+                new_row = self.browser.find_element(
+                    By.CSS_SELECTOR, f".ag-row[row-id='{row_id}']"
+                )
+                is_selected = new_row.get_attribute("aria-selected") == "true"
+            else:
+                is_selected = True  # Assume success if no row-id
+        except Exception:
+            is_selected = False
+
+        if not is_selected and row_id:
+            # Retry: click the row again
+            self.logger.info("Row not selected after first click, retrying...")
+            try:
+                new_row = self.browser.find_element(
+                    By.CSS_SELECTOR, f".ag-row[row-id='{row_id}']"
+                )
+                ActionChains(self.browser).move_to_element(new_row).click().perform()
+                time.sleep(2)
+                new_row = self.browser.find_element(
+                    By.CSS_SELECTOR, f".ag-row[row-id='{row_id}']"
+                )
+                is_selected = new_row.get_attribute("aria-selected") == "true"
+            except Exception:
+                pass
+
+        self.logger.info(f"Row selection state: aria-selected={is_selected}")
 
         self.logger.info(f"Selected model row: '{row_text}'")
-        time.sleep(1)
+        time.sleep(3)
 
-        # Click the Select button if present (modal footer)
-        try:
-            select_btn = self.element_to_be_clickable(
-                Loc.ION_CHANNEL_MODEL_SELECT_BTN, timeout=5
-            )
-            select_btn.click()
-            self.logger.info("Clicked 'Select' button in modal")
+        # Click the Confirm/Select button (may take a moment to enable after row selection)
+        confirm_clicked = False
+        for attempt in range(3):
+            # Try XPath locator first
+            try:
+                select_btn = self.element_to_be_clickable(
+                    Loc.ION_CHANNEL_MODEL_SELECT_BTN, timeout=5
+                )
+                select_btn.click()
+                self.logger.info("Clicked 'Confirm/Select' button")
+                confirm_clicked = True
+                break
+            except TimeoutException:
+                pass
+
+            # Fallback: use JS to find and click a Confirm button by textContent
+            clicked = self.browser.execute_script("""
+                var btns = document.querySelectorAll('button');
+                for (var i = 0; i < btns.length; i++) {
+                    var text = btns[i].textContent.trim();
+                    if (text.startsWith('Confirm') && btns[i].offsetParent !== null && !btns[i].disabled) {
+                        btns[i].click();
+                        return text;
+                    }
+                }
+                return null;
+            """)
+            if clicked:
+                self.logger.info(f"Clicked Confirm button via JS: '{clicked}'")
+                confirm_clicked = True
+                break
+
+            self.logger.info(f"Confirm button not found (attempt {attempt + 1}), waiting...")
             time.sleep(2)
-        except TimeoutException:
-            self.logger.info("No modal Select button found — selection may be inline")
 
+        if not confirm_clicked:
+            self.logger.warning("No Confirm/Select button found after all attempts")
+
+        time.sleep(3)
         return row_text
 
     def fill_conductance_value(self, value, timeout=10):
@@ -531,11 +656,18 @@ class SimulateIonChannelPage(HomePage):
         self.browser.execute_script(
             "arguments[0].scrollIntoView({block: 'center'});", inp
         )
+        time.sleep(0.5)
+        # Use focus + click pattern for reliability (avoids overlay interception)
+        self.browser.execute_script("arguments[0].focus();", inp)
         time.sleep(0.3)
-        inp.click()
+        try:
+            inp.click()
+        except Exception:
+            self.browser.execute_script("arguments[0].click();", inp)
         inp.send_keys(Keys.COMMAND + "a")
         inp.send_keys(Keys.BACKSPACE)
         inp.send_keys(str(value))
+        inp.send_keys(Keys.TAB)
         self.logger.info(f"Filled conductance value: {value}")
         time.sleep(0.5)
 

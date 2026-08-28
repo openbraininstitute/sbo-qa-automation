@@ -5,6 +5,7 @@ import time
 
 from selenium.common import ElementNotVisibleException, TimeoutException, \
     StaleElementReferenceException
+from selenium.webdriver.common.by import By
 
 from pages.explore_page import ExplorePage
 from locators.explore_morphology_locators import ExploreMorphologyPageLocators
@@ -29,6 +30,12 @@ class ExploreMorphologyPage(ExplorePage):
                     raise RuntimeError("The Explore Morphology page did not load within 60 seconds")
             return self.browser.current_url
         return None
+
+    def wait_for_page_ready(self, timeout=30):
+        """Wait for AG Grid listing to be ready."""
+        super().wait_for_page_ready(timeout=timeout)
+        self.find_element(ExploreMorphologyPageLocators.TABLE, timeout=timeout)
+        self.find_element(ExploreMorphologyPageLocators.LV_NAME, timeout=timeout)
 
     def clear_filters_btn(self):
         return self.find_element(ExploreMorphologyPageLocators.CLEAR_FILTERS_BTN)
@@ -74,7 +81,14 @@ class ExploreMorphologyPage(ExplorePage):
         return self.is_visible(ExploreMorphologyPageLocators.BRAIN_REGION_COLUMN_TITLE)
 
     def find_br_sort_arrow(self):
-        return self.element_visibility(ExploreMorphologyPageLocators.BR_SORT_ARROW)
+        # Prefer the header label; fall back to the whole header cell
+        try:
+            return self.element_visibility(
+                (By.CSS_SELECTOR, ".ag-header-cell[col-id='brainRegion'] .ag-header-cell-label"),
+                timeout=5,
+            )
+        except TimeoutException:
+            return self.element_visibility(ExploreMorphologyPageLocators.LV_BRAIN_REGION)
 
     def find_br_sorted(self):
         return self.element_visibility(ExploreMorphologyPageLocators.BR_SORTED)

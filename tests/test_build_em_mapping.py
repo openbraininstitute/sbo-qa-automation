@@ -199,7 +199,11 @@ class TestBuildEMMapping:
         logger.info("Clicked Generate build(s), waiting for generation...")
 
         # ── Step 32: Results tab active ──────────────────────────────────
-        results_active = page.wait_for_results_tab_active(timeout=60)
+        results_active = page.wait_for_results_tab_active(timeout=120)
+        if not results_active:
+            credit_msg = page.get_blocking_credit_message(timeout=3)
+            if credit_msg:
+                pytest.skip(f"Insufficient project credits for build generation: {credit_msg}")
         assert results_active, "Results tab should become active after generation"
         logger.info("Results tab is active")
 

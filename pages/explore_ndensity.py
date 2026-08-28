@@ -4,6 +4,7 @@
 import time
 
 from selenium.common import TimeoutException
+from selenium.webdriver.common.by import By
 
 from pages.explore_page import ExplorePage
 from locators.explore_ndensity_locators import ExploreNDensityPageLocators
@@ -28,6 +29,11 @@ class ExploreNeuronDensityPage(ExplorePage):
                 if attempt == retries - 1:
                     raise RuntimeError("The Explore page failed to load after multiple attempts.")
             return self.browser.current_url
+
+    def wait_for_page_ready(self, timeout=30):
+        """Wait for AG Grid listing to be ready."""
+        super().wait_for_page_ready(timeout=timeout)
+        self.find_element(ExploreNDensityPageLocators.LV_NAME, timeout=timeout)
 
     def wait_for_ndensity_tab(self, timeout=60):
         """
@@ -70,52 +76,57 @@ class ExploreNeuronDensityPage(ExplorePage):
         time.sleep(2)
 
     def find_column_headers(self, column_locators, timeout=30):
+        """Return AG Grid header elements, reading each immediately after scroll.
+
+        AG Grid may virtualize horizontally, so earlier header nodes can go stale
+        after scrolling later columns into view. We re-find each locator right
+        before appending so callers get a usable reference for that column.
+        """
         column_headers = []
 
         for locator in column_locators:
             self.logger.info(f"Checking locator: {locator}")
-
             try:
-                elements = self.find_all_elements(locator)
-
-                if not elements:
-                    self.logger.warning(f"No elements found with locator {locator}")
-                    continue
-
-                element = elements[0]
-
-                # Scroll element into center of view (horizontal + vertical)
-                self.logger.debug(f"Scrolling element into view: {locator}")
-                self.browser.execute_script("""
-                    arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});
-                """, element)
-
-                time.sleep(0.3)  # Allow layout to settle
-
-                # If element is not visible, try clicking the right arrow to scroll table horizontally
+                element = self.find_element(locator, timeout=timeout)
                 try:
-                    self.element_visibility(locator, timeout=5)
-                except TimeoutException:
-                    self.logger.info(f"Column not visible after scrollIntoView, clicking right arrow...")
+                    self.browser.execute_script(
+                        "arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});",
+                        element,
+                    )
+                    time.sleep(0.3)
+                except Exception as e:
+                    self.logger.debug(f"scrollIntoView skipped for {locator}: {e}")
                     self._click_table_scroll_right()
-                    time.sleep(1)
+                    time.sleep(0.5)
 
-                # Check visibility **after** scroll
-                self.element_visibility(locator, timeout=timeout)
-
-                # Add all matching elements (if >1), or just the one
-                if len(elements) > 1:
-                    self.logger.info(f"Found multiple elements for {locator}")
-                    column_headers.extend(elements)
-                else:
-                    column_headers.append(element)
-
+                # Fresh reference after scroll / possible virtualization
+                element = self.find_element(locator, timeout=timeout)
+                # Force a text read now so we fail fast if the node is unusable
+                _ = element.text
+                column_headers.append(element)
             except TimeoutException:
-                self.logger.error(f"Timeout: Column header with locator {locator} is not visible after {timeout}s")
+                self.logger.error(f"Timeout: Column header with locator {locator} is not present after {timeout}s")
                 raise
 
         self.logger.info(f"Found {len(column_headers)} column headers")
         return column_headers
+
+    def get_column_header_texts(self, column_locators, timeout=30):
+        """Return header label texts for the given locators (scroll-safe)."""
+        texts = []
+        for locator in column_locators:
+            element = self.find_element(locator, timeout=timeout)
+            try:
+                self.browser.execute_script(
+                    "arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});",
+                    element,
+                )
+                time.sleep(0.2)
+            except Exception:
+                pass
+            element = self.find_element(locator, timeout=timeout)
+            texts.append((element.text or "").strip())
+        return texts
 
     def _click_table_scroll_right(self, clicks=3):
         """Click the right arrow button to scroll the table horizontally."""
@@ -205,7 +216,17 @@ class ExploreNeuronDensityPage(ExplorePage):
         return self.find_element(ExploreNDensityPageLocators.DV_NUM_MEAS_VALUE)
 
     def lv_br_row1(self):
-        return self.find_element(ExploreNDensityPageLocators.LV_BR_ROW1)
+        # Prefer brain-region cell; fall back to name cell if needed
+        try:
+            return self.find_element(
+                (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-cell[col-id='brainRegion']"),
+                timeout=10,
+            )
+        except TimeoutException:
+            return self.find_element(
+                (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-cell[col-id='name']"),
+                timeout=10,
+            )
 
     def scroll_sideways(self):
         return self.element_visibility(ExploreNDensityPageLocators.SCROLL_SIDEWAYS)

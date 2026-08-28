@@ -46,9 +46,26 @@ class ExploreSynaptomeDataPage(ExplorePage):
         """Find the search button"""
         return self.find_element(ExploreSynaptomePageLocators.SEARCH_BUTTON, timeout)
 
+    def open_search(self, timeout=10):
+        """Open the search input if it is collapsed behind the toolbar button."""
+        try:
+            return self.element_to_be_clickable(
+                ExploreSynaptomePageLocators.INPUT_PLACEHOLDER, timeout=2
+            )
+        except TimeoutException:
+            btn = self.element_to_be_clickable(
+                ExploreSynaptomePageLocators.SEARCH_BUTTON, timeout=timeout
+            )
+            btn.click()
+            self.logger.info("Opened search toolbar")
+            time.sleep(1)
+            return self.element_to_be_clickable(
+                ExploreSynaptomePageLocators.INPUT_PLACEHOLDER, timeout=timeout
+            )
+
     def input_placeholder(self, timeout=20):
-        """Find the search input field"""
-        return self.find_element(ExploreSynaptomePageLocators.INPUT_PLACEHOLDER, timeout)
+        """Find the search input field, opening the toolbar search if needed."""
+        return self.open_search(timeout=timeout)
 
     def find_lv_row(self):
         """Find the table body with rows"""

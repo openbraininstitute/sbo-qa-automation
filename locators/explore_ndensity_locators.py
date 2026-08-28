@@ -27,28 +27,23 @@ class ExploreNDensityPageLocators:
         "//div[@data-label='brain-region-switcher']//span[contains(@class,'font-bold')]"
         " | //div[@aria-label='brain-region-banner']//span[contains(@class, 'font-bold')]",
     )
-    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
-    TABLE_CELLS = (
-        By.CSS_SELECTOR,
-        "tbody.ant-table-tbody td.ant-table-cell.text-primary-7.cursor-pointer.ant"
-        "-table-cell-ellipsis")
+    TABLE_ROWS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
+    TABLE_CELLS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-cell")
     NDENSITY_TAB = (By.CSS_SELECTOR, "a#counter-experimental_neuron_density")
     LV_THUMBNAIL = (By.XPATH, "//img[starts-with(@alt,'Morphology preview')]")
-    LV_BRAIN_REGION = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Brain region']")
-    LV_MTYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='M-type']")
-    LV_ETYPE = (By.XPATH, "//th[@data-testid='column-header']//div[text()='E-type']")
-    LV_DENSITY = (By.XPATH, "//th[@data-testid='column-header']//div[contains(text(),'Density')]")
-    LV_NMEASUREMENTS = (By.XPATH, "//th[@data-testid='column-header']//div[contains(text(),'N° of "
-                                  "measurements')]")
-    LV_NAME = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Name']")
-    LV_SPECIES = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Species']")
-    LV_AGE = (By.XPATH, "//th[@data-testid='column-header']//div[contains(text(),'Age')]")
-    LV_CONTRIBUTORS = (By.XPATH, "//th[@data-testid='column-header']//div[text()='Contributors']")
-    LV_REGISTRATION_DATE = (By.XPATH, "//th[@data-testid='column-header']//div[text("
-                                      ")='Registration "
-                                      "date']")
+    LV_BRAIN_REGION = (By.CSS_SELECTOR, ".ag-header-cell[col-id='brainRegion']")
+    LV_MTYPE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='mtype']")
+    LV_ETYPE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='etype']")
+    LV_DENSITY = (By.CSS_SELECTOR, ".ag-header-cell[col-id='density']")
+    LV_NMEASUREMENTS = (By.CSS_SELECTOR, ".ag-header-cell[col-id='numberOfMeasurements']")
+    LV_NAME = (By.CSS_SELECTOR, ".ag-header-cell[col-id='name']")
+    LV_SPECIES = (By.CSS_SELECTOR, ".ag-header-cell[col-id='species']")
+    LV_AGE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='subjectAge']")
+    LV_CONTRIBUTORS = (By.CSS_SELECTOR, ".ag-header-cell[col-id='contributions']")
+    LV_REGISTRATION_DATE = (By.CSS_SELECTOR, ".ag-header-cell[col-id='registrationDate']")
     LV_FILTER_MTYPE = (By.XPATH, "//span[text()='M-type']")
-    LV_BR_ROW1 = (By.XPATH, "(//td[@class='ant-table-cell text-primary-7 cursor-pointer before:!content-none ant-table-cell-ellipsis'])[1]")
+    LV_BR_ROW1 = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-cell[col-id='brainRegion'], "
+                                   ".ag-center-cols-container .ag-row[role='row'] .ag-cell[col-id='name']")
     DV_NAME_TITLE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(@class,'uppercase') and text()='Name']")
     DV_DESC_TITLE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(@class,'uppercase') and text()='Description']")
     DV_CONTRIBUTORS_TITLE = (By.XPATH, "//div[contains(@class,'text-primary-3') and contains(@class,'uppercase') and text("

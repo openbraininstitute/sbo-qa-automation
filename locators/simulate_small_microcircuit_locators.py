@@ -32,15 +32,19 @@ class SimulateSmallMicrocircuitLocators:
     PUBLIC_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Public')] or text()='Public']")
     PROJECT_TAB = (By.XPATH, "//button[@role='tab'][.//span[contains(text(),'Project')] or text()='Project']")
 
-    """Column headers in the model picker table."""
-    COLUMN_HEADERS = (By.CSS_SELECTOR, "th[data-testid='column-header']")
+    """Column headers in the model picker table (AG Grid)."""
+    COLUMN_HEADERS = (By.CSS_SELECTOR, ".ag-header-cell[role='columnheader']")
     TABLE_SCROLL_END_BTN = (
         By.CSS_SELECTOR,
-        "div.ml-auto button.ant-btn-circle.ant-btn-icon-only"
+        ".ag-body-horizontal-scroll-viewport, .ag-center-cols-viewport"
     )
 
-    """Table rows."""
-    TABLE_ROWS = (By.CSS_SELECTOR, "tbody.ant-table-tbody tr.ant-table-row")
+    """Table rows (AG Grid)."""
+    TABLE_ROWS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
+    TABLE_ROW_NAME_CELLS = (
+        By.CSS_SELECTOR,
+        ".ag-center-cols-container .ag-row[role='row'] .ag-cell[col-id='name']",
+    )
 
     """Pagination."""
     PAGINATION_CONTAINER = (By.CSS_SELECTOR, "ul.ant-pagination")
@@ -218,7 +222,10 @@ class SimulateSmallMicrocircuitLocators:
     )
 
     """Simulations tab: JSON preview (right column)."""
-    JSON_PREVIEW_CODE = (By.CSS_SELECTOR, "pre.shiki code")
+    JSON_PREVIEW_CODE = (
+        By.CSS_SELECTOR,
+        "pre.shiki code, pre.shiki, pre code, pre, .monaco-editor .view-lines"
+    )
     JSON_PREVIEW_COPY_BTN = (
         By.XPATH,
         "//button[.//span[@aria-label='copy']]"

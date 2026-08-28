@@ -59,10 +59,20 @@ class SimulateSynaptomePage(HomePage):
     # ── Model picker ─────────────────────────────────────────────────────
 
     def click_public_tab(self):
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
         el = self.find_element(Loc.PUBLIC_TAB, timeout=15)
         el.click()
         self.logger.info("Clicked Public tab")
         time.sleep(3)
+        try:
+            WebDriverWait(self.browser, 30).until(
+                EC.presence_of_element_located(Loc.TABLE_ROWS)
+            )
+            self.logger.info("Table rows appeared after Public tab click")
+        except Exception:
+            self.logger.warning("Table rows not found within 30s after Public tab click")
+        time.sleep(1)
 
     def get_table_rows(self, timeout=15):
         self.find_element(Loc.TABLE_ROWS, timeout=timeout)
@@ -78,26 +88,20 @@ class SimulateSynaptomePage(HomePage):
         if not rows:
             raise RuntimeError("No rows found in the table")
 
-        headers = self.browser.find_elements(*Loc.COLUMN_HEADERS)
-        creator_idx = date_idx = None
-        for i, h in enumerate(headers):
-            text = h.text.strip()
-            if 'Created by' in text:
-                creator_idx = i
-            if 'Registration date' in text:
-                date_idx = i
-
         visible_rows = rows[:min(10, len(rows))]
         eligible = []
         for row in visible_rows:
-            cells = row.find_elements("tag name", "td")
             skip = False
-            if creator_idx is not None and date_idx is not None and len(cells) > max(creator_idx, date_idx):
-                creator = cells[creator_idx].text.strip()
-                reg_date = cells[date_idx].text.strip()
+            try:
+                creator_cells = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='created_by'], .ag-cell[col-id='createdBy']")
+                date_cells = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='creation_date'], .ag-cell[col-id='registrationDate']")
+                creator = creator_cells[0].text.strip() if creator_cells else ""
+                reg_date = date_cells[0].text.strip() if date_cells else ""
                 if exclude_creator in creator and exclude_date in reg_date:
                     self.logger.info(f"Skipping row: creator='{creator}', date='{reg_date}'")
                     skip = True
+            except Exception:
+                pass
             if not skip:
                 eligible.append(row)
 
@@ -106,16 +110,25 @@ class SimulateSynaptomePage(HomePage):
             eligible = visible_rows
 
         row = random.choice(eligible)
-        row_text = row.text.split('\n')[0][:60]
+        click_target = row
+        name_cells = row.find_elements(By.CSS_SELECTOR, ".ag-cell[col-id='name']")
+        if name_cells:
+            click_target = name_cells[0]
+        row_text = (click_target.text or row.text).split('\n')[0][:60]
         self.logger.info(f"Clicking row: '{row_text}...'")
-        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", row)
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", click_target)
         time.sleep(1)
         try:
-            ActionChains(self.browser).move_to_element(row).click().perform()
+            ActionChains(self.browser).move_to_element(click_target).click().perform()
         except Exception:
-            self.browser.execute_script("arguments[0].click();", row)
+            self.browser.execute_script("arguments[0].click();", click_target)
         time.sleep(3)
         return row_text
+
+    def as_synaptome_beta_page(self):
+        """Hand off to SimulateSynaptomeBetaPage for shared scan-config UI steps."""
+        from pages.simulate_synaptome_beta_page import SimulateSynaptomeBetaPage
+        return SimulateSynaptomeBetaPage(self.browser, self.wait, self.logger, self.lab_url)
 
     # ── Filter panel ─────────────────────────────────────────────────────
 
@@ -124,29 +137,56 @@ class SimulateSynaptomePage(HomePage):
         btn.click()
         self.logger.info("Opened filter panel")
         time.sleep(2)
+        try:
+            self.find_element(Loc.FILTERS_PANE, timeout=5)
+        except Exception:
+            self.logger.warning("Filters pane not detected after open")
 
     def close_filter_panel(self):
-        btn = self.find_element(Loc.FILTER_CLOSE_BUTTON, timeout=5)
-        btn.click()
-        self.logger.info("Closed filter panel")
-        time.sleep(1)
+        # Prefer explicit close; otherwise toggle Filters / Escape
+        try:
+            btn = self.find_element(Loc.FILTER_CLOSE_BUTTON, timeout=3)
+            btn.click()
+            self.logger.info("Closed filter panel via Close")
+            time.sleep(1)
+            return
+        except Exception:
+            pass
+        try:
+            btn = self.find_element(Loc.FILTER_BUTTON, timeout=3)
+            btn.click()
+            self.logger.info("Closed filter panel via Filters toggle")
+            time.sleep(1)
+            return
+        except Exception:
+            pass
+        try:
+            ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+            self.logger.info("Closed filter panel via Escape")
+            time.sleep(1)
+        except Exception as e:
+            self.logger.warning(f"Could not close filter panel: {e}")
 
     def click_random_filter_accordion(self, timeout=15):
-        """Click a random filter accordion trigger to verify it's clickable."""
+        """Click a random filter field (advanced menu item or legacy accordion)."""
         try:
-            triggers = self.find_all_elements(Loc.FILTER_ACCORDION_TRIGGERS, timeout=timeout)
+            items = self.find_all_elements(Loc.FILTER_MENU_ITEMS, timeout=timeout)
         except Exception:
-            self.logger.warning("No filter accordion triggers found")
+            items = []
+        if not items:
+            try:
+                items = self.find_all_elements(Loc.FILTER_ACCORDION_TRIGGERS, timeout=5)
+            except Exception:
+                items = []
+        if not items:
+            self.logger.warning("No filter fields found")
             return None
-        if not triggers:
-            self.logger.warning("No filter accordion triggers found")
-            return None
-        trigger = random.choice(triggers)
-        label = trigger.text.strip()
+        trigger = random.choice(items)
+        label = (trigger.text or "").strip().split("\n")[0]
         trigger.click()
-        self.logger.info(f"Clicked filter accordion: '{label}'")
+        self.logger.info(f"Clicked filter field: '{label}'")
         time.sleep(1)
-        return label
+        return label or "filter"
 
     # ── Mini-detail view ─────────────────────────────────────────────────
 

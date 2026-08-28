@@ -157,21 +157,33 @@ class BuildEMMappingPage(HomePage):
         header_texts = []
         for h in headers:
             try:
-                title_div = h.find_element(By.CSS_SELECTOR, "div[class*='columnTitle']")
-                header_texts.append(title_div.text.strip())
+                title_div = h.find_element(
+                    By.CSS_SELECTOR,
+                    ".ag-header-cell-text, div[class*='columnTitle'], .ag-header-cell-label",
+                )
+                text = (title_div.text or "").strip().split("\n")[0]
             except Exception:
-                header_texts.append(h.text.strip().split("\n")[0])
+                text = (h.text or "").strip().split("\n")[0]
+            if text:
+                header_texts.append(text)
         self.logger.info(f"Column headers found: {header_texts}")
         results = {}
         for name in expected:
-            results[name] = {'present': name in header_texts}
+            results[name] = {
+                'present': any(name.lower() in h.lower() for h in header_texts)
+            }
         return results
 
     def tick_random_checkbox(self):
-        """Tick a random row checkbox in the table."""
+        """Tick a random data-row checkbox (excludes header select-all)."""
         import random
         try:
-            checkboxes = self.browser.find_elements(*Loc.TABLE_CHECKBOX)
+            checkboxes = self.browser.find_elements(
+                By.CSS_SELECTOR,
+                ".ag-pinned-left-cols-container .ag-row input.ag-checkbox-input",
+            )
+            if not checkboxes:
+                checkboxes = self.browser.find_elements(*Loc.TABLE_CHECKBOX)
             if not checkboxes:
                 self.logger.warning("No checkboxes found")
                 return False
@@ -191,7 +203,15 @@ class BuildEMMappingPage(HomePage):
         """Get the text of the Use selection button."""
         try:
             btn = self.find_element(Loc.USE_SELECTION_BTN, timeout=10)
-            text = btn.text.strip()
+            text = (btn.text or "").strip()
+            if "Use selection" not in text:
+                # Prefer the footer action button if a sibling (e.g. Change) was matched.
+                candidates = self.browser.find_elements(*Loc.USE_SELECTION_BTN)
+                for candidate in candidates:
+                    candidate_text = (candidate.text or "").strip()
+                    if "Use selection" in candidate_text:
+                        text = candidate_text
+                        break
             self.logger.info(f"Use selection button text: '{text}'")
             return text
         except TimeoutException:
@@ -201,6 +221,11 @@ class BuildEMMappingPage(HomePage):
         """Check if the Use selection button is enabled."""
         try:
             btn = self.find_element(Loc.USE_SELECTION_BTN, timeout=10)
+            if "Use selection" not in (btn.text or ""):
+                for candidate in self.browser.find_elements(*Loc.USE_SELECTION_BTN):
+                    if "Use selection" in (candidate.text or ""):
+                        btn = candidate
+                        break
             disabled = btn.get_attribute("disabled")
             return disabled is None
         except TimeoutException:
@@ -262,6 +287,12 @@ class BuildEMMappingPage(HomePage):
         """Check if the Results tab is currently active."""
         try:
             tab = self.find_element(Loc.CONFIG_TAB_RESULTS, timeout=5)
+            aria = (tab.get_attribute("aria-selected") or "").lower()
+            if aria == "true":
+                return True
+            data_state = (tab.get_attribute("data-state") or "").lower()
+            if data_state == "active":
+                return True
             classes = tab.get_attribute("class") or ""
             return "text-white" in classes or "from-[#003A8C]" in classes
         except TimeoutException:
@@ -325,14 +356,14 @@ class BuildEMMappingPage(HomePage):
         try:
             el = self.find_element(Loc.INFO_BTN_WARNING_ICON, timeout=timeout)
             return el.is_displayed()
-        except TimeoutException:
+        except (TimeoutException, Exception):
             return False
 
     def is_info_check_icon_visible(self, timeout=5):
         try:
             el = self.find_element(Loc.INFO_BTN_CHECK_ICON, timeout=timeout)
             return el.is_displayed()
-        except TimeoutException:
+        except (TimeoutException, Exception):
             return False
 
     def fill_name(self, name):
@@ -543,23 +574,64 @@ class BuildEMMappingPage(HomePage):
         self.logger.info("Clicked 'Generate build(s)'")
         time.sleep(5)
 
+    def get_blocking_credit_message(self, timeout=3):
+        """Return a credits-related blocking message if visible on the page."""
+        end = time.time() + timeout
+        while time.time() < end:
+            texts = self.browser.execute_script(
+                """
+                const seen = new Set();
+                for (const sel of [
+                  '[role="alert"]', '[role="status"]',
+                  '.ant-message-notice-content', '[data-sonner-toast]',
+                ]) {
+                  for (const e of document.querySelectorAll(sel)) {
+                    const t = (e.innerText || '').trim();
+                    if (t) seen.add(t);
+                  }
+                }
+                const body = (document.body && document.body.innerText) || '';
+                if (/not enough credits|insufficient credits|does not have enough credits/i.test(body)) {
+                  const match = body.match(/[^\\n]*not enough credits[^\\n]*/i);
+                  if (match) seen.add(match[0].trim());
+                }
+                return [...seen];
+                """
+            ) or []
+            for text in texts:
+                if "credit" in text.lower():
+                    return text
+            time.sleep(0.5)
+        return None
+
     # ── Results tab ──────────────────────────────────────────────────────
 
-    def wait_for_results_tab_active(self, timeout=60):
-        """Wait for Results tab to become active after generation."""
+    def wait_for_results_tab_active(self, timeout=120):
+        """Wait for Results tab/content after generation."""
         start = time.time()
         while time.time() - start < timeout:
+            credit_msg = self.get_blocking_credit_message(timeout=1)
+            if credit_msg:
+                self.logger.warning(f"Build generation blocked: {credit_msg}")
+                return False
+
             if self.is_results_tab_active():
                 self.logger.info("Results tab is active")
                 return True
-            time.sleep(2)
-        # Try clicking it manually
-        try:
-            self.click_results_tab()
-            time.sleep(3)
-            return self.is_results_tab_active()
-        except Exception:
-            return False
+            if self.get_build_cards(timeout=2):
+                self.logger.info("Results content visible (build cards found)")
+                return True
+
+            try:
+                self.click_results_tab()
+            except Exception:
+                pass
+            time.sleep(5)
+
+        credit_msg = self.get_blocking_credit_message(timeout=2)
+        if credit_msg:
+            self.logger.warning(f"Build generation blocked: {credit_msg}")
+        return False
 
     def get_build_cards(self, timeout=10):
         try:

@@ -39,8 +39,8 @@ class BuildSingleNeuronLocators:
     SN_MTYPE = (By.XPATH, "//div[contains(@class, 'text-neutral-4') and text()='m-type']/following-sibling::div")
     SN_ETYPE = (By.XPATH, "//div[contains(@class, 'text-neutral-4') and text()='e-type']/following-sibling::div")
     START_BUILDING_BTN = (By.XPATH, "//button[normalize-space()='Start building']")
-    TICK_SEARCHED_M_RECORD = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[2]//span[@class='ant-radio-inner']")
-    TICK_SEARCHED_E_RECORD = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[2]//span[@class='ant-radio-inner']")
+    TICK_SEARCHED_M_RECORD = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-selection-checkbox input")
+    TICK_SEARCHED_E_RECORD = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-selection-checkbox input")
 
     # Workflow Build Locators
     # Main workflow page - Build category card (first card in the category carousel)
@@ -97,16 +97,16 @@ class BuildSingleNeuronLocators:
     MODELING_SECTION = (By.XPATH, "//div[text()='Modeling']")
     
     # M-model and E-model table selectors (for when redirected to selection tables)
-    M_MODEL_TABLE = (By.CSS_SELECTOR, "tbody.ant-table-tbody")
-    M_MODEL_RADIO_BUTTON = (By.XPATH, "(//span[@class='ant-radio-inner'])[2]")
-    FIRST_M_MODEL_RADIO = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[2]//input[@type='radio']")
-    SECOND_M_MODEL_RADIO = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[3]//input[@type='radio']")
-    
-    E_MODEL_TABLE = (By.ID, "data-table-with-filters")
-    E_MODEL_RADIO_BUTTON = (By.XPATH, "//table//input[@type='radio'][1] | //table//tr[position()>1][1]//input[@type='radio']")
-    FIRST_E_MODEL_RADIO = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[2]//input[@type='radio']")
-    SECOND_E_MODEL_RADIO = (By.XPATH, "//table[@id='data-table-with-filters']//tbody//tr[3]//input[@type='radio']")
-    
+    M_MODEL_TABLE = (By.CSS_SELECTOR, ".ag-root-wrapper, .ag-root")
+    M_MODEL_RADIO_BUTTON = (By.CSS_SELECTOR, ".ag-selection-checkbox input, .ag-cell[col-id='ag-Grid-SelectionColumn'] input")
+    FIRST_M_MODEL_RADIO = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-selection-checkbox input")
+    SECOND_M_MODEL_RADIO = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-selection-checkbox input")
+
+    E_MODEL_TABLE = (By.CSS_SELECTOR, ".ag-root-wrapper, .ag-root")
+    E_MODEL_RADIO_BUTTON = (By.CSS_SELECTOR, ".ag-selection-checkbox input, .ag-cell[col-id='ag-Grid-SelectionColumn'] input")
+    FIRST_E_MODEL_RADIO = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-selection-checkbox input")
+    SECOND_E_MODEL_RADIO = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row'] .ag-selection-checkbox input")
+
     # Status indicators
     SELECT_M_MODEL_TEXT = (By.XPATH, "//div[text()='Select M-model']")
     SELECT_E_MODEL_TEXT = (By.XPATH, "//div[text()='Select E-model']")

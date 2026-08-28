@@ -29,13 +29,23 @@ class ExploreSynaptomePageLocators:
         By.XPATH,
         "//button[@aria-label='Open search'] | //button[@aria-label='Close search']",
     )
-    SEARCH_INPUT = (By.CSS_SELECTOR, "input[placeholder='Search for entities...']")
-    INPUT_PLACEHOLDER = (By.CSS_SELECTOR, "input[placeholder='Search for entities...']")
-    
-    # Table
-    LV_ROW = (By.CSS_SELECTOR, ".ant-table-body")
-    LV_FIRST_ROW = (By.XPATH, "//tr[@data-row-key][1]")
-    LV_FIRST_ROW_CELL = (By.XPATH, "//tr[@data-row-key][1]//td[2]")  # Click on the name cell
+    SEARCH_INPUT = (
+        By.CSS_SELECTOR,
+        "input[placeholder*='Search for entities'], input[placeholder*='Search for resources']",
+    )
+    INPUT_PLACEHOLDER = (
+        By.CSS_SELECTOR,
+        "input[placeholder*='Search for entities'], input[placeholder*='Search for resources']",
+    )
+
+    # Table (AG Grid)
+    TABLE_ROWS = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
+    LV_ROW = (By.CSS_SELECTOR, ".ag-root-wrapper, .ag-root, .ag-center-cols-container")
+    LV_FIRST_ROW = (By.CSS_SELECTOR, ".ag-center-cols-container .ag-row[role='row']")
+    LV_FIRST_ROW_CELL = (
+        By.CSS_SELECTOR,
+        ".ag-center-cols-container .ag-row[role='row'] .ag-cell[col-id='name']",
+    )
     
     # Detail view
     MINI_DETAIL_VIEW = (By.CSS_SELECTOR, "a[title='Go to details page']")

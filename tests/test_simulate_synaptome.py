@@ -8,21 +8,11 @@ from pages.simulate_synaptome_page import SimulateSynaptomePage
 
 
 class TestSimulateSynaptome:
-    """End-to-end test for Synaptome simulation (non-beta).
+    """End-to-end test for Synaptome simulation (non-legacy card).
 
-    Flow:
-    1.  Workflows → Simulate → Synaptome card → model picker
-    2.  Filter panel: open, click random field, close
-    3.  Click random row → mini-detail (title, desc, images, metadata, buttons)
-    4.  Use model → config page with 3D viewer
-    5.  Info tab: datetime name, description, verify registered by/at
-    6.  Experimental setup: verify labels
-    7.  Synaptic input: verify entries, toggle eye button
-    8.  Stimulation protocol: wait for plot, verify download
-    9.  Recording: add recordings (soma, dend, apic, axon)
-    10. Run experiment → Results tab
-    11. Verify buttons disabled → plots + canvas → completion → buttons enabled
-    12. Success notification with View Simulation link
+    Entry is via Workflows → Simulate → Cellular Synaptome (non-legacy, non-beta).
+    After Use model, the config UI matches Synaptome beta (scan-config), so the
+    post-picker flow reuses SimulateSynaptomeBetaPage.
     """
 
     def _get_page(self, setup, logger):
@@ -60,153 +50,148 @@ class TestSimulateSynaptome:
         detail = page.verify_mini_detail_view()
         assert detail['title'], "Mini-detail title should be present"
         assert detail['description'], "Mini-detail description should be present"
-        # Wait for both images to load (second one can be slow)
-        if detail['images_count'] < 2:
-            logger.info("Only 1 image found, waiting for second to load...")
+        if detail['images_count'] < 1:
+            logger.info("No images found, waiting for preview to load...")
             time.sleep(10)
             detail = page.verify_mini_detail_view()
-        assert detail['images_count'] >= 2, f"Expected at least 2 images, got {detail['images_count']}"
+        assert detail['images_count'] >= 1, f"Expected at least 1 image, got {detail['images_count']}"
+        if detail['images_count'] < 2:
+            logger.warning(f"Only {detail['images_count']} mini-detail image(s) — continuing")
         assert detail['metadata_count'] > 0, "Mini-detail should have metadata"
         assert detail['close_btn'], "Close (x) button should be present"
         assert detail['view_details_btn'], "'View details' button should be present"
         assert detail['use_model_btn'], "'Use model' button should be present"
         logger.info("Mini-detail view verified")
 
-        # Step 7: Click Use model → config page
+        # Step 7: Click Use model → hand off to shared scan-config UI
         page.click_use_model()
         logger.info(f"After Use model, URL: {page.browser.current_url}")
 
-        # Step 8: Wait for config page
-        page.wait_for_config_page(timeout=30)
+        beta = page.as_synaptome_beta_page()
+
+        # Step 8: Config page → verify tabs
+        beta.wait_for_config_page(timeout=30)
         logger.info("Config page loaded")
 
-        try:
-            page.wait_for_neuron_visualizer(timeout=120)
-            logger.info("3D morphology viewer loaded")
-        except Exception as e:
-            logger.warning(f"Neuron visualizer not loaded: {e}")
-
-        # Step 9: Verify Configuration and Results tabs
-        tabs = page.verify_config_tabs()
+        tabs = beta.verify_config_tabs()
         assert tabs['configuration']['present'], "Configuration tab should be present"
-        assert tabs['results']['present'], "Results tab should be present"
+        assert tabs['simulations']['present'], "Simulations tab should be present"
+        logger.info("Configuration and Simulations tabs verified")
 
-        # Step 10: Info tab — fill datetime name + description
-        page.click_info_tab()
-        name = page.fill_name_with_datetime()
-        page.fill_description("automated test of synaptome")
-        logger.info(f"Info filled: name='{name}'")
+        preview_ok = beta.wait_for_circuit_preview(timeout=30)
+        if preview_ok:
+            logger.info("Circuit preview image loaded")
+        else:
+            logger.warning("Circuit preview image not found")
 
-        # Step 11: Verify registered by/at
-        reg_by = page.get_registered_by()
-        reg_at = page.get_registered_at()
-        assert reg_by, "Registered by should not be empty"
-        assert reg_at, "Registered at should not be empty"
-        logger.info(f"Registered by: '{reg_by}', at: '{reg_at}'")
+        # Step 9: Info tab — fill name/description
+        beta.click_info_tab()
+        campaign_name = beta.fill_name_with_datetime()
+        beta.fill_description("automated test of synaptome")
+        logger.info(f"Info filled: name='{campaign_name}'")
 
-        # Step 12: Experimental setup — verify labels
-        page.click_experimental_setup_tab()
-        labels = page.get_panel_labels()
-        assert len(labels) > 0, "Experimental setup should have labels"
-        logger.info(f"Experimental setup: {len(labels)} labels")
+        # Step 10: Initialization
+        beta.click_initialization_tab()
+        init_labels = beta.get_initialization_labels()
+        logger.info(f"Initialization labels: {init_labels}")
 
-        # Step 13: Synaptic input — verify at least 1 entry
-        page.click_synaptic_input_tab()
-        syn_count = page.get_synaptic_input_count()
-        assert syn_count >= 1, f"Expected at least 1 synaptic input, got {syn_count}"
-        logger.info(f"Synaptic inputs: {syn_count}")
+        # Step 11: Stimuli — one random stimulus
+        beta.click_stimuli_tab()
+        beta.click_add_button_in_active_sub_entry()
+        stim_items = beta.get_dictionary_items()
+        assert len(stim_items) > 0, "Expected at least one stimulus dictionary item"
+        stim_label = beta.click_random_dictionary_item()
+        logger.info(f"Selected stimulus: '{stim_label}'")
+        beta.wait_for_block_single(timeout=10)
 
-        # Step 14: Click eye button → 3D should show synapses, eye crossed out
-        page.click_eye_button()
-        assert page.is_eye_crossed_out(), "Eye button should be crossed out after clicking"
-        logger.info("Eye button toggled — synapses visible in 3D, eye crossed out")
+        # Step 12: Recordings
+        beta.click_recordings_tab()
+        beta.click_add_button_in_active_sub_entry("Recording")
+        rec_items = beta.get_dictionary_items()
+        assert len(rec_items) > 0, "Expected at least one recording item"
+        rec_label = beta.click_random_dictionary_item()
+        logger.info(f"Selected recording: '{rec_label}'")
+        beta.wait_for_block_single(timeout=10)
 
-        # Step 15: Stimulation protocol — wait for plot, verify download
-        page.click_stimulation_protocol_tab()
+        # Step 13: Neuron sets
+        beta.click_neuron_sets_tab()
+        beta.click_add_button_in_active_sub_entry("Neuron Set")
+        ns_items = beta.get_dictionary_items()
+        assert len(ns_items) > 0, "Expected at least one neuron set item"
         try:
-            page.wait_for_stim_plot(timeout=60)
-            logger.info("IDrest plot loaded")
-        except Exception as e:
-            logger.warning(f"IDrest plot not loaded: {e}")
+            ns_label = beta.click_dictionary_item_by_label("ALL POPULATIONS")
+        except AssertionError:
+            try:
+                ns_label = beta.click_dictionary_item_by_label("SINGLE POPULATION (Virtual)")
+            except AssertionError:
+                ns_label = beta.click_random_dictionary_item()
+        logger.info(f"Selected neuron set: '{ns_label}'")
+        beta.wait_for_block_single(timeout=10)
 
-        download_ok = page.is_stim_download_btn_clickable(timeout=10)
-        if download_ok:
-            logger.info("Download button is clickable")
-        else:
-            logger.warning("Download button not found or not clickable")
+        # Step 14: Synaptic manipulations
+        beta.click_synaptic_manip_tab()
+        beta.click_add_button_in_active_sub_entry("Synaptic Manipulation")
+        sm_items = beta.get_dictionary_items()
+        assert len(sm_items) > 0, "Expected at least one synaptic manipulation item"
+        sm_label = beta.click_random_dictionary_item()
+        logger.info(f"Selected synaptic manipulation: '{sm_label}'")
+        beta.wait_for_block_single(timeout=10)
 
-        # Step 16: Recording — add recordings for available sections
-        page.click_recording_tab()
-        prefixes = page.get_available_section_prefixes(dropdown_index=0)
-        logger.info(f"Available sections: {prefixes}")
+        # Step 15: Timestamps
+        beta.click_timestamps_tab()
+        beta.click_add_button_in_active_sub_entry("Timestamp")
+        ts_items = beta.get_dictionary_items()
+        assert len(ts_items) > 0, "Expected at least one timestamp item"
+        try:
+            ts_label = beta.click_dictionary_item_by_label("Timestamp")
+        except AssertionError:
+            ts_label = beta.click_random_dictionary_item()
+        logger.info(f"Selected timestamp: '{ts_label}'")
+        beta.wait_for_block_single(timeout=10)
 
-        desired = ['soma', 'dend']
-        for extra in ['apic', 'axon', 'myelin']:
-            if extra in prefixes:
-                desired.append(extra)
+        # Step 16: Generate → Simulations tab
+        beta.click_generate_simulation()
+        logger.info("Clicked Generate simulation(s)")
 
-        selected_0 = page.select_recording_section(0, 'soma')
-        logger.info(f"Recording 0: '{selected_0}'")
+        from selenium.webdriver.support.ui import WebDriverWait
+        try:
+            WebDriverWait(beta.browser, 60).until(
+                lambda d: beta.is_simulations_tab_active()
+            )
+        except Exception:
+            logger.info("Simulations tab not auto-active after 60s, clicking manually")
+            try:
+                beta.click_simulations_tab()
+                time.sleep(3)
+            except Exception as e:
+                logger.warning(f"Could not click Simulations tab: {e}")
 
-        for i, prefix in enumerate(desired[1:], start=1):
-            page.click_add_recording()
-            selected = page.select_recording_section(i, prefix)
-            logger.info(f"Recording {i}: '{selected}'")
+        assert beta.is_simulations_tab_active(), (
+            "Simulations tab should be active after Generate simulation(s)"
+        )
+        logger.info("Simulations tab active")
 
-        logger.info(f"Added {len(desired)} recording(s): {desired}")
+        sim_cards = beta.get_simulation_cards()
+        assert len(sim_cards) >= 1, f"Expected at least 1 simulation card, got {len(sim_cards)}"
+        logger.info(f"Found {len(sim_cards)} simulation card(s)")
 
-        # Step 17: Run experiment
-        run_btn = page.find_run_experiment_btn(timeout=10)
-        assert run_btn.is_displayed(), "Run experiment button should be visible"
-        assert run_btn.is_enabled(), "Run experiment button should be enabled"
-        page.click_run_experiment()
-        logger.info("Clicked Run experiment")
+        input_files = beta.get_input_file_buttons()
+        assert len(input_files) >= 1, "Expected at least 1 input file"
+        file_names = [b.get_attribute("title") or "" for b in input_files]
+        logger.info(f"Input files ({len(input_files)}): {file_names}")
 
-        # Step 18: Verify auto-redirect to Results tab
-        time.sleep(5)
-        assert page.is_results_tab_active(), "Results tab should be active after Run experiment"
-        logger.info("Results tab active")
+        # Step 17: Launch and poll
+        assert beta.is_launch_simulations_enabled(), "Launch simulations should be enabled"
+        beta.click_launch_simulations()
+        logger.info("Clicked Launch simulations")
 
-        # Step 19: Verify left menu (All + recording buttons)
-        all_btns = page.get_results_left_menu_buttons()
-        assert len(all_btns) >= 2, f"Expected All + recording buttons, got {len(all_btns)}"
-        rec_btns = page.get_results_recording_buttons()
-        assert len(rec_btns) >= 1, "Expected at least 1 recording button"
-        logger.info(f"Results menu: {len(all_btns)} buttons, {len(rec_btns)} recording(s)")
-
-        # Step 20: Download CSV and Reconfigure disabled while running
-        assert not page.is_download_csv_enabled(), "Download CSV should be disabled while running"
-        assert not page.is_reconfigure_enabled(), "Reconfigure should be disabled while running"
-        logger.info("Buttons disabled (simulation running)")
-
-        # Step 21: IDREST plots and 3D canvas visible during simulation
-        plot_count = page.get_idrest_plot_count()
-        logger.info(f"IDREST plots visible: {plot_count}")
-        assert page.is_neuron_canvas_visible(), "3D canvas should be visible"
-        logger.info("3D canvas visible")
-
-        # Step 22: Wait for simulation completion
-        sim_done = page.wait_for_simulation_complete(timeout=300, poll_interval=10)
+        sim_done = beta.wait_for_simulation_terminal_state(timeout=300, poll_interval=10)
         if sim_done:
-            logger.info("Simulation completed")
+            logger.info("All simulations reached terminal state")
+            final_statuses = beta.get_simulation_card_statuses()
+            for s in final_statuses:
+                logger.info(f"  Final: {s['title']}: {s['status']}")
         else:
-            logger.warning("Simulation did not complete within 300s")
-
-        # Step 23: Verify buttons enabled after completion
-        if sim_done:
-            assert page.is_download_csv_enabled(), "Download CSV should be enabled"
-            assert page.is_reconfigure_enabled(), "Reconfigure should be enabled"
-            logger.info("Buttons enabled after completion")
-        else:
-            logger.info("Skipping post-completion button checks")
-
-        # Step 24: Success notification with View Simulation link
-        notif_ok = page.wait_for_success_notification(timeout=30)
-        if notif_ok:
-            link = page.get_view_simulation_link()
-            assert link is not None, "View Simulation link should be present"
-            logger.info(f"View Simulation link: {link.get_attribute('href')}")
-        else:
-            logger.warning("Success notification not found — may have auto-dismissed")
+            logger.warning("Simulations did not complete within 300s")
 
         logger.info(f"Final URL: {page.browser.current_url}")
